@@ -8,7 +8,20 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "./scripts/run-tests.sh"
+    "install": "node-pre-gyp install --fallback-to-build",
+    "rebuild": "node-pre-gyp rebuild"
   },
-  "license": "ISC"
+  "gypfile": true,
+  "license": "ISC",
+  "dependencies": {
+    "bindings": "*",
+    "node-pre-gyp": "*"
+  },
+  "binary": {
+    "module_name": "test",
+    "module_path": "build/Release",
+    "host": "https://signalratio.farted.net/ftp/node-pre-gyp",
+    "remote_path": "{name}/v{version}",
+    "package_name": "{module_name}-v{version}-{platform}-{arch}.tar.gz"
+  }
 }
