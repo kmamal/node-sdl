@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "name": "@xyz/sdl",
+  "description": "sdl",
+  "repository": {
+    "type": "git",
+    "url": "git:repos/sdl"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./scripts/run-tests.sh"
+  },
+  "license": "ISC"
+}
