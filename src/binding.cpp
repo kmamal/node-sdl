@@ -79,9 +79,7 @@ fromVariant(napi_env env, const SdlHelpers::Variant & variant, napi_value * resu
   return napi_generic_failure;
 }
 
-
 napi_ref logger_func_ref;
-napi_ref events_func_ref;
 napi_env logger_env = nullptr;
 
 int logger (const char * format, ...)
@@ -108,26 +106,32 @@ int logger (const char * format, ...)
 
 
 napi_value
-setCallbacks(napi_env env, napi_callback_info info)
+initialize(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-
-  napi_value argv[2];
+  size_t argc = 1;
+  napi_value argv[argc];
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   CALL_NAPI(nullptr, napi_create_reference, env, argv[0], 1, &logger_func_ref);
 
-  CALL_NAPI(nullptr, napi_create_reference, env, argv[1], 1, &events_func_ref);
+  SdlHelpers::Variant pixel_formats;
+  CALL_SDL_HELPER(env, getPixelFormats, pixel_formats);
 
-  return nullptr;
+  napi_value object, key, value;
+  CALL_NAPI(nullptr, napi_create_object, env, &object);
+
+  CALL_NAPI(nullptr, fromVariant, env, pixel_formats, &value);
+  CALL_NAPI(nullptr, napi_create_string_latin1, env, "pixel-formats", 13, &key);
+  CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
+
+  return object;
 }
 
 napi_value
 createWindow(napi_env env, napi_callback_info info)
 {
-  size_t argc = 5;
-
-  napi_value argv[5];
+  size_t argc = 6;
+  napi_value argv[argc];
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   size_t title_length;
@@ -141,9 +145,11 @@ createWindow(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_get_value_int32, env, argv[3], &w);
   CALL_NAPI(nullptr, napi_get_value_int32, env, argv[4], &h);
 
+  bool resizable;
+  CALL_NAPI(nullptr, napi_get_value_bool, env, argv[5], &resizable);
+
   int window_id;
-  SdlHelpers::Framebuffer fb;
-  CALL_SDL_HELPER(env, createWindow, title, x, y, w, h, &window_id, &fb);
+  CALL_SDL_HELPER(env, createWindow, title, x, y, w, h, resizable, &window_id);
 
   napi_value object, key, value;
   CALL_NAPI(nullptr, napi_create_object, env, &object);
@@ -152,37 +158,31 @@ createWindow(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_create_string_latin1, env, "handle", 6, &key);
   CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
 
-  CALL_NAPI(nullptr, napi_create_int32, env, fb.w, &value);
-  CALL_NAPI(nullptr, napi_create_string_latin1, env, "w", 1, &key);
-  CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
-
-  CALL_NAPI(nullptr, napi_create_int32, env, fb.h, &value);
-  CALL_NAPI(nullptr, napi_create_string_latin1, env, "h", 1, &key);
-  CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
-
-  CALL_NAPI(nullptr, napi_create_external_buffer, env, fb.h * fb.stride, fb.pixels, nullptr, nullptr, &value);
-  CALL_NAPI(nullptr, napi_create_string_latin1, env, "buffer", 6, &key);
-  CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
-
-  CALL_NAPI(nullptr, napi_create_int32, env, fb.stride, &value);
-  CALL_NAPI(nullptr, napi_create_string_latin1, env, "stride", 6, &key);
-  CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
-
   return object;
 }
 
 napi_value
-updateWindow(napi_env env, napi_callback_info info)
+renderWindow(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-
-  napi_value handle;
-  CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, &handle, nullptr, nullptr);
+  size_t argc = 6;
+  napi_value argv[argc];
+  CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
-  CALL_NAPI(nullptr, napi_get_value_int32, env, handle, &window_id);
+  CALL_NAPI(nullptr, napi_get_value_int32, env, argv[0], &window_id);
 
-  CALL_SDL_HELPER(env, updateWindow, window_id);
+  int w, h, stride;
+  CALL_NAPI(nullptr, napi_get_value_int32, env, argv[1], &w);
+  CALL_NAPI(nullptr, napi_get_value_int32, env, argv[2], &h);
+  CALL_NAPI(nullptr, napi_get_value_int32, env, argv[3], &stride);
+
+  unsigned int format;
+  CALL_NAPI(nullptr, napi_get_value_uint32, env, argv[4], &format);
+
+  void * pixels;
+  CALL_NAPI(nullptr, napi_get_buffer_info, env, argv[5], &pixels, nullptr);
+
+  CALL_SDL_HELPER(env, renderWindow, window_id, w, h, stride, format, pixels);
 
   return nullptr;
 }
@@ -227,7 +227,7 @@ waitEvent(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_get_value_int32, env, value, &timeout);
 
   SdlHelpers::Variant event;
-  CALL_SDL_HELPER(env, waitEvent, event, timeout);
+  CALL_SDL_HELPER(env, waitEvent, timeout, event);
 
   napi_value object;
   CALL_NAPI(nullptr, fromVariant, env, event, &object);
@@ -265,9 +265,9 @@ init (napi_env env, napi_value exports)
 	// napi_add_env_cleanup_hook
 
 	napi_property_descriptor desc[] = {
-    { "setCallbacks", NULL, setCallbacks, NULL, NULL, NULL, napi_enumerable, NULL },
+    { "initialize", NULL, initialize, NULL, NULL, NULL, napi_enumerable, NULL },
     { "createWindow", NULL, createWindow, NULL, NULL, NULL, napi_enumerable, NULL },
-    { "updateWindow", NULL, updateWindow, NULL, NULL, NULL, napi_enumerable, NULL },
+    { "renderWindow", NULL, renderWindow, NULL, NULL, NULL, napi_enumerable, NULL },
     { "destroyWindow", NULL, destroyWindow, NULL, NULL, NULL, napi_enumerable, NULL },
     { "pollEvent", NULL, pollEvent, NULL, NULL, NULL, napi_enumerable, NULL },
     { "waitEvent", NULL, waitEvent, NULL, NULL, NULL, napi_enumerable, NULL },

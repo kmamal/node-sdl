@@ -31,25 +31,26 @@ class Variant : public std::variant<
 using VariantMap = std::map<const char *, Variant>;
 using VariantList = std::vector<Variant>;
 
-struct Framebuffer {
-	int w;
-	int h;
-	int stride;
-	void * pixels;
-};
+ErrorMessage * getPixelFormats (Logger, Variant & formats);
 
 ErrorMessage * createWindow (
 	Logger,
 	const char * title,
 	int x, int y, int w, int h,
-	int * window_id,
-	Framebuffer *
+	bool resizable,
+	int * window_id
 );
-ErrorMessage * updateWindow (Logger, int window_id);
+ErrorMessage * renderWindow (
+	Logger,
+	int window_id,
+	int w, int h, int stride,
+	unsigned int format,
+	void * pixels
+);
 ErrorMessage * destroyWindow (Logger, int window_id);
 
 ErrorMessage * pollEvent (Logger, Variant & event);
-ErrorMessage * waitEvent (Logger, Variant & event, int timeout);
+ErrorMessage * waitEvent (Logger, int timeout, Variant & event);
 
 ErrorMessage * startAudio (Logger);
 ErrorMessage * stopAudio (Logger);

@@ -19,16 +19,8 @@
 	} \
 } while (0)
 
+
 namespace SdlHelpers {
-
-static bool initialized = false;
-static bool initialized_video = false;
-static bool initialized_audio = false;
-
-bool anyInitialized ()
-{
-	return initialized_video || initialized_audio;
-}
 
 ErrorMessage::
 ErrorMessage(const char * _message, bool _should_dispose)
@@ -43,6 +35,16 @@ ErrorMessage::
 	free((void *) this->message);
 }
 
+static bool initialized = false;
+static bool initialized_video = false;
+static bool initialized_audio = false;
+
+static int num_windows = 0;
+
+bool anyInitialized ()
+{
+	return initialized_video || initialized_audio;
+}
 
 ErrorMessage *
 init (Logger logger)
@@ -329,20 +331,95 @@ void quitAudio()
 }
 
 ErrorMessage *
-createWindow (Logger logger, const char * title, int x, int y, int w, int h, int * window_id, Framebuffer * fb)
+getPixelFormats (Logger, Variant & formats)
 {
-	ErrorMessage * error = initVideo(logger);
+	formats.emplace<1>(VariantMap());
+	Variant value;
+
+	value.emplace<3>(SDL_PIXELFORMAT_RGB332);
+	std::get<VariantMap>(formats).insert({ "RGB332", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGB444);
+	std::get<VariantMap>(formats).insert({ "RGB444", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGB555);
+	std::get<VariantMap>(formats).insert({ "RGB555", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGR555);
+	std::get<VariantMap>(formats).insert({ "BGR555", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ARGB4444);
+	std::get<VariantMap>(formats).insert({ "ARGB4444", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGBA4444);
+	std::get<VariantMap>(formats).insert({ "RGBA4444", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ABGR4444);
+	std::get<VariantMap>(formats).insert({ "ABGR4444", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGRA4444);
+	std::get<VariantMap>(formats).insert({ "BGRA4444", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ARGB1555);
+	std::get<VariantMap>(formats).insert({ "ARGB1555", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGBA5551);
+	std::get<VariantMap>(formats).insert({ "RGBA5551", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ABGR1555);
+	std::get<VariantMap>(formats).insert({ "ABGR1555", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGRA5551);
+	std::get<VariantMap>(formats).insert({ "BGRA5551", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGB565);
+	std::get<VariantMap>(formats).insert({ "RGB565", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGR565);
+	std::get<VariantMap>(formats).insert({ "BGR565", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGB24);
+	std::get<VariantMap>(formats).insert({ "RGB24", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGR24);
+	std::get<VariantMap>(formats).insert({ "BGR24", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGB888);
+	std::get<VariantMap>(formats).insert({ "RGB888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGBX8888);
+	std::get<VariantMap>(formats).insert({ "RGBX8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGR888);
+	std::get<VariantMap>(formats).insert({ "BGR888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGRX8888);
+	std::get<VariantMap>(formats).insert({ "BGRX8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ARGB8888);
+	std::get<VariantMap>(formats).insert({ "ARGB8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGBA8888);
+	std::get<VariantMap>(formats).insert({ "RGBA8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ABGR8888);
+	std::get<VariantMap>(formats).insert({ "ABGR8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGRA8888);
+	std::get<VariantMap>(formats).insert({ "BGRA8888", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ARGB2101010);
+	std::get<VariantMap>(formats).insert({ "ARGB2101010", value });
+
+	return nullptr;
+}
+
+struct RenderingInfo {
+	SDL_Renderer * renderer;
+	int w;
+	int h;
+	Uint32 format;
+	SDL_Texture * texture;
+};
+
+ErrorMessage *
+createWindow (
+	Logger logger,
+	const char * title,
+	int x, int y, int w, int h,
+	bool resizable,
+	int * window_id
+) {
+	ErrorMessage * error;
+
+	error = initVideo(logger);
 	if (error) { return error; }
 
 	// Create Window
-	SDL_Window * window;
-	SDL_Surface * surface;
 	{
+		SDL_Window * window;
+
 		if (x == -1) { x = SDL_WINDOWPOS_CENTERED; }
 		if (y == -1) { y = SDL_WINDOWPOS_CENTERED; }
 		if (w == -1) { w = 640; }
 		if (h == -1) { h = 480; }
-		window = SDL_CreateWindow(title, x, y, w, h, SDL_WINDOW_RESIZABLE);
+		window = SDL_CreateWindow(title, x, y, w, h, resizable ? SDL_WINDOW_RESIZABLE : 0);
 		if (window == nullptr) {
 			RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
 		}
@@ -352,44 +429,27 @@ createWindow (Logger logger, const char * title, int x, int y, int w, int h, int
 			RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
 		}
 
-		surface =  SDL_GetWindowSurface(window);
-		if (surface == nullptr) {
-			RETURN_ERROR("SDL_GetWindowSurface() error: %s\n", SDL_GetError());
+		SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+		if (renderer == nullptr) {
+			RETURN_ERROR("SDL_CreateRenderer() error: %s\n", SDL_GetError());
 		}
 
-		Uint32 format = surface->format->format;
-		bool is_packed_32 = SDL_PIXELTYPE(format) == SDL_PIXELTYPE_PACKED32;
-		bool is_packed_lil_endian = SDL_PIXELORDER(format) == SDL_PACKEDORDER_XRGB;
-		bool is_packed_big_endian = SDL_PIXELORDER(format) == SDL_PACKEDORDER_BGRX;
-		bool is_device_lil_endian = SDL_BYTEORDER == SDL_LIL_ENDIAN;
-
-		bool can_use_surface = is_packed_32 && (is_device_lil_endian
-			? is_packed_lil_endian
-			: is_packed_big_endian
-		);
-
-		if (!can_use_surface) {
-			RETURN_ERROR("Can't use surface with format %d\n", format);
-		}
-
-		fb->w = surface->w;
-		fb->h = surface->h;
-		fb->stride = surface->pitch;
-		fb->pixels = surface->pixels;
+		RenderingInfo * rendering_info = new RenderingInfo({ renderer, 0, 0, 0, nullptr });
+		SDL_SetWindowData(window, "rendering-info", rendering_info);
 	}
 
+	num_windows += 1;
 	return nullptr;
 }
 
-// After resizing a window this function must be called again to return a valid surface.
-
-// You may not combine this with 3D or the rendering API on this window.
-
-// Force the window's pixel format
-
 ErrorMessage *
-updateWindow (Logger logger, int window_id)
-{
+renderWindow (
+	Logger logger,
+	int window_id,
+	int w, int h, int stride,
+	unsigned int format,
+	void * pixels
+) {
 	// Update Window
 	{
 		SDL_Window * window = SDL_GetWindowFromID(window_id);
@@ -397,12 +457,37 @@ updateWindow (Logger logger, int window_id)
 			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 		}
 
-		if (SDL_UpdateWindowSurface(window) != 0) {
-			RETURN_ERROR("SDL_UpdateWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
-		}
-	}
+		RenderingInfo * rendering_info = (RenderingInfo *) SDL_GetWindowData(window, "rendering-info");
+		SDL_Renderer * renderer = rendering_info->renderer;
+		SDL_Texture * texture = rendering_info->texture;
 
-	if (false) { quitVideo(); }
+		bool is_valid = texture != nullptr
+			&& rendering_info->w == w
+			&& rendering_info->h == h
+			&& rendering_info->format == format;
+
+		if (!is_valid) {
+			texture = SDL_CreateTexture(rendering_info->renderer, format, SDL_TEXTUREACCESS_STREAMING, w, h);
+			if (texture == nullptr) {
+				RETURN_ERROR("SDL_CreateTexture(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
+			}
+
+			rendering_info->w = w;
+			rendering_info->h = h;
+			rendering_info->format = format;
+			rendering_info->texture = texture;
+		}
+
+		if (SDL_UpdateTexture(texture, NULL, pixels, stride) != 0) {
+			RETURN_ERROR("SDL_UpdateTexture(%d) error: %s\n", window_id, SDL_GetError());
+		}
+
+		if (SDL_RenderCopy(renderer, texture, NULL, NULL) != 0) {
+			RETURN_ERROR("SDL_RenderCopy(%d) error: %s\n", window_id, SDL_GetError());
+		}
+
+		SDL_RenderPresent(renderer);
+	}
 
 	return nullptr;
 }
@@ -417,17 +502,24 @@ destroyWindow (Logger logger, int window_id)
 			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 		}
 
-		// SDL_DestroyRenderer(renderer);
+		RenderingInfo * rendering_info = (RenderingInfo *) SDL_GetWindowData(window, "rendering-info");
+		SDL_Renderer * renderer = rendering_info->renderer;
+		SDL_Texture * texture = rendering_info->texture;
+		delete rendering_info;
+
+		if (texture) { SDL_DestroyTexture(texture); }
+
+		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
 	}
 
-	if (false) { quitVideo(); }
-
+	num_windows -= 1;
+	if (num_windows == 0) { quitVideo(); }
 	return nullptr;
 }
 
 
-void
+ErrorMessage *
 packageEvent (const SDL_Event & event, Variant & object)
 {
 	object.emplace<1>(VariantMap());
@@ -442,8 +534,9 @@ packageEvent (const SDL_Event & event, Variant & object)
 		}
 
 		case SDL_WINDOWEVENT: {
-			value.emplace<3>(event.window.windowID);
-			std::get<VariantMap>(object).insert({ "_window", value });
+			Uint32 window_id = event.window.windowID;
+			value.emplace<3>(window_id);
+			std::get<VariantMap>(object).insert({ "window", value });
 
 			switch (event.window.event) {
 
@@ -456,6 +549,11 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 					value.emplace<3>(event.window.data2);
 					std::get<VariantMap>(object).insert({ "height", value });
+
+					SDL_Window * window = SDL_GetWindowFromID(event.window.windowID);
+					if (window == nullptr) {
+						RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+					}
 
 					break;
 				}
@@ -548,6 +646,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 		}
 
 	}
+	return nullptr;
 }
 
 ErrorMessage *
@@ -564,7 +663,7 @@ pollEvent (Logger, Variant & object)
 }
 
 ErrorMessage *
-waitEvent (Logger, Variant & object, int timeout)
+waitEvent (Logger, int timeout, Variant & object)
 {
 	SDL_Event event;
 
