@@ -9,7 +9,7 @@ class Window extends EventEmitter {
 	constructor (options = {}) {
 		super()
 
-		let { title, x, y, w, h, resizable } = options
+		let { title, x, y, width, height, fullscreen, resizable, borderless } = options
 
 		const typeof_title = typeof title
 		if (typeof_title === 'undefined') {
@@ -32,53 +32,165 @@ class Window extends EventEmitter {
 			throw new Error("y must be a number")
 		}
 
-		const typeof_w = typeof w
-		if (typeof_w === 'undefined') {
-			w = -1
-		} else if (typeof_w !== 'number') {
-			throw new Error("w must be a number")
+		const typeof_width = typeof width
+		if (typeof_width === 'undefined') {
+			width = -1
+		} else if (typeof_width !== 'number') {
+			throw new Error("width must be a number")
 		}
 
-		const typeof_h = typeof h
-		if (typeof_h === 'undefined') {
-			h = -1
-		} else if (typeof_h !== 'number') {
-			throw new Error("h must be a number")
+		const typeof_height = typeof height
+		if (typeof_height === 'undefined') {
+			height = -1
+		} else if (typeof_height !== 'number') {
+			throw new Error("height must be a number")
+		}
+
+		const typeof_fullscreen = typeof fullscreen
+		if (typeof_fullscreen === 'undefined') {
+			fullscreen = false
+		} else if (typeof_fullscreen !== 'boolean') {
+			throw new Error("fullscreen must be a boolean")
 		}
 
 		const typeof_resizable = typeof resizable
+		const typeof_borderless = typeof borderless
+
 		if (typeof_resizable === 'undefined') {
 			resizable = true
 		} else if (typeof_resizable !== 'boolean') {
 			throw new Error("resizable must be a boolean")
 		}
 
-		const result = Bindings.createWindow(title, x, y, w, h, resizable)
+		if (typeof_borderless === 'undefined') {
+			borderless = false
+		} else if (typeof_borderless !== 'boolean') {
+			throw new Error("borderless must be a boolean")
+		}
 
-		this._handle = result.handle
-		this._w = result.width
-		this._h = result.height
+		if (true
+			&& typeof_resizable !== 'undefined'
+			&& typeof_borderless !== 'undefined'
+			&& resizable && borderless
+		) {
+			throw new Error("resizable and borderless are mutually exclusive")
+		}
 
+		if (borderless) { resizable = false }
+
+		const result = Bindings.window_create(
+			title,
+			x,
+			y,
+			width,
+			height,
+			fullscreen,
+			resizable,
+			borderless,
+		)
+
+		this._id = result.id
+		this._x = result.x
+		this._y = result.y
+		this._width = result.width
+		this._height = result.height
+
+		this._title = title
+		this._fullscreen = fullscreen
+		this._resizable = resizable
+		this._borderless = borderless
 		this._destroyed = false
-		windows.set(this._handle, this)
+
+		windows.set(this._id, this)
 	}
 
-	get w () { return this._w }
-	get h () { return this._h }
+	get title () { return this._title }
+	set title (title) {
+		if (typeof title !== 'string') {
+			throw new Error("title must be a string")
+		}
 
-	render (w, h, stride, format, buffer) {
+		this._title = title
+		Bindings.window_setTitle(this._id, title)
+	}
+
+	get width () { return this._width }
+	set width (width) {
+		if (typeof width !== 'number') {
+			throw new Error("width must be a number")
+		}
+
+		this._width = width
+		Bindings.window_setSize(this._id, width, this._height)
+	}
+
+	get height () { return this._height }
+	set height (height) {
+		if (typeof height !== 'number') {
+			throw new Error("height must be a number")
+		}
+
+		this._height = height
+		Bindings.window_setSize(this._id, this._width, height)
+	}
+
+	get fullscreen () { return this._fullscreen }
+	set fullscreen (fullscreen) {
+		if (typeof fullscreen !== 'boolean') {
+			throw new Error("fullscreen must be a boolean")
+		}
+
+		this._fullscreen = fullscreen
+		Bindings.window_setFullscreen(this._id, fullscreen)
+	}
+
+	get resizable () { return this._resizable }
+	set resizable (resizable) {
+		if (typeof resizable !== 'boolean') {
+			throw new Error("resizable must be a boolean")
+		}
+
+		this._resizable = resizable
+		Bindings.window_setResizable(this._id, resizable)
+	}
+
+	focus () {
+		Bindings.window_focus(this._id)
+	}
+
+	show () {
+		Bindings.window_show(this._id)
+	}
+
+	hide () {
+		Bindings.window_hide(this._id)
+	}
+
+	maximize () {
+		Bindings.window_maximize(this._id)
+	}
+
+	minimize () {
+		Bindings.window_minimize(this._id)
+	}
+
+	restore () {
+		Bindings.window_restore(this._id)
+	}
+
+	setIcon (width, height, stride, format, buffer) {
 		if (this._destroyed) {
 			const error = new Error("window is destroyed")
-			error.window = this._handle
+			error.window = this._id
 			throw error
 		}
 
-		if (typeof w !== 'number') {
-			throw new Error("w must be a number")
+		if (typeof width !== 'number') {
+			throw new Error("width must be a number")
 		}
 
-		if (typeof h !== 'number') {
-			throw new Error("h must be a number")
+		if (typeof height !== 'number') {
+			throw new Error("height must be a number")
 		}
 
 		if (typeof stride !== 'number') {
@@ -93,35 +205,116 @@ class Window extends EventEmitter {
 			throw new Error("buffer must be a Buffer")
 		}
 
-		if (buffer.length < stride * h) {
+		if (buffer.length < stride * height) {
 			throw new Error("buffer is smaller than expected")
 		}
 
-		Bindings.renderWindow(this._handle, w, h, stride, format, buffer)
+		Bindings.window_setIcon(this._id, width, height, stride, format, buffer)
+	}
+
+	render (width, height, stride, format, buffer) {
+		if (this._destroyed) {
+			const error = new Error("window is destroyed")
+			error.window = this._id
+			throw error
+		}
+
+		if (typeof width !== 'number') {
+			throw new Error("width must be a number")
+		}
+
+		if (typeof height !== 'number') {
+			throw new Error("height must be a number")
+		}
+
+		if (typeof stride !== 'number') {
+			throw new Error("stride must be a number")
+		}
+
+		if (typeof format !== 'number') {
+			throw new Error("format must be a number")
+		}
+
+		if (!(buffer instanceof Buffer)) {
+			throw new Error("buffer must be a Buffer")
+		}
+
+		if (buffer.length < stride * height) {
+			throw new Error("buffer is smaller than expected")
+		}
+
+		Bindings.window_render(this._id, width, height, stride, format, buffer)
 	}
 
 	destroy () {
 		if (this._destroyed) {
 			const error = new Error("window is destroyed")
-			error.window = this._handle
+			error.window = this._id
 			throw error
 		}
 
-		Bindings.destroyWindow(this._handle)
+		Bindings.window_destroy(this._id)
 
 		this._destroyed = true
-		windows.delete(this._handle)
+		windows.delete(this._id)
 	}
 }
 
 // Audio
 
-const startAudio = (callback, { channels = 1, buffer_size = 4096 } = {}) => {
-	Bindings.startAudio(callback, channels, buffer_size)
-}
+const Audio = {
+	start (options = {}) {
+		let { freq, format, channels, samples } = options
 
-const stopAudio = () => {
-	Bindings.stopAudio()
+		const typeof_freq = typeof freq
+		if (typeof_freq === 'undefined') {
+			freq = 48000
+		} else if (typeof_freq !== 'number') {
+			throw new Error("freq must be a number")
+		}
+
+		const typeof_format = typeof format
+		if (typeof_format === 'undefined') {
+			format = AudioFormat.S16
+		} else if (typeof_format !== 'number') {
+			throw new Error("format must be a number")
+		}
+
+		const typeof_channels = typeof channels
+		if (typeof_channels === 'undefined') {
+			channels = 1
+		} else if (typeof_channels !== 'number') {
+			throw new Error("channels must be a number")
+		}
+
+		const typeof_samples = typeof samples
+		if (typeof_samples === 'undefined') {
+			samples = 4096
+		} else if (typeof_samples !== 'number') {
+			throw new Error("samples must be a number")
+		}
+
+		Bindings.audio_start(freq, format, channels, samples)
+
+		return { freq, format, channels, samples }
+	},
+	getQueuedSize () {
+		return Bindings.audio_getQueuedSize()
+	},
+	queue (buffer, num_bytes) {
+		if (!(buffer instanceof Buffer)) {
+			throw new Error("buffer must be a Buffer")
+		}
+
+		if (typeof num_bytes !== 'number') {
+			throw new Error("num_bytes must be a number")
+		}
+
+		Bindings.audio_queue(buffer, num_bytes)
+	},
+	stop () {
+		Bindings.audio_stop()
+	},
 }
 
 // Logging
@@ -187,8 +380,8 @@ const processEvent = (event) => {
 		if (!window) { throw new Error("event for destroyed window") }
 
 		if (event.type === 'window-resized') {
-			window._w = event.width
-			window._h = event.height
+			window._width = event.width
+			window._height = event.height
 		}
 
 		event.window = window
@@ -197,22 +390,25 @@ const processEvent = (event) => {
 
 // Global setup
 
-const { 'pixel-formats': PixelFormat } = Bindings.initialize(handleLogging)
+const {
+	'pixel-formats': PixelFormat,
+	'audio-formats': AudioFormat,
+} = Bindings.initialize(handleLogging)
 
 process.on('exit', () => {
 	for (const window of windows.values()) {
 		window.destroy()
 	}
-	stopAudio()
+	Audio.stop()
 	Bindings.cleanup()
 })
 
 module.exports = {
 	PixelFormat,
+	AudioFormat,
+	setLogger,
 	Window,
 	pollEvent,
 	waitEvent,
-	startAudio,
-	stopAudio,
-	setLogger,
+	Audio,
 }

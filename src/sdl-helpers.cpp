@@ -40,6 +40,7 @@ static bool initialized_video = false;
 static bool initialized_audio = false;
 
 static int num_windows = 0;
+static SDL_AudioDeviceID audio_device;
 
 bool anyInitialized ()
 {
@@ -54,6 +55,11 @@ init (Logger logger)
 	// Init
 	{
 		if (SDL_Init(0) != 0) { RETURN_ERROR("SDL_Init(0) error: %s\n", SDL_GetError()); }
+	}
+
+	// Hints
+	{
+		SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
 	}
 
 	// Version
@@ -107,7 +113,7 @@ initVideo (Logger logger)
 			if(driver_name == nullptr) {
 				RETURN_ERROR("SDL_GetVideoDriver(%d) error: %s\n", i, SDL_GetError());
 			}
-			CALL_LOGGER(" %s", driver_name);
+			CALL_LOGGER(" \"%s\"", driver_name);
 		}
 
 		CALL_LOGGER("\n");
@@ -241,7 +247,7 @@ initAudio (Logger logger)
 			if(driver_name == nullptr) {
 				RETURN_ERROR("SDL_GetAudioDriver(%d) error: %s\n", i, SDL_GetError());
 			}
-			CALL_LOGGER(" %s", driver_name);
+			CALL_LOGGER(" \"%s\"", driver_name);
 		}
 
 		CALL_LOGGER("\n");
@@ -386,24 +392,92 @@ getPixelFormats (Logger, Variant & formats)
 	std::get<VariantMap>(formats).insert({ "BGRA8888", value });
 	value.emplace<3>(SDL_PIXELFORMAT_ARGB2101010);
 	std::get<VariantMap>(formats).insert({ "ARGB2101010", value });
+	value.emplace<3>(SDL_PIXELFORMAT_RGBA32);
+	std::get<VariantMap>(formats).insert({ "RGBA32", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ARGB32);
+	std::get<VariantMap>(formats).insert({ "ARGB32", value });
+	value.emplace<3>(SDL_PIXELFORMAT_BGRA32);
+	std::get<VariantMap>(formats).insert({ "BGRA32", value });
+	value.emplace<3>(SDL_PIXELFORMAT_ABGR32);
+	std::get<VariantMap>(formats).insert({ "ABGR32", value });
+	value.emplace<3>(SDL_PIXELFORMAT_YV12);
+	std::get<VariantMap>(formats).insert({ "YV12", value });
+	value.emplace<3>(SDL_PIXELFORMAT_IYUV);
+	std::get<VariantMap>(formats).insert({ "IYUV", value });
+	value.emplace<3>(SDL_PIXELFORMAT_YUY2);
+	std::get<VariantMap>(formats).insert({ "YUY2", value });
+	value.emplace<3>(SDL_PIXELFORMAT_UYVY);
+	std::get<VariantMap>(formats).insert({ "UYVY", value });
+	value.emplace<3>(SDL_PIXELFORMAT_YVYU);
+	std::get<VariantMap>(formats).insert({ "YVYU", value });
+	value.emplace<3>(SDL_PIXELFORMAT_NV12);
+	std::get<VariantMap>(formats).insert({ "NV12", value });
+	value.emplace<3>(SDL_PIXELFORMAT_NV21);
+	std::get<VariantMap>(formats).insert({ "NV21", value });
 
 	return nullptr;
 }
 
-struct RenderingInfo {
-	SDL_Renderer * renderer;
-	int w;
-	int h;
-	Uint32 format;
-	SDL_Texture * texture;
-};
+ErrorMessage *
+getAudioFormats (Logger, Variant & formats)
+{
+	formats.emplace<1>(VariantMap());
+	Variant value;
+
+	value.emplace<3>(AUDIO_S8);
+	std::get<VariantMap>(formats).insert({ "S8", value });
+	value.emplace<3>(AUDIO_U8);
+	std::get<VariantMap>(formats).insert({ "U8", value });
+	value.emplace<3>(AUDIO_S16LSB);
+	std::get<VariantMap>(formats).insert({ "S16LSB", value });
+	value.emplace<3>(AUDIO_S16MSB);
+	std::get<VariantMap>(formats).insert({ "S16MSB", value });
+	value.emplace<3>(AUDIO_S16SYS);
+	std::get<VariantMap>(formats).insert({ "S16SYS", value });
+	value.emplace<3>(AUDIO_S16);
+	std::get<VariantMap>(formats).insert({ "S16", value });
+	value.emplace<3>(AUDIO_S16LSB);
+	std::get<VariantMap>(formats).insert({ "S16LSB", value });
+	value.emplace<3>(AUDIO_U16LSB);
+	std::get<VariantMap>(formats).insert({ "U16LSB", value });
+	value.emplace<3>(AUDIO_U16MSB);
+	std::get<VariantMap>(formats).insert({ "U16MSB", value });
+	value.emplace<3>(AUDIO_U16SYS);
+	std::get<VariantMap>(formats).insert({ "U16SYS", value });
+	value.emplace<3>(AUDIO_U16);
+	std::get<VariantMap>(formats).insert({ "U16", value });
+	value.emplace<3>(AUDIO_U16LSB);
+	std::get<VariantMap>(formats).insert({ "U16LSB", value });
+	value.emplace<3>(AUDIO_S32LSB);
+	std::get<VariantMap>(formats).insert({ "S32LSB", value });
+	value.emplace<3>(AUDIO_S32MSB);
+	std::get<VariantMap>(formats).insert({ "S32MSB", value });
+	value.emplace<3>(AUDIO_S32SYS);
+	std::get<VariantMap>(formats).insert({ "S32SYS", value });
+	value.emplace<3>(AUDIO_S32);
+	std::get<VariantMap>(formats).insert({ "S32", value });
+	value.emplace<3>(AUDIO_S32LSB);
+	std::get<VariantMap>(formats).insert({ "S32LSB", value });
+	value.emplace<3>(AUDIO_F32LSB);
+	std::get<VariantMap>(formats).insert({ "F32LSB", value });
+	value.emplace<3>(AUDIO_F32MSB);
+	std::get<VariantMap>(formats).insert({ "F32MSB", value });
+	value.emplace<3>(AUDIO_F32SYS);
+	std::get<VariantMap>(formats).insert({ "F32SYS", value });
+	value.emplace<3>(AUDIO_F32);
+	std::get<VariantMap>(formats).insert({ "F32", value });
+	value.emplace<3>(AUDIO_F32LSB);
+	std::get<VariantMap>(formats).insert({ "F32LSB", value });
+
+	return nullptr;
+}
 
 ErrorMessage *
-createWindow (
+window_create (
 	Logger logger,
 	const char * title,
-	int x, int y, int w, int h,
-	bool resizable,
+	int * x, int * y, int * width, int * height,
+	bool fullscreen, bool resizable, bool borderless,
 	int * window_id
 ) {
 	ErrorMessage * error;
@@ -415,11 +489,15 @@ createWindow (
 	{
 		SDL_Window * window;
 
-		if (x == -1) { x = SDL_WINDOWPOS_CENTERED; }
-		if (y == -1) { y = SDL_WINDOWPOS_CENTERED; }
-		if (w == -1) { w = 640; }
-		if (h == -1) { h = 480; }
-		window = SDL_CreateWindow(title, x, y, w, h, resizable ? SDL_WINDOW_RESIZABLE : 0);
+		if (*x == -1) { *x = SDL_WINDOWPOS_CENTERED; }
+		if (*y == -1) { *y = SDL_WINDOWPOS_CENTERED; }
+		if (*width == -1) { *width = 640; }
+		if (*height == -1) { *height = 480; }
+		int flags = 0
+			| fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
+			| resizable ? SDL_WINDOW_RESIZABLE : 0
+			| borderless ? SDL_WINDOW_BORDERLESS : 0;
+		window = SDL_CreateWindow(title, *x, *y, *width, *height, flags);
 		if (window == nullptr) {
 			RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
 		}
@@ -428,14 +506,6 @@ createWindow (
 		if (*window_id == 0) {
 			RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
 		}
-
-		SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
-		if (renderer == nullptr) {
-			RETURN_ERROR("SDL_CreateRenderer() error: %s\n", SDL_GetError());
-		}
-
-		RenderingInfo * rendering_info = new RenderingInfo({ renderer, 0, 0, 0, nullptr });
-		SDL_SetWindowData(window, "rendering-info", rendering_info);
 	}
 
 	num_windows += 1;
@@ -443,7 +513,182 @@ createWindow (
 }
 
 ErrorMessage *
-renderWindow (
+window_setTitle (Logger, int window_id, const char * title)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetWindowTitle(window, title);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setPosition (Logger, int window_id, int x, int y)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetWindowPosition(window, x, y);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setSize (Logger, int window_id, int width, int height)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetWindowSize(window, width, height);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setFullscreen (Logger, int window_id, bool fullscreen)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	if (SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) != 0) {
+		RETURN_ERROR("SDL_SetWindowFullscreen(%d, %d) error: %s\n", window_id, fullscreen, SDL_GetError());
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setResizable (Logger, int window_id, bool resizable)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetWindowResizable(window, resizable ? SDL_TRUE : SDL_FALSE);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_focus (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RaiseWindow(window);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_show (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_ShowWindow(window);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_hide (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_HideWindow(window);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_maximize (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_MaximizeWindow(window);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_minimize (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_MinimizeWindow(window);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_restore (Logger, int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RestoreWindow(window);
+
+	return nullptr;
+}
+
+
+ErrorMessage *
+window_setIcon (
+	Logger logger,
+	int window_id,
+	int w, int h, int stride,
+	unsigned int format,
+	void * pixels
+) {
+	// Set Icon
+	{
+		SDL_Window * window = SDL_GetWindowFromID(window_id);
+		if (window == nullptr) {
+			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+		}
+
+		SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+		if (surface == nullptr) {
+			RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
+		}
+
+		SDL_SetWindowIcon(window, surface);
+
+		SDL_FreeSurface(surface);
+	}
+
+	return nullptr;
+}
+
+
+ErrorMessage *
+window_render (
 	Logger logger,
 	int window_id,
 	int w, int h, int stride,
@@ -457,43 +702,34 @@ renderWindow (
 			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 		}
 
-		RenderingInfo * rendering_info = (RenderingInfo *) SDL_GetWindowData(window, "rendering-info");
-		SDL_Renderer * renderer = rendering_info->renderer;
-		SDL_Texture * texture = rendering_info->texture;
+		SDL_Surface* src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+		if (src_surface == nullptr) {
+			RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
+		}
+		SDL_Rect src_rect = { 0, 0, w, h };
 
-		bool is_valid = texture != nullptr
-			&& rendering_info->w == w
-			&& rendering_info->h == h
-			&& rendering_info->format == format;
+		SDL_Surface * window_surface = SDL_GetWindowSurface(window);
+		if (window_surface == nullptr) {
+			RETURN_ERROR("SDL_GetWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
+		}
+		SDL_Rect window_rect = { 0, 0, window_surface->w, window_surface->h };
 
-		if (!is_valid) {
-			texture = SDL_CreateTexture(rendering_info->renderer, format, SDL_TEXTUREACCESS_STREAMING, w, h);
-			if (texture == nullptr) {
-				RETURN_ERROR("SDL_CreateTexture(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
-			}
-
-			rendering_info->w = w;
-			rendering_info->h = h;
-			rendering_info->format = format;
-			rendering_info->texture = texture;
+		if (SDL_LowerBlit(src_surface, &src_rect, window_surface, &window_rect) != 0) {
+			RETURN_ERROR("SDL_LowerBlit(%d) error: %s\n", window_id, SDL_GetError());
 		}
 
-		if (SDL_UpdateTexture(texture, NULL, pixels, stride) != 0) {
-			RETURN_ERROR("SDL_UpdateTexture(%d) error: %s\n", window_id, SDL_GetError());
-		}
+		SDL_FreeSurface(src_surface);
 
-		if (SDL_RenderCopy(renderer, texture, NULL, NULL) != 0) {
-			RETURN_ERROR("SDL_RenderCopy(%d) error: %s\n", window_id, SDL_GetError());
+		if (SDL_UpdateWindowSurface(window) != 0) {
+			RETURN_ERROR("SDL_UpdateWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
 		}
-
-		SDL_RenderPresent(renderer);
 	}
 
 	return nullptr;
 }
 
 ErrorMessage *
-destroyWindow (Logger logger, int window_id)
+window_destroy (Logger logger, int window_id)
 {
 	// Destroy Window
 	{
@@ -502,14 +738,6 @@ destroyWindow (Logger logger, int window_id)
 			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 		}
 
-		RenderingInfo * rendering_info = (RenderingInfo *) SDL_GetWindowData(window, "rendering-info");
-		SDL_Renderer * renderer = rendering_info->renderer;
-		SDL_Texture * texture = rendering_info->texture;
-		delete rendering_info;
-
-		if (texture) { SDL_DestroyTexture(texture); }
-
-		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
 	}
 
@@ -679,24 +907,73 @@ waitEvent (Logger, int timeout, Variant & object)
 
 
 ErrorMessage *
-startAudio (Logger logger)
+audio_start (Logger logger, int freq, int format, int channels, int samples)
 {
-	ErrorMessage * error = initAudio(logger);
+	ErrorMessage * error;
+
+	quitAudio();
+
+	error = initAudio(logger);
 	if (error) { return error; }
+
+	// Open Audio Device
+	{
+		SDL_AudioSpec desired, obtained;
+		desired.freq = freq;
+		desired.format = format;
+		desired.channels = channels;
+		desired.samples = samples;
+		desired.callback = nullptr;
+
+		audio_device = SDL_OpenAudioDevice(nullptr, 0, &desired, &obtained, 0);
+		if (audio_device == 0) {
+			RETURN_ERROR("SDL_OpenAudioDevice() error: %s\n", SDL_GetError());
+		}
+
+		printf("Audio specs: channels:%d freq:%d buffer:%d (signed:%d float:%d bits:%d silence:%d)\n",
+			obtained.channels,
+			obtained.freq,
+			obtained.size,
+			!!SDL_AUDIO_ISSIGNED(obtained.format),
+			!!SDL_AUDIO_ISFLOAT(obtained.format),
+			SDL_AUDIO_BITSIZE(obtained.format),
+			obtained.silence
+		);
+
+		SDL_PauseAudioDevice(audio_device, 0);
+	}
 
 	return nullptr;
 }
 
 ErrorMessage *
-stopAudio (Logger logger)
+audio_getQueuedSize (Logger logger, unsigned int * size)
 {
-	// // Close Audio Device
-	// {
-	// 	SDL_PauseAudioDevice(audio_device, 1);
-	// 	SDL_CloseAudioDevice(audio_device);
-	// }
+	*size = SDL_GetQueuedAudioSize(audio_device);
 
-	if (false) { quitAudio(); }
+	return nullptr;
+}
+
+ErrorMessage *
+audio_queue (Logger logger, void * samples, int number)
+{
+	if (SDL_QueueAudio(audio_device, samples, number) != 0) {
+		RETURN_ERROR("SDL_QueueAudio() error: %s\n", SDL_GetError());
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_stop (Logger logger)
+{
+	// Close Audio Device
+	{
+		SDL_PauseAudioDevice(audio_device, 1);
+		SDL_CloseAudioDevice(audio_device);
+	}
+
+	quitAudio();
 
 	return nullptr;
 }

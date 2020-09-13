@@ -1,0 +1,12 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-regl",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {},
+  "license": "ISC",
+  "dependencies": {
+    "gl": "^4.6.1",
+    "regl": "^1.6.1"
+  }
+}
