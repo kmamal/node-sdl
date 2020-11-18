@@ -489,8 +489,8 @@ window_create (
 	{
 		SDL_Window * window;
 
-		if (*x == -1) { *x = SDL_WINDOWPOS_CENTERED; }
-		if (*y == -1) { *y = SDL_WINDOWPOS_CENTERED; }
+		if (*x == -1) { *x = SDL_WINDOWPOS_CENTERED_DISPLAY(0); }
+		if (*y == -1) { *y = SDL_WINDOWPOS_CENTERED_DISPLAY(0); }
 		if (*width == -1) { *width = 640; }
 		if (*height == -1) { *height = 480; }
 		int flags = 0

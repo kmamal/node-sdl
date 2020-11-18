@@ -1,9 +1,9 @@
-const Bindings = require('../../..')
+const SDL = require('../../..')
 const Canvas = require('canvas')
 
-Bindings.setLogger((x) => console.log('SDL>', x))
+SDL.setLogger((x) => console.log('SDL>', x))
 
-const window = new Bindings.Window({
+const window = new SDL.Window({
 	title: "JavaScript",
 	resizable: false,
 	borderless: true,
@@ -19,6 +19,6 @@ ctx.textAlign = 'center'
 ctx.fillText("Hello, World!", w / 2, h / 2)
 
 const buffer = canvas.toBuffer('raw')
-window.render(w, h, w * 4, Bindings.PixelFormat.ARGB8888, buffer)
+window.render(w, h, w * 4, SDL.PixelFormat.ARGB8888, buffer)
 
 setTimeout(() => {}, 3e3)

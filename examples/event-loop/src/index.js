@@ -1,12 +1,12 @@
-const Bindings = require('../../..')
+const SDL = require('../../..')
 
-Bindings.setLogger((x) => console.log('SDL>', x))
+SDL.setLogger((x) => console.log('SDL>', x))
 
-const window = new Bindings.Window({ title: "JavaScript" })
+const window = new SDL.Window({ title: "JavaScript" })
 
 for (;;) {
 	for (;;) {
-		const event = Bindings.pollEvent()
+		const event = SDL.pollEvent()
 		if (!event) { break }
 
 		switch (event.type) {

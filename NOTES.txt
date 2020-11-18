@@ -1,0 +1,9 @@
+list displays
+    https://stackoverflow.com/questions/41745492/sdl2-how-to-position-a-window-on-a-second-monitor
+
+list audio devices
+    xxx
+
+clipboard
+touch
+all events
