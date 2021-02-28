@@ -1,4 +1,4 @@
-#include <nodejs/src/node_api.h>
+#include <node_api.h>
 #include <cstdlib>
 #include <cstdio>
 #include <cstdarg>
