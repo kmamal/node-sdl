@@ -4,7 +4,7 @@
   "description": "sdl",
   "repository": {
     "type": "git",
-    "url": "git.server:repos/sdl"
+    "url": "git:repos/sdl"
   },
   "main": "src/index.js",
   "scripts": {
@@ -14,8 +14,8 @@
   "gypfile": true,
   "license": "ISC",
   "dependencies": {
-    "bindings": "*",
-    "node-pre-gyp": "*"
+    "@mapbox/node-pre-gyp": "*",
+    "bindings": "*"
   },
   "binary": {
     "module_name": "test",
