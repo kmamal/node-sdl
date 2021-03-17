@@ -138,10 +138,16 @@ initialize(napi_env env, napi_callback_info info)
   return object;
 }
 
+void
+freeNativePointer(napi_env env, void * data, void * pointer)
+{
+  free(pointer);
+}
+
 napi_value
 window_create(napi_env env, napi_callback_info info)
 {
-  size_t argc = 8;
+  size_t argc = 9;
   napi_value argv[argc];
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
@@ -156,18 +162,21 @@ window_create(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_get_value_int32, env, argv[3], &width);
   CALL_NAPI(nullptr, napi_get_value_int32, env, argv[4], &height);
 
-  bool fullscreen, resizable, borderless;
+  bool fullscreen, resizable, borderless, opengl;
   CALL_NAPI(nullptr, napi_get_value_bool, env, argv[5], &fullscreen);
   CALL_NAPI(nullptr, napi_get_value_bool, env, argv[6], &resizable);
   CALL_NAPI(nullptr, napi_get_value_bool, env, argv[7], &borderless);
+  CALL_NAPI(nullptr, napi_get_value_bool, env, argv[8], &opengl);
 
   int window_id;
+  void * native_pointer = nullptr;
+  int native_pointer_size;
   CALL_SDL_HELPER(
     env, window_create,
     title,
     &x, &y, &width, &height,
-    fullscreen, resizable, borderless,
-    &window_id
+    fullscreen, resizable, borderless, opengl,
+    &window_id, &native_pointer, &native_pointer_size
   );
 
   napi_value object, key, value;
@@ -192,6 +201,14 @@ window_create(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_create_int32, env, height, &value);
   CALL_NAPI(nullptr, napi_create_string_latin1, env, "height", 6, &key);
   CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
+
+  if (native_pointer) {
+    CALL_NAPI(nullptr, napi_create_external_buffer, env,
+      native_pointer_size, native_pointer, freeNativePointer, native_pointer,
+    &value);
+    CALL_NAPI(nullptr, napi_create_string_latin1, env, "native", 6, &key);
+    CALL_NAPI(nullptr, napi_set_property, env, object, key, value);
+  }
 
   return object;
 }
@@ -286,6 +303,24 @@ window_setResizable(napi_env env, napi_callback_info info)
   CALL_NAPI(nullptr, napi_get_value_bool, env, argv[1], &resizable);
 
   CALL_SDL_HELPER(env, window_setResizable, window_id, resizable);
+
+  return nullptr;
+}
+
+napi_value
+window_setBorderless(napi_env env, napi_callback_info info)
+{
+  size_t argc = 2;
+  napi_value argv[argc];
+  CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
+
+  int window_id;
+  CALL_NAPI(nullptr, napi_get_value_int32, env, argv[0], &window_id);
+
+  bool resizable;
+  CALL_NAPI(nullptr, napi_get_value_bool, env, argv[1], &resizable);
+
+  CALL_SDL_HELPER(env, window_setBorderless, window_id, resizable);
 
   return nullptr;
 }
@@ -555,6 +590,7 @@ init (napi_env env, napi_value exports)
     { "window_setSize", NULL, window_setSize, NULL, NULL, NULL, napi_enumerable, NULL },
     { "window_setFullscreen", NULL, window_setFullscreen, NULL, NULL, NULL, napi_enumerable, NULL },
     { "window_setResizable", NULL, window_setResizable, NULL, NULL, NULL, napi_enumerable, NULL },
+    { "window_setBorderless", NULL, window_setBorderless, NULL, NULL, NULL, napi_enumerable, NULL },
     { "window_focus", NULL, window_focus, NULL, NULL, NULL, napi_enumerable, NULL },
     { "window_show", NULL, window_show, NULL, NULL, NULL, napi_enumerable, NULL },
     { "window_hide", NULL, window_hide, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -573,7 +609,7 @@ init (napi_env env, napi_value exports)
     { "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-  CALL_NAPI(nullptr, napi_define_properties, env, exports, 23, desc);
+  CALL_NAPI(nullptr, napi_define_properties, env, exports, 24, desc);
 
   return exports;
 }

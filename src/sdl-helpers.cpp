@@ -1,5 +1,6 @@
 #include "sdl-helpers.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
 #include <cstdio>
 #include <cstdlib>
 #include <map>
@@ -477,8 +478,8 @@ window_create (
 	Logger logger,
 	const char * title,
 	int * x, int * y, int * width, int * height,
-	bool fullscreen, bool resizable, bool borderless,
-	int * window_id
+	bool fullscreen, bool resizable, bool borderless, bool opengl,
+	int * window_id, void ** native_pointer, int * native_pointer_size
 ) {
 	ErrorMessage * error;
 
@@ -494,9 +495,10 @@ window_create (
 		if (*width == -1) { *width = 640; }
 		if (*height == -1) { *height = 480; }
 		int flags = 0
-			| fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0
-			| resizable ? SDL_WINDOW_RESIZABLE : 0
-			| borderless ? SDL_WINDOW_BORDERLESS : 0;
+			| (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
+			| (resizable ? SDL_WINDOW_RESIZABLE : 0)
+			| (borderless ? SDL_WINDOW_BORDERLESS : 0)
+			| (opengl ? SDL_WINDOW_OPENGL : 0);
 		window = SDL_CreateWindow(title, *x, *y, *width, *height, flags);
 		if (window == nullptr) {
 			RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
@@ -506,6 +508,29 @@ window_create (
 		if (*window_id == 0) {
 			RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
 		}
+
+		SDL_SysWMinfo info;
+		SDL_VERSION(&(info.version));
+		bool got_info = SDL_GetWindowWMInfo(window, &info);
+		if (!got_info) {
+			RETURN_ERROR("SDL_GetWindowWMInfo() error: %s\n", SDL_GetError());
+		}
+
+		#ifdef __LINUX__
+			int size = sizeof(Window);
+			Window * pointer = (Window *) malloc(size);
+			*pointer = info.info.x11.window;
+			*native_pointer = pointer;
+			*native_pointer_size = size;
+		#endif
+
+		#ifdef __WIN32__
+			int size = sizeof(HWND);
+			HWND * pointer = (HWND *) malloc(size);
+			*pointer = info.info.win.window;
+			*native_pointer = pointer;
+			*native_pointer_size = size;
+		#endif
 	}
 
 	num_windows += 1;
@@ -575,6 +600,19 @@ window_setResizable (Logger, int window_id, bool resizable)
 	}
 
 	SDL_SetWindowResizable(window, resizable ? SDL_TRUE : SDL_FALSE);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setBorderless (Logger, int window_id, bool borderless)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetWindowBordered(window, borderless ? SDL_FALSE : SDL_TRUE);
 
 	return nullptr;
 }

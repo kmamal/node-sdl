@@ -1,11 +1,13 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-gl",
+  "name": "sdl-example-regl",
   "description": "",
   "main": "src/index.js",
   "scripts": {},
   "license": "ISC",
   "dependencies": {
-    "gl": "^4.9.0"
+    "@kmamal/gl": "^4.9.0",
+    "gl": "file:../../../../../headless-gl",
+    "regl": "^1.6.1"
   }
 }

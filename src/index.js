@@ -9,7 +9,15 @@ class Window extends EventEmitter {
 	constructor (options = {}) {
 		super()
 
-		let { title, x, y, width, height, fullscreen, resizable, borderless } = options
+		let {
+			title,
+			x, y,
+			width, height,
+			fullscreen,
+			resizable,
+			borderless,
+			opengl,
+		} = options
 
 		const typeof_title = typeof title
 		if (typeof_title === 'undefined') {
@@ -78,6 +86,13 @@ class Window extends EventEmitter {
 
 		if (borderless) { resizable = false }
 
+		const typeof_opengl = typeof opengl
+		if (typeof_opengl === 'undefined') {
+			opengl = false
+		} else if (typeof_opengl !== 'boolean') {
+			throw new Error("opengl must be a boolean")
+		}
+
 		const result = Bindings.window_create(
 			title,
 			x,
@@ -87,6 +102,7 @@ class Window extends EventEmitter {
 			fullscreen,
 			resizable,
 			borderless,
+			opengl,
 		)
 
 		this._id = result.id
@@ -94,11 +110,13 @@ class Window extends EventEmitter {
 		this._y = result.y
 		this._width = result.width
 		this._height = result.height
+		this._native = result.native
 
 		this._title = title
 		this._fullscreen = fullscreen
 		this._resizable = resizable
 		this._borderless = borderless
+		this._opengl = opengl
 		this._destroyed = false
 
 		windows.set(this._id, this)
@@ -153,6 +171,18 @@ class Window extends EventEmitter {
 		this._resizable = resizable
 		Bindings.window_setResizable(this._id, resizable)
 	}
+
+	get borderless () { return this._borderless }
+	set borderless (borderless) {
+		if (typeof borderless !== 'boolean') {
+			throw new Error("borderless must be a boolean")
+		}
+
+		this._borderless = borderless
+		Bindings.window_setBorderless(this._id, borderless)
+	}
+
+	get native () { return this._native }
 
 	focus () {
 		Bindings.window_focus(this._id)
@@ -257,6 +287,8 @@ class Window extends EventEmitter {
 
 		this._destroyed = true
 		windows.delete(this._id)
+
+		this._native = null
 	}
 }
 

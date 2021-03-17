@@ -38,14 +38,15 @@ ErrorMessage * window_create (
 	Logger,
 	const char * title,
 	int * x, int * y, int * width, int * height,
-	bool fullscreen, bool resizable, bool borderless,
-	int * window_id
+	bool fullscreen, bool resizable, bool borderless, bool opengl,
+	int * window_id, void ** native_pointer, int * native_pointer_size
 );
 ErrorMessage * window_setTitle (Logger, int window_id, const char * title);
 ErrorMessage * window_setPosition (Logger, int window_id, int x, int y);
 ErrorMessage * window_setSize (Logger, int window_id, int width, int height);
 ErrorMessage * window_setFullscreen (Logger, int window_id, bool fullscreen);
 ErrorMessage * window_setResizable (Logger, int window_id, bool resizable);
+ErrorMessage * window_setBorderless (Logger, int window_id, bool borderless);
 ErrorMessage * window_focus (Logger, int window_id);
 ErrorMessage * window_show (Logger, int window_id);
 ErrorMessage * window_hide (Logger, int window_id);
