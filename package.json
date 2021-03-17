@@ -17,10 +17,13 @@
   "main": "src/index.js",
   "scripts": {
     "rebuild": "node-gyp rebuild --verbose",
-    "prebuild": "prebuild --all --strip -r napi",
+    "prebuild": "prebuild --all --strip -r napi -t 3",
     "install": "prebuild-install || node-gyp rebuild"
   },
   "gypfile": true,
+  "binary": {
+    "napi_versions": [ 3 ]
+  },
   "license": "ISC",
   "dependencies": {
     "bindings": "*",
