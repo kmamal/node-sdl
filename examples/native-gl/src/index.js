@@ -1,6 +1,5 @@
 const SDL = require('../../..')
-// const createContext = require('@kmamal/gl')
-const createContext = require('gl')
+const createContext = require('@kmamal/gl')
 const createRegl = require('regl')
 
 SDL.setLogger((x) => console.log('SDL>', x))
@@ -13,6 +12,7 @@ const window = new SDL.Window({
 })
 
 const { width: w, height: h, native } = window
+console.log({ native })
 const gl = createContext(w, h, { window: native })
 const regl = createRegl({ gl })
 
@@ -47,6 +47,8 @@ const drawTriangle = regl({
 })
 
 const tick = regl.frame(({ time }) => {
+	while (SDL.pollEvent()) {}
+
 	regl.clear({
 		color: [ 0, 0, 0, 1 ],
 		depth: 1,

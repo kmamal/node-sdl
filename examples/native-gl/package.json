@@ -7,7 +7,6 @@
   "license": "ISC",
   "dependencies": {
     "@kmamal/gl": "^4.9.0",
-    "gl": "file:../../../../../headless-gl",
     "regl": "^1.6.1"
   }
 }

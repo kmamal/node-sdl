@@ -5,6 +5,19 @@
 #include <cstdlib>
 #include <map>
 
+#if defined(__LINUX__)
+	#define __WINDOW_TYPE__ Window
+	#define GET_WINDOW(x) x.info.x11.window
+#elif defined(__WIN32__)
+	#define __WINDOW_TYPE__ HWND
+	#define GET_WINDOW(x) x.info.win.window
+#elif defined(__MACOSX__)
+	#include "cocoa-window.h"
+	#define __WINDOW_TYPE__ CALayer *
+	#define GET_WINDOW(x) getView(x.info.cocoa.window)
+#endif
+
+typedef __WINDOW_TYPE__ NativeWindow;
 
 #define RETURN_ERROR(...) do { \
 	char * error; \
@@ -516,21 +529,11 @@ window_create (
 			RETURN_ERROR("SDL_GetWindowWMInfo() error: %s\n", SDL_GetError());
 		}
 
-		#ifdef __LINUX__
-			int size = sizeof(Window);
-			Window * pointer = (Window *) malloc(size);
-			*pointer = info.info.x11.window;
-			*native_pointer = pointer;
-			*native_pointer_size = size;
-		#endif
-
-		#ifdef __WIN32__
-			int size = sizeof(HWND);
-			HWND * pointer = (HWND *) malloc(size);
-			*pointer = info.info.win.window;
-			*native_pointer = pointer;
-			*native_pointer_size = size;
-		#endif
+		int size = sizeof(NativeWindow);
+		NativeWindow * pointer = (NativeWindow *) malloc(size);
+		*pointer = GET_WINDOW(info);
+		*native_pointer = pointer;
+		*native_pointer_size = size;
 	}
 
 	num_windows += 1;
