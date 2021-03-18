@@ -132,6 +132,26 @@ class Window extends EventEmitter {
 		Bindings.window_setTitle(this._id, title)
 	}
 
+	get x () { return this._x }
+	set x (x) {
+		if (typeof x !== 'number') {
+			throw new Error("x must be a number")
+		}
+
+		this._x = x
+		Bindings.window_setSize(this._id, x, this._y)
+	}
+
+	get y () { return this._y }
+	set y (y) {
+		if (typeof y !== 'number') {
+			throw new Error("y must be a number")
+		}
+
+		this._y = y
+		Bindings.window_setSize(this._id, this._x, y)
+	}
+
 	get width () { return this._width }
 	set width (width) {
 		if (typeof width !== 'number') {
