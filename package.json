@@ -1,5 +1,5 @@
 {
-  "version": "0.0.9",
+  "version": "0.0.10",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
   "keywords": [
@@ -22,7 +22,9 @@
   },
   "gypfile": true,
   "binary": {
-    "napi_versions": [ 3 ]
+    "napi_versions": [
+      3
+    ]
   },
   "license": "ISC",
   "dependencies": {
