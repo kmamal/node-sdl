@@ -5,14 +5,17 @@
 #include <cstring>
 #include "sdl-helpers.h"
 
+#if defined(_WIN32)
+	#include "asprintf.h"
+#endif
 
 #define CALL_SDL_HELPER(env, fn, ...) do { \
   logger_env = env; \
-	SdlHelpers::ErrorMessage * error = SdlHelpers::fn(logger, ## __VA_ARGS__); \
-	if (error) { \
+  SdlHelpers::ErrorMessage * error = SdlHelpers::fn(logger, ## __VA_ARGS__); \
+  if (error) { \
     napi_throw_error(env, nullptr, error->message); \
-		delete error; \
-	} \
+    delete error; \
+  } \
   logger_env = nullptr; \
 } while (0)
 
@@ -108,8 +111,8 @@ int logger (const char * format, ...)
 napi_value
 initialize(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   CALL_NAPI(nullptr, napi_create_reference, env, argv[0], 1, &logger_func_ref);
@@ -147,13 +150,13 @@ freeNativePointer(napi_env env, void * data, void * pointer)
 napi_value
 window_create(napi_env env, napi_callback_info info)
 {
-  size_t argc = 9;
-  napi_value argv[argc];
+  napi_value argv[9];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   size_t title_length;
   CALL_NAPI(nullptr, napi_get_value_string_latin1, env, argv[0], nullptr, 0, &title_length);
-  char title[title_length + 1];
+  char * title = (char *) malloc(title_length + 1);
   CALL_NAPI(nullptr, napi_get_value_string_latin1, env, argv[0], title, title_length + 1, nullptr);
 
   int x, y, width, height;
@@ -178,6 +181,8 @@ window_create(napi_env env, napi_callback_info info)
     fullscreen, resizable, borderless, opengl,
     &window_id, &native_pointer, &native_pointer_size
   );
+
+  free(title);
 
   napi_value object, key, value;
   CALL_NAPI(nullptr, napi_create_object, env, &object);
@@ -216,8 +221,8 @@ window_create(napi_env env, napi_callback_info info)
 napi_value
 window_setTitle(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[2];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -225,10 +230,12 @@ window_setTitle(napi_env env, napi_callback_info info)
 
   size_t title_length;
   CALL_NAPI(nullptr, napi_get_value_string_latin1, env, argv[1], nullptr, 0, &title_length);
-  char title[title_length + 1];
+  char * title = (char *) malloc(title_length + 1);
   CALL_NAPI(nullptr, napi_get_value_string_latin1, env, argv[1], title, title_length + 1, nullptr);
 
   CALL_SDL_HELPER(env, window_setTitle, window_id, title);
+
+  free(title);
 
   return nullptr;
 }
@@ -236,8 +243,8 @@ window_setTitle(napi_env env, napi_callback_info info)
 napi_value
 window_setPosition(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[3];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -255,8 +262,8 @@ window_setPosition(napi_env env, napi_callback_info info)
 napi_value
 window_setSize(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[3];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -274,8 +281,8 @@ window_setSize(napi_env env, napi_callback_info info)
 napi_value
 window_setFullscreen(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[2];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -292,8 +299,8 @@ window_setFullscreen(napi_env env, napi_callback_info info)
 napi_value
 window_setResizable(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[2];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -310,8 +317,8 @@ window_setResizable(napi_env env, napi_callback_info info)
 napi_value
 window_setBorderless(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[2];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -328,8 +335,8 @@ window_setBorderless(napi_env env, napi_callback_info info)
 napi_value
 window_focus(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -343,8 +350,8 @@ window_focus(napi_env env, napi_callback_info info)
 napi_value
 window_show(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -358,8 +365,8 @@ window_show(napi_env env, napi_callback_info info)
 napi_value
 window_hide(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -373,8 +380,8 @@ window_hide(napi_env env, napi_callback_info info)
 napi_value
 window_maximize(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -388,8 +395,8 @@ window_maximize(napi_env env, napi_callback_info info)
 napi_value
 window_minimize(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -403,8 +410,8 @@ window_minimize(napi_env env, napi_callback_info info)
 napi_value
 window_restore(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -418,8 +425,8 @@ window_restore(napi_env env, napi_callback_info info)
 napi_value
 window_setIcon(napi_env env, napi_callback_info info)
 {
-  size_t argc = 6;
-  napi_value argv[argc];
+  napi_value argv[6];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -444,8 +451,8 @@ window_setIcon(napi_env env, napi_callback_info info)
 napi_value
 window_render(napi_env env, napi_callback_info info)
 {
-  size_t argc = 6;
-  napi_value argv[argc];
+  napi_value argv[6];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -470,8 +477,8 @@ window_render(napi_env env, napi_callback_info info)
 napi_value
 window_destroy(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int window_id;
@@ -497,8 +504,8 @@ pollEvent(napi_env env, napi_callback_info info)
 napi_value
 waitEvent(napi_env env, napi_callback_info info)
 {
-  size_t argc = 1;
-  napi_value argv[argc];
+  napi_value argv[1];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int timeout;
@@ -516,8 +523,8 @@ waitEvent(napi_env env, napi_callback_info info)
 napi_value
 audio_start(napi_env env, napi_callback_info info)
 {
-  size_t argc = 4;
-  napi_value argv[argc];
+  napi_value argv[4];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   int freq, format, channels, samples;
@@ -546,8 +553,8 @@ audio_getQueuedSize(napi_env env, napi_callback_info info)
 napi_value
 audio_queue(napi_env env, napi_callback_info info)
 {
-  size_t argc = 2;
-  napi_value argv[argc];
+  napi_value argv[2];
+  size_t argc = sizeof(argv);
   CALL_NAPI(nullptr, napi_get_cb_info, env, info, &argc, argv, nullptr, nullptr);
 
   void * samples;
