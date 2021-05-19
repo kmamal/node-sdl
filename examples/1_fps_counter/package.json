@@ -1,0 +1,8 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-1-fps-counter",
+  "main": "src/index.js",
+  "dependencies": {
+    "@kmamal/sdl": "*"
+  }
+}

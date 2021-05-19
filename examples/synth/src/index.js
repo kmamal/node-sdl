@@ -8,7 +8,7 @@ const num_midi_notes = 127
 const first_piano_note = 21
 const last_piano_note = 108
 const isPianoNote = (note) => true
-	&& note >= first_piano_note
+	&& first_piano_note <= note
 	&& note <= last_piano_note
 
 const note_names = [ "C", "D", "E", "F", "G", "A", "B" ]
@@ -134,12 +134,7 @@ class Sine {
 
 // SDL
 
-SDL.setLogger((x) => console.log('SDL>', x))
-
-const window = new SDL.Window({
-	title: "JavaScript",
-	resizable: false,
-})
+const window = new SDL.Window()
 
 // Video
 
@@ -157,11 +152,16 @@ window.render(w, h, w * 4, SDL.PixelFormat.ARGB8888, pixels)
 
 // Audio
 
-const audio_spec = SDL.Audio.start({ format: SDL.AudioFormat.F32LSB, samples: 1024 })
+const audio_spec = SDL.Audio.start({
+	format: SDL.AudioFormat.F32LSB,
+	channels: 2,
+	samples: 1024,
+})
 audio_spec.bytes_per_sample = 4
 audio_spec.bytes_per_frame = audio_spec.bytes_per_sample * audio_spec.channels
 
-const audio_buffer_frames = audio_spec.samples * 2
+const safety_factor = 2
+const audio_buffer_frames = audio_spec.samples * safety_factor
 const audio_buffer_size = audio_buffer_frames * audio_spec.bytes_per_frame
 const audio_buffer = Buffer.alloc(audio_buffer_size)
 const audio_buffer_duration = (audio_buffer_frames / audio_spec.freq) * 1e3
@@ -170,7 +170,7 @@ const silenceAudioBuffer = () => {
 	let offset = 0
 	for (let i = 0; i < audio_buffer_frames; i++) {
 		for (let j = 0; j < audio_spec.channels; j++) {
-			audio_buffer.writeFloatLE(0, offset++ * audio_spec.bytes_per_frame)
+			offset = audio_buffer.writeFloatLE(0, offset)
 		}
 	}
 }
@@ -181,7 +181,7 @@ let last_index = 0
 
 // Main
 
-const eventLoop = () => {
+const mainLoop = () => {
 	for (;;) {
 		const event = SDL.pollEvent()
 		if (!event) { break }
@@ -236,7 +236,7 @@ const eventLoop = () => {
 		silenceAudioBuffer()
 	}
 
-	setImmediate(eventLoop)
+	setTimeout(mainLoop, 0)
 }
 
-eventLoop()
+mainLoop()

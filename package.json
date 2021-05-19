@@ -1,5 +1,5 @@
 {
-  "version": "0.0.10",
+  "version": "0.0.11",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
   "keywords": [
@@ -10,23 +10,23 @@
     "audio",
     "input"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/kmamal/node-sdl.git"
   },
   "main": "src/index.js",
+  "gypfile": true,
   "scripts": {
     "rebuild": "node-gyp rebuild --verbose",
-    "prebuild": "prebuild --all --strip -r napi -t 3",
+    "prebuild": "prebuild --all --strip -r napi",
     "install": "prebuild-install || node-gyp rebuild"
   },
-  "gypfile": true,
   "binary": {
     "napi_versions": [
       3
     ]
   },
-  "license": "ISC",
   "dependencies": {
     "bindings": "*",
     "prebuild-install": "^6.0.1"
