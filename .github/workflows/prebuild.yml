@@ -28,7 +28,7 @@ jobs:
         run: |
           curl.exe https://www.libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
           mkdir SDL2
-          tar.exe -xf SDL2.zip -C SDL2 --strip1
+          tar.exe -xf SDL2.zip -C SDL2 --strip 1
           del SDL2.zip
 
       - id: npm-cache
