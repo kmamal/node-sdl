@@ -475,7 +475,7 @@ const _processEvent = (event) => {
 		const window = windows.get(event.window)
 		if (!window) { return false }
 		event.window = window
-	} else if (event.startsWith('audio-device-')) {
+	} else if (event.type.startsWith('audio-device-')) {
 		const { index, recording } = event
 		const outdated = recording ? recording_devices : playback_devices
 		const updated = Bindings.audio_getDevices(recording)
@@ -484,7 +484,7 @@ const _processEvent = (event) => {
 		} else {
 			playback_devices = updated
 		}
-		event.device = (event.endsWith('added') ? updated : outdated)[index]
+		event.device = (event.type.endsWith('added') ? updated : outdated)[index]
 		delete event.index
 		delete event.recording
 	}

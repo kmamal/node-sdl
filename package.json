@@ -1,14 +1,21 @@
 {
-  "version": "0.0.12",
+  "version": "0.0.13",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
   "keywords": [
     "sdl",
     "sdl2",
     "gui",
+    "windows",
+    "screen",
     "video",
     "audio",
-    "input"
+    "sound",
+    "input",
+    "mouse",
+    "keyboard",
+    "clipboard",
+    "game"
   ],
   "license": "MIT",
   "repository": {
