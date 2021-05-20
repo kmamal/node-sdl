@@ -1,4 +1,4 @@
-const Bindings = require('bindings')('test.node')
+const Bindings = require('bindings')('sdl.node')
 
 const windows = new Map()
 const closeAllWindows = () => {
@@ -435,7 +435,7 @@ const _processEvent = (event) => {
 			// No default
 		}
 
-		// event.window = window
+		event.window = window
 	} else if (event.joystick) {
 		const joystick = joysticks.get(event.joystick)
 		if (!joystick) { return false }

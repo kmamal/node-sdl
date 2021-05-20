@@ -799,7 +799,7 @@ Maps a keycode to the corresponding scancode based on the current keyboard mappi
 
 #### sdl.keyboard.getState()
 
-* Returns: `<boolean>[]` an object representing the state of each key.
+* Returns: `<boolean>[]` an array representing the state of each key.
 
 Use the values of [`sdl.keyboard.SCANCODE`](#enum-sdlkeyboardscancode) as indexes. Pressed keys will have `true` values.
 
@@ -918,6 +918,7 @@ const A = 3
 const { width, height } = window
 const stride = width * 4
 const buffer = Buffer.alloc(stride * height)
+
 for (let i = 0; i < height; i++) {
   for (let j = 0; j < width; j++) {
     const offset = i * stride + j * 4
@@ -927,6 +928,7 @@ for (let i = 0; i < height; i++) {
     buffer[offset + A] = 255
   }
 }
+
 window.render(width, height, stride, sdl.video.FORMAT.RGBA32, buffer)
 ```
 
@@ -940,7 +942,7 @@ Audio data are a sequence of frames, with each frame being a sequence of samples
 * For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
 * For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
 
-So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, assuming `sdl.audio.FORMAT.F32` format samples, you could do:
+So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, assuming a `sdl.audio.FORMAT.F32` format, you could do:
 
 ```js
 

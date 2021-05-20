@@ -1,7 +1,7 @@
 {
 	'targets': [
 		{
-			'target_name': 'test',
+			'target_name': 'sdl',
 			'sources': [
 				'src/binding.cpp',
 				'src/sdl-helpers.cpp',
