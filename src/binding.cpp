@@ -110,7 +110,8 @@ freePointer(napi_env env, void * data, void * pointer) {
 napi_value
 getEnums(napi_env env, napi_callback_info info)
 {
-	napi_value result, key, value;
+	napi_value result = nullptr;
+	napi_value key, value;
 	CALL_NAPI(napi_create_object, &result);
 
 	{
@@ -774,7 +775,7 @@ audio_dequeue(napi_env env, napi_callback_info info)
 napi_value
 events_poll(napi_env env, napi_callback_info info)
 {
-	napi_value result;
+	napi_value result = nullptr;
 
 	SdlHelpers::Variant event;
 	CALL_SDL_HELPER(events_poll, event);
@@ -788,7 +789,7 @@ events_poll(napi_env env, napi_callback_info info)
 napi_value
 events_wait(napi_env env, napi_callback_info info)
 {
-	napi_value result;
+	napi_value result = nullptr;
 
 	SdlHelpers::Variant event;
 
