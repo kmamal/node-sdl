@@ -1,5 +1,5 @@
 {
-  "version": "0.0.11",
+  "version": "0.0.12",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
   "keywords": [
@@ -20,7 +20,7 @@
   "scripts": {
     "rebuild": "node-gyp rebuild --verbose",
     "prebuild": "prebuild --runtime napi --strip --verbose",
-    "install": "prebuild-install || node-gyp rebuild --verbose"
+    "install": "prebuild-install --runtime napi || node-gyp rebuild --verbose"
   },
   "binary": {
     "napi_versions": [
