@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: apt install libsdl2-dev
+        run: sudo apt-get install libsdl2-dev -y
 
       - if: ${{ matrix.os == 'macos-latest' }}
         run: brew install sdl2
