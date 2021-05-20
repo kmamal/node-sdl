@@ -19,8 +19,8 @@
   "gypfile": true,
   "scripts": {
     "rebuild": "node-gyp rebuild --verbose",
-    "prebuild": "prebuild --all --strip -r napi",
-    "install": "prebuild-install || node-gyp rebuild"
+    "prebuild": "prebuild --runtime napi --strip --verbose",
+    "install": "prebuild-install || node-gyp rebuild --verbose"
   },
   "binary": {
     "napi_versions": [

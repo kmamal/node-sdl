@@ -6,6 +6,9 @@
 				'src/binding.cpp',
 				'src/sdl-helpers.cpp',
 			],
+			'defines': [
+				'NAPI_VERSION=<(napi_build_version)'
+			],
 			'cflags_cc': [ '-std=c++17' ],
 			'conditions': [
 				[ 'OS=="linux"', {
@@ -16,10 +19,9 @@
 					'sources': [
 						'src/cocoa-window.mm',
 					],
-					'cflags': [ '<!(sdl2-config --cflags)' ],
 					'libraries': [ '<!(sdl2-config --libs)', ],
 					'xcode_settings': {
-						'OTHER_CFLAGS': [ '-std=c++17' ],
+						'OTHER_CFLAGS': [ '-std=c++17', '<!(sdl2-config --cflags)' ],
 					},
 				} ],
 				[ 'OS=="win"', {
