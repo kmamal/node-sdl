@@ -1,0 +1,49 @@
+name: Build and upload binaries
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build and upload
+
+    # strategy:
+    #   matrix:
+    #     os: [ubuntu-latest, macos-latest, windows-latest]
+
+    # runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # - uses: actions/checkout@v2
+
+      # - id: npm-cache
+      #   run: echo "::set-output name=dir::$(npm config get cache)"
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: ${{ steps.npm-cache.outputs.dir }}
+      #     key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-npm-
+
+      # - run: npm install
+      # - run: npm run prebuild
+      # - run: npx prebuild --upload-all ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Inspect contexts
+        run: |
+          echo "The github context is:"
+          echo "${{ toJson(github) }}"
+          echo ""
+          echo "The job context is:"
+          echo "${{ toJson(job) }}"
+          echo ""
+          echo "The steps context is:"
+          echo "${{ toJson(steps) }}"
+          echo ""
+          echo "The runner context is:"
+          echo "${{ toJson(runner) }}"
+          echo ""
+          echo "The strategy context is:"
+          echo "${{ toJson(strategy) }}"
+          echo ""
+          echo "The matrix context is:"
+          echo "${{ toJson(matrix) }}"
