@@ -8,12 +8,28 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os:
+          - ubuntu-latest
+          # - macos-latest
+          # - windows-latest
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
+
+      - if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: apt install libsdl2-dev
+
+      - if: ${{ matrix.os == 'macos-latest' }}
+        run: brew install sdl2
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          curl.exe https://www.libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
+          mkdir SDL2
+          tar.exe -xf SDL2.zip -C SDL2 --strip1
+          del SDL2.zip
 
       - id: npm-cache
         run: echo "::set-output name=dir::$(npm config get cache)"
