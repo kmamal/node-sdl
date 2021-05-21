@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-4-canvas-drawing",
+  "main": "index.js",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "canvas": "*"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "version": "0.0.0",
-  "name": "sdl-example-raw-drawing",
-  "description": "",
-  "main": "src/index.js",
-  "scripts": {},
-  "license": "ISC"
-}

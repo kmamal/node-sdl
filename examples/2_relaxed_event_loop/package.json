@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-1-fps-counter",
+  "name": "sdl-example-2-relaxed-event-loop",
   "main": "index.js",
   "dependencies": {
     "@kmamal/sdl": "*"

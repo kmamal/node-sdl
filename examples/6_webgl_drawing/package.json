@@ -1,8 +1,9 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-1-fps-counter",
+  "name": "sdl-example-6-webgl-drawing",
   "main": "index.js",
   "dependencies": {
+    "@kmamal/gl": "*",
     "@kmamal/sdl": "*"
   }
 }
