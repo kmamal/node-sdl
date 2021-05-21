@@ -492,7 +492,7 @@ Initializes an audio device for playback/recording. If the opened device is a pl
 
 The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the device will look like. See also the section on [audio data](#audio-data).
 
-The `buffered` option specifies the "delay" that you will experience between the application and the audio driver. With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently. If the application is not latency-sensitive it's better to have higher values.
+The `buffered` option specifies the "delay" that you will experience between the application and the audio driver. With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently. Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
 
 ### class AudioDevice
 

@@ -16,7 +16,7 @@ Note again the event loop. We check for any available events with `sdl.events.po
 
 ## [2. Relaxed Event Loop](https://github.com/kmamal/node-sdl/tree/master/examples/2-relaxed-event-loop)
 
-One final example to demonstrate the third type of event-loop: This time we have replace the `for` loop with a call to `setInterval`. Finally we are able to handle async events as is the common expectation in Node.js. CPU usage has also improved. In this example we have set the interval to 100ms, which is a acceptable delay for most user interactions. Depending on the type of work you are doing in your event loop you might need a lower "idle" period (as low as `0`).
+One final example to demonstrate the third type of event-loop: This time we have replaced the `for` loop with a call to `setInterval`. Finally we are able to handle async events as is the common expectation in Node.js. CPU usage has also improved. In this example we have set the interval to 100ms, which is a acceptable delay for most user interactions. Depending on the type of work you are doing in your event loop you might need a lower "idle" period (as low as `0`).
 
 ## [3. Raw Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/3-raw-drawing)
 
@@ -31,12 +31,12 @@ Instead of filling the buffer by hand we can use the popular [`canvas`](https://
 This is probably not a real use-case, but it serves to demonstrate why [`@kmamal/gl`](https://github.com/kmamal/headless-gl#readme) was necessary. In this example we use the base [`gl`](https://github.com/stackgl/headless-gl#readme) library to fill a buffer with data. The idea is the same as in the previous example, but this time using the 3D WebGL API instead of the 2D Canvas API.
 
 There are 2 problems:
-1. The buffer we get is upside down. The `readPixels` function lets you specify a rectangle of pixels to copy, but its origin is at the lower left corner (what's called "cartesian coordinates") vs the more familiar upper left corner ("screen coordinates"). This is a minor annoyance since you can arrange you drawing code to accommodate this (as we did in this example).
+1. The buffer we get is upside down. The `readPixels` function lets you specify a rectangle of pixels to copy, but its origin is at the lower left corner (what's called "cartesian coordinates") vs the more familiar upper left corner ("screen coordinates"). This is only a minor annoyance since you can arrange you drawing code to accommodate this (as we did in this example).
 1. To render anything this way, you have to send the data to the GPU, then read back the result to memory, only to send it back to the GPU to be displayed. This is inelegant.
 
 ## [6. (Direct) WebGL Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/6-webgl-drawing)
 
-Same example, but this time with the [`@kmamal/gl`](https://github.com/kmamal/headless-gl#readme) library. Note that no call to `render` is necessary. It has instead been replaced by the call to `gl.swap()`.
+Same example, but this time with the [`@kmamal/gl`](https://github.com/kmamal/headless-gl#readme) library. Note that the call to `render` is gone. It has instead been replaced by the call to `gl.swap()`.
 
 ## [7. WebGL+regl](https://github.com/kmamal/node-sdl/tree/master/examples/7-webgl-regl)
 
