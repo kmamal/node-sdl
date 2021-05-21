@@ -89,11 +89,11 @@ ErrorMessage * audio_openDevice (
 	int * device_id
 );
 ErrorMessage * audio_close (int device_id);
-ErrorMessage * audio_pause (int device_id, bool paused);
+ErrorMessage * audio_play (int device_id, bool play);
 ErrorMessage * audio_getQueuedSize (int device_id, unsigned int * size);
 ErrorMessage * audio_clearQueued (int device_id);
-ErrorMessage * audio_queue (int device_id, void * samples, int number);
-ErrorMessage * audio_dequeue (int device_id, void * samples, int number);
+ErrorMessage * audio_queue (int device_id, void * src, int size);
+ErrorMessage * audio_dequeue (int device_id, void * dst, int size, int * num);
 
 ErrorMessage * events_poll (Variant & event);
 ErrorMessage * events_wait (int timeout, Variant & event);

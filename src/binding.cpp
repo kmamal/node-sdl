@@ -672,7 +672,7 @@ audio_close(napi_env env, napi_callback_info info)
 }
 
 napi_value
-audio_pause(napi_env env, napi_callback_info info)
+audio_play(napi_env env, napi_callback_info info)
 {
 	napi_value argv[2];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
@@ -681,10 +681,10 @@ audio_pause(napi_env env, napi_callback_info info)
 	int device_id;
 	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
 
-	bool paused;
-	CALL_NAPI(napi_get_value_bool, argv[1], &paused);
+	bool play;
+	CALL_NAPI(napi_get_value_bool, argv[1], &play);
 
-	CALL_SDL_HELPER(audio_pause, device_id, paused);
+	CALL_SDL_HELPER(audio_play, device_id, play);
 
 	cleanup:
 	return nullptr;
@@ -737,13 +737,13 @@ audio_queue(napi_env env, napi_callback_info info)
 	int device_id;
 	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
 
-	void * samples;
-	CALL_NAPI(napi_get_buffer_info, argv[1], &samples, nullptr);
+	void * src;
+	CALL_NAPI(napi_get_buffer_info, argv[1], &src, nullptr);
 
-	int number;
-	CALL_NAPI(napi_get_value_int32, argv[2], &number);
+	int size;
+	CALL_NAPI(napi_get_value_int32, argv[2], &size);
 
-	CALL_SDL_HELPER(audio_queue, device_id, samples, number);
+	CALL_SDL_HELPER(audio_queue, device_id, src, size);
 
 	cleanup:
 	return nullptr;
@@ -752,6 +752,8 @@ audio_queue(napi_env env, napi_callback_info info)
 napi_value
 audio_dequeue(napi_env env, napi_callback_info info)
 {
+	napi_value result = nullptr;
+
 	napi_value argv[3];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
@@ -759,16 +761,19 @@ audio_dequeue(napi_env env, napi_callback_info info)
 	int device_id;
 	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
 
-	void * samples;
-	CALL_NAPI(napi_get_buffer_info, argv[1], &samples, nullptr);
+	void * dst;
+	CALL_NAPI(napi_get_buffer_info, argv[1], &dst, nullptr);
 
-	int number;
-	CALL_NAPI(napi_get_value_int32, argv[2], &number);
+	int size;
+	CALL_NAPI(napi_get_value_int32, argv[2], &size);
 
-	CALL_SDL_HELPER(audio_dequeue, device_id, samples, number);
+	int num;
+	CALL_SDL_HELPER(audio_dequeue, device_id, dst, size, &num);
+
+	CALL_NAPI(napi_create_uint32, num, &result);
 
 	cleanup:
-	return nullptr;
+	return result;
 }
 
 
@@ -1152,8 +1157,10 @@ init (napi_env env, napi_value exports)
 		{ "audio_getDevices", NULL, audio_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_openDevice", NULL, audio_openDevice, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_close", NULL, audio_close, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_play", NULL, audio_play, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_getQueuedSize", NULL, audio_getQueuedSize, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_queue", NULL, audio_queue, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_dequeue", NULL, audio_dequeue, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "events_poll", NULL, events_poll, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "events_wait", NULL, events_wait, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getKeycode", NULL, keyboard_getKeycode, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1176,7 +1183,7 @@ init (napi_env env, napi_value exports)
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 44, desc);
+	CALL_NAPI(napi_define_properties, exports, 46, desc);
 
 	cleanup:
 	return exports;

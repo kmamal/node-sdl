@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-9-mic-waveform",
+  "main": "index.js",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "canvas": "*"
+  }
+}

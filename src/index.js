@@ -314,10 +314,10 @@ class AudioDevice {
 	get buffered () { return this._buffered }
 
 	get playing () { return this._playing }
-	play (play) {
+	play (play = true) {
 		if (typeof play !== 'boolean') { throw new Error("play must be a boolean") }
 		this._playing = play
-		Bindings.audio_pause(this._id, play ? 0 : 1)
+		Bindings.audio_play(this._id, play)
 	}
 
 	pause () {
@@ -325,7 +325,7 @@ class AudioDevice {
 	}
 
 
-	get queued () { return Bindings.audio_getQueuedSize() }
+	get queued () { return Bindings.audio_getQueuedSize(this._id) }
 	clearQueued () { Bindings.audio_clearQueued(this._id) }
 
 	get closed () { return this._closed }
@@ -341,7 +341,7 @@ class AudioPlaybackDevice extends AudioDevice {
 		if (!(buffer instanceof Buffer)) { throw new Error("buffer must be a Buffer") }
 		if (!Number.isFinite(num_bytes)) { throw new Error("num_bytes must be a number") }
 
-		Bindings.audio_queue(buffer, num_bytes)
+		Bindings.audio_queue(this._id, buffer, num_bytes)
 	}
 }
 
@@ -350,7 +350,7 @@ class AudioRecordingDevice extends AudioDevice {
 		if (!(buffer instanceof Buffer)) { throw new Error("buffer must be a Buffer") }
 		if (!Number.isFinite(num_bytes)) { throw new Error("num_bytes must be a number") }
 
-		Bindings.audio_dequeue(buffer, num_bytes)
+		return Bindings.audio_dequeue(this._id, buffer, num_bytes)
 	}
 }
 
@@ -365,8 +365,8 @@ sdl.audio = {
 
 	openDevice (device, options) {
 		return device.recording
-			? new AudioPlaybackDevice(device, options)
-			: new AudioRecordingDevice(device, options)
+			? new AudioRecordingDevice(device, options)
+			: new AudioPlaybackDevice(device, options)
 	},
 }
 

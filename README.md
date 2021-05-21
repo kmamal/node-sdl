@@ -485,12 +485,14 @@ A list of all the detected audio devices. Sample output for PulseAudio:
   * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
   * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
   * `format: `[`<sdl.audio.FORMAT>`](#enum-sdlaudioformat): The binary format for each sample. Default `sdl.audio.FORMAT.S16`.
-  * `buffer: <number>`: Number of frames that will be buffered before sending to the driver. Must be a power of `2`. Default `4096`.
+  * `buffer: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
 * Returns: [`<AudioDevice>`](#class-audiodevice) an object representing the opened audio device.
 
 Initializes an audio device for playback/recording. If the opened device is a playback device, then the returned object will be an [`AudioPlaybackDevice`](#class-audioplaybackdevice-extends-audiodevice), otherwise it will be an [`AudioRecordingDevice`](#class-audiorecordingdevice-extends-audiodevice).
 
 The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the device will look like. See also the section on [audio data](#audio-data).
+
+The `buffered` option specifies the "delay" that you will experience between the application and the audio driver. With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently. If the application is not latency-sensitive it's better to have higher values.
 
 ### class AudioDevice
 
@@ -589,6 +591,7 @@ This class is not directly exposed by the API so you can't use it with the `new`
 
 * `buffer: <Buffer>` The buffer to write data to.
 * `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
+* Returns: `<number>` The actual number of bytes read.
 
 Takes recorded audio data that has been put on the queue, and writes it to the provided buffer.
 
@@ -603,7 +606,7 @@ If there are events in the queue, it returns the first one. Otherwise, it return
 
 #### sdl.events.wait([timeout])
 
-* `timeout: <number>` How long to wait for events. Default `1e3`
+* `timeout: <number>` Number of milliseconds to wait for events. Default `1e3`
 * Returns: [`<Event>`](#events-reference)`|<null>` an object representing the emitted event, or `null`.
 
 __Warning: this is a blocking function.__
@@ -945,14 +948,14 @@ Audio data are a sequence of frames, with each frame being a sequence of samples
 So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, assuming a `sdl.audio.FORMAT.F32` format, you could do:
 
 ```js
+const TWO_PI = 2 * Math.PI
 
 const { channels, frequency } = audioDevice
 const bytesPerSample = 4
 
-const TWO_PI = 2 * Math.PI
-const amplitude = 0.3
-const note = 440
-const period = 1 / note
+const sineAmplitude = 0.3
+const sineNote = 440
+const sinePeriod = 1 / sineNote
 
 const duration = 3
 const numFrames = duration * frequency
@@ -962,11 +965,11 @@ const buffer = Buffer.alloc(numBytes)
 
 let offset = 0
 for (let i = 0; i < numFrames; i++) {
-  const time = i / frequency
-  const angle = time / period * TWO_PI
-  const sample = Math.sin(angle) * amplitude
-  for (let j = 0; j < channels; j++) {
-    offset = buffer.writeFloatLE(offset, sample)
-  }
+	const time = i / frequency
+	const angle = time / sinePeriod * TWO_PI
+	const sample = Math.sin(angle) * sineAmplitude
+	for (let j = 0; j < channels; j++) {
+		offset = buffer.writeFloatLE(sample, offset)
+	}
 }
 ```

@@ -1276,7 +1276,7 @@ audio_getDevices(bool capture, Variant & list)
 			MAKE_MAP(device);
 
 			SET_NULL(device, "name");
-			SET_BOOL(device, "capture", capture);
+			SET_BOOL(device, "recording", capture);
 
 			APPEND(list, device);
 		}
@@ -1291,7 +1291,7 @@ audio_getDevices(bool capture, Variant & list)
 			MAKE_MAP(device);
 
 			SET_STRING(device, "name", name);
-			SET_BOOL(device, "capture", capture);
+			SET_BOOL(device, "recording", capture);
 
 			APPEND(list, device);
 		}
@@ -1333,9 +1333,9 @@ audio_close (int device_id)
 }
 
 ErrorMessage *
-audio_pause (int device_id, bool paused)
+audio_play (int device_id, bool play)
 {
-	SDL_PauseAudioDevice(device_id, paused ? 1 : 0);
+	SDL_PauseAudioDevice(device_id, play ? 0 : 1);
 
 	return nullptr;
 }
@@ -1357,9 +1357,9 @@ audio_clearQueued (int device_id)
 }
 
 ErrorMessage *
-audio_queue (int device_id, void * samples, int number)
+audio_queue (int device_id, void * src, int size)
 {
-	if (SDL_QueueAudio(device_id, samples, number) != 0) {
+	if (SDL_QueueAudio(device_id, src, size) != 0) {
 		RETURN_ERROR("SDL_QueueAudio() error: %s\n", SDL_GetError());
 	}
 
@@ -1367,11 +1367,9 @@ audio_queue (int device_id, void * samples, int number)
 }
 
 ErrorMessage *
-audio_dequeue (int device_id, void * samples, int number)
+audio_dequeue (int device_id, void * dst, int size, int * num)
 {
-	if (SDL_DequeueAudio(device_id, samples, number) != 0) {
-		RETURN_ERROR("SDL_DequeueAudio() error: %s\n", SDL_GetError());
-	}
+	*num = SDL_DequeueAudio(device_id, dst, size);
 
 	return nullptr;
 }
