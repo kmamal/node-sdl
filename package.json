@@ -25,6 +25,7 @@
   "main": "src/index.js",
   "gypfile": true,
   "scripts": {
+    "test": "tests/run-all.sh",
     "rebuild": "node-gyp rebuild --verbose",
     "prebuild": "prebuild --runtime napi --strip --verbose",
     "install": "prebuild-install --runtime napi || node-gyp rebuild --verbose"
@@ -35,8 +36,8 @@
     ]
   },
   "dependencies": {
-    "bindings": "*",
-    "prebuild-install": "^6.0.1"
+    "bindings": "^1.5.0",
+    "prebuild-install": "^6.1.2"
   },
   "devDependencies": {
     "prebuild": "^10.0.1"
