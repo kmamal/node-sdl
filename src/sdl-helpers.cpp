@@ -1388,6 +1388,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 	}
 
 	MAKE_MAP(object);
+	SET_NUM(object, "timestamp", event.common.timestamp);
 
 	Variant value;
 	switch (event.type) {

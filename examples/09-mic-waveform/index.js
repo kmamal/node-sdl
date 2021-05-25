@@ -1,4 +1,4 @@
-const sdl = require('../..')
+const sdl = require('@kmamal/sdl')
 const { createCanvas } = require('canvas')
 
 const window = sdl.video.createWindow()

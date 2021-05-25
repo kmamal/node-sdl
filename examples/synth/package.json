@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {},
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "canvas": "^2.6.1"
   }

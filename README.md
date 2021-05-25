@@ -7,7 +7,7 @@ It should work on Linux, Mac, and Windows. Prebuilt binaries are available for x
 
 ## Usage
 
-1. Install SDL2 (`>=2.0.4`) on your system. You might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
+1. Install SDL2 (`>=2.0.5`) on your system. You might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
     * __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
     * __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
     * __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
@@ -619,6 +619,9 @@ If there are events in the queue, it returns the first one. Otherwise it waits u
 Event objects are returned from calls to [`sdl.events.poll()`](#sdleventspoll) and [`sdl.events.wait()`](#sdleventswaittimeout). They all have the following common property:
 
 * `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event, in milliseconds.
+
+Note that `timestamp` will not be the exact time the event happened, but instead the time of the first call to either [`sdl.events.poll()`](#sdleventspoll) or [`sdl.events.wait()`](#sdleventswaittimeout) after the event happened.
 
 There are many different types of events and each can carry some extra properties. Here they are all together, grouped into categories:
 
@@ -635,36 +638,23 @@ All window events have the following property:
 The following window events are defined along with any additional properties:
 
 * `'window-shown'` Fired when a window becomes visible.
-
 * `'window-hidden'` Fired when a window becomes hidden.
-
 * `'window-exposed'` Fired when a window becomes exposed.
-
 * `'window-minimized'` Fired when a window becomes minimized.
-
 * `'window-maximized'` Fired when a window becomes maximized.
-
 * `'window-restored'` Fired when a window stops being either minimized or maximized.
-
 * `'window-focus-gained'` Fired when a window gains the keyboard focus.
-
 * `'window-focus-lost'` Fired when a window loses the keyboard focus.
-
 * `'window-enter'` Fired when the mouse enters the window.
-
 * `'window-leave'` Fired when the mouse leaves the window.
-
 * `'window-close'` Fired when the window is closed. The window is not destroyed automatically so that you get a chance to display any confirmation dialogs you might need. Handle this event and then call `window.destroy()` to destroy the window.
-
 * `'window-moved'` Fired when the window changes position.
   * `x: <number>` The window's new x position, relative to the screen.
   * `y: <number>` The window's new y position, relative to the screen.
-
-* `'window-size-changed'` Fired before the window changes position.
+* `'window-size-changed'` Fired before the window changes size.
   * `width: <number>` The window's new width.
   * `height: <number>` The window's new height.
-
-* `'window-resized'` Fired after the window changes position.
+* `'window-resized'` Fired after the window changes size.
   * `width: <number>` The window's new width.
   * `height: <number>` The window's new height.
 
@@ -699,7 +689,6 @@ Both key events have the following properties:
 The following key events are defined:
 
 * `'key-down'` Fired when a key is pressed, and will also be fired repeatedly afterwards if the key is held down.
-
 * `'key-up'` Fired when a key is released.
 
 #### Text events
@@ -719,13 +708,10 @@ All mouse events have the following properties:
 The following mouse events are defined, along with any additional properties:
 
 * `'mouse-move'` Fired when the mouse moves within a window.
-
 * `'mouse-button-down'` Fired when a mouse button is pressed.
   * `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was pressed.
-
 * `'mouse-button-up'` Fired when a mouse button is released.
   * `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was released.
-
 * `'mouse-wheel'` Fired when the mouse wheel moves.
   * `dx: <number>` The wheel's x movement, relative to last position.
   * `dy: <number>` The wheel's y movement, relative to last position.
@@ -742,12 +728,9 @@ All drag-n-drop events have the following property:
 The following drag-n-drop events are defined, along with any additional properties:
 
 * `'drop-begin'` Fired before a set of items has been dropped on a window.
-
 * `'drop-complete'` Fired after a set of items has been dropped on a window.
-
 * `'drop-text'` Fired when one of the drops is a text item.
   * `text: <string>`: The text that was dropped onto the window.
-
 * `'drop-file'` Fired when one of the drops is a file.
   * `file: <string>`: The path to the file that was dropped onto the window.
 
