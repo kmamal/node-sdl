@@ -1287,7 +1287,7 @@ audio_getDevices(bool capture, Variant & list)
 		for (int i = 0; i < num_devices; i++) {
 			const char * name = SDL_GetAudioDeviceName(i, capture);
 			if (name == nullptr) {
-				RETURN_ERROR("SDL_GetAudioDeviceName(%d, %d) error: %s\n", i, capture, error);
+				RETURN_ERROR("SDL_GetAudioDeviceName(%d, %d) error: %s\n", i, capture, SDL_GetError());
 			}
 
 			Variant device;
