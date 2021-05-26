@@ -954,12 +954,12 @@ const buffer = Buffer.alloc(numBytes)
 
 let offset = 0
 for (let i = 0; i < numFrames; i++) {
-	const time = i / frequency
-	const angle = time / sinePeriod * TWO_PI
-	const sample = Math.sin(angle) * sineAmplitude
-	for (let j = 0; j < channels; j++) {
-		offset = buffer.writeFloatLE(sample, offset)
-	}
+  const time = i / frequency
+  const angle = time / sinePeriod * TWO_PI
+  const sample = Math.sin(angle) * sineAmplitude
+  for (let j = 0; j < channels; j++) {
+    offset = buffer.writeFloatLE(sample, offset)
+  }
 }
 ```
 
@@ -972,9 +972,9 @@ for (let i = 0; i < numFrames; i++) {
 This should not be necessary, since this package bundles the SDL2 runtime library along with its binaries, but you never know...
 
 This package depends on SDL2 `>=2.0.5`. To install it on your system you might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
-    * __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
-    * __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
-    * __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
+* __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
+* __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
+* __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
 
 
 ### Building from source
