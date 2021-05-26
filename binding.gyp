@@ -78,17 +78,20 @@
 		[ 'OS=="mac"', {
 			'targets': [
 				{
-					'target_name': 'action_after_build',
+					'target_name': "action_after_build",
 					'type': 'none',
-					'dependencies': [ '<(module_name)' ],
+					'dependencies': [ 'sdl' ],
 					'actions': [
 						{
+							'action_name': "fixing_dylib",
+							'inputs': [ '<(module_root_dir)/build/Release/sdl.node' ],
+							'outputs': [ 'foo' ],
 							'action': [
 								'install_name_tool',
 								'-change',
 								'/usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib',
 								'@rpath/libSDL2-2.0.0.dylib',
-								'<(module_name)'
+								'<(module_root_dir)/build/Release/sdl.node'
 							],
 						},
 					],
