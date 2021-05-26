@@ -66,7 +66,7 @@
 						{
 							'destination': '<(module_root_dir)/build/Release',
 							'files': [
-								'<(module_root_dir)/deps/windows/libSDL2.dll',
+								'<(module_root_dir)/deps/windows/SDL2.dll',
 							]
 						}
 					]
