@@ -1,5 +1,5 @@
 {
-  "version": "0.0.17",
+  "version": "0.0.18",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
   "keywords": [
