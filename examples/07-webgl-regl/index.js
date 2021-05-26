@@ -68,7 +68,7 @@ for (;;) {
 		}
 	}
 
-	// Draw stuff
+	// Render
 	{
 		regl.clear({
 			color: [ 0, 0, 0, 1 ],

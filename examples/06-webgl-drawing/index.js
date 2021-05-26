@@ -13,7 +13,6 @@ const ext = gl.getExtension('STACKGL_resize_drawingbuffer')
 const vertexShader = gl.createShader(gl.VERTEX_SHADER)
 gl.shaderSource(vertexShader, `
 	attribute vec2 position;
-
 	void main() {
 		gl_Position = vec4(position, 0.0, 1.0);
 	}
@@ -26,7 +25,7 @@ if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
 
 const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
 gl.shaderSource(fragmentShader, `
-	precision highp float;
+	precision mediump float;
 	uniform float width;
 	uniform float height;
 	void main() {

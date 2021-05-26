@@ -1003,6 +1003,8 @@ window_create (
 		RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
 	}
 
+	SDL_GetWindowPosition(window, *x, *y);
+
 	*window_id = SDL_GetWindowID(window);
 	if (*window_id == 0) {
 		RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
@@ -1221,6 +1223,7 @@ window_render (
 		}
 
 		SDL_Surface* src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+		SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
 		if (src_surface == nullptr) {
 			RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
 		}
