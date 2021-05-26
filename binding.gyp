@@ -14,6 +14,12 @@
 				[ 'OS=="linux"', {
 					'cflags': [ '<!(sdl2-config --cflags)' ],
 					'libraries': [ '<!(sdl2-config --libs)', ],
+					'link_settings': {
+						'libraries': [
+							'-Wl,-rpath,\'$$ORIGIN\'',
+							'-Wl,-rpath,\'$$ORIGIN\'/..'
+						],
+					}
 				} ],
 				[ 'OS=="mac"', {
 					'sources': [
@@ -23,6 +29,12 @@
 					'xcode_settings': {
 						'OTHER_CFLAGS': [ '-std=c++17', '<!(sdl2-config --cflags)' ],
 					},
+					'link_settings': {
+						'libraries': [
+							'-Wl,-rpath,@loader_path',
+							'-Wl,-rpath,@loader_path/..',
+						],
+					}
 				} ],
 				[ 'OS=="win"', {
 					'sources': [

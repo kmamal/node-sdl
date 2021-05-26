@@ -1,6 +1,7 @@
 .github
 tests
 examples
+deps
 build
 prebuilds
 NOTES.txt
