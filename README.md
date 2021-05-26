@@ -10,9 +10,9 @@ SDL2 bindings for Node.js. Provides window management, input events, audio playb
 It should work on Linux, Mac, and Windows. Prebuilt binaries are available for x64 architectures.
 
 
-## Usage
+## Installation
 
-SDL2 is bundled along with the binaries so no separate installation is necessary. This package is self-contained. Just run:
+SDL2 is bundled along with the binaries so a separate installation is not necessary. This package is self-contained. Just run:
 
 ```
 npm install @kmamal/sdl
