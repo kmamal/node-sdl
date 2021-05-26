@@ -17,9 +17,16 @@
 					'link_settings': {
 						'libraries': [
 							'-Wl,-rpath,\'$$ORIGIN\'',
-							'-Wl,-rpath,\'$$ORIGIN\'/..'
 						],
-					}
+					},
+					'copies': [
+						{
+							'destination': '<(module_root_dir)/build/Release',
+							'files': [
+								'<(module_root_dir)/deps/linux/libSDL2-2.0.so.0',
+							]
+						}
+					]
 				} ],
 				[ 'OS=="mac"', {
 					'sources': [
@@ -32,9 +39,16 @@
 					'link_settings': {
 						'libraries': [
 							'-Wl,-rpath,@loader_path',
-							'-Wl,-rpath,@loader_path/..',
 						],
-					}
+					},
+					'copies': [
+						{
+							'destination': '<(module_root_dir)/build/Release',
+							'files': [
+								'<(module_root_dir)/deps/mac/libSDL2-2.0.0.dylib',
+							]
+						}
+					]
 				} ],
 				[ 'OS=="win"', {
 					'sources': [
@@ -48,6 +62,14 @@
 							'LanguageStandard': 'stdcpp17',
 						},
 					},
+					'copies': [
+						{
+							'destination': '<(module_root_dir)/build/Release',
+							'files': [
+								'<(module_root_dir)/deps/windows/libSDL2.dll',
+							]
+						}
+					]
 				} ],
 			],
 		},
