@@ -12,12 +12,13 @@ It should work on Linux, Mac, and Windows. Prebuilt binaries are available for x
 
 ## Usage
 
-1. Install SDL2 (`>=2.0.5`) on your system. You might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
-    * __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
-    * __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
-    * __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
-2. Install this package via `npm install @kmamal/sdl` or `yarn add @kmamal/sdl`.
-3. Import it from your code with `const sdl = require('@kmamal/sdl')` or `import sdl from '@kmamal/sdl'`.
+SDL2 is bundled along with the binaries so no separate installation is necessary. This package is self-contained. Just run:
+
+```
+npm install @kmamal/sdl
+```
+
+(But if things go wrong do look over [here](#installing-sdl2))
 
 
 ## Example
@@ -961,3 +962,21 @@ for (let i = 0; i < numFrames; i++) {
 	}
 }
 ```
+
+
+## Miscellanea
+
+
+### Installing SDL2
+
+This should not be necessary, since this package bundles the SDL2 runtime library along with its binaries, but you never know...
+
+This package depends on SDL2 `>=2.0.5`. To install it on your system you might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
+    * __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
+    * __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
+    * __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
+
+
+### Building from source
+
+// TODO
