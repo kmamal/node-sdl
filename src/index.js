@@ -157,7 +157,7 @@ class Window {
 		if (!Number.isFinite(y)) { throw new Error("y must be a number") }
 		this._x = x
 		this._y = y
-		Bindings.window_setSize(this._id, x, y)
+		Bindings.window_setPosition(this._id, x, y)
 	}
 
 	get width () { return this._width }
