@@ -1,7 +1,6 @@
 const sdl = require('@kmamal/sdl')
 const path = require('path')
 const { loadImage, loadVideo } = require('./ffmpeg')
-const { performance: { now } } = require('perf_hooks')
 
 const width = 640
 const height = 480
@@ -29,7 +28,7 @@ const main = async () => {
 						if (startTime) {
 							startTime = null
 						} else {
-							startTime = now()
+							startTime = Date.now()
 						}
 						break
 					}
@@ -49,7 +48,7 @@ const main = async () => {
 
 		// Render video
 		{
-			const time = (now() - startTime) / 1e3
+			const time = (Date.now() - startTime) / 1e3
 			const index = Math.floor(time * framerate)
 
 			if (index === lastIndex) { continue }
