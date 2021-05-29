@@ -42,11 +42,15 @@ Same example, but this time with the [`@kmamal/gl`](https://github.com/kmamal/he
 
 Uses the popular [`regl`](https://www.npmjs.com/package/regl) library to simplify some of that WebGL code.
 
-## [8. Sine wave](https://github.com/kmamal/node-sdl/tree/master/examples/08-sine-wave)
+## [8. FFmpeg video/image loading](https://github.com/kmamal/node-sdl/tree/master/examples/08-ffmpeg)
+
+There are many ways to load static assets into your application. In this example we use FFmpeg (through the [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static) package) to decode an image and a video into raw pixels that we can render to the screen.
+
+## [9. Sine wave](https://github.com/kmamal/node-sdl/tree/master/examples/09-sine-wave)
 
 Plays a 440Hz sine wave for 3 seconds. Note that there is no event loop at all since we don't react to any user input, and instead there's a call to `setTimeout` at the end to keep the process alive while the sound plays.
 
-## [9. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/09-mic-waveform)
+## [10. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/10-mic-waveform)
 
 Listens to the mic and plots the volume of recorded audio on the screen. Note how we have reduced the value of the `buffered` option to get audio samples more frequently (and with smaller delays) from the hardware.
 

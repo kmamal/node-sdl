@@ -1,9 +1,9 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-9-mic-waveform",
+  "name": "sdl-example-8-ffmpeg",
   "main": "index.js",
   "dependencies": {
     "@kmamal/sdl": "*",
-    "canvas": "*"
+    "ffmpeg-static": "*"
   }
 }
