@@ -54,5 +54,9 @@ Plays a 440Hz sine wave for 3 seconds. Note that there is no event loop at all s
 
 Listens to the mic and plots the volume of recorded audio on the screen. Note how we have reduced the value of the `buffered` option to get audio samples more frequently (and with smaller delays) from the hardware.
 
+## [11. Echo effect](https://github.com/kmamal/node-sdl/tree/master/examples/11-echo)
+
+Use headphones for this one or you'll end up in a feedback loop. Listens to the mic and then plays back what it recorded plus an echo effect.
+
 
 // TODO: more

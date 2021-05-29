@@ -491,7 +491,7 @@ A list of all the detected audio devices. Sample output for PulseAudio:
   * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
   * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
   * `format: `[`<sdl.audio.FORMAT>`](#enum-sdlaudioformat): The binary format for each sample. Default `sdl.audio.FORMAT.S16`.
-  * `buffer: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
+  * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
 * Returns: [`<AudioDevice>`](#class-audiodevice) an object representing the opened audio device.
 
 Initializes an audio device for playback/recording. If the opened device is a playback device, then the returned object will be an [`AudioPlaybackDevice`](#class-audioplaybackdevice-extends-audiodevice), otherwise it will be an [`AudioRecordingDevice`](#class-audiorecordingdevice-extends-audiodevice).

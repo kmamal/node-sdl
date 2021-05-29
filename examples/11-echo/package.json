@@ -1,0 +1,8 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-11-echo",
+  "main": "index.js",
+  "dependencies": {
+    "@kmamal/sdl": "*"
+  }
+}
