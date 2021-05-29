@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-12-clipboard",
+  "main": "index.js",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "canvas": "*"
+  }
+}
