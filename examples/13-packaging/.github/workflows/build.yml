@@ -1,0 +1,34 @@
+name: Build and upload binaries
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build and upload
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - id: npm-cache
+        run: echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - run: npm install --no-save @kmamal/packager
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist

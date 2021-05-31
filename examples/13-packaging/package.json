@@ -1,0 +1,15 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-13-packaging",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "packager --include '[ \"src/**/*.js\", \"assets/**/*\", \"package*.json\" ]' --out-dir dist"
+  },
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "ffmpeg-static": "*"
+  },
+  "devDependencies": {
+    "@kmamal/packager": "*"
+  }
+}

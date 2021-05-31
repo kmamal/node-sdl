@@ -58,5 +58,13 @@ Listens to the mic and plots the volume of recorded audio on the screen. Note ho
 
 Use headphones for this one or you'll end up in a feedback loop. Listens to the mic and then plays back what it recorded plus an echo effect.
 
+## [12. Clipboard mutator](https://github.com/kmamal/node-sdl/tree/master/examples/12-clipboard-mutator)
+
+Applies random changes to whatever text has been copied to the clipboard.
+
+## [13. Packaging for distribution](https://github.com/kmamal/node-sdl/tree/master/examples/13-packaging)
+
+Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/publisher`](https://github.com/kmamal/publisher#readme) here, but other packagers should work as well. There's also a github workflow file that builds and bundles th eproject for all supported platforms.
+
 
 // TODO: more
