@@ -45,6 +45,7 @@ const drawTriangle = regl({
 const resize = () => {
 	const { width: w, height: h } = window
 	ext.resize(w, h)
+	regl.poll()
 }
 
 resize()
