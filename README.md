@@ -70,8 +70,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [Event: 'mouse-move'](#event-mouse-move)
     * [Event: 'mouse-wheel'](#event-mouse-wheel)
     * [Event: 'drop-begin'](#event-drop-begin)
-    * [Event: 'drop-file'](#event-drop-file)
     * [Event: 'drop-text'](#event-drop-text)
+    * [Event: 'drop-file'](#event-drop-file)
     * [Event: 'drop-complete'](#event-drop-complete)
     * [window.id](#windowid)
     * [window.title](#windowtitle)
@@ -107,6 +107,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 * [sdl.audio](#sdlaudio)
   * [Enum: sdl.audio.FORMAT](#enum-sdlaudioformat)
   * [Enum: sdl.audio.FORMAT_NAME](#enum-sdlaudioformat_name)
+  * [Event: 'device-add'](#event-device-add)
+  * [Event: 'device-remove'](#event-device-remove)
   * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioDevice](#class-audiodevice)
@@ -147,6 +149,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   * [sdl.mouse.uncapture()](#sdlmousecapture)
 * [sdl.clipboard](#sdlclipboard)
+  * [Event: 'update'](#event-update)
   * [sdl.clipboard.text](#sdlclipboardtext)
   * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
 * [Notes](#notes)
@@ -742,7 +745,7 @@ Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_AudioForm
 
 Maps values of [`sdl.audio.FORMAT`](#enum-sdlaudioformat) back to their names so that `sdl.audio.FORMAT_NAME[sdl.audio.FORMAT.FOO] === 'FOO'`.
 
-### Event: 'device-added'
+### Event: 'device-add'
 
 * `type: <string>` The event's type.
 * `timestamp: <number>` The time when SDL received the event.
@@ -750,7 +753,7 @@ Maps values of [`sdl.audio.FORMAT`](#enum-sdlaudioformat) back to their names so
 
 Fired when a new audio device becomes available. Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
 
-### Event: 'device-removed'
+### Event: 'device-remove'
 
 * `type: <string>` The event's type.
 * `timestamp: <number>` The time when SDL received the event.

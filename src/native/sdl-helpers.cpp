@@ -1537,12 +1537,12 @@ packageEvent (const SDL_Event & event, Variant & object)
 			break ;
 		}
 		case SDL_JOYDEVICEADDED: {
-			SET_STRING(object, "type", "joystick-device-added");
+			SET_STRING(object, "type", "joystick-device-add");
 			SET_NUM(object, "index", event.jdevice.which);
 			break;
 		}
 		case SDL_JOYDEVICEREMOVED: {
-			SET_STRING(object, "type", "joystick-device-removed");
+			SET_STRING(object, "type", "joystick-device-remove");
 			SET_NUM(object, "joystick", event.jdevice.which);
 			break ;
 		}
