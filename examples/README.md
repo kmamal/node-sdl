@@ -42,7 +42,7 @@ There are many ways to load static assets into your application. In this example
 
 Plays a 440Hz sine wave for 3 seconds.
 
-## [9. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/9-mic-waveform)
+## [9. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/09-mic-waveform)
 
 Listens to the mic and plots the volume of recorded audio on the screen. Note how we have reduced the value of the `buffered` option to get audio samples more frequently (and with smaller delays) from the hardware.
 
