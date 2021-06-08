@@ -3,8 +3,8 @@
 		{
 			'target_name': 'sdl',
 			'sources': [
-				'src/binding.cpp',
-				'src/sdl-helpers.cpp',
+				'src/native/binding.cpp',
+				'src/native/sdl-helpers.cpp',
 			],
 			'defines': [
 				'NAPI_VERSION=<(napi_build_version)'
@@ -30,7 +30,7 @@
 				} ],
 				[ 'OS=="mac"', {
 					'sources': [
-						'src/cocoa-window.mm',
+						'src/native/cocoa-window.mm',
 					],
 					'libraries': [ '<!(sdl2-config --libs)', ],
 					'xcode_settings': {
@@ -52,7 +52,7 @@
 				} ],
 				[ 'OS=="win"', {
 					'sources': [
-						'src/asprintf.c',
+						'src/native/asprintf.c',
 					],
 					'cflags': [ '-D_REENTRANT' ],
 					'include_dirs': [ 'SDL2\\include' ],

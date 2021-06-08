@@ -1,4 +1,5 @@
-const sdl = require('@kmamal/sdl')
+import sdl from '@kmamal/sdl'
+import { setTimeout } from 'timers/promises'
 
 const window = sdl.video.createWindow()
 
@@ -11,16 +12,7 @@ let tic = Date.now()
 let toc
 let frames = 0
 
-main_loop:
-for (;;) {
-	// Handle events
-	{
-		let event
-		while ((event = sdl.events.poll())) {
-			if (event.type === 'quit') { break main_loop }
-		}
-	}
-
+while (!window.destroyed) {
 	// Draw to the screen
 	window.render(width, height, stride, sdl.video.FORMAT.RGBA32, buffer)
 
@@ -38,4 +30,6 @@ for (;;) {
 			frames = 0
 		}
 	}
+
+	await setTimeout(0)
 }

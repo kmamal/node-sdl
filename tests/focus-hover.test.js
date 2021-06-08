@@ -6,19 +6,7 @@ const base_width = screen_width / 5
 sdl.video.createWindow({ x: base_width, width: base_width })
 sdl.video.createWindow({ x: 3 * base_width, width: base_width })
 
-for (;;) {
-	const event = sdl.events.wait()
-
-	switch (event?.type) {
-		case 'window-close': {
-			event.window.destroy()
-			break
-		}
-
-		case 'quit': { process.exit() }
-		// No default
-	}
-
+setInterval(() => {
 	const { windows, focused, hovered } = sdl.video
 	if (focused) {
 		if (!focused.focused) { throw new Error('window.focused not set') }
@@ -32,4 +20,4 @@ for (;;) {
 		if (window.focused && !focused) { Error('sdl.video.focused not set') }
 		if (window.hovered && !hovered) { Error('sdl.video.hovered not set') }
 	}
-}
+}, 0)

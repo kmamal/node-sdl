@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-hello-world",
+  "name": "sdl-example-raw-drawing",
   "main": "index.js",
   "type": "module",
   "dependencies": {

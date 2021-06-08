@@ -24,33 +24,55 @@ npm install @kmamal/sdl
 ## Example
 
 ```js
-const sdl = require('@kmamal/sdl')
+import sdl from '@kmamal/sdl'
 
 sdl.video.createWindow({ title: "Hello, World!" })
-
-for (;;) {
-  const event = sdl.events.wait()
-  if (event?.type === 'quit') { break }
-}
 ```
 
-There are more examples [here](https://github.com/kmamal/node-sdl/tree/master/examples).
+There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples), covering several common use cases, including how to draw using Canvas and WebGL, as well as how to package the application for distribution.
 
 
 # API Reference
 
 ## Contents
 
-* [sdl.info](#sdlinfo)
+* [sdl](#sdl)
+  * [Event: 'before-quit'](#event-before-quit)
+  * [Event: 'quit'](#event-quit)
+  * [sdl.info](#sdlinfo)
 * [sdl.video](#sdlvideo)
-  * [enum sdl.video.FORMAT](#enum-sdlvideoformat)
-  * [enum sdl.video.FORMAT_NAME](#enum-sdlvideoformat_name)
+  * [Enum: sdl.video.FORMAT](#enum-sdlvideoformat)
+  * [Enum: sdl.video.FORMAT_NAME](#enum-sdlvideoformat_name)
   * [sdl.video.displays](#sdlvideodisplays)
   * [sdl.video.windows](#sdlvideowindows)
   * [sdl.video.focused](#sdlvideofocused)
   * [sdl.video.hovered](#sdlvideohovered)
   * [sdl.video.createWindow([options])](#sdlvideocreatewindowoptions)
   * [class Window](#class-window)
+    * [Event: 'show'](#event-show)
+    * [Event: 'hide'](#event-hide)
+    * [Event: 'expose'](#event-expose)
+    * [Event: 'minimize'](#event-minimize)
+    * [Event: 'maximize'](#event-maximize)
+    * [Event: 'restore'](#event-restore)
+    * [Event: 'move'](#event-move)
+    * [Event: 'resize'](#event-resize)
+    * [Event: 'focus'](#event-focus)
+    * [Event: 'blur'](#event-blur)
+    * [Event: 'hover'](#event-hover)
+    * [Event: 'leave'](#event-leave)
+    * [Event: 'close'](#event-close)
+    * [Event: 'key-down'](#event-key-down)
+    * [Event: 'key-up'](#event-key-up)
+    * [Event: 'text-input'](#event-text-input)
+    * [Event: 'mouse-button-down'](#event-mouse-button-down)
+    * [Event: 'mouse-button-up'](#event-mouse-button-up)
+    * [Event: 'mouse-move'](#event-mouse-move)
+    * [Event: 'mouse-wheel'](#event-mouse-wheel)
+    * [Event: 'drop-begin'](#event-drop-begin)
+    * [Event: 'drop-file'](#event-drop-file)
+    * [Event: 'drop-text'](#event-drop-text)
+    * [Event: 'drop-complete'](#event-drop-complete)
     * [window.id](#windowid)
     * [window.title](#windowtitle)
     * [window.setTitle(title)](#windowsettitletitle)
@@ -83,8 +105,8 @@ There are more examples [here](https://github.com/kmamal/node-sdl/tree/master/ex
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
 * [sdl.audio](#sdlaudio)
-  * [enum sdl.audio.FORMAT](#enum-sdlaudioformat)
-  * [enum sdl.audio.FORMAT_NAME](#enum-sdlaudioformat_name)
+  * [Enum: sdl.audio.FORMAT](#enum-sdlaudioformat)
+  * [Enum: sdl.audio.FORMAT_NAME](#enum-sdlaudioformat_name)
   * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioDevice](#class-audiodevice)
@@ -105,28 +127,17 @@ There are more examples [here](https://github.com/kmamal/node-sdl/tree/master/ex
     * [playbackDevice.queue(buffer[, bytes])](#playbackdevicequeuebuffer-bytes)
   * [class AudioRecordingDevice extends AudioDevice](#class-audiorecordingdevice-extends-audiodevice)
     * [recordingDevice.dequeue(buffer[, bytes])](#recordingdevicedequeuebuffer-bytes)
-* [sdl.events](#sdlevents)
-  * [sdl.events.poll()](#sdleventspoll)
-  * [sdl.events.wait([timeout])](#sdleventswaittimeout)
-  * [Events reference](#events-reference)
-    * [Application events](#application-events)
-    * [Window events](#window-events)
-    * [Audio device events](#audio-device-events)
-    * [Key events](#key-events)
-    * [Mouse events](#mouse-events)
-    * [Drag-n-Drop events](#drag-n-drop-events)
-    * [Clipboard events](#clipboard-events)
 * [sdl.keyboard](#sdlkeyboard)
-  * [enum sdl.keyboard.SCANCODE](#enum-sdlkeyboardscancode)
-  * [enum sdl.keyboard.SCANCODE_NAME](#enum-sdlkeyboardscancode_name)
-  * [enum sdl.keyboard.KEYCODE](#enum-sdlkeyboardkeycode)
-  * [enum sdl.keyboard.KEYCODE_NAME](#enum-sdlkeyboardkeycode_name)
+  * [Enum: sdl.keyboard.SCANCODE](#enum-sdlkeyboardscancode)
+  * [Enum: sdl.keyboard.SCANCODE_NAME](#enum-sdlkeyboardscancode_name)
+  * [Enum: sdl.keyboard.KEYCODE](#enum-sdlkeyboardkeycode)
+  * [Enum: sdl.keyboard.KEYCODE_NAME](#enum-sdlkeyboardkeycode_name)
   * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
 * [sdl.mouse](#sdlmouse)
-  * [enum sdl.mouse.BUTTON](#enum-sdlmousebutton)
-  * [enum sdl.mouse.BUTTON_NAME](#enum-sdlmousebutton_name)
-  * [enum sdl.mouse.CURSOR](#enum-sdlmousecursor)
-  * [enum sdl.mouse.CURSOR_NAME](#enum-sdlmousecursor_name)
+  * [Enum: sdl.mouse.BUTTON](#enum-sdlmousebutton)
+  * [Enum: sdl.mouse.BUTTON_NAME](#enum-sdlmousebutton_name)
+  * [Enum: sdl.mouse.CURSOR](#enum-sdlmousecursor)
+  * [Enum: sdl.mouse.CURSOR_NAME](#enum-sdlmousecursor_name)
   * [sdl.mouse.position](#sdlmouseposition)
   * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
   * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursor)
@@ -143,7 +154,24 @@ There are more examples [here](https://github.com/kmamal/node-sdl/tree/master/ex
   * [Audio data](#audio-data)
 
 
-## sdl.info
+## sdl
+
+### Event: 'before-quit'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `prevent: <function (void) => void>` Call this to prevent the application from closing.
+
+Fired to indicate that the user has requested the application to close (usually by closing the last window). If you need to display any confirmation dialogs you should call `event.prevent()` and handle termination manually. If `prevent` is not called, then this event will be followed by a `'quit'` event.
+
+### Event: 'quit'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+
+Indicates that the application is about to close. Handle any cleanup here. This event will be followed by a call to `process.exit()`.
+
+### sdl.info
 
 * `<object>`
   * `version: <object>`
@@ -187,13 +215,13 @@ Sample data for Ubuntu:
 
 ## sdl.video
 
-### enum sdl.video.FORMAT
+### Enum: sdl.video.FORMAT
 
 Values of this enum are used to represent how the pixels of an image are stored in a Buffer. See also the section on [image data](#image-data).
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_PixelFormatEnum), __except__ the ones for formats that are indexed (palette-based). The `SDL_PIXELFORMAT_` prefix is removed so that `SDL_PIXELFORMAT_FOO` corresponds to `sdl.video.FORMAT.FOO`.
+Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_PixelFormatEnum), __except__ for formats that are indexed (palette-based). The `SDL_PIXELFORMAT_` prefix is removed so that `SDL_PIXELFORMAT_FOO` corresponds to `sdl.video.FORMAT.FOO`.
 
-### enum sdl.video.FORMAT_NAME
+### Enum: sdl.video.FORMAT_NAME
 
 Maps values of [`sdl.video.FORMAT`](#enum-sdlvideoformat) back to their names so that `sdl.video.FORMAT_NAME[sdl.video.FORMAT.FOO] === 'FOO'`.
 
@@ -279,6 +307,251 @@ The following restrictions apply:
 ## class Window
 
 This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.video.createWindow()`](#sdlvideocreatewindowoptions) are of this type.
+
+### Event: 'show'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window becomes visible.
+
+### Event: 'hide'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window becomes hidden.
+
+### Event: 'expose'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window becomes exposed.
+
+### Event: 'minimize'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window becomes minimized.
+
+### Event: 'maximize'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window becomes maximized.
+
+### Event: 'restore'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window stops being either minimized or maximized.
+
+### Event: 'move'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `x: <number>` The window's new x position, relative to the screen.
+* `y: <number>` The window's new y position, relative to the screen.
+
+Fired when the window changes position.
+
+### Event: 'resize'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `width: <number>` The window's new width.
+* `height: <number>` The window's new height.
+
+Fired when the window changes size.
+
+### Event: 'focus'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window gains the keyboard focus.
+
+### Event: 'blur'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when a window loses the keyboard focus.
+
+### Event: 'hover'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when the mouse enters the window.
+
+### Event: 'leave'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Fired when the mouse leaves the window.
+
+### Event: 'before-close'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `prevent: <function (void) => void>` Call this to prevent the window from closing.
+
+Fired to indicate that the user has requested the window to close (usually by clicking the "x" button). If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually. If `prevent` is not called, then this event will be followed by a `'close'` event.
+
+### Event: 'close'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+
+Indicates that the application is about to be destroyed. Handle any cleanup here. This event will be followed by a call to `window.destroy()`.
+
+### Event: 'key-down'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode) The scancode of the key that caused the event.
+* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode) The keycode of the key that caused the event.
+* `repeat: <number>` Is `true` if the event was generated by holding down a key for a long time.
+* `shift: <number>` Is `true` if the Shift key was pressed when the event was generated.
+* `ctrl: <number>` Is `true` if the Ctrl key was pressed when the event was generated.
+* `alt: <number>` Is `true` if the Alt key was pressed when the event was generated.
+* `super: <number>` Is `true` if the "Windows" key was pressed when the event was generated.
+* `altgr: <number>` Is `true` if the AltGr key was pressed when the event was generated.
+* `capslock: <number>` Is `true` if CapsLock was active when the event was generated.
+* `numlock: <number>` Is `true` if NumLock was active when the event was generated.
+
+Fired when a key is pressed, and will also be fired repeatedly afterwards if the key is held down.
+
+### Event: 'key-up'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode) The scancode of the key that caused the event.
+* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode) The keycode of the key that caused the event.
+* `repeat: <number>` Is `true` if the event was generated by holding down a key for a long time.
+* `shift: <number>` Is `true` if the Shift key was pressed when the event was generated.
+* `ctrl: <number>` Is `true` if the Ctrl key was pressed when the event was generated.
+* `alt: <number>` Is `true` if the Alt key was pressed when the event was generated.
+* `super: <number>` Is `true` if the "Windows" key was pressed when the event was generated.
+* `altgr: <number>` Is `true` if the AltGr key was pressed when the event was generated.
+* `capslock: <number>` Is `true` if CapsLock was active when the event was generated.
+* `numlock: <number>` Is `true` if NumLock was active when the event was generated.
+
+Fired when a key is released.
+
+### Event: 'text-input'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `text: <string>` The unicode representation of the character that was entered.
+
+Fired when the keys pressed by the user result in a character being printed.
+
+### Event: 'mouse-button-down'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `x: <number>` The mouse's x position when the event happened, relative to the window.
+* `y: <number>` The mouse's y position when the event happened, relative to the window.
+* `touch: <boolean>` Will be `true` if the event was caused by a touch event.
+* `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was pressed.
+
+Fired when a mouse button is pressed.
+
+### Event: 'mouse-button-up'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `x: <number>` The mouse's x position when the event happened, relative to the window.
+* `y: <number>` The mouse's y position when the event happened, relative to the window.
+* `touch: <boolean>` Will be `true` if the event was caused by a touch event.
+* `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was pressed.
+
+Fired when a mouse button is released.
+
+### Event: 'mouse-move'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `x: <number>` The mouse's x position when the event happened, relative to the window.
+* `y: <number>` The mouse's y position when the event happened, relative to the window.
+* `touch: <boolean>` Will be `true` if the event was caused by a touch event.
+
+Fired when the mouse moves.
+
+### Event: 'mouse-wheel'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window) The window that caused the event.
+* `x: <number>` The mouse's x position when the event happened, relative to the window.
+* `y: <number>` The mouse's y position when the event happened, relative to the window.
+* `touch: <boolean>` Will be `true` if the event was caused by a touch event.
+* `dx: <number>` The wheel's x movement, relative to its last position.
+* `dy: <number>` The wheel's y movement, relative to its last position.
+* `flipped: <number>` Will be `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
+
+Fired when the mouse wheel is scrolled.
+
+### Event: 'drop-begin'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window): The window that received the drop.
+
+When dropping a set of items onto a window, first the `'drop-begin'` event will be fired, then a number of `'drop-text'` and/or `'drop-file'` events will be fired corresponding to the contents of the drop, then finally the `'drop-complete'` event will be fired.
+
+### Event: 'drop-text'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window): The window that received the drop.
+* `text: <string>`: The text that was dropped onto the window.
+
+Fired when one of the drops is a text item.
+
+### Event: 'drop-file'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window): The window that received the drop.
+* `file: <string>`: The path to the file that was dropped onto the window.
+
+Fired when one of the drops is a file.
+
+### Event: 'drop-complete'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `window: `[`<Window>`](#class-window): The window that received the drop.
+
+Fired after a set of items has been dropped on a window.
 
 ### window.id
 
@@ -459,15 +732,31 @@ Destroys the window.
 
 ## sdl.audio
 
-### enum sdl.audio.FORMAT
+### Enum: sdl.audio.FORMAT
 
 Values of this enum are used to represent how audio samples are stored in a Buffer. See also the section on [audio data](#audio-data).
 
 Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_AudioFormat) with the `AUDIO_` prefix removed so that `AUDIO_FOO` corresponds to `sdl.audio.FORMAT.FOO`.
 
-### enum sdl.audio.FORMAT_NAME
+### Enum: sdl.audio.FORMAT_NAME
 
 Maps values of [`sdl.audio.FORMAT`](#enum-sdlaudioformat) back to their names so that `sdl.audio.FORMAT_NAME[sdl.audio.FORMAT.FOO] === 'FOO'`.
+
+### Event: 'device-added'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+
+Fired when a new audio device becomes available. Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
+
+### Event: 'device-removed'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+
+Fired when an existing audio device is removed. Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
 
 ### sdl.audio.devices
 
@@ -602,176 +891,31 @@ This class is not directly exposed by the API so you can't use it with the `new`
 Takes recorded audio data that has been put on the queue, and writes it to the provided buffer.
 
 
-## sdl.events
-
-### sdl.events.poll()
-
-* Returns: [`<Event>`](#events-reference)`|<null>` an object representing the emitted event, or `null`.
-
-If there are events in the queue, it returns the first one. Otherwise, it returns null.
-
-### sdl.events.wait([timeout])
-
-* `timeout: <number>` Number of milliseconds to wait for events. Default `1e3`
-* Returns: [`<Event>`](#events-reference)`|<null>` an object representing the emitted event, or `null`.
-
-__Warning: this is a blocking function.__
-
-If there are events in the queue, it returns the first one. Otherwise it waits up to `timeout` milliseconds for an event to arrive and returns that. If no events arrive before the timeout, it returns null.
-
-
-## Events reference
-
-Event objects are returned from calls to [`sdl.events.poll()`](#sdleventspoll) and [`sdl.events.wait()`](#sdleventswaittimeout). They all have the following common property:
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event, in milliseconds.
-
-Note that `timestamp` will not be the exact time the event happened, but instead the time of the first call to either [`sdl.events.poll()`](#sdleventspoll) or [`sdl.events.wait()`](#sdleventswaittimeout) after the event happened.
-
-There are many different types of events and each can carry some extra properties. Here they are all together, grouped into categories:
-
-### Application events
-
-* `'quit'` Fired to indicate that the user has requested the application to close (most often by closing the last window). The process is not terminated automatically so that you get a chance to display any confirmation dialogs you might need to. Handle this event and then terminate the application manually when you are ready.
-
-### Window events
-
-All window events have the following property:
-
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
-The following window events are defined along with any additional properties:
-
-* `'window-shown'` Fired when a window becomes visible.
-* `'window-hidden'` Fired when a window becomes hidden.
-* `'window-exposed'` Fired when a window becomes exposed.
-* `'window-minimized'` Fired when a window becomes minimized.
-* `'window-maximized'` Fired when a window becomes maximized.
-* `'window-restored'` Fired when a window stops being either minimized or maximized.
-* `'window-focus-gained'` Fired when a window gains the keyboard focus.
-* `'window-focus-lost'` Fired when a window loses the keyboard focus.
-* `'window-enter'` Fired when the mouse enters the window.
-* `'window-leave'` Fired when the mouse leaves the window.
-* `'window-close'` Fired when the window is closed. The window is not destroyed automatically so that you get a chance to display any confirmation dialogs you might need. Handle this event and then call `window.destroy()` to destroy the window.
-* `'window-moved'` Fired when the window changes position.
-  * `x: <number>` The window's new x position, relative to the screen.
-  * `y: <number>` The window's new y position, relative to the screen.
-* `'window-size-changed'` Fired before the window changes size.
-  * `width: <number>` The window's new width.
-  * `height: <number>` The window's new height.
-* `'window-resized'` Fired after the window changes size.
-  * `width: <number>` The window's new width.
-  * `height: <number>` The window's new height.
-
-### Audio device events
-
-All audio device events have the following property:
-
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
-
-The following audio device events are defined:
-
-* `'audio-device-added'` Fired when a new audio device becomes available.
-* `'audio-device-removed'` Fired when an existing audio device is removed.
-
-After either of these evens you can check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
-
-### Key events
-
-Both key events have the following properties:
-
-* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode) The scancode of the key that caused the event.
-* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode) The keycode of the key that caused the event.
-* `repeat: <number>` Is `true` if the event was generated by holding down a key for a long time.
-* `shift: <number>` Is `true` if the Shift key was pressed when the event was generated.
-* `ctrl: <number>` Is `true` if the Ctrl key was pressed when the event was generated.
-* `alt: <number>` Is `true` if the Alt key was pressed when the event was generated.
-* `super: <number>` Is `true` if the "Windows" key was pressed when the event was generated.
-* `altgr: <number>` Is `true` if the AltGr key was pressed when the event was generated.
-* `capslock: <number>` Is `true` if CapsLock was active when the event was generated.
-* `numlock: <number>` Is `true` if NumLock was active when the event was generated.
-
-The following key events are defined:
-
-* `'key-down'` Fired when a key is pressed, and will also be fired repeatedly afterwards if the key is held down.
-* `'key-up'` Fired when a key is released.
-
-### Text events
-
-* `'text-input'` Fired when the keys pressed by the user result in a character being printed.
-  * `text: <string>` The unicode representation of the character that was entered.
-  * `window: `[`<Window>`](#class-window) The window that caused the event.
-
-### Mouse events
-
-All mouse events have the following properties:
-
-* `x: <number>` The mouse's x position when the event happened, relative to the screen.
-* `y: <number>` The mouse's y position when the event happened, relative to the screen.
-* `touch: <boolean>` Will be `true` if the event was caused by a touch event.
-
-The following mouse events are defined, along with any additional properties:
-
-* `'mouse-move'` Fired when the mouse moves within a window.
-* `'mouse-button-down'` Fired when a mouse button is pressed.
-  * `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was pressed.
-* `'mouse-button-up'` Fired when a mouse button is released.
-  * `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was released.
-* `'mouse-wheel'` Fired when the mouse wheel moves.
-  * `dx: <number>` The wheel's x movement, relative to last position.
-  * `dy: <number>` The wheel's y movement, relative to last position.
-  * `flipped: <number>` Will be `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
-
-Mouse events are received only if the mouse is over a window, unless the mouse is captured in which case mouse events are received from the whole screen.
-
-### Drag-n-Drop events
-
-All drag-n-drop events have the following property:
-
-* `window: `[`<Window>`](#class-window): The window that received the drop.
-
-The following drag-n-drop events are defined, along with any additional properties:
-
-* `'drop-begin'` Fired before a set of items has been dropped on a window.
-* `'drop-complete'` Fired after a set of items has been dropped on a window.
-* `'drop-text'` Fired when one of the drops is a text item.
-  * `text: <string>`: The text that was dropped onto the window.
-* `'drop-file'` Fired when one of the drops is a file.
-  * `file: <string>`: The path to the file that was dropped onto the window.
-
-When dropping a set of items onto a window, first the `'drop-begin'` event will be fired, then a number of `'drop-text'` and/or `'drop-file'` events will be fired corresponding to the contents of the drop, then finally the `'drop-complete'` event will be fired.
-
-### Clipboard events
-
-* `'clipboard-update'` Fired when the contents of the clipboard have changed.
-
-
 ## sdl.keyboard
 
 There's three ways you can deal with the keyboard:
 
 * If you care about the physical layout of the keys, then you should use the [scancodes](#enum-sdlkeyboardscancode). Each physical keys will always be associated with the same scancode.
 * If you care about the character (or meaning) that corresponds to each key, then you should use [keycodes](#enum-sdlkeyboardkeycode). A key's keycode depends on the current keyboard mapping and its value is equal to either a) the unicode character that the unmodified key would produce if pressed or b) one of the enum values.
-* If you care about text written by the user, then you should be handling the [`text-input`](#text-events) events. Instead of handling keycodes and translating them into text by hand (by handling modifiers), these events will give you the final text as reported by the OS.
+* If you care about text written by the user, then you should be handling the [`'text-input'`](#event-text-input) events. Instead of handling keycodes and translating them into text by hand (by handling modifiers), these events will give you the final text as reported by the OS.
 
-### enum sdl.keyboard.SCANCODE
+### Enum: sdl.keyboard.SCANCODE
 
 Values of this enum are used to represent physical keys on the keyboard. See also the section on [handling keyboard input](#sdlkeyboard).
 
 Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_Scancode) with the `SDL_SCANCODE_` prefix removed so that `SDL_SCANCODE_FOO` corresponds to `sdl.keyboard.SCANCODE.FOO`.
 
-### enum sdl.keyboard.SCANCODE_NAME
+### Enum: sdl.keyboard.SCANCODE_NAME
 
 Maps values of [`sdl.keyboard.SCANCODE`](#enum-sdlkeyboardscancode) back to their names so that `sdl.keyboard.SCANCODE_NAME[sdl.keyboard.SCANCODE.FOO] === 'FOO'`.
 
-### enum sdl.keyboard.KEYCODE
+### Enum: sdl.keyboard.KEYCODE
 
 Values of this enum are used to represent virtual keys in the context of the current keyboard mapping. See also the section on [handling keyboard input](#sdlkeyboard).
 
 Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_Keycode) with the `SDLK_` prefix removed so that `SDLK_FOO` corresponds to `sdl.keyboard.KEYCODE.FOO`.
 
-### enum sdl.keyboard.KEYCODE_NAME
+### Enum: sdl.keyboard.KEYCODE_NAME
 
 Maps values of [`sdl.keyboard.KEYCODE`](#enum-sdlkeyboardkeycode) back to their names so that `sdl.keyboard.KEYCODE_NAME[sdl.keyboard.KEYCODE.FOO] === 'FOO'`.
 
@@ -798,23 +942,23 @@ Use the values of [`sdl.keyboard.SCANCODE`](#enum-sdlkeyboardscancode) as indexe
 
 ## sdl.mouse
 
-### enum sdl.mouse.BUTTON
+### Enum: sdl.mouse.BUTTON
 
 Values of this enum are used to represent the buttons on a mouse.
 
 Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_MouseButtonEvent) with the `SDL_BUTTON_` prefix removed so that `SDL_BUTTON_FOO` corresponds to `sdl.mouse.BUTTON.FOO`.
 
-### enum sdl.mouse.BUTTON_NAME
+### Enum: sdl.mouse.BUTTON_NAME
 
 Maps values of [`sdl.mouse.BUTTON`](#enum-sdlmousebutton) back to their names so that `sdl.mouse.BUTTON_NAME[sdl.video.BUTTON.FOO] === 'FOO'`.
 
-### enum sdl.mouse.CURSOR
+### Enum: sdl.mouse.CURSOR
 
 Values of this enum are used to represent the types of cursors available on most systems.
 
 Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_SystemCursor) with the `SDL_SYSTEM_CURSOR_` prefix removed so that `SDL_SYSTEM_CURSOR_FOO` corresponds to `sdl.mouse.CURSOR.FOO`.
 
-### enum sdl.mouse.CURSOR_NAME
+### Enum: sdl.mouse.CURSOR_NAME
 
 Maps values of [`sdl.mouse.CURSOR`](#enum-sdlmousecursor) back to their names so that `sdl.mouse.CURSOR_NAME[sdl.video.CURSOR.FOO] === 'FOO'`.
 
@@ -869,6 +1013,13 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 
 ## sdl.clipboard
+
+### Event: 'update'
+
+* `type: <string>` The event's type.
+* `timestamp: <number>` The time when SDL received the event.
+
+Fired when the contents of the clipboard have changed. Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the clipboard.
 
 ### sdl.clipboard.text
 
@@ -980,3 +1131,5 @@ This package depends on SDL2 `>=2.0.5`. To install it on your system you might h
 ### Building from source
 
 // TODO
+
+can't draw on the window in opengl mode?

@@ -1,9 +1,10 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-hello-world",
+  "name": "sdl-example-canvas-drawing",
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "@kmamal/sdl": "*"
+    "@kmamal/sdl": "*",
+    "canvas": "*"
   }
 }

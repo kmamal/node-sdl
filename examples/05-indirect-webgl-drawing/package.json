@@ -1,9 +1,0 @@
-{
-  "version": "0.0.0",
-  "name": "sdl-example-5-indirect-webgl-drawing",
-  "main": "index.js",
-  "dependencies": {
-    "@kmamal/sdl": "*",
-    "gl": "*"
-  }
-}

@@ -1,8 +1,7 @@
-const sdl = require('@kmamal/sdl')
+// import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 
-sdl.video.createWindow({ title: "Hello, World!" })
+const window = sdl.video.createWindow({ title: "Hello, World!" })
 
-for (;;) {
-	const event = sdl.events.wait()
-	if (event?.type === 'quit') { break }
-}
+window.on('hover', () => console.log('in'))
+window.on('leave', () => console.log('out'))

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-webgl-regl",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@kmamal/gl": "*",
+    "@kmamal/sdl": "*",
+    "regl": "*"
+  }
+}

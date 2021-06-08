@@ -1,8 +1,0 @@
-{
-  "version": "0.0.0",
-  "name": "sdl-example-3-raw-drawing",
-  "main": "index.js",
-  "dependencies": {
-    "@kmamal/sdl": "*"
-  }
-}

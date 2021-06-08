@@ -22,7 +22,7 @@
     "type": "git",
     "url": "git://github.com/kmamal/node-sdl.git"
   },
-  "main": "src/index.js",
+  "main": "src/javascript/index.js",
   "gypfile": true,
   "scripts": {
     "test": "tests/run-all.sh",
