@@ -1,7 +1,6 @@
 const Bindings = require('../bindings')
 const { enums } = require('../enums')
 
-console.log(enums)
 const keyboard = {
 	get SCANCODE () { return enums.scancode },
 	get SCANCODE_NAME () { return enums.scancode_names },
