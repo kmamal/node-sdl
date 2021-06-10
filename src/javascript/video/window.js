@@ -81,6 +81,8 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
+		this.once('close', () => {})
+
 		process.nextTick(() => {
 			const event = {
 				type: 'resize',

@@ -155,7 +155,7 @@ getEnums(napi_env env, napi_callback_info info)
 		CALL_SDL_HELPER(enum_getKeycodes, keycodes);
 
 		CALL_NAPI(fromVariant, keycodes, &value);
-		CALL_NAPI(napi_create_string_latin1, "keycode", 8, &key);
+		CALL_NAPI(napi_create_string_latin1, "keycode", 7, &key);
 		CALL_NAPI(napi_set_property, result, key, value);
 	}
 
