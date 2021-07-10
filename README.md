@@ -1473,8 +1473,8 @@ String values used to represent virtual keys in the context of the current keybo
 | `'Keypad >'` |
 | `'Keypad &'` |
 | `'Keypad &&'` |
-| `'Keypad |'` |
-| `'Keypad ||'` |
+| `'Keypad &#124;'` |
+| `'Keypad &#124;&#124;'` |
 | `'Keypad :'` |
 | `'Keypad #'` |
 | `'Keypad Space'` |
