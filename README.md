@@ -1309,229 +1309,130 @@ String values used to represent virtual keys in the context of the current keybo
 
 | Value |
 | --- |
-| `'A'` |
-| `'B'` |
-| `'C'` |
-| `'D'` |
-| `'E'` |
-| `'F'` |
-| `'G'` |
-| `'H'` |
-| `'I'` |
-| `'J'` |
-| `'K'` |
-| `'L'` |
-| `'M'` |
-| `'N'` |
-| `'O'` |
-| `'P'` |
-| `'Q'` |
-| `'R'` |
-| `'S'` |
-| `'T'` |
-| `'U'` |
-| `'V'` |
-| `'W'` |
-| `'X'` |
-| `'Y'` |
-| `'Z'` |
-| `'1'` |
-| `'2'` |
-| `'3'` |
-| `'4'` |
-| `'5'` |
-| `'6'` |
-| `'7'` |
-| `'8'` |
-| `'9'` |
-| `'0'` |
-| `'Return'` |
-| `'Escape'` |
-| `'Backspace'` |
-| `'Tab'` |
-| `'Space'` |
-| `'-'` |
-| `'='` |
-| `'['` |
-| `']'` |
-| `'\\'` |
-| `'#'` |
-| `';'` |
-| `'''` |
-| ``'`'`` |
-| `','` |
-| `'.'` |
-| `'/'` |
-| `'CapsLock'` |
-| `'F1'` |
-| `'F2'` |
-| `'F3'` |
-| `'F4'` |
-| `'F5'` |
-| `'F6'` |
-| `'F7'` |
-| `'F8'` |
-| `'F9'` |
-| `'F10'` |
-| `'F11'` |
-| `'F12'` |
-| `'PrintScreen'` |
-| `'ScrollLock'` |
-| `'Pause'` |
-| `'Insert'` |
-| `'Home'` |
-| `'PageUp'` |
-| `'Delete'` |
-| `'End'` |
-| `'PageDown'` |
-| `'Right'` |
-| `'Left'` |
-| `'Down'` |
-| `'Up'` |
-| `'Numlock'` |
-| `'Keypad /'` |
-| `'Keypad *'` |
-| `'Keypad -'` |
-| `'Keypad +'` |
-| `'Keypad Enter'` |
-| `'Keypad 1'` |
-| `'Keypad 2'` |
-| `'Keypad 3'` |
-| `'Keypad 4'` |
-| `'Keypad 5'` |
-| `'Keypad 6'` |
-| `'Keypad 7'` |
-| `'Keypad 8'` |
-| `'Keypad 9'` |
-| `'Keypad 0'` |
-| `'Keypad .'` |
-| `'Application'` |
-| `'Power'` |
-| `'Keypad ='` |
-| `'F13'` |
-| `'F14'` |
-| `'F15'` |
-| `'F16'` |
-| `'F17'` |
-| `'F18'` |
-| `'F19'` |
-| `'F20'` |
-| `'F21'` |
-| `'F22'` |
-| `'F23'` |
-| `'F24'` |
-| `'Execute'` |
-| `'Help'` |
-| `'Menu'` |
-| `'Select'` |
-| `'Stop'` |
-| `'Again'` |
-| `'Undo'` |
-| `'Cut'` |
-| `'Copy'` |
-| `'Paste'` |
-| `'Find'` |
-| `'Mute'` |
-| `'VolumeUp'` |
-| `'VolumeDown'` |
-| `'Keypad ,'` |
-| `'Keypad = (AS400)'` |
-| `'AltErase'` |
-| `'SysReq'` |
-| `'Cancel'` |
-| `'Clear'` |
-| `'Prior'` |
-| `'Return'` |
-| `'Separator'` |
-| `'Out'` |
-| `'Oper'` |
-| `'Clear / Again'` |
-| `'CrSel'` |
-| `'ExSel'` |
-| `'Keypad 00'` |
-| `'Keypad 000'` |
-| `'ThousandsSeparator'` |
-| `'DecimalSeparator'` |
-| `'CurrencyUnit'` |
-| `'CurrencySubUnit'` |
-| `'Keypad ('` |
-| `'Keypad )'` |
-| `'Keypad {'` |
-| `'Keypad }'` |
-| `'Keypad Tab'` |
-| `'Keypad Backspace'` |
-| `'Keypad A'` |
-| `'Keypad B'` |
-| `'Keypad C'` |
-| `'Keypad D'` |
-| `'Keypad E'` |
-| `'Keypad F'` |
-| `'Keypad XOR'` |
-| `'Keypad ^'` |
-| `'Keypad %'` |
-| `'Keypad <'` |
-| `'Keypad >'` |
-| `'Keypad &'` |
-| `'Keypad &&'` |
-| `'Keypad \|'` |
-| `'Keypad \|\|'` |
-| `'Keypad :'` |
-| `'Keypad #'` |
-| `'Keypad Space'` |
-| `'Keypad @'` |
-| `'Keypad !'` |
-| `'Keypad MemStore'` |
-| `'Keypad MemRecall'` |
-| `'Keypad MemClear'` |
-| `'Keypad MemAdd'` |
-| `'Keypad MemSubtract'` |
-| `'Keypad MemMultiply'` |
-| `'Keypad MemDivide'` |
-| `'Keypad +/-'` |
-| `'Keypad Clear'` |
-| `'Keypad ClearEntry'` |
-| `'Keypad Binary'` |
-| `'Keypad Octal'` |
-| `'Keypad Decimal'` |
-| `'Keypad Hexadecimal'` |
-| `'Left Ctrl'` |
-| `'Left Shift'` |
-| `'Left Alt'` |
-| `'Left GUI'` |
-| `'Right Ctrl'` |
-| `'Right Shift'` |
-| `'Right Alt'` |
-| `'Right GUI'` |
-| `'ModeSwitch'` |
-| `'AudioNext'` |
-| `'AudioPrev'` |
-| `'AudioStop'` |
-| `'AudioPlay'` |
-| `'AudioMute'` |
-| `'MediaSelect'` |
-| `'WWW'` |
-| `'Mail'` |
-| `'Calculator'` |
-| `'Computer'` |
-| `'AC Search'` |
-| `'AC Home'` |
-| `'AC Back'` |
-| `'AC Forward'` |
-| `'AC Stop'` |
-| `'AC Refresh'` |
-| `'AC Bookmarks'` |
-| `'BrightnessDown'` |
-| `'BrightnessUp'` |
-| `'DisplaySwitch'` |
-| `'KBDIllumToggle'` |
-| `'KBDIllumDown'` |
-| `'KBDIllumUp'` |
-| `'Eject'` |
-| `'Sleep'` |
-| `'App1'` |
-| `'App2'` |
-| `'AudioRewind'` |
-| `'AudioFastForward'` |
+| `'&&'` |
+| `'+/-'` |
+| `'||'` |
+| `'00'` |
+| `'000'` |
+| `'again'` |
+| `'altErase'` |
+| `'app1'` |
+| `'app2'` |
+| `'application'` |
+| `'audioFastForward'` |
+| `'audioMute'` |
+| `'audioNext'` |
+| `'audioPlay'` |
+| `'audioPrev'` |
+| `'audioRewind'` |
+| `'audioStop'` |
+| `'back'` |
+| `'binary'` |
+| `'bookmarks'` |
+| `'brightnessDown'` |
+| `'brightnessUp'` |
+| `'calculator'` |
+| `'cancel'` |
+| `'capsLock'` |
+| `'clear'` |
+| `'clear/again'` |
+| `'clearEntry'` |
+| `'computer'` |
+| `'copy'` |
+| `'crSel'` |
+| `'currencySubUnit'` |
+| `'currencyUnit'` |
+| `'cut'` |
+| `'decimal'` |
+| `'decimalSeparator'` |
+| `'delete'` |
+| `'displaySwitch'` |
+| `'down'` |
+| `'eject'` |
+| `'end'` |
+| `'execute'` |
+| `'exSel'` |
+| `'f1'` |
+| `'f2'` |
+| `'f3'` |
+| `'f4'` |
+| `'f5'` |
+| `'f6'` |
+| `'f7'` |
+| `'f8'` |
+| `'f9'` |
+| `'f10'` |
+| `'f11'` |
+| `'f12'` |
+| `'f13'` |
+| `'f14'` |
+| `'f15'` |
+| `'f16'` |
+| `'f17'` |
+| `'f18'` |
+| `'f19'` |
+| `'f20'` |
+| `'f21'` |
+| `'f22'` |
+| `'f23'` |
+| `'f24'` |
+| `'find'` |
+| `'forward'` |
+| `'help'` |
+| `'hexadecimal'` |
+| `'home'` |
+| `'illumDown'` |
+| `'illumToggle'` |
+| `'illumUp'` |
+| `'insert'` |
+| `'left'` |
+| `'leftAlt'` |
+| `'leftCtrl'` |
+| `'leftGui'` |
+| `'leftShift'` |
+| `'mail'` |
+| `'mediaSelect'` |
+| `'memAdd'` |
+| `'memClear'` |
+| `'memDivide'` |
+| `'memMultiply'` |
+| `'memRecall'` |
+| `'memStore'` |
+| `'memSubtract'` |
+| `'menu'` |
+| `'modeSwitch'` |
+| `'mute'` |
+| `'numlock'` |
+| `'octal'` |
+| `'oper'` |
+| `'out'` |
+| `'pageDown'` |
+| `'pageUp'` |
+| `'paste'` |
+| `'pause'` |
+| `'power'` |
+| `'printScreen'` |
+| `'prior'` |
+| `'refresh'` |
+| `'right'` |
+| `'rightAlt'` |
+| `'rightCtrl'` |
+| `'rightGUI'` |
+| `'rightShift'` |
+| `'scrollLock'` |
+| `'search'` |
+| `'select'` |
+| `'separator'` |
+| `'sleep'` |
+| `'stop'` |
+| `'sysReq'` |
+| `'thousandsSeparator'` |
+| `'undo'` |
+| `'up'` |
+| `'volumeDown'` |
+| `'volumeUp'` |
+| `'www'` |
+| `'xor'` |
 
 ### sdl.keyboard.getKey(scancode)
 
@@ -1545,7 +1446,7 @@ Maps a scancode to the corresponding key based on the current keyboard mapping.
 * `key: `[`<Key>`](#virtual-keys)
 * Returns: [`<Scancode>`](#enum-scancode)
 
-Maps a key to the corresponding scancode based on the current keyboard mapping.
+Maps a key to the corresponding scancode based on the current keyboard mapping. If multiple physical keys produce the same virtual key, then only the first one will be returned.
 
 ### sdl.keyboard.getState()
 
