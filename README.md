@@ -1459,7 +1459,7 @@ The returned array can be indexed with [`Scancode`](#enum-scancode) values. Pres
 
 ### Mouse cursors
 
-Values of this enum are used to represent the types of cursors available on most systems.
+String values used to represent the types of cursors available on most systems.
 
 | Value | Corresponding `SDL_SystemCursor` | Description |
 | --- | --- | --- |
@@ -1510,7 +1510,7 @@ Moves the mouse to the specified position.
 
 ### sdl.mouse.setCursor(cursor)
 
-* `cursor: `[`<sdl.mouse.CURSOR>`](#enum-sdlmousecursor) The icon to use for the cursor.
+* `cursor: `[`<MouseCursor>`](#mouse-cursors) The icon to use for the cursor.
 
 Changes the icon that is displayed for the mouse cursor.
 
