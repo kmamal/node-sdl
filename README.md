@@ -1311,7 +1311,7 @@ String values used to represent virtual keys in the context of the current keybo
 | --- |
 | `'&&'` |
 | `'+/-'` |
-| `'||'` |
+| `'\|\|'` |
 | `'00'` |
 | `'000'` |
 | `'again'` |
