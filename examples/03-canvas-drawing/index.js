@@ -14,5 +14,5 @@ window.on('resize', () => {
 	ctx.fillText("Hello, World!", width / 2, height / 2)
 
 	const buffer = canvas.toBuffer('raw')
-	window.render(width, height, width * 4, sdl.video.FORMAT.BGRA32, buffer)
+	window.render(width, height, width * 4, 'bgra32', buffer)
 })

@@ -14,7 +14,7 @@ let frames = 0
 
 while (!window.destroyed) {
 	// Draw to the screen
-	window.render(width, height, stride, sdl.video.FORMAT.RGBA32, buffer)
+	window.render(width, height, stride, 'rgba32', buffer)
 
 	// Count frames
 	{

@@ -37,12 +37,12 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 ## Contents
 
 * [sdl](#sdl)
-  * [Event: 'before-quit'](#event-before-quit)
+  * [Event: 'beforeQuit'](#event-beforequit)
   * [Event: 'quit'](#event-quit)
   * [sdl.info](#sdlinfo)
 * [sdl.video](#sdlvideo)
-  * [Enum: sdl.video.FORMAT](#enum-sdlvideoformat)
-  * [Enum: sdl.video.FORMAT_NAME](#enum-sdlvideoformat_name)
+  * [Image data](#image-data)
+  * [Pixel formats](#pixel-formats)
   * [sdl.video.displays](#sdlvideodisplays)
   * [sdl.video.windows](#sdlvideowindows)
   * [sdl.video.focused](#sdlvideofocused)
@@ -61,18 +61,19 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [Event: 'blur'](#event-blur)
     * [Event: 'hover'](#event-hover)
     * [Event: 'leave'](#event-leave)
+    * [Event: 'beforeClose'](#event-beforeclose)
     * [Event: 'close'](#event-close)
-    * [Event: 'key-down'](#event-key-down)
-    * [Event: 'key-up'](#event-key-up)
-    * [Event: 'text-input'](#event-text-input)
-    * [Event: 'mouse-button-down'](#event-mouse-button-down)
-    * [Event: 'mouse-button-up'](#event-mouse-button-up)
-    * [Event: 'mouse-move'](#event-mouse-move)
-    * [Event: 'mouse-wheel'](#event-mouse-wheel)
-    * [Event: 'drop-begin'](#event-drop-begin)
-    * [Event: 'drop-text'](#event-drop-text)
-    * [Event: 'drop-file'](#event-drop-file)
-    * [Event: 'drop-complete'](#event-drop-complete)
+    * [Event: 'keyDown'](#event-keydown)
+    * [Event: 'keyUp'](#event-keyup)
+    * [Event: 'textInput'](#event-textinput)
+    * [Event: 'mouseButtonDown'](#event-mousebuttondown)
+    * [Event: 'mouseButtonUp'](#event-mousebuttonup)
+    * [Event: 'mouseMove'](#event-mousemove)
+    * [Event: 'mouseWheel'](#event-mousewheel)
+    * [Event: 'dropBegin'](#event-dropbegin)
+    * [Event: 'dropText'](#event-droptext)
+    * [Event: 'dropFile'](#event-dropfile)
+    * [Event: 'dropComplete'](#event-dropcomplete)
     * [window.id](#windowid)
     * [window.title](#windowtitle)
     * [window.setTitle(title)](#windowsettitletitle)
@@ -91,6 +92,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.setResizable(resizable)](#windowsetresizableresizable)
     * [window.borderless](#windowborderless)
     * [window.setBorderless(borderless)](#windowsetborderlessborderless)
+    * [window.opengl](#windowopengl)
     * [window.native](#windownative)
     * [window.maximized](#windowmaximized)
     * [window.maximize()](#windowmaximize)
@@ -105,41 +107,52 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
 * [sdl.audio](#sdlaudio)
-  * [Enum: sdl.audio.FORMAT](#enum-sdlaudioformat)
-  * [Enum: sdl.audio.FORMAT_NAME](#enum-sdlaudioformat_name)
-  * [Event: 'device-add'](#event-device-add)
-  * [Event: 'device-remove'](#event-device-remove)
-  * [sdl.audio.devices](#sdlaudiodevices)
+  * [Audio data](#audio-data)
+  * [Sample formats](#sample-formats)
+  * [Event: 'deviceAdd'](#event-deviceadd)
+  * [Event: 'deviceRemove'](#event-deviceremove)
+  * [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
+  * [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
+  * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
+  * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
+  * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformatbufferoffset)
+  * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudioreadsampleformatbuffervalueoffset)
+  * [sdl.audio.devices](#sdlaudioinstances)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
-  * [class AudioDevice](#class-audiodevice)
-    * [audioDevice.id](#audiodeviceid)
-    * [audioDevice.name](#audiodevicename)
-    * [audioDevice.channels](#audiodevicechannels)
-    * [audioDevice.frequency](#audiodevicefrequency)
-    * [audioDevice.format](#audiodeviceformat)
-    * [audioDevice.buffered](#audiodevicebuffered)
-    * [audioDevice.playing](#audiodeviceplaying)
-    * [audioDevice.play([play])](#audiodeviceplayplay)
-    * [audioDevice.pause()](#audiodevicepause)
-    * [audioDevice.queued](#audiodevicequeued)
-    * [audioDevice.clearQueued()](#audiodeviceclearqueued)
-    * [audioDevice.closed](#audiodeviceclosed)
-    * [audioDevice.close()](#audiodeviceclose)
-  * [class AudioPlaybackDevice extends AudioDevice](#class-audioplaybackdevice-extends-audiodevice)
-    * [playbackDevice.queue(buffer[, bytes])](#playbackdevicequeuebuffer-bytes)
-  * [class AudioRecordingDevice extends AudioDevice](#class-audiorecordingdevice-extends-audiodevice)
-    * [recordingDevice.dequeue(buffer[, bytes])](#recordingdevicedequeuebuffer-bytes)
+  * [class AudioInstance](#class-audioinstance)
+    * [audioInstance.id](#audioinstanceid)
+    * [audioInstance.name](#audioinstancename)
+    * [audioInstance.channels](#audioinstancechannels)
+    * [audioInstance.frequency](#audioinstancefrequency)
+    * [audioInstance.format](#audioinstanceformat)
+    * [audioInstance.bytesPerSample](#audioinstancebytespersample)
+    * [audioInstance.minSampleValue](#audioinstanceminsamplevalue)
+    * [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
+    * [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
+    * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebufferoffset)
+    * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancereadsamplebuffervalueoffset)
+    * [audioInstance.buffered](#audioinstancebuffered)
+    * [audioInstance.playing](#audioinstanceplaying)
+    * [audioInstance.play([play])](#audioinstanceplayplay)
+    * [audioInstance.pause()](#audioinstancepause)
+    * [audioInstance.queued](#audioinstancequeued)
+    * [audioInstance.clearQueue()](#audioinstanceclearqueue)
+    * [audioInstance.closed](#audioinstanceclosed)
+    * [audioInstance.close()](#audioinstanceclose)
+  * [class AudioPlaybackInstance extends AudioInstance](#class-audioplaybackinstance-extends-audioinstance)
+    * [playbackInstance.enqueue(buffer[, bytes])](#playbackinstanceenqueuebuffer-bytes)
+  * [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
+    * [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
 * [sdl.keyboard](#sdlkeyboard)
-  * [Enum: sdl.keyboard.SCANCODE](#enum-sdlkeyboardscancode)
-  * [Enum: sdl.keyboard.SCANCODE_NAME](#enum-sdlkeyboardscancode_name)
-  * [Enum: sdl.keyboard.KEYCODE](#enum-sdlkeyboardkeycode)
-  * [Enum: sdl.keyboard.KEYCODE_NAME](#enum-sdlkeyboardkeycode_name)
+  * [Virtual keys](#virtual-keys)
+  * [Enum: SCANCODE](#enum-scancode)
+  * [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
+  * [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
   * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
 * [sdl.mouse](#sdlmouse)
-  * [Enum: sdl.mouse.BUTTON](#enum-sdlmousebutton)
-  * [Enum: sdl.mouse.BUTTON_NAME](#enum-sdlmousebutton_name)
-  * [Enum: sdl.mouse.CURSOR](#enum-sdlmousecursor)
-  * [Enum: sdl.mouse.CURSOR_NAME](#enum-sdlmousecursor_name)
+  * [Mouse cursors](#mouse-cursors)
+  * [Enum: BUTTON](#enum-buttons)
+  * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
   * [sdl.mouse.position](#sdlmouseposition)
   * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
   * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursor)
@@ -152,25 +165,17 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'update'](#event-update)
   * [sdl.clipboard.text](#sdlclipboardtext)
   * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
-* [Notes](#notes)
-  * [Image data](#image-data)
-  * [Audio data](#audio-data)
 
 
 ## sdl
 
-### Event: 'before-quit'
+### Event: 'beforeQuit'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
 * `prevent: <function (void) => void>` Call this to prevent the application from closing.
 
 Fired to indicate that the user has requested the application to close (usually by closing the last window). If you need to display any confirmation dialogs you should call `event.prevent()` and handle termination manually. If `prevent` is not called, then this event will be followed by a `'quit'` event.
 
 ### Event: 'quit'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
 
 Indicates that the application is about to close. Handle any cleanup here. This event will be followed by a call to `process.exit()`.
 
@@ -218,21 +223,88 @@ Sample data for Ubuntu:
 
 ## sdl.video
 
-### Enum: sdl.video.FORMAT
+### Image data
 
-Values of this enum are used to represent how the pixels of an image are stored in a Buffer. See also the section on [image data](#image-data).
+There are 3 places in the API where you will need to provide an image to the library:
+* [`window.render()`](#windowrenderwidth-height-stride-format-buffer)
+* [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
+* [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_PixelFormatEnum), __except__ for formats that are indexed (palette-based). The `SDL_PIXELFORMAT_` prefix is removed so that `SDL_PIXELFORMAT_FOO` corresponds to `sdl.video.FORMAT.FOO`.
+All three of these functions accept the image as a series of arguments:
+* `width: <number>` The width of the image in pixels.
+* `height: <number>` The height of the image in pixels.
+* `stride: <number>` How many bytes each row of the image takes up in the buffer. This is usually equal to `width * bytesPerPixel`, but can be larger if the rows of the buffer are padded to always be some multiple of bytes.
+* `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
+* `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
 
-### Enum: sdl.video.FORMAT_NAME
+So for example, to fill the window with a red+green gradient you could do:
 
-Maps values of [`sdl.video.FORMAT`](#enum-sdlvideoformat) back to their names so that `sdl.video.FORMAT_NAME[sdl.video.FORMAT.FOO] === 'FOO'`.
+```js
+const { width, height } = window
+const stride = width * 4
+const buffer = Buffer.alloc(stride * height)
+
+let offset = 0
+for (let i = 0; i < height; i++) {
+  for (let j = 0; j < width; j++) {
+    buffer[offset++] = Math.floor(256 * i / height) // R
+    buffer[offset++] = Math.floor(256 * j / width)  // G
+    buffer[offset++] = 0                            // B
+    buffer[offset++] = 255                          // A
+  }
+}
+
+window.render(width, height, stride, 'rgba32', buffer)
+```
+
+### Pixel formats
+
+Used to represent how the pixels of an image are stored in a Buffer.
+
+| Value | Corresponding `SDL_PixelFormatEnum` | Description |
+| --- | --- | --- |
+| `'rgb332'` | `SDL_PIXELFORMAT_RGB332` | |
+| `'rgb444'` | `SDL_PIXELFORMAT_RGB444` | |
+| `'rgb555'` | `SDL_PIXELFORMAT_RGB555` | |
+| `'bgr555'` | `SDL_PIXELFORMAT_BGR555` | |
+| `'argb4444'` | `SDL_PIXELFORMAT_ARGB4444` | |
+| `'rgba4444'` | `SDL_PIXELFORMAT_RGBA4444` | |
+| `'abgr4444'` | `SDL_PIXELFORMAT_ABGR4444` | |
+| `'bgra4444'` | `SDL_PIXELFORMAT_BGRA4444` | |
+| `'argb1555'` | `SDL_PIXELFORMAT_ARGB1555` | |
+| `'rgba5551'` | `SDL_PIXELFORMAT_RGBA5551` | |
+| `'abgr1555'` | `SDL_PIXELFORMAT_ABGR1555` | |
+| `'bgra5551'` | `SDL_PIXELFORMAT_BGRA5551` | |
+| `'rgb565'` | `SDL_PIXELFORMAT_RGB565` | |
+| `'bgr565'` | `SDL_PIXELFORMAT_BGR565` | |
+| `'rgb24'` | `SDL_PIXELFORMAT_RGB24` | |
+| `'bgr24'` | `SDL_PIXELFORMAT_BGR24` | |
+| `'rgb888'` | `SDL_PIXELFORMAT_RGB888` | |
+| `'rgbx8888'` | `SDL_PIXELFORMAT_RGBX8888` | |
+| `'bgr888'` | `SDL_PIXELFORMAT_BGR888` | |
+| `'bgrx8888'` | `SDL_PIXELFORMAT_BGRX8888` | |
+| `'argb8888'` | `SDL_PIXELFORMAT_ARGB8888` | |
+| `'rgba8888'` | `SDL_PIXELFORMAT_RGBA8888` | |
+| `'abgr8888'` | `SDL_PIXELFORMAT_ABGR8888` | |
+| `'bgra8888'` | `SDL_PIXELFORMAT_BGRA8888` | |
+| `'argb2101010'` | `SDL_PIXELFORMAT_ARGB2101010` | |
+| `'rgba32'` | `SDL_PIXELFORMAT_RGBA32` | alias for `'rgba8888'` on big endian machines and for `'abgr8888'` on little endian machines |
+| `'argb32'` | `SDL_PIXELFORMAT_ARGB32` | alias for `'argb8888'` on big endian machines and for `'bgra8888'` on little endian machines |
+| `'bgra32'` | `SDL_PIXELFORMAT_BGRA32` | alias for `'bgra8888'` on big endian machines and for `'argb8888'` on little endian machines |
+| `'abgr32'` | `SDL_PIXELFORMAT_ABGR32` | alias for `'abgr8888'` on big endian machines and for `'rgba8888'` on little endian machines |
+| `'yv12'` | `SDL_PIXELFORMAT_YV12` | planar mode: Y + V + U (3 planes) |
+| `'iyuv'` | `SDL_PIXELFORMAT_IYUV` | planar mode: Y + U + V (3 planes) |
+| `'yuy2'` | `SDL_PIXELFORMAT_YUY2` | packed mode: Y0+U0+Y1+V0 (1 plane) |
+| `'uyvy'` | `SDL_PIXELFORMAT_UYVY` | packed mode: U0+Y0+V0+Y1 (1 plane) |
+| `'yvyu'` | `SDL_PIXELFORMAT_YVYU` | packed mode: Y0+V0+Y1+U0 (1 plane) |
+| `'nv12'` | `SDL_PIXELFORMAT_NV12` | planar mode: Y + U/V interleaved (2 planes) |
+| `'nv21'` | `SDL_PIXELFORMAT_NV21` | planar mode: Y + V/U interleaved (2 planes) |
 
 ### sdl.video.displays
 
 * `<object>[]`
   * `name: <string>` The name of the display.
-  * `format: `[`<sdl.video.FORMAT>`](#enum-sdlvideoformat) The pixel format of the display.
+  * `format: `[`<PixelFormat>`](#pixel-formats) The pixel format of the display.
   * `frequency: <number>` The refresh rate of the display.
   * `geometry: <object>` The desktop region represented by the display.
     * `x, y, width, height: <Rect>` The position and size of the display's geometry.
@@ -249,7 +321,7 @@ A list of all detected displays. Sample output for two side-to-side monitors is 
 [
   {
     name: '0',
-    format: 370546692, // sdl.video.FORMAT.RGBA8888
+    format: 'rgb888',
     frequency: 60,
     geometry: { x: 0, y: 0, width: 1920, height: 1080 },
     usable: { x: 0, y: 27, width: 1920, height: 1053 },
@@ -257,7 +329,7 @@ A list of all detected displays. Sample output for two side-to-side monitors is 
   },
   {
     name: '1',
-    format: 370546692, // sdl.video.FORMAT.RGBA8888
+    format: 'rgb888',
     frequency: 60,
     geometry: { x: 1920, y: 0, width: 1920, height: 1080 },
     usable: { x: 1920, y: 27, width: 1920, height: 1053 },
@@ -306,6 +378,7 @@ The following restrictions apply:
 * If you specify the `display` option, you can't also specify the `x` or `y` options, and vice-versa.
 * The `resizable` and `borderless` options can't both be true.
 
+If you set the `opengl` option, then you can only render to the window with OpenGL calls. Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 ## class Window
 
@@ -313,57 +386,30 @@ This class is not directly exposed by the API so you can't use it with the `new`
 
 ### Event: 'show'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when a window becomes visible.
 
 ### Event: 'hide'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 
 Fired when a window becomes hidden.
 
 ### Event: 'expose'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when a window becomes exposed.
 
 ### Event: 'minimize'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 
 Fired when a window becomes minimized.
 
 ### Event: 'maximize'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when a window becomes maximized.
 
 ### Event: 'restore'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 
 Fired when a window stops being either minimized or maximized.
 
 ### Event: 'move'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `x: <number>` The window's new x position, relative to the screen.
 * `y: <number>` The window's new y position, relative to the screen.
 
@@ -371,9 +417,6 @@ Fired when the window changes position.
 
 ### Event: 'resize'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `width: <number>` The window's new width.
 * `height: <number>` The window's new height.
 
@@ -381,60 +424,34 @@ Fired when the window changes size.
 
 ### Event: 'focus'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when a window gains the keyboard focus.
 
 ### Event: 'blur'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 
 Fired when a window loses the keyboard focus.
 
 ### Event: 'hover'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when the mouse enters the window.
 
 ### Event: 'leave'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Fired when the mouse leaves the window.
 
-### Event: 'before-close'
+### Event: 'beforeClose'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `prevent: <function (void) => void>` Call this to prevent the window from closing.
 
 Fired to indicate that the user has requested the window to close (usually by clicking the "x" button). If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually. If `prevent` is not called, then this event will be followed by a `'close'` event.
 
 ### Event: 'close'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-
 Indicates that the application is about to be destroyed. Handle any cleanup here. This event will be followed by a call to `window.destroy()`.
 
-### Event: 'key-down'
+### Event: 'keyDown'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode) The scancode of the key that caused the event.
-* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode) The keycode of the key that caused the event.
+* `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
+* `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
 * `repeat: <number>` Is `true` if the event was generated by holding down a key for a long time.
 * `shift: <number>` Is `true` if the Shift key was pressed when the event was generated.
 * `ctrl: <number>` Is `true` if the Ctrl key was pressed when the event was generated.
@@ -446,14 +463,10 @@ Indicates that the application is about to be destroyed. Handle any cleanup here
 
 Fired when a key is pressed, and will also be fired repeatedly afterwards if the key is held down.
 
-### Event: 'key-up'
+### Event: 'keyUp'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
-* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode) The scancode of the key that caused the event.
-* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode) The keycode of the key that caused the event.
-* `repeat: <number>` Is `true` if the event was generated by holding down a key for a long time.
+* `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
+* `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
 * `shift: <number>` Is `true` if the Shift key was pressed when the event was generated.
 * `ctrl: <number>` Is `true` if the Ctrl key was pressed when the event was generated.
 * `alt: <number>` Is `true` if the Alt key was pressed when the event was generated.
@@ -464,20 +477,14 @@ Fired when a key is pressed, and will also be fired repeatedly afterwards if the
 
 Fired when a key is released.
 
-### Event: 'text-input'
+### Event: 'textInput'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `text: <string>` The unicode representation of the character that was entered.
 
-Fired when the keys pressed by the user result in a character being printed.
+Fired when the user enters text via the keyboard.
 
-### Event: 'mouse-button-down'
+### Event: 'mouseButtonDown'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `x: <number>` The mouse's x position when the event happened, relative to the window.
 * `y: <number>` The mouse's y position when the event happened, relative to the window.
 * `touch: <boolean>` Will be `true` if the event was caused by a touch event.
@@ -485,74 +492,51 @@ Fired when the keys pressed by the user result in a character being printed.
 
 Fired when a mouse button is pressed.
 
-### Event: 'mouse-button-up'
+### Event: 'mouseButtonUp'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `x: <number>` The mouse's x position when the event happened, relative to the window.
 * `y: <number>` The mouse's y position when the event happened, relative to the window.
 * `touch: <boolean>` Will be `true` if the event was caused by a touch event.
-* `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was pressed.
+* `button: `[`<sdl.mouse.BUTTON>`](#enum-sdlmousebutton) The button that was released.
 
 Fired when a mouse button is released.
 
-### Event: 'mouse-move'
+### Event: 'mouseMove'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `x: <number>` The mouse's x position when the event happened, relative to the window.
 * `y: <number>` The mouse's y position when the event happened, relative to the window.
 * `touch: <boolean>` Will be `true` if the event was caused by a touch event.
 
 Fired when the mouse moves.
 
-### Event: 'mouse-wheel'
+### Event: 'mouseWheel'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window) The window that caused the event.
 * `x: <number>` The mouse's x position when the event happened, relative to the window.
 * `y: <number>` The mouse's y position when the event happened, relative to the window.
 * `touch: <boolean>` Will be `true` if the event was caused by a touch event.
 * `dx: <number>` The wheel's x movement, relative to its last position.
 * `dy: <number>` The wheel's y movement, relative to its last position.
-* `flipped: <number>` Will be `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
+* `flipped: <boolean>` Will be `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
 
 Fired when the mouse wheel is scrolled.
 
-### Event: 'drop-begin'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window): The window that received the drop.
+### Event: 'dropBegin'
 
 When dropping a set of items onto a window, first the `'drop-begin'` event will be fired, then a number of `'drop-text'` and/or `'drop-file'` events will be fired corresponding to the contents of the drop, then finally the `'drop-complete'` event will be fired.
 
-### Event: 'drop-text'
+### Event: 'dropText'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window): The window that received the drop.
 * `text: <string>`: The text that was dropped onto the window.
 
 Fired when one of the drops is a text item.
 
-### Event: 'drop-file'
+### Event: 'dropFile'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window): The window that received the drop.
 * `file: <string>`: The path to the file that was dropped onto the window.
 
 Fired when one of the drops is a file.
 
-### Event: 'drop-complete'
-
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `window: `[`<Window>`](#class-window): The window that received the drop.
+### Event: 'dropComplete'
 
 Fired after a set of items has been dropped on a window.
 
@@ -664,6 +648,12 @@ Will be `true` if the window is borderless. A borderless window has no borders o
 
 Changes the window's borderless property.
 
+### window.opengl
+
+* `<boolean>`
+
+Will be `true` if the window was created in OpenGl mode.
+
 ### window.native
 
 * `<any>`
@@ -735,31 +725,137 @@ Destroys the window.
 
 ## sdl.audio
 
-### Enum: sdl.audio.FORMAT
+### Audio data
 
-Values of this enum are used to represent how audio samples are stored in a Buffer. See also the section on [audio data](#audio-data).
+The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output. The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_AudioFormat) with the `AUDIO_` prefix removed so that `AUDIO_FOO` corresponds to `sdl.audio.FORMAT.FOO`.
+Audio data are a sequence of frames, with each frame being a sequence of samples. A _sample_ is a single number representing the intensity of a single audio channel at a specific point in time. For audio with multiple channels, each point in time is represented by one sample per channel. This is called a _frame_. The samples in a frame are arranged as follows:
+* For 1 channel (mono) a frame contains just the one sample.
+* For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
+* For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
+* For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
 
-### Enum: sdl.audio.FORMAT_NAME
+So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, you could do:
 
-Maps values of [`sdl.audio.FORMAT`](#enum-sdlaudioformat) back to their names so that `sdl.audio.FORMAT_NAME[sdl.audio.FORMAT.FOO] === 'FOO'`.
+```js
+const TWO_PI = 2 * Math.PI
 
-### Event: 'device-add'
+const {
+  channels,
+  frequency,
+  bytesPerSample,
+  minSampleValue,
+  maxSampleValue,
+  zeroSampleValue,
+} = playbackInstance
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+const range = maxSampleValue - minSampleValue
+const amplitude = range / 2
 
-Fired when a new audio device becomes available. Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
+const sineAmplitude = 0.3 * amplitude
+const sineNote = 440
+const sinePeriod = 1 / sineNote
 
-### Event: 'device-remove'
+const duration = 3
+const numFrames = duration * frequency
+const numSamples = numFrames * channels
+const numBytes = numSamples * bytesPerSample
+const buffer = Buffer.alloc(numBytes)
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+let offset = 0
+for (let i = 0; i < numFrames; i++) {
+  const time = i / frequency
+  const angle = time / sinePeriod * TWO_PI
+  const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
+  for (let j = 0; j < channels; j++) {
+    offset = playbackInstance.writeSample(buffer, sample, offset)
+  }
+}
+```
 
-Fired when an existing audio device is removed. Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
+### Sample formats
+
+Used to represent how audio samples are stored in a Buffer.
+
+| Value | Corresponding `SDL_AudioFormat` | Description |
+| --- | --- | --- |
+| `'s8'` | `AUDIO_S8` | signed 8-bit samples |
+| `'u8'` | `AUDIO_U8` | unsigned 8-bit samples |
+| `'s16lsb'` | `AUDIO_S16LSB` | signed 16-bit samples in little-endian byte order |
+| `'s16msb'` | `AUDIO_S16MSB` | signed 16-bit samples in big-endian byte order |
+| `'s16sys'` | `AUDIO_S16SYS` | signed 16-bit samples in native byte order |
+| `'s16'` | `AUDIO_S16` | alias for `'s16lsb'` |
+| `'u16lsb'` | `AUDIO_U16LSB` | unsigned 16-bit samples in little-endian byte order |
+| `'u16msb'` | `AUDIO_U16MSB` | unsigned 16-bit samples in big-endian byte order |
+| `'u16sys'` | `AUDIO_U16SYS` | unsigned 16-bit samples in native byte order |
+| `'u16'` | `AUDIO_U16` | alias for `'u16lsb'` |
+| `'s32lsb'` | `AUDIO_S32LSB` | 32-bit integer samples in little-endian byte order |
+| `'s32msb'` | `AUDIO_S32MSB` | 32-bit integer samples in big-endian byte order |
+| `'s32sys'` | `AUDIO_S32SYS` | 32-bit integer samples in native byte order |
+| `'s32'` | `AUDIO_S32` | alias for `'s32lsb'` |
+| `'f32lsb'` | `AUDIO_F32LSB` | 32-bit floating point samples in little-endian byte order |
+| `'f32msb'` | `AUDIO_F32MSB` | 32-bit floating point samples in big-endian byte order |
+| `'f32sys'` | `AUDIO_F32SYS` | 32-bit floating point samples in native byte order |
+| `'f32'` | `AUDIO_F32` | alias for `'f32lsb'` |
+
+### Event: 'deviceAdd'
+
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
+
+Fired when a new audio device becomes available. Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
+
+### Event: 'deviceRemove'
+
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
+
+Fired when an existing audio device is removed. Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices. When this event is emitted, all instances that were opened from the removed device are closed automatically.
+
+### sdl.audio.bytesPerSample(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The number of bytes.
+
+Helper function which maps each sample format to the corresponding number of bytes its samples take up.
+
+### sdl.audio.minSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The minimum sample value.
+
+Helper function which maps each sample format to the corresponding minimum value its samples can take.
+
+### sdl.audio.maxSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The maximum sample value.
+
+Helper function which maps each sample format to the corresponding maximum value its samples can take.
+
+### sdl.audio.zeroSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The zero sample value.
+
+Helper function which maps each sample format to the sample value that corresponds to silence.
+
+### sdl.audio.readSample(format, buffer[, offset])
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* `buffer: <Buffer>` The buffer to read the sample from.
+* `offset: <number>` The position from which to read the sample. Default: `0`
+* Returns: `<number>` The value of the sample read.
+
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument. For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+
+### sdl.audio.writeSample(format, buffer, value[, offset])
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* `buffer: <Buffer>` The buffer to write the sample to.
+* `value: <number>` The value of the sample to write.
+* `offset: <number>` The position at which to write the sample. Default: `0`
+* Returns: `<number>` The updated `offset`.
+
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument. For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
 ### sdl.audio.devices
 
@@ -778,102 +874,151 @@ A list of all the detected audio devices. Sample output for PulseAudio:
 
 ### sdl.audio.openDevice(device[, options])
 
-* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices) that should be opened.
+* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudioinstances) that should be opened.
 * `options: <object>` See also the section on [audio data](#audio-data)
+  * `name: <string>`: Some drivers accept custom names, such as a hostname/IP address for a remote audio server, or a filename in the diskaudio driver. Default: `device.name`.
   * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
   * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
-  * `format: `[`<sdl.audio.FORMAT>`](#enum-sdlaudioformat): The binary format for each sample. Default `sdl.audio.FORMAT.S16`.
+  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default `'f32'`.
   * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
-* Returns: [`<AudioDevice>`](#class-audiodevice) an object representing the opened audio device.
+* Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
 
-Initializes an audio device for playback/recording. If the opened device is a playback device, then the returned object will be an [`AudioPlaybackDevice`](#class-audioplaybackdevice-extends-audiodevice), otherwise it will be an [`AudioRecordingDevice`](#class-audiorecordingdevice-extends-audiodevice).
+Initializes an audio device for playback/recording and returns a corresponding instance. If the opened device is a playback device, then the returned object will be an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it will be an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
 
-The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the device will look like. See also the section on [audio data](#audio-data).
+The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the instance will look like. See also the section on [audio data](#audio-data).
 
 The `buffered` option specifies the "delay" that you will experience between the application and the audio driver. With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently. Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
 
-## class AudioDevice
 
-This class is not directly exposed by the API so you can't use it with the `new` operator. It only serves as the base class for [`AudioPlaybackDevice`](#class-audioplaybackdevice-extends-audiodevice) and [`AudioRecordingDevice`](#class-audiorecordingdevice-extends-audiodevice).
+## class AudioInstance
 
-### audioDevice.id
+This class is not directly exposed by the API so you can't use it with the `new` operator. It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+
+### audioInstance.id
 
 * `<number>`
 
-A unique identifier for the audio device.
+A unique identifier for the instance.
 
-### audioDevice.name
+### audioInstance.device
+
+* `<object>`
+
+The [device](#sdlaudiodevices) from which this instance was opened.
+
+### audioInstance.name
 
 * `<string>`
 
-The name of the audio device.
+The name the instance was opened with.
 
-### audioDevice.channels
-
-* `<number>`
-
-The number of channels the device has been opened with.
-
-### audioDevice.frequency
+### audioInstance.channels
 
 * `<number>`
 
-The sampling frequency (in frames per second) the device has been opened with.
+The number of channels the instance was opened with.
 
-### audioDevice.format
-
-* [`<sdl.audio.FORMAT>`](#enum-sdlaudioformat)
-
-The audio sample format the device has been opened with.
-
-### audioDevice.buffered
+### audioInstance.frequency
 
 * `<number>`
 
-The buffer size (in frames) the device has been opened with.
+The sampling frequency (in frames per second) the instance was opened with.
 
-### audioDevice.playing
+### audioInstance.format
+
+* [`<SampleFormat>`](#sample-formats)
+
+The audio sample format the instance was opened with.
+
+### audioInstance.bytesPerSample
+
+* `<number>`
+
+The number of bytes that make up a single audio sample, based on the format the instance was opened with.
+
+### audioInstance.minSampleValue
+
+* `<number>`
+
+The minimum value a sample can take, based on the format the instance was opened with.
+
+### audioInstance.maxSampleValue
+
+* `<number>`
+
+The maximum value a sample can take, based on the format the instance was opened with.
+
+### audioInstance.zeroSampleValue
+
+* `<number>`
+
+The sample value that corresponds to silence, based on the format the instance was opened with.
+
+### audioInstance.readSample(buffer[, offset])
+
+* `buffer: <Buffer>` The buffer to read the sample from.
+* `offset: <number>` The position from which to read the sample. Default: `0`
+* Returns: `<number>` The value of the sample read.
+
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with. For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+
+### audioInstance.writeSample(buffer, value[, offset])
+
+* `buffer: <Buffer>` The buffer to write the sample to.
+* `value: <number>` The value of the sample to write.
+* `offset: <number>` The position at which to write the sample. Default: `0`
+* Returns: `<number>` The updated `offset`.
+
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with. For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+
+### audioInstance.buffered
+
+* `<number>`
+
+The buffer size (in frames) the instance was opened with.
+
+### audioInstance.playing
 
 * `<boolean>`
 
-Will be `true` if the audio device is currently playing.
+Will be `true` if the instance is currently playing.
 
-### audioDevice.play([play])
+### audioInstance.play([play])
 
-* `show: <boolean>` Set to `true` to start the audio device, `false` to stop. Default: `true`
+* `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
 
-Starts or stops the audio device.
+Starts or stops the instance.
 
-### audioDevice.pause()
+### audioInstance.pause()
 
-Equivalent to [`audioDevice.play(false)`](#audiodeviceplayplay)
+Equivalent to [`audioInstance.play(false)`](#audioinstanceplayplay)
 
-### audioDevice.queued
+### audioInstance.queued
 
 * `<number>`
 
-The number of bytes that are currently queued up, waiting to be either played by the device or dequeued by the user.
+The number of bytes that are currently queued up, waiting to be either played by the instance or dequeued by the user.
 
-### audioDevice.clearQueued()
+### audioInstance.clearQueue()
 
 Clears the queued data.
 
-### audioDevice.closed
+### audioInstance.closed
 
 * `<number>`
 
-Will be `true` if the audio device is closed. A closed audio device object should not be used any further.
+Will be `true` if the instance is closed. A closed instance object should not be used any further.
 
-### audioDevice.close()
+### audioInstance.close()
 
-Closes the audio device.
+Closes the instance.
 
 
-## class AudioPlaybackDevice extends AudioDevice
+## class AudioPlaybackInstance extends AudioInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a playback device is opened.
 
-### playbackDevice.queue(buffer[, bytes])
+### playbackInstance.enqueue(buffer[, bytes])
 
 * `buffer: <Buffer>` The buffer to read data from.
 * `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
@@ -881,11 +1026,11 @@ This class is not directly exposed by the API so you can't use it with the `new`
 Takes generated audio data from the buffer, and writes it to the queue, from which it will be played back.
 
 
-## class AudioRecordingDevice extends AudioDevice
+## class AudioRecordingInstance extends AudioInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a recording device is opened.
 
-### recordingDevice.dequeue(buffer[, bytes])
+### recordingInstance.dequeue(buffer[, bytes])
 
 * `buffer: <Buffer>` The buffer to write data to.
 * `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
@@ -896,74 +1041,330 @@ Takes recorded audio data that has been put on the queue, and writes it to the p
 
 ## sdl.keyboard
 
-There's three ways you can deal with the keyboard:
+There are three levels at which you can deal with the keyboard: physical keys (scancodes), virtual keys (keys), and text (`'text-input'` events).
 
-* If you care about the physical layout of the keys, then you should use the [scancodes](#enum-sdlkeyboardscancode). Each physical keys will always be associated with the same scancode.
-* If you care about the character (or meaning) that corresponds to each key, then you should use [keycodes](#enum-sdlkeyboardkeycode). A key's keycode depends on the current keyboard mapping and its value is equal to either a) the unicode character that the unmodified key would produce if pressed or b) one of the enum values.
-* If you care about text written by the user, then you should be handling the [`'text-input'`](#event-text-input) events. Instead of handling keycodes and translating them into text by hand (by handling modifiers), these events will give you the final text as reported by the OS.
+On the physical level, a keyboard is usually (as the name implies) a board with a number of keys on it. Each of these physical keys corresponds to a number: the key's scancode. For any given physical keyboard, the same key will always produce the same scancode. If your application cares about the physical layout of the keyboard (for example using the "WASD" keys as a substitute for arrow keys), then you should handle key events at this level using the `scancode` property.
 
-### Enum: sdl.keyboard.SCANCODE
+For the most part it's better to treat scancodes as opaque values, but SDL does provide a scancode enumeration with values based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf) so you should be able to derive some meaning from the scancodes.
 
-Values of this enum are used to represent physical keys on the keyboard. See also the section on [handling keyboard input](#sdlkeyboard).
+More commonly, however, you don't care about the physical key itself but about the "meaning" associated with each key: the character that it produces ("a", "b", "@", " ", .e.t.c) or the function that it corresponds to ("Esc", "F4", "Ctrl",  e.t.c.). Your operating system provides a "keyboard mapping" that associates physical keys with their corresponding meaning. Changing the keyboard mapping (for example by changing the language from English to German) will also change the corresponding meaning for each key (using the English-German example: the "y" and "z" keys will be switched). Meanings are represented either as single-character strings that contain the unicode symbol the key produces, or as multi-character strings that contain the name of the function the key corresponds to. If your application cares about the meaning associated with individual keys then you should handle key events at this level using the `key` property.
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_Scancode) with the `SDL_SCANCODE_` prefix removed so that `SDL_SCANCODE_FOO` corresponds to `sdl.keyboard.SCANCODE.FOO`.
+But sometimes the application doesn't care about individual keys at all, but about the actual text that the user is entering. Consider for example what happens when a user on a Greek keyboard layout enters an accent mark "´" followed by the letter "α" to produce the character "ά": Even though two keys were pressed, only a single character was produced. Trying to handle text input through manual translation of the key events to text is not really viable. If your application cares about text instead of keys, then you should be handling `'text-input'` events.
 
-### Enum: sdl.keyboard.SCANCODE_NAME
 
-Maps values of [`sdl.keyboard.SCANCODE`](#enum-sdlkeyboardscancode) back to their names so that `sdl.keyboard.SCANCODE_NAME[sdl.keyboard.SCANCODE.FOO] === 'FOO'`.
+### Enum: SCANCODE
 
-### Enum: sdl.keyboard.KEYCODE
+Used to represent physical keys on the keyboard.
 
-Values of this enum are used to represent virtual keys in the context of the current keyboard mapping. See also the section on [handling keyboard input](#sdlkeyboard).
+| Value | Corresponding `SDL_Scancode` |
+| --- | --- |
+| `sdl.keyboard.SCANCODE.A` | `SDL_SCANCODE_A` |
+| `sdl.keyboard.SCANCODE.B` | `SDL_SCANCODE_B` |
+| `sdl.keyboard.SCANCODE.C` | `SDL_SCANCODE_C` |
+| `sdl.keyboard.SCANCODE.D` | `SDL_SCANCODE_D` |
+| `sdl.keyboard.SCANCODE.E` | `SDL_SCANCODE_E` |
+| `sdl.keyboard.SCANCODE.F` | `SDL_SCANCODE_F` |
+| `sdl.keyboard.SCANCODE.G` | `SDL_SCANCODE_G` |
+| `sdl.keyboard.SCANCODE.H` | `SDL_SCANCODE_H` |
+| `sdl.keyboard.SCANCODE.I` | `SDL_SCANCODE_I` |
+| `sdl.keyboard.SCANCODE.J` | `SDL_SCANCODE_J` |
+| `sdl.keyboard.SCANCODE.K` | `SDL_SCANCODE_K` |
+| `sdl.keyboard.SCANCODE.L` | `SDL_SCANCODE_L` |
+| `sdl.keyboard.SCANCODE.M` | `SDL_SCANCODE_M` |
+| `sdl.keyboard.SCANCODE.N` | `SDL_SCANCODE_N` |
+| `sdl.keyboard.SCANCODE.O` | `SDL_SCANCODE_O` |
+| `sdl.keyboard.SCANCODE.P` | `SDL_SCANCODE_P` |
+| `sdl.keyboard.SCANCODE.Q` | `SDL_SCANCODE_Q` |
+| `sdl.keyboard.SCANCODE.R` | `SDL_SCANCODE_R` |
+| `sdl.keyboard.SCANCODE.S` | `SDL_SCANCODE_S` |
+| `sdl.keyboard.SCANCODE.T` | `SDL_SCANCODE_T` |
+| `sdl.keyboard.SCANCODE.U` | `SDL_SCANCODE_U` |
+| `sdl.keyboard.SCANCODE.V` | `SDL_SCANCODE_V` |
+| `sdl.keyboard.SCANCODE.W` | `SDL_SCANCODE_W` |
+| `sdl.keyboard.SCANCODE.X` | `SDL_SCANCODE_X` |
+| `sdl.keyboard.SCANCODE.Y` | `SDL_SCANCODE_Y` |
+| `sdl.keyboard.SCANCODE.Z` | `SDL_SCANCODE_Z` |
+| `sdl.keyboard.SCANCODE.1` | `SDL_SCANCODE_1` |
+| `sdl.keyboard.SCANCODE.2` | `SDL_SCANCODE_2` |
+| `sdl.keyboard.SCANCODE.3` | `SDL_SCANCODE_3` |
+| `sdl.keyboard.SCANCODE.4` | `SDL_SCANCODE_4` |
+| `sdl.keyboard.SCANCODE.5` | `SDL_SCANCODE_5` |
+| `sdl.keyboard.SCANCODE.6` | `SDL_SCANCODE_6` |
+| `sdl.keyboard.SCANCODE.7` | `SDL_SCANCODE_7` |
+| `sdl.keyboard.SCANCODE.8` | `SDL_SCANCODE_8` |
+| `sdl.keyboard.SCANCODE.9` | `SDL_SCANCODE_9` |
+| `sdl.keyboard.SCANCODE.0` | `SDL_SCANCODE_0` |
+| `sdl.keyboard.SCANCODE.RETURN` | `SDL_SCANCODE_RETURN` |
+| `sdl.keyboard.SCANCODE.ESCAPE` | `SDL_SCANCODE_ESCAPE` |
+| `sdl.keyboard.SCANCODE.BACKSPACE` | `SDL_SCANCODE_BACKSPACE` |
+| `sdl.keyboard.SCANCODE.TAB` | `SDL_SCANCODE_TAB` |
+| `sdl.keyboard.SCANCODE.SPACE` | `SDL_SCANCODE_SPACE` |
+| `sdl.keyboard.SCANCODE.MINUS` | `SDL_SCANCODE_MINUS` |
+| `sdl.keyboard.SCANCODE.EQUALS` | `SDL_SCANCODE_EQUALS` |
+| `sdl.keyboard.SCANCODE.LEFTBRACKET` | `SDL_SCANCODE_LEFTBRACKET` |
+| `sdl.keyboard.SCANCODE.RIGHTBRACKET` | `SDL_SCANCODE_RIGHTBRACKET` |
+| `sdl.keyboard.SCANCODE.BACKSLASH` | `SDL_SCANCODE_BACKSLASH` |
+| `sdl.keyboard.SCANCODE.NONUSHASH` | `SDL_SCANCODE_NONUSHASH` |
+| `sdl.keyboard.SCANCODE.SEMICOLON` | `SDL_SCANCODE_SEMICOLON` |
+| `sdl.keyboard.SCANCODE.APOSTROPHE` | `SDL_SCANCODE_APOSTROPHE` |
+| `sdl.keyboard.SCANCODE.GRAVE` | `SDL_SCANCODE_GRAVE` |
+| `sdl.keyboard.SCANCODE.COMMA` | `SDL_SCANCODE_COMMA` |
+| `sdl.keyboard.SCANCODE.PERIOD` | `SDL_SCANCODE_PERIOD` |
+| `sdl.keyboard.SCANCODE.SLASH` | `SDL_SCANCODE_SLASH` |
+| `sdl.keyboard.SCANCODE.CAPSLOCK` | `SDL_SCANCODE_CAPSLOCK` |
+| `sdl.keyboard.SCANCODE.F1` | `SDL_SCANCODE_F1` |
+| `sdl.keyboard.SCANCODE.F2` | `SDL_SCANCODE_F2` |
+| `sdl.keyboard.SCANCODE.F3` | `SDL_SCANCODE_F3` |
+| `sdl.keyboard.SCANCODE.F4` | `SDL_SCANCODE_F4` |
+| `sdl.keyboard.SCANCODE.F5` | `SDL_SCANCODE_F5` |
+| `sdl.keyboard.SCANCODE.F6` | `SDL_SCANCODE_F6` |
+| `sdl.keyboard.SCANCODE.F7` | `SDL_SCANCODE_F7` |
+| `sdl.keyboard.SCANCODE.F8` | `SDL_SCANCODE_F8` |
+| `sdl.keyboard.SCANCODE.F9` | `SDL_SCANCODE_F9` |
+| `sdl.keyboard.SCANCODE.F10` | `SDL_SCANCODE_F10` |
+| `sdl.keyboard.SCANCODE.F11` | `SDL_SCANCODE_F11` |
+| `sdl.keyboard.SCANCODE.F12` | `SDL_SCANCODE_F12` |
+| `sdl.keyboard.SCANCODE.PRINTSCREEN` | `SDL_SCANCODE_PRINTSCREEN` |
+| `sdl.keyboard.SCANCODE.SCROLLLOCK` | `SDL_SCANCODE_SCROLLLOCK` |
+| `sdl.keyboard.SCANCODE.PAUSE` | `SDL_SCANCODE_PAUSE` |
+| `sdl.keyboard.SCANCODE.INSERT` | `SDL_SCANCODE_INSERT` |
+| `sdl.keyboard.SCANCODE.HOME` | `SDL_SCANCODE_HOME` |
+| `sdl.keyboard.SCANCODE.PAGEUP` | `SDL_SCANCODE_PAGEUP` |
+| `sdl.keyboard.SCANCODE.DELETE` | `SDL_SCANCODE_DELETE` |
+| `sdl.keyboard.SCANCODE.END` | `SDL_SCANCODE_END` |
+| `sdl.keyboard.SCANCODE.PAGEDOWN` | `SDL_SCANCODE_PAGEDOWN` |
+| `sdl.keyboard.SCANCODE.RIGHT` | `SDL_SCANCODE_RIGHT` |
+| `sdl.keyboard.SCANCODE.LEFT` | `SDL_SCANCODE_LEFT` |
+| `sdl.keyboard.SCANCODE.DOWN` | `SDL_SCANCODE_DOWN` |
+| `sdl.keyboard.SCANCODE.UP` | `SDL_SCANCODE_UP` |
+| `sdl.keyboard.SCANCODE.NUMLOCKCLEAR` | `SDL_SCANCODE_NUMLOCKCLEAR` |
+| `sdl.keyboard.SCANCODE.KP_DIVIDE` | `SDL_SCANCODE_KP_DIVIDE` |
+| `sdl.keyboard.SCANCODE.KP_MULTIPLY` | `SDL_SCANCODE_KP_MULTIPLY` |
+| `sdl.keyboard.SCANCODE.KP_MINUS` | `SDL_SCANCODE_KP_MINUS` |
+| `sdl.keyboard.SCANCODE.KP_PLUS` | `SDL_SCANCODE_KP_PLUS` |
+| `sdl.keyboard.SCANCODE.KP_ENTER` | `SDL_SCANCODE_KP_ENTER` |
+| `sdl.keyboard.SCANCODE.KP_1` | `SDL_SCANCODE_KP_1` |
+| `sdl.keyboard.SCANCODE.KP_2` | `SDL_SCANCODE_KP_2` |
+| `sdl.keyboard.SCANCODE.KP_3` | `SDL_SCANCODE_KP_3` |
+| `sdl.keyboard.SCANCODE.KP_4` | `SDL_SCANCODE_KP_4` |
+| `sdl.keyboard.SCANCODE.KP_5` | `SDL_SCANCODE_KP_5` |
+| `sdl.keyboard.SCANCODE.KP_6` | `SDL_SCANCODE_KP_6` |
+| `sdl.keyboard.SCANCODE.KP_7` | `SDL_SCANCODE_KP_7` |
+| `sdl.keyboard.SCANCODE.KP_8` | `SDL_SCANCODE_KP_8` |
+| `sdl.keyboard.SCANCODE.KP_9` | `SDL_SCANCODE_KP_9` |
+| `sdl.keyboard.SCANCODE.KP_0` | `SDL_SCANCODE_KP_0` |
+| `sdl.keyboard.SCANCODE.KP_PERIOD` | `SDL_SCANCODE_KP_PERIOD` |
+| `sdl.keyboard.SCANCODE.NONUSBACKSLASH` | `SDL_SCANCODE_NONUSBACKSLASH` |
+| `sdl.keyboard.SCANCODE.APPLICATION` | `SDL_SCANCODE_APPLICATION` |
+| `sdl.keyboard.SCANCODE.POWER` | `SDL_SCANCODE_POWER` |
+| `sdl.keyboard.SCANCODE.KP_EQUALS` | `SDL_SCANCODE_KP_EQUALS` |
+| `sdl.keyboard.SCANCODE.F13` | `SDL_SCANCODE_F13` |
+| `sdl.keyboard.SCANCODE.F14` | `SDL_SCANCODE_F14` |
+| `sdl.keyboard.SCANCODE.F15` | `SDL_SCANCODE_F15` |
+| `sdl.keyboard.SCANCODE.F16` | `SDL_SCANCODE_F16` |
+| `sdl.keyboard.SCANCODE.F17` | `SDL_SCANCODE_F17` |
+| `sdl.keyboard.SCANCODE.F18` | `SDL_SCANCODE_F18` |
+| `sdl.keyboard.SCANCODE.F19` | `SDL_SCANCODE_F19` |
+| `sdl.keyboard.SCANCODE.F20` | `SDL_SCANCODE_F20` |
+| `sdl.keyboard.SCANCODE.F21` | `SDL_SCANCODE_F21` |
+| `sdl.keyboard.SCANCODE.F22` | `SDL_SCANCODE_F22` |
+| `sdl.keyboard.SCANCODE.F23` | `SDL_SCANCODE_F23` |
+| `sdl.keyboard.SCANCODE.F24` | `SDL_SCANCODE_F24` |
+| `sdl.keyboard.SCANCODE.EXECUTE` | `SDL_SCANCODE_EXECUTE` |
+| `sdl.keyboard.SCANCODE.HELP` | `SDL_SCANCODE_HELP` |
+| `sdl.keyboard.SCANCODE.MENU` | `SDL_SCANCODE_MENU` |
+| `sdl.keyboard.SCANCODE.SELECT` | `SDL_SCANCODE_SELECT` |
+| `sdl.keyboard.SCANCODE.STOP` | `SDL_SCANCODE_STOP` |
+| `sdl.keyboard.SCANCODE.AGAIN` | `SDL_SCANCODE_AGAIN` |
+| `sdl.keyboard.SCANCODE.UNDO` | `SDL_SCANCODE_UNDO` |
+| `sdl.keyboard.SCANCODE.CUT` | `SDL_SCANCODE_CUT` |
+| `sdl.keyboard.SCANCODE.COPY` | `SDL_SCANCODE_COPY` |
+| `sdl.keyboard.SCANCODE.PASTE` | `SDL_SCANCODE_PASTE` |
+| `sdl.keyboard.SCANCODE.FIND` | `SDL_SCANCODE_FIND` |
+| `sdl.keyboard.SCANCODE.MUTE` | `SDL_SCANCODE_MUTE` |
+| `sdl.keyboard.SCANCODE.VOLUMEUP` | `SDL_SCANCODE_VOLUMEUP` |
+| `sdl.keyboard.SCANCODE.VOLUMEDOWN` | `SDL_SCANCODE_VOLUMEDOWN` |
+| `sdl.keyboard.SCANCODE.KP_COMMA` | `SDL_SCANCODE_KP_COMMA` |
+| `sdl.keyboard.SCANCODE.KP_EQUALSAS400` | `SDL_SCANCODE_KP_EQUALSAS400` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL1` | `SDL_SCANCODE_INTERNATIONAL1` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL2` | `SDL_SCANCODE_INTERNATIONAL2` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL3` | `SDL_SCANCODE_INTERNATIONAL3` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL4` | `SDL_SCANCODE_INTERNATIONAL4` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL5` | `SDL_SCANCODE_INTERNATIONAL5` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL6` | `SDL_SCANCODE_INTERNATIONAL6` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL7` | `SDL_SCANCODE_INTERNATIONAL7` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL8` | `SDL_SCANCODE_INTERNATIONAL8` |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL9` | `SDL_SCANCODE_INTERNATIONAL9` |
+| `sdl.keyboard.SCANCODE.LANG1` | `SDL_SCANCODE_LANG1` |
+| `sdl.keyboard.SCANCODE.LANG2` | `SDL_SCANCODE_LANG2` |
+| `sdl.keyboard.SCANCODE.LANG3` | `SDL_SCANCODE_LANG3` |
+| `sdl.keyboard.SCANCODE.LANG4` | `SDL_SCANCODE_LANG4` |
+| `sdl.keyboard.SCANCODE.LANG5` | `SDL_SCANCODE_LANG5` |
+| `sdl.keyboard.SCANCODE.LANG6` | `SDL_SCANCODE_LANG6` |
+| `sdl.keyboard.SCANCODE.LANG7` | `SDL_SCANCODE_LANG7` |
+| `sdl.keyboard.SCANCODE.LANG8` | `SDL_SCANCODE_LANG8` |
+| `sdl.keyboard.SCANCODE.LANG9` | `SDL_SCANCODE_LANG9` |
+| `sdl.keyboard.SCANCODE.ALTERASE` | `SDL_SCANCODE_ALTERASE` |
+| `sdl.keyboard.SCANCODE.SYSREQ` | `SDL_SCANCODE_SYSREQ` |
+| `sdl.keyboard.SCANCODE.CANCEL` | `SDL_SCANCODE_CANCEL` |
+| `sdl.keyboard.SCANCODE.CLEAR` | `SDL_SCANCODE_CLEAR` |
+| `sdl.keyboard.SCANCODE.PRIOR` | `SDL_SCANCODE_PRIOR` |
+| `sdl.keyboard.SCANCODE.RETURN2` | `SDL_SCANCODE_RETURN2` |
+| `sdl.keyboard.SCANCODE.SEPARATOR` | `SDL_SCANCODE_SEPARATOR` |
+| `sdl.keyboard.SCANCODE.OUT` | `SDL_SCANCODE_OUT` |
+| `sdl.keyboard.SCANCODE.OPER` | `SDL_SCANCODE_OPER` |
+| `sdl.keyboard.SCANCODE.CLEARAGAIN` | `SDL_SCANCODE_CLEARAGAIN` |
+| `sdl.keyboard.SCANCODE.CRSEL` | `SDL_SCANCODE_CRSEL` |
+| `sdl.keyboard.SCANCODE.EXSEL` | `SDL_SCANCODE_EXSEL` |
+| `sdl.keyboard.SCANCODE.KP_00` | `SDL_SCANCODE_KP_00` |
+| `sdl.keyboard.SCANCODE.KP_000` | `SDL_SCANCODE_KP_000` |
+| `sdl.keyboard.SCANCODE.THOUSANDSSEPARATOR` | `SDL_SCANCODE_THOUSANDSSEPARATOR` |
+| `sdl.keyboard.SCANCODE.DECIMALSEPARATOR` | `SDL_SCANCODE_DECIMALSEPARATOR` |
+| `sdl.keyboard.SCANCODE.CURRENCYUNIT` | `SDL_SCANCODE_CURRENCYUNIT` |
+| `sdl.keyboard.SCANCODE.CURRENCYSUBUNIT` | `SDL_SCANCODE_CURRENCYSUBUNIT` |
+| `sdl.keyboard.SCANCODE.KP_LEFTPAREN` | `SDL_SCANCODE_KP_LEFTPAREN` |
+| `sdl.keyboard.SCANCODE.KP_RIGHTPAREN` | `SDL_SCANCODE_KP_RIGHTPAREN` |
+| `sdl.keyboard.SCANCODE.KP_LEFTBRACE` | `SDL_SCANCODE_KP_LEFTBRACE` |
+| `sdl.keyboard.SCANCODE.KP_RIGHTBRACE` | `SDL_SCANCODE_KP_RIGHTBRACE` |
+| `sdl.keyboard.SCANCODE.KP_TAB` | `SDL_SCANCODE_KP_TAB` |
+| `sdl.keyboard.SCANCODE.KP_BACKSPACE` | `SDL_SCANCODE_KP_BACKSPACE` |
+| `sdl.keyboard.SCANCODE.KP_A` | `SDL_SCANCODE_KP_A` |
+| `sdl.keyboard.SCANCODE.KP_B` | `SDL_SCANCODE_KP_B` |
+| `sdl.keyboard.SCANCODE.KP_C` | `SDL_SCANCODE_KP_C` |
+| `sdl.keyboard.SCANCODE.KP_D` | `SDL_SCANCODE_KP_D` |
+| `sdl.keyboard.SCANCODE.KP_E` | `SDL_SCANCODE_KP_E` |
+| `sdl.keyboard.SCANCODE.KP_F` | `SDL_SCANCODE_KP_F` |
+| `sdl.keyboard.SCANCODE.KP_XOR` | `SDL_SCANCODE_KP_XOR` |
+| `sdl.keyboard.SCANCODE.KP_POWER` | `SDL_SCANCODE_KP_POWER` |
+| `sdl.keyboard.SCANCODE.KP_PERCENT` | `SDL_SCANCODE_KP_PERCENT` |
+| `sdl.keyboard.SCANCODE.KP_LESS` | `SDL_SCANCODE_KP_LESS` |
+| `sdl.keyboard.SCANCODE.KP_GREATER` | `SDL_SCANCODE_KP_GREATER` |
+| `sdl.keyboard.SCANCODE.KP_AMPERSAND` | `SDL_SCANCODE_KP_AMPERSAND` |
+| `sdl.keyboard.SCANCODE.KP_DBLAMPERSAND` | `SDL_SCANCODE_KP_DBLAMPERSAND` |
+| `sdl.keyboard.SCANCODE.KP_VERTICALBAR` | `SDL_SCANCODE_KP_VERTICALBAR` |
+| `sdl.keyboard.SCANCODE.KP_DBLVERTICALBAR` | `SDL_SCANCODE_KP_DBLVERTICALBAR` |
+| `sdl.keyboard.SCANCODE.KP_COLON` | `SDL_SCANCODE_KP_COLON` |
+| `sdl.keyboard.SCANCODE.KP_HASH` | `SDL_SCANCODE_KP_HASH` |
+| `sdl.keyboard.SCANCODE.KP_SPACE` | `SDL_SCANCODE_KP_SPACE` |
+| `sdl.keyboard.SCANCODE.KP_AT` | `SDL_SCANCODE_KP_AT` |
+| `sdl.keyboard.SCANCODE.KP_EXCLAM` | `SDL_SCANCODE_KP_EXCLAM` |
+| `sdl.keyboard.SCANCODE.KP_MEMSTORE` | `SDL_SCANCODE_KP_MEMSTORE` |
+| `sdl.keyboard.SCANCODE.KP_MEMRECALL` | `SDL_SCANCODE_KP_MEMRECALL` |
+| `sdl.keyboard.SCANCODE.KP_MEMCLEAR` | `SDL_SCANCODE_KP_MEMCLEAR` |
+| `sdl.keyboard.SCANCODE.KP_MEMADD` | `SDL_SCANCODE_KP_MEMADD` |
+| `sdl.keyboard.SCANCODE.KP_MEMSUBTRACT` | `SDL_SCANCODE_KP_MEMSUBTRACT` |
+| `sdl.keyboard.SCANCODE.KP_MEMMULTIPLY` | `SDL_SCANCODE_KP_MEMMULTIPLY` |
+| `sdl.keyboard.SCANCODE.KP_MEMDIVIDE` | `SDL_SCANCODE_KP_MEMDIVIDE` |
+| `sdl.keyboard.SCANCODE.KP_PLUSMINUS` | `SDL_SCANCODE_KP_PLUSMINUS` |
+| `sdl.keyboard.SCANCODE.KP_CLEAR` | `SDL_SCANCODE_KP_CLEAR` |
+| `sdl.keyboard.SCANCODE.KP_CLEARENTRY` | `SDL_SCANCODE_KP_CLEARENTRY` |
+| `sdl.keyboard.SCANCODE.KP_BINARY` | `SDL_SCANCODE_KP_BINARY` |
+| `sdl.keyboard.SCANCODE.KP_OCTAL` | `SDL_SCANCODE_KP_OCTAL` |
+| `sdl.keyboard.SCANCODE.KP_DECIMAL` | `SDL_SCANCODE_KP_DECIMAL` |
+| `sdl.keyboard.SCANCODE.KP_HEXADECIMAL` | `SDL_SCANCODE_KP_HEXADECIMAL` |
+| `sdl.keyboard.SCANCODE.LCTRL` | `SDL_SCANCODE_LCTRL` |
+| `sdl.keyboard.SCANCODE.LSHIFT` | `SDL_SCANCODE_LSHIFT` |
+| `sdl.keyboard.SCANCODE.LALT` | `SDL_SCANCODE_LALT` |
+| `sdl.keyboard.SCANCODE.LGUI` | `SDL_SCANCODE_LGUI` |
+| `sdl.keyboard.SCANCODE.RCTRL` | `SDL_SCANCODE_RCTRL` |
+| `sdl.keyboard.SCANCODE.RSHIFT` | `SDL_SCANCODE_RSHIFT` |
+| `sdl.keyboard.SCANCODE.RALT` | `SDL_SCANCODE_RALT` |
+| `sdl.keyboard.SCANCODE.RGUI` | `SDL_SCANCODE_RGUI` |
+| `sdl.keyboard.SCANCODE.MODE` | `SDL_SCANCODE_MODE` |
+| `sdl.keyboard.SCANCODE.AUDIONEXT` | `SDL_SCANCODE_AUDIONEXT` |
+| `sdl.keyboard.SCANCODE.AUDIOPREV` | `SDL_SCANCODE_AUDIOPREV` |
+| `sdl.keyboard.SCANCODE.AUDIOSTOP` | `SDL_SCANCODE_AUDIOSTOP` |
+| `sdl.keyboard.SCANCODE.AUDIOPLAY` | `SDL_SCANCODE_AUDIOPLAY` |
+| `sdl.keyboard.SCANCODE.AUDIOMUTE` | `SDL_SCANCODE_AUDIOMUTE` |
+| `sdl.keyboard.SCANCODE.MEDIASELECT` | `SDL_SCANCODE_MEDIASELECT` |
+| `sdl.keyboard.SCANCODE.WWW` | `SDL_SCANCODE_WWW` |
+| `sdl.keyboard.SCANCODE.MAIL` | `SDL_SCANCODE_MAIL` |
+| `sdl.keyboard.SCANCODE.CALCULATOR` | `SDL_SCANCODE_CALCULATOR` |
+| `sdl.keyboard.SCANCODE.COMPUTER` | `SDL_SCANCODE_COMPUTER` |
+| `sdl.keyboard.SCANCODE.AC_SEARCH` | `SDL_SCANCODE_AC_SEARCH` |
+| `sdl.keyboard.SCANCODE.AC_HOME` | `SDL_SCANCODE_AC_HOME` |
+| `sdl.keyboard.SCANCODE.AC_BACK` | `SDL_SCANCODE_AC_BACK` |
+| `sdl.keyboard.SCANCODE.AC_FORWARD` | `SDL_SCANCODE_AC_FORWARD` |
+| `sdl.keyboard.SCANCODE.AC_STOP` | `SDL_SCANCODE_AC_STOP` |
+| `sdl.keyboard.SCANCODE.AC_REFRESH` | `SDL_SCANCODE_AC_REFRESH` |
+| `sdl.keyboard.SCANCODE.AC_BOOKMARKS` | `SDL_SCANCODE_AC_BOOKMARKS` |
+| `sdl.keyboard.SCANCODE.BRIGHTNESSDOWN` | `SDL_SCANCODE_BRIGHTNESSDOWN` |
+| `sdl.keyboard.SCANCODE.BRIGHTNESSUP` | `SDL_SCANCODE_BRIGHTNESSUP` |
+| `sdl.keyboard.SCANCODE.DISPLAYSWITCH` | `SDL_SCANCODE_DISPLAYSWITCH` |
+| `sdl.keyboard.SCANCODE.KBDILLUMTOGGLE` | `SDL_SCANCODE_KBDILLUMTOGGLE` |
+| `sdl.keyboard.SCANCODE.KBDILLUMDOWN` | `SDL_SCANCODE_KBDILLUMDOWN` |
+| `sdl.keyboard.SCANCODE.KBDILLUMUP` | `SDL_SCANCODE_KBDILLUMUP` |
+| `sdl.keyboard.SCANCODE.EJECT` | `SDL_SCANCODE_EJECT` |
+| `sdl.keyboard.SCANCODE.SLEEP` | `SDL_SCANCODE_SLEEP` |
+| `sdl.keyboard.SCANCODE.APP1` | `SDL_SCANCODE_APP1` |
+| `sdl.keyboard.SCANCODE.APP2` | `SDL_SCANCODE_APP2` |
+| `sdl.keyboard.SCANCODE.AUDIOREWIND` | `SDL_SCANCODE_AUDIOREWIND` |
+| `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD` | `SDL_SCANCODE_AUDIOFASTFORWARD` |
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_Keycode) with the `SDLK_` prefix removed so that `SDLK_FOO` corresponds to `sdl.keyboard.KEYCODE.FOO`.
+### Virtual keys
 
-### Enum: sdl.keyboard.KEYCODE_NAME
+Used to represent virtual keys in the context of the current keyboard mapping.
 
-Maps values of [`sdl.keyboard.KEYCODE`](#enum-sdlkeyboardkeycode) back to their names so that `sdl.keyboard.KEYCODE_NAME[sdl.keyboard.KEYCODE.FOO] === 'FOO'`.
+A Key can be one of the values below __or__ any unicode character. Keys that produce characters are represented by that character, and all others are represented by the values below.
 
-### sdl.keyboard.getKeycode(scancode)
+### sdl.keyboard.getKey(scancode)
 
-* `scancode: `[`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode)
-* Returns: [`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode)
+* `scancode: `[`<Scancode>`](#enum-scancode)
+* Returns: [`<Key>`](#virtual-keys)
 
-Maps a scancode to the corresponding keyode based on the current keyboard mapping.
+Maps a scancode to the corresponding key based on the current keyboard mapping.
 
-### sdl.keyboard.getScancode(keycode)
+### sdl.keyboard.getScancode(key)
 
-* `keycode: `[`<sdl.keyboard.KEYCODE>`](#enum-sdlkeyboardkeycode)
-* Returns: [`<sdl.keyboard.SCANCODE>`](#enum-sdlkeyboardscancode)
+* `key: `[`<Key>`](#virtual-keys)
+* Returns: [`<Scancode>`](#enum-scancode)
 
-Maps a keycode to the corresponding scancode based on the current keyboard mapping.
+Maps a key to the corresponding scancode based on the current keyboard mapping.
 
 ### sdl.keyboard.getState()
 
-* Returns: `<boolean>[]` an array representing the state of each key.
+* Returns: `<boolean[]>` an object representing the state of each key.
 
-Use the values of [`sdl.keyboard.SCANCODE`](#enum-sdlkeyboardscancode) as indexes. Pressed keys will have `true` values.
+The returned array can be indexed with [`Scancode`](#enum-scancode) values. Pressed keys will correspond to `true` values.
 
 
 ## sdl.mouse
 
-### Enum: sdl.mouse.BUTTON
-
-Values of this enum are used to represent the buttons on a mouse.
-
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_MouseButtonEvent) with the `SDL_BUTTON_` prefix removed so that `SDL_BUTTON_FOO` corresponds to `sdl.mouse.BUTTON.FOO`.
-
-### Enum: sdl.mouse.BUTTON_NAME
-
-Maps values of [`sdl.mouse.BUTTON`](#enum-sdlmousebutton) back to their names so that `sdl.mouse.BUTTON_NAME[sdl.video.BUTTON.FOO] === 'FOO'`.
-
-### Enum: sdl.mouse.CURSOR
+### Mouse cursors
 
 Values of this enum are used to represent the types of cursors available on most systems.
 
-Includes all the entries of the [SDL enum](https://wiki.libsdl.org/SDL_SystemCursor) with the `SDL_SYSTEM_CURSOR_` prefix removed so that `SDL_SYSTEM_CURSOR_FOO` corresponds to `sdl.mouse.CURSOR.FOO`.
+| Value | Corresponding `SDL_SystemCursor` | Description |
+| --- | --- | --- |
+| `'arrow'` | `SDL_SYSTEM_CURSOR_ARROW` | arrow |
+| `'ibeam'` | `SDL_SYSTEM_CURSOR_IBEAM` | i-beam |
+| `'wait'` | `SDL_SYSTEM_CURSOR_WAIT` | wait |
+| `'crosshair'` | `SDL_SYSTEM_CURSOR_CROSSHAIR` | crosshair |
+| `'waitarrow'` | `SDL_SYSTEM_CURSOR_WAITARROW` | small wait cursor (or wait if not available) |
+| `'sizenwse'` | `SDL_SYSTEM_CURSOR_SIZENWSE` | double arrow pointing northwest and southeast |
+| `'sizenesw'` | `SDL_SYSTEM_CURSOR_SIZENESW` | double arrow pointing northeast and southwest |
+| `'sizewe'` | `SDL_SYSTEM_CURSOR_SIZEWE` | double arrow pointing west and east |
+| `'sizens'` | `SDL_SYSTEM_CURSOR_SIZENS` | double arrow pointing north and south |
+| `'sizeall'` | `SDL_SYSTEM_CURSOR_SIZEALL` | four pointed arrow pointing north, south, east, and west |
+| `'no'` | `SDL_SYSTEM_CURSOR_NO` | slashed circle or crossbones |
+| `'hand'` | `SDL_SYSTEM_CURSOR_HAND` | hand |
 
-### Enum: sdl.mouse.CURSOR_NAME
+### Enum: BUTTON
 
-Maps values of [`sdl.mouse.CURSOR`](#enum-sdlmousecursor) back to their names so that `sdl.mouse.CURSOR_NAME[sdl.video.CURSOR.FOO] === 'FOO'`.
+Values of this enum are used to represent the buttons on a mouse.
+
+| Value | Corresponding `SDL_BUTTON_*` |
+| --- | --- |
+| `sdl.mouse.BUTTON.LEFT` | `SDL_BUTTON_LEFT` |
+| `sdl.mouse.BUTTON.MIDDLE` | `SDL_BUTTON_MIDDLE` |
+| `sdl.mouse.BUTTON.RIGHT` | `SDL_BUTTON_RIGHT` |
+
+### sdl.mouse.getButton(button)
+
+* `button: <number>` The index of the button.
+* Returns: `<boolean>` Will be `true` if the button is pressed.
+
+Queries the state of a single mouse button.
 
 ### sdl.mouse.position
 
@@ -1019,8 +1420,6 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 ### Event: 'update'
 
-* `type: <string>` The event's type.
-* `timestamp: <number>` The time when SDL received the event.
 
 Fired when the contents of the clipboard have changed. Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the clipboard.
 
@@ -1036,86 +1435,6 @@ The current text value on the clipboard.
 
 Changes the text contents of the clipboard.
 
-
-## Notes
-
-### Image data
-
-There are 3 places in the API where you will need to provide an image to the library:
-* [`window.render()`](#windowrenderwidth-height-stride-format-buffer)
-* [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
-* [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
-
-All three of these functions accept the image as a series of arguments:
-* `width: <number>` The width of the image in pixels.
-* `height: <number>` The height of the image in pixels.
-* `stride: <number>` How many bytes each row of the image takes up in the buffer. This is usually equal to `width * bytesPerPixel`, but can be larger if the rows of the buffer are padded to always be some multiple of bytes.
-* `format: `[`<sdl.video.FORMAT>`](#enum-sdlvideoformat) The binary representation of the data in the buffer.
-* `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
-
-So for example, to fill the window with a red+green gradient you could do:
-
-```js
-const R = 0
-const G = 1
-const B = 2
-const A = 3
-
-const { width, height } = window
-const stride = width * 4
-const buffer = Buffer.alloc(stride * height)
-
-for (let i = 0; i < height; i++) {
-  for (let j = 0; j < width; j++) {
-    const offset = i * stride + j * 4
-    buffer[offset + R] = Math.floor(256 * i / height)
-    buffer[offset + G] = Math.floor(256 * j / width)
-    buffer[offset + B] = 0
-    buffer[offset + A] = 255
-  }
-}
-
-window.render(width, height, stride, sdl.video.FORMAT.RGBA32, buffer)
-```
-
-### Audio data
-
-The [`playbackDevice.queue()`](#playbackdevicequeuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingDevice.dequeue()`](#recordingdevicedequeuebuffer-bytes) function returns a buffer of audio data as output. The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
-
-Audio data are a sequence of frames, with each frame being a sequence of samples. A _sample_ is a single number representing the intensity of a single audio channel at a specific point in time. For audio with multiple channels, each point in time is represented by one sample per channel. This is called a _frame_. The samples in a frame are arranged as follows:
-* For 1 channel (mono) a frame contains just the one sample.
-* For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
-* For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
-* For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
-
-So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, assuming a `sdl.audio.FORMAT.F32` format, you could do:
-
-```js
-const TWO_PI = 2 * Math.PI
-
-const { channels, frequency } = audioDevice
-const bytesPerSample = 4
-
-const sineAmplitude = 0.3
-const sineNote = 440
-const sinePeriod = 1 / sineNote
-
-const duration = 3
-const numFrames = duration * frequency
-const numSamples = numFrames * channels
-const numBytes = numSamples * bytesPerSample
-const buffer = Buffer.alloc(numBytes)
-
-let offset = 0
-for (let i = 0; i < numFrames; i++) {
-  const time = i / frequency
-  const angle = time / sinePeriod * TWO_PI
-  const sample = Math.sin(angle) * sineAmplitude
-  for (let j = 0; j < channels; j++) {
-    offset = buffer.writeFloatLE(sample, offset)
-  }
-}
-```
 
 
 ## Miscellanea
@@ -1134,5 +1453,3 @@ This package depends on SDL2 `>=2.0.5`. To install it on your system you might h
 ### Building from source
 
 // TODO
-
-can't draw on the window in opengl mode?

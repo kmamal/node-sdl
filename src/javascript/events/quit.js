@@ -4,16 +4,16 @@ const { sdl } = require('../sdl')
 const maybeTriggerQuit = () => {
 	if (Globals.windows.all.size > 0) { return }
 
-	let should_prevent = false
-	const prevent = () => { should_prevent = true }
+	let shouldPrevent = false
+	const prevent = () => { shouldPrevent = true }
 
-	const type2 = 'before-quit'
-	const event2 = { type: type2, timestamp: Date.now(), prevent }
+	const type2 = 'beforeQuit'
+	const event2 = { prevent }
 	sdl.emit(type2, event2)
 
-	if (should_prevent) { return }
+	if (shouldPrevent) { return }
 
-	sdl.emit('quit', { type: 'quit', timestamp: Date.now() })
+	sdl.emit('quit')
 	process.exit()
 }
 

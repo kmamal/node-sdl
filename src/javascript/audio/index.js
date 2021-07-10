@@ -1,37 +1,38 @@
-const { enums } = require('../enums')
 const Globals = require('../globals')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { AudioPlaybackDevice } = require('./audio-playback-device')
-const { AudioRecordingDevice } = require('./audio-recording-device')
-const { audio_format_helpers } = require('./format-helpers')
+const { AudioPlaybackInstance } = require('./audio-playback-instance')
+const { AudioRecordingInstance } = require('./audio-recording-instance')
+const { AudioFormatHelpers } = require('./format-helpers')
+
+const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 const audio = new class extends EventsViaPoll {
-	get FORMAT () { return enums.audio_format }
-	get FORMAT_NAME () { return enums.audio_format_names }
-
-	bytesPerSample (format) {
-		return audio_format_helpers[format].bytes_per_sample
-	}
-
-	writeSample (format, buffer, value, offset) {
-		return audio_format_helpers[format].writer.call(buffer, value, offset)
-	}
-
-	readSample (format, buffer, offset) {
-		return audio_format_helpers[format].reader.call(buffer, offset)
-	}
+	constructor () { super(validEvents) }
 
 	get devices () {
 		return [
-			...Globals.audio_devices.playback,
-			...Globals.audio_devices.recording,
+			...Globals.audioDevices.playback,
+			...Globals.audioDevices.recording,
 		]
 	}
 
-	openDevice (device, options) {
+	openDevice (device, options = {}) {
 		return device.recording
-			? new AudioRecordingDevice(device, options)
-			: new AudioPlaybackDevice(device, options)
+			? new AudioRecordingInstance(device, options)
+			: new AudioPlaybackInstance(device, options)
+	}
+
+	bytesPerSample (format) { return AudioFormatHelpers[format].bytesPerSample }
+	minSampleValue (format) { return AudioFormatHelpers[format].minSampleValue }
+	maxSampleValue (format) { return AudioFormatHelpers[format].maxSampleValue }
+	zeroSampleValue (format) { return AudioFormatHelpers[format].zeroSampleValue }
+
+	readSample (format, buffer, offset) {
+		return AudioFormatHelpers[format].reader.call(buffer, offset)
+	}
+
+	writeSample (format, buffer, value, offset) {
+		return AudioFormatHelpers[format].writer.call(buffer, value, offset)
 	}
 }()
 

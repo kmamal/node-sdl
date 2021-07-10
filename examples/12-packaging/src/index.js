@@ -18,7 +18,7 @@ const [ image, video ] = await Promise.all([
 
 const window = sdl.video.createWindow({ width, height })
 
-window.on('mouse-button-up', () => {
+window.on('mouseButtonUp', () => {
 	startTime = startTime ? null : Date.now()
 	render()
 })
@@ -27,7 +27,7 @@ const render = async () => {
 	for (;;) {
 		// Render pause image
 		if (!startTime) {
-			window.render(width, height, width * 3, sdl.video.FORMAT.RGB24, image)
+			window.render(width, height, width * 3, 'rgb24', image)
 			return
 		}
 
@@ -42,11 +42,11 @@ const render = async () => {
 				startTime = null
 				lastIndex = null
 
-				window.render(width, height, width * 3, sdl.video.FORMAT.RGB24, image)
+				window.render(width, height, width * 3, 'rgb24', image)
 				return
 			}
 
-			window.render(width, height, width * 3, sdl.video.FORMAT.RGB24, video[index])
+			window.render(width, height, width * 3, 'rgb24', video[index])
 			lastIndex = index
 		}
 

@@ -8,35 +8,41 @@ const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
 const device = sdl.audio.devices.find(({ recording }) => recording)
-const format = sdl.audio.FORMAT.F32
 const channels = 1
 const buffered = 128
-const audioDevice = sdl.audio.openDevice(device, {
-	format,
+const recordingInstance = sdl.audio.openDevice(device, {
 	channels,
 	buffered,
 })
-const { frequency, bytesPerSample } = audioDevice
+const {
+	frequency,
+	bytesPerSample,
+	minSampleValue,
+	maxSampleValue,
+	zeroSampleValue,
+} = recordingInstance
+const range = maxSampleValue - minSampleValue
+const amplitude = range / 2
 
 const duration = 5
 const numSamples = duration * frequency
 const numBytes = numSamples * bytesPerSample
 const audioBuffer = Buffer.alloc(numBytes, 0)
 
-audioDevice.play()
+recordingInstance.play()
 
 const supersampling = 4
 
 while (!window.destroyed) {
 	// Read new audio samples
 	{
-		const { queued } = audioDevice
+		const { queued } = recordingInstance
 		if (queued === 0) {
 			await setTimeout(1)
 			continue
 		}
 		audioBuffer.copy(audioBuffer, 0, queued)
-		audioDevice.dequeue(audioBuffer.slice(-queued))
+		recordingInstance.dequeue(audioBuffer.slice(-queued))
 	}
 
 	// Render
@@ -56,13 +62,15 @@ while (!window.destroyed) {
 				const x = Math.floor((i / numSamples) * width * supersampling)
 
 				if (x > last_x) {
-					ctx.fillRect(last_x / supersampling, min, 1, max - min)
+					const y = (min - zeroSampleValue) / amplitude
+					const h = (max - min) / amplitude
+					ctx.fillRect(last_x / supersampling, y, 1, h)
 					last_x = x
 					min = Infinity
 					max = -Infinity
 				}
 
-				const sample = audioDevice.readSample(audioBuffer, i * bytesPerSample)
+				const sample = recordingInstance.readSample(audioBuffer, i * bytesPerSample)
 				max = Math.max(max, sample)
 				min = Math.min(min, sample)
 			}
@@ -70,7 +78,7 @@ while (!window.destroyed) {
 		ctx.restore()
 
 		const pixelBuffer = canvas.toBuffer('raw')
-		window.render(width, height, width * 4, sdl.video.FORMAT.BGRA32, pixelBuffer)
+		window.render(width, height, width * 4, 'bgra32', pixelBuffer)
 	}
 
 	await setTimeout(0)

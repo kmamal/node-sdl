@@ -2,10 +2,14 @@ const Bindings = require('../bindings')
 const { enums } = require('../enums')
 
 const mouse = {
-	get BUTTON () { return enums.mouse_button },
-	get BUTTON_NAME () { return enums.mouse_button_names },
-	get CURSOR () { return enums.cursor },
-	get CURSOR_NAME () { return enums.cursor_names },
+	get BUTTON () { return enums.button },
+
+	getButton (button) {
+		if (!Number.isFinite(button)) { throw Object.assign(new Error("button must be a number"), { button }) }
+		if (button < 0 || button >= 32) { throw Object.assign(new Error("invalid button"), { button }) }
+
+		return Bindings.mouse_getButton(button)
+	},
 
 	get position () {
 		const position = Bindings.mouse_getPosition()
@@ -16,38 +20,50 @@ const mouse = {
 	},
 
 	setPosition (x, y) {
-		if (!Number.isFinite(x)) { throw new Error("x must be a number") }
-		if (!Number.isFinite(y)) { throw new Error("y must be a number") }
+		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
 
 		Bindings.mouse_setPosition(x, y)
 	},
 
 	setCursor (cursor) {
-		if (!Number.isFinite(cursor)) { throw new Error("cursor must be a number") }
+		const _cursor = enums.cursor[cursor]
+		if (typeof cursor !== 'string') { throw Object.assign(new Error("cursor must be a string"), { cursor }) }
+		if (!_cursor) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
+
+		Bindings.mouse_setCursor(_cursor)
 	},
 
 	setCursorImage (width, height, stride, format, buffer, x, y) {
-		if (!Number.isFinite(width)) { throw new Error("width must be a number") }
-		if (!Number.isFinite(height)) { throw new Error("height must be a number") }
-		if (!Number.isFinite(stride)) { throw new Error("stride must be a number") }
-		if (!Number.isFinite(format)) { throw new Error("format must be a number") }
-		if (!(buffer instanceof Buffer)) { throw new Error("buffer must be a Buffer") }
-		if (buffer.length < stride * height) { throw new Error("buffer is smaller than expected") }
-		if (!Number.isFinite(x)) { throw new Error("x must be a number") }
-		if (!Number.isFinite(y)) { throw new Error("y must be a number") }
+		const _format = enums.pixelFormat[format] ?? null
 
-		Bindings.mouse_setCursorImage(width, height, stride, format, buffer, x, y)
+		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
+		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
+		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+		if (_format === null) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (x < 0 || x >= width) { throw Object.assign(new Error("invalid x"), { x }) }
+		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (y < 0 || y >= height) { throw Object.assign(new Error("invalid y"), { y }) }
+
+		Bindings.mouse_setCursorImage(width, height, stride, _format, buffer, x, y)
 	},
 
 	showCursor (show = true) {
-		if (typeof show !== 'boolean') { throw new Error("show must be a boolean") }
+		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
 		Bindings.mouse_showCursor(show)
 	},
 
 	hideCursor () { mouse.showCursor(false) },
 
 	capture (capture = true) {
-		if (typeof capture !== 'boolean') { throw new Error("capture must be a boolean") }
+		if (typeof capture !== 'boolean') { throw Object.assign(new Error("capture must be a boolean"), { capture }) }
 		Bindings.mouse_capture(capture)
 	},
 

@@ -11,9 +11,9 @@ process.on('exit', (code) => {
 		window.destroy()
 	}
 
-	// Close all audio devices
-	for (const device of Globals.audio_devices.all.values()) {
-		device.close()
+	// Close all audio instances
+	for (const instance of Globals.audioInstances.all.values()) {
+		instance.close()
 	}
 
 	// Close all joysticks

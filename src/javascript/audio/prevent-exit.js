@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const { AudioPlaybackInstance } = require('./audio-playback-instance')
 
 let timeout
 
@@ -11,13 +12,14 @@ process.on('beforeExit', (code) => {
 
 	let duration = 0
 
-	for (const device of Globals.audio_devices.all.values()) {
-		const { queue, queued, buffered, playing } = device
-		if (!queue || !queued || !playing) { continue }
+	for (const instance of Globals.audioInstances.all.values()) {
+		if (!(instance instanceof AudioPlaybackInstance)) { continue }
+		const { queued, playing, buffered } = instance
+		if (!queued || !playing) { continue }
 
-		const { channels, frequency, bytesPerSample } = device
-		const bytes_per_second = channels * frequency * bytesPerSample
-		duration = Math.max(duration, (queued + buffered) / bytes_per_second)
+		const { channels, frequency, bytesPerSample } = instance
+		const bytesPerSecond = channels * frequency * bytesPerSample
+		duration = Math.max(duration, (queued + buffered) / bytesPerSecond)
 	}
 
 	if (duration) {

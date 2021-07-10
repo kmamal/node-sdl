@@ -5,10 +5,12 @@ module.exports = {
 		focused: null,
 		hovered: null,
 	},
-	audio_devices: {
-		all: new Map(),
+	audioDevices: {
 		playback: [],
 		recording: [],
+	},
+	audioInstances: {
+		all: new Map(),
 	},
 	joysticks: {
 		all: new Map(),

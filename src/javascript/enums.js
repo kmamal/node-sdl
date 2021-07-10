@@ -7,7 +7,7 @@ for (const [ key, obj ] of Object.entries(enums)) {
 	for (const [ name, value ] of Object.entries(obj)) {
 		names[value] = name
 	}
-	enums[`${key}_names`] = names
+	enums[`${key}Names`] = names
 }
 
 module.exports = { enums }

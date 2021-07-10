@@ -1,89 +1,94 @@
-const { enums } = require('../enums')
 const Os = require('os')
 
-const audio_format_helpers = {
-	[enums.audio_format.S8]: {
-		bytes_per_sample: 1,
+const signedLimits = (bits) => ({
+	bytesPerSample: bits / 8,
+	minSampleValue: -(2 ** (bits - 1)),
+	zeroSampleValue: 0,
+	maxSampleValue: (2 ** (bits - 1)) - 1,
+})
+
+const unsignedLimits = (bits) => ({
+	bytesPerSample: bits / 8,
+	minSampleValue: 0,
+	zeroSampleValue: (2 ** (bits - 1)) - 1,
+	maxSampleValue: (2 ** bits) - 1,
+})
+
+const floatLimits = {
+	bytesPerSample: 4,
+	minSampleValue: -1,
+	zeroSampleValue: 0,
+	maxSampleValue: 1,
+}
+
+const AudioFormatHelpers = {
+	s8: {
 		reader: Buffer.prototype.readInt8,
 		writer: Buffer.prototype.writeInt8,
+		...signedLimits(8),
 	},
-	[enums.audio_format.U8]: {
-		bytes_per_sample: 1,
+	u8: {
 		reader: Buffer.prototype.readUInt8,
 		writer: Buffer.prototype.writeUInt8,
+		...unsignedLimits(8),
 	},
-	[enums.audio_format.S16LSB]: {
-		bytes_per_sample: 2,
+	s16lsb: {
 		reader: Buffer.prototype.readInt16LE,
 		writer: Buffer.prototype.writeInt16LE,
+		...signedLimits(16),
 	},
-	[enums.audio_format.S16MSB]: {
-		bytes_per_sample: 2,
+	s16msb: {
 		reader: Buffer.prototype.readInt16BE,
 		writer: Buffer.prototype.writeInt16BE,
+		...signedLimits(16),
 	},
-	[enums.audio_format.S16]: {
-		bytes_per_sample: 2,
-		reader: Buffer.prototype.readInt16LE,
-		writer: Buffer.prototype.writeInt16LE,
-	},
-	[enums.audio_format.U16LSB]: {
-		bytes_per_sample: 2,
+	u16lsb: {
 		reader: Buffer.prototype.readUInt16LE,
 		writer: Buffer.prototype.writeUInt16LE,
+		...unsignedLimits(16),
 	},
-	[enums.audio_format.U16MSB]: {
-		bytes_per_sample: 2,
+	u16msb: {
 		reader: Buffer.prototype.readUInt16BE,
 		writer: Buffer.prototype.writeUInt16BE,
+		...unsignedLimits(16),
 	},
-	[enums.audio_format.U16]: {
-		bytes_per_sample: 2,
-		reader: Buffer.prototype.readUInt32LE,
-		writer: Buffer.prototype.writeUInt32LE,
-	},
-	[enums.audio_format.S32LSB]: {
-		bytes_per_sample: 4,
+	s32lsb: {
 		reader: Buffer.prototype.readInt32LE,
 		writer: Buffer.prototype.writeInt32LE,
+		...signedLimits(32),
 	},
-	[enums.audio_format.S32MSB]: {
-		bytes_per_sample: 4,
+	s32msb: {
 		reader: Buffer.prototype.readInt32BE,
 		writer: Buffer.prototype.writeInt32BE,
+		...signedLimits(32),
 	},
-	[enums.audio_format.S32]: {
-		bytes_per_sample: 4,
-		reader: Buffer.prototype.readInt32LE,
-		writer: Buffer.prototype.writeInt32LE,
-	},
-	[enums.audio_format.F32LSB]: {
-		bytes_per_sample: 4,
+	f32lsb: {
 		reader: Buffer.prototype.readFloatLE,
 		writer: Buffer.prototype.writeFloatLE,
+		...floatLimits,
 	},
-	[enums.audio_format.F32MSB]: {
-		bytes_per_sample: 4,
+	f32msb: {
 		reader: Buffer.prototype.readFloatBE,
 		writer: Buffer.prototype.writeFloatBE,
-	},
-	[enums.audio_format.F32]: {
-		bytes_per_sample: 4,
-		reader: Buffer.prototype.readFloatLE,
-		writer: Buffer.prototype.writeFloatLE,
+		...floatLimits,
 	},
 }
+
+AudioFormatHelpers.s16 = AudioFormatHelpers.s16lsb
+AudioFormatHelpers.u16 = AudioFormatHelpers.u16lsb
+AudioFormatHelpers.s32 = AudioFormatHelpers.s32lsb
+AudioFormatHelpers.f32 = AudioFormatHelpers.f32lsb
 
 if (Os.endianness() === 'LE') {
-	audio_format_helpers[enums.audio_format.S16SYS] = audio_format_helpers[enums.audio_format.S16LSB]
-	audio_format_helpers[enums.audio_format.U16SYS] = audio_format_helpers[enums.audio_format.U16LSB]
-	audio_format_helpers[enums.audio_format.S32SYS] = audio_format_helpers[enums.audio_format.S32LSB]
-	audio_format_helpers[enums.audio_format.F32SYS] = audio_format_helpers[enums.audio_format.F32LSB]
+	AudioFormatHelpers.s16sys = AudioFormatHelpers.s16lsb
+	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16lsb
+	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32lsb
+	AudioFormatHelpers.f32sys = AudioFormatHelpers.f32lsb
 } else {
-	audio_format_helpers[enums.audio_format.S16SYS] = audio_format_helpers[enums.audio_format.S16MSB]
-	audio_format_helpers[enums.audio_format.U16SYS] = audio_format_helpers[enums.audio_format.U16MSB]
-	audio_format_helpers[enums.audio_format.S32SYS] = audio_format_helpers[enums.audio_format.S32MSB]
-	audio_format_helpers[enums.audio_format.F32SYS] = audio_format_helpers[enums.audio_format.F32MSB]
+	AudioFormatHelpers.s16sys = AudioFormatHelpers.s16msb
+	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16msb
+	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32msb
+	AudioFormatHelpers.f32sys = AudioFormatHelpers.f32msb
 }
 
-module.exports = { audio_format_helpers }
+module.exports = { AudioFormatHelpers }

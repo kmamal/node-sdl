@@ -2,6 +2,7 @@
   "version": "0.0.0",
   "name": "sdl-example-packaging",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "build": "packager --include '[ \"src/**/*.js\", \"assets/**/*\", \"package*.json\" ]' --out-dir dist"
   },

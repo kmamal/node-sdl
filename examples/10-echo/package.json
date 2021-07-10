@@ -2,6 +2,7 @@
   "version": "0.0.0",
   "name": "sdl-example-echo",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@kmamal/sdl": "*"
   }

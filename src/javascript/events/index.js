@@ -10,6 +10,7 @@ const handleEvents = () => {
 		const { family, type } = event
 		if (!family || !type) { continue }
 		delete event.family
+		delete event.type
 
 		switch (family) {
 			case 'app': {
@@ -20,6 +21,7 @@ const handleEvents = () => {
 			case 'window': {
 				const window = Globals.windows.all.get(event.window)
 				if (!window) { return }
+				delete event.window
 
 				switch (type) {
 					case 'move': {
@@ -81,26 +83,25 @@ const handleEvents = () => {
 					}
 
 					case 'close': {
-						let should_prevent = false
-						const prevent = () => { should_prevent = true }
+						let shouldPrevent = false
+						const prevent = () => { shouldPrevent = true }
 
-						const type2 = 'before-close'
-						const event2 = {
-							type: type2,
-							timestamp: event.timestamp,
-							prevent,
-						}
+						const type2 = 'beforeClose'
+						const event2 = { prevent }
 						window.emit(type2, event2)
 
-						if (should_prevent) { return }
+						if (shouldPrevent) { return }
 						break
 					}
 
 					// No default
 				}
 
-				event.window = window
-				window.emit(type, event)
+				if (Object.keys(event).length > 0) {
+					window.emit(type, event)
+				} else {
+					window.emit(type)
+				}
 
 				if (type === 'close') { window.destroy() }
 				break
@@ -108,29 +109,45 @@ const handleEvents = () => {
 
 			case 'keyboard':
 			case 'mouse':
+			case 'text':
 			case 'drop':
 			{
 				const window = Globals.windows.all.get(event.window)
 				if (!window) { return }
+				delete event.window
 
-				event.window = window
-				window.emit(type, event)
+				if (Object.keys(event).length > 0) {
+					window.emit(type, event)
+				} else {
+					window.emit(type)
+				}
+
 				break
 			}
 
-			case 'audio-device': {
+			case 'audioDevice': {
 				const { index, recording } = event
 				const outdated = recording
-					? Globals.audio_devices.recording
-					: Globals.audio_devices.playback
+					? Globals.audioDevices.recording
+					: Globals.audioDevices.playback
 				const updated = Bindings.audio_getDevices(recording)
 				if (recording) {
-					Globals.audio_devices.recording = updated
+					Globals.audioDevices.recording = updated
 				} else {
-					Globals.audio_devices.playback = updated
+					Globals.audioDevices.playback = updated
 				}
 
-				event.device = (type.endsWith('add') ? updated : outdated)[index]
+				if (type.endsWith('remove')) {
+					const device = outdated[index]
+					for (const instance of Globals.audioInstances.all.values()) {
+						if (instance.device !== device) { continue }
+						instance.close()
+					}
+					event.device = device
+				} else {
+					event.device = updated[index]
+				}
+
 				delete event.index
 				delete event.recording
 				audio.emit(type, event)
@@ -138,7 +155,7 @@ const handleEvents = () => {
 			}
 
 			case 'clipboard': {
-				clipboard.emit(type, event)
+				clipboard.emit(type)
 			}
 
 			// No default
@@ -149,29 +166,29 @@ const handleEvents = () => {
 		// 	if (!joystick) { return }
 
 		// 	switch (type) {
-		// 		case 'joystick-axis-motion': {
+		// 		case 'joystickAxisMotion': {
 		// 			joystick.axes[event.axis] = event.value
 		// 			break
 		// 		}
-		// 		case 'joystick-ball-motion': {
+		// 		case 'joystickBallMotion': {
 		// 			const ball = joystick.balls[event.ball]
 		// 			ball.x = event.x
 		// 			ball.x = event.y
 		// 			break
 		// 		}
-		// 		case 'joystick-hat-motion': {
+		// 		case 'joystickHatMotion': {
 		// 			joystick.hats[event.hat] = event.value
 		// 			break
 		// 		}
-		// 		case 'joystick-button-up': {
+		// 		case 'joystickButtonUp': {
 		// 			joystick.buttons[event.button] = 0
 		// 			break
 		// 		}
-		// 		case 'joystick-button-down': {
+		// 		case 'joystickButtonDown': {
 		// 			joystick.buttons[event.button] = 0
 		// 			break
 		// 		}
-		// 		case 'joystick-device-removed': {
+		// 		case 'joystickDeviceRemoved': {
 		// 			joystick.close()
 		// 			break
 		// 		}
@@ -185,15 +202,15 @@ const handleEvents = () => {
 	}
 }
 
-let events_interval = null
+let eventsInterval = null
 
 const startPolling = () => {
-	events_interval = setInterval(handleEvents, 0)
+	eventsInterval = setInterval(handleEvents, 0)
 }
 
 const stopPolling = () => {
-	clearInterval(events_interval)
-	events_interval = null
+	clearInterval(eventsInterval)
+	eventsInterval = null
 }
 
 Globals.events = {

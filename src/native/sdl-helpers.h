@@ -35,7 +35,7 @@ using VariantList = std::vector<Variant>;
 ErrorMessage * enum_getPixelFormats (Variant & object);
 ErrorMessage * enum_getAudioFormats (Variant & object);
 ErrorMessage * enum_getScancodes (Variant & object);
-ErrorMessage * enum_getKeycodes (Variant & object);
+ErrorMessage * enum_getMouseButtons (Variant & object);
 ErrorMessage * enum_getCursors (Variant & object);
 ErrorMessage * enum_getHatPositions (Variant & object);
 ErrorMessage * enum_getPowerLevels (Variant & object);
@@ -48,7 +48,7 @@ ErrorMessage * video_getDisplays (Variant & list);
 
 ErrorMessage * window_create (
 	const char * title, int display,
-	int ** x, int ** y, int * width, int * height,
+	int ** x, int ** y, int ** width, int ** height,
 	bool visible,
 	bool fullscreen,
 	bool resizable,
@@ -90,18 +90,19 @@ ErrorMessage * audio_openDevice (
 );
 ErrorMessage * audio_close (int device_id);
 ErrorMessage * audio_play (int device_id, bool play);
-ErrorMessage * audio_getQueuedSize (int device_id, unsigned int * size);
-ErrorMessage * audio_clearQueued (int device_id);
-ErrorMessage * audio_queue (int device_id, void * src, int size);
+ErrorMessage * audio_getQueueSize (int device_id, unsigned int * size);
+ErrorMessage * audio_clearQueue (int device_id);
+ErrorMessage * audio_enqueue (int device_id, void * src, int size);
 ErrorMessage * audio_dequeue (int device_id, void * dst, int size, int * num);
 
 ErrorMessage * events_poll (Variant & event);
 ErrorMessage * events_wait (int timeout, Variant & event);
 
-ErrorMessage * keyboard_getKeycode (int scancode, int * keycode);
-ErrorMessage * keyboard_getScancode (int keycode, int * scancode);
+ErrorMessage * keyboard_getKey (int scancode, const char ** key);
+ErrorMessage * keyboard_getScancode (const char * key, int * scancode);
 ErrorMessage * keyboard_getState (Variant & list);
 
+ErrorMessage * mouse_getButton (int button, int * state);
 ErrorMessage * mouse_getPosition (Variant & position);
 ErrorMessage * mouse_setPosition (int x, int y);
 ErrorMessage * mouse_capture (bool capture);

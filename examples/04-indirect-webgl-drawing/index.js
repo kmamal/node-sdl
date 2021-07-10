@@ -83,5 +83,5 @@ window.on('resize', () => {
 
 	const buffer = new Uint8Array(w * h * 4)
 	gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buffer)
-	window.render(w, h, w * 4, sdl.video.FORMAT.RGBA32, Buffer.from(buffer))
+	window.render(w, h, w * 4, 'rgba32', Buffer.from(buffer))
 })
