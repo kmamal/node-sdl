@@ -115,8 +115,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
   * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
   * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
-  * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformatbufferoffset)
-  * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudioreadsampleformatbuffervalueoffset)
+  * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
+  * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudioreadsampleformat-buffer-value-offset)
   * [sdl.audio.devices](#sdlaudioinstances)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioInstance](#class-audioinstance)
@@ -129,8 +129,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [audioInstance.minSampleValue](#audioinstanceminsamplevalue)
     * [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
     * [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
-    * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebufferoffset)
-    * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancereadsamplebuffervalueoffset)
+    * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
+    * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancereadsamplebuffer-value-offset)
     * [audioInstance.buffered](#audioinstancebuffered)
     * [audioInstance.playing](#audioinstanceplaying)
     * [audioInstance.play([play])](#audioinstanceplayplay)
@@ -259,9 +259,9 @@ window.render(width, height, stride, 'rgba32', buffer)
 
 ### Pixel formats
 
-Used to represent how the pixels of an image are stored in a Buffer.
+String values used to represent how the pixels of an image are stored in a Buffer.
 
-| Value | Corresponding `SDL_PixelFormatEnum` | Description |
+| Value | Corresponding `SDL_PixelFormatEnum` | Comment |
 | --- | --- | --- |
 | `'rgb332'` | `SDL_PIXELFORMAT_RGB332` | |
 | `'rgb444'` | `SDL_PIXELFORMAT_RGB444` | |
@@ -775,9 +775,9 @@ for (let i = 0; i < numFrames; i++) {
 
 ### Sample formats
 
-Used to represent how audio samples are stored in a Buffer.
+String values used to represent how audio samples are stored in a Buffer.
 
-| Value | Corresponding `SDL_AudioFormat` | Description |
+| Value | Corresponding `SDL_AudioFormat` | Comment |
 | --- | --- | --- |
 | `'s8'` | `AUDIO_S8` | signed 8-bit samples |
 | `'u8'` | `AUDIO_U8` | unsigned 8-bit samples |
@@ -874,8 +874,8 @@ A list of all the detected audio devices. Sample output for PulseAudio:
 
 ### sdl.audio.openDevice(device[, options])
 
-* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudioinstances) that should be opened.
-* `options: <object>` See also the section on [audio data](#audio-data)
+* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices) that should be opened.
+* `options: <object>`
   * `name: <string>`: Some drivers accept custom names, such as a hostname/IP address for a remote audio server, or a filename in the diskaudio driver. Default: `device.name`.
   * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
   * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
