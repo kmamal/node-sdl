@@ -117,7 +117,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
   * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
   * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
-  * [sdl.audio.devices](#sdlaudioinstances)
+  * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioInstance](#class-audioinstance)
     * [audioInstance.id](#audioinstanceid)
