@@ -12,6 +12,7 @@ const keyboard = {
 		const _key = Bindings.keyboard_getKey(scancode)
 		return mapping[_key] ?? (_key && Array.from(_key).length === 1 ? _key : null)
 	},
+
 	getScancode (key) {
 		if (typeof key !== 'string') { throw Object.assign(new Error("key must be a string"), { key }) }
 

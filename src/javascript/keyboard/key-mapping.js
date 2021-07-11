@@ -1,3 +1,4 @@
+const Bindings = require('../bindings')
 
 const mapping = {
 	'A': 'a',
@@ -146,10 +147,10 @@ const mapping = {
 	'Keypad Tab': '\t',
 	'Keypad XOR': 'xor',
 	'L': 'l',
-	'Left Alt': 'leftAlt',
-	'Left Ctrl': 'leftCtrl',
-	'Left GUI': 'leftGui',
-	'Left Shift': 'leftShift',
+	'Left Alt': 'alt',
+	'Left Ctrl': 'ctrl',
+	'Left GUI': 'gui',
+	'Left Shift': 'shift',
 	'Left': 'left',
 	'M': 'm',
 	'Mail': 'mail',
@@ -173,10 +174,10 @@ const mapping = {
 	'Q': 'q',
 	'R': 'r',
 	'Return': '\r',
-	'Right Alt': 'rightAlt',
-	'Right Ctrl': 'rightCtrl',
-	'Right GUI': 'rightGUI',
-	'Right Shift': 'rightShift',
+	'Right Alt': 'alt',
+	'Right Ctrl': 'ctrl',
+	'Right GUI': 'gUI',
+	'Right Shift': 'shift',
 	'Right': 'right',
 	'S': 's',
 	'ScrollLock': 'scrollLock',
@@ -205,8 +206,12 @@ const mapping = {
 const reverseMapping = {}
 
 for (const [ key, value ] of Object.entries(mapping)) {
-	const existing = reverseMapping[value] ?? '\ufff0'
-	reverseMapping[value] = existing < key ? existing : key
+	const existing = reverseMapping[value]
+	const _key = existing ? Bindings.keyboard_getKey(Math.min(
+		Bindings.keyboard_getScancode(existing),
+		Bindings.keyboard_getScancode(key),
+	)) : key
+	reverseMapping[value] = _key
 }
 
 module.exports = {

@@ -1,10 +1,10 @@
 const sdl = require('..')
 
-const screen_width = sdl.video.displays[0].usable.width
-const base_width = screen_width / 5
+const screenWidth = sdl.video.displays[0].usable.width
+const baseWidth = screenWidth / 5
 
-sdl.video.createWindow({ x: base_width, width: base_width })
-sdl.video.createWindow({ x: 3 * base_width, width: base_width })
+sdl.video.createWindow({ x: baseWidth, width: baseWidth })
+sdl.video.createWindow({ x: 3 * baseWidth, width: baseWidth })
 
 setInterval(() => {
 	const { windows, focused, hovered } = sdl.video

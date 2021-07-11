@@ -1315,6 +1315,7 @@ String values used to represent virtual keys in the context of the current keybo
 | `'00'` |
 | `'000'` |
 | `'again'` |
+| `'alt'` |
 | `'altErase'` |
 | `'app1'` |
 | `'app2'` |
@@ -1340,6 +1341,7 @@ String values used to represent virtual keys in the context of the current keybo
 | `'computer'` |
 | `'copy'` |
 | `'crSel'` |
+| `'ctrl'` |
 | `'currencySubUnit'` |
 | `'currencyUnit'` |
 | `'cut'` |
@@ -1378,6 +1380,7 @@ String values used to represent virtual keys in the context of the current keybo
 | `'f24'` |
 | `'find'` |
 | `'forward'` |
+| `'gui'` |
 | `'help'` |
 | `'hexadecimal'` |
 | `'home'` |
@@ -1386,10 +1389,6 @@ String values used to represent virtual keys in the context of the current keybo
 | `'illumUp'` |
 | `'insert'` |
 | `'left'` |
-| `'leftAlt'` |
-| `'leftCtrl'` |
-| `'leftGui'` |
-| `'leftShift'` |
 | `'mail'` |
 | `'mediaSelect'` |
 | `'memAdd'` |
@@ -1415,14 +1414,11 @@ String values used to represent virtual keys in the context of the current keybo
 | `'prior'` |
 | `'refresh'` |
 | `'right'` |
-| `'rightAlt'` |
-| `'rightCtrl'` |
-| `'rightGUI'` |
-| `'rightShift'` |
 | `'scrollLock'` |
 | `'search'` |
 | `'select'` |
 | `'separator'` |
+| `'shift'` |
 | `'sleep'` |
 | `'stop'` |
 | `'sysReq'` |
