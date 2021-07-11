@@ -3,6 +3,7 @@ const Globals = require('../globals')
 const { maybeTriggerQuit } = require('./quit')
 const { audio } = require('../audio')
 const { clipboard } = require('../clipboard')
+const { mapping } = require('../keyboard/key-mapping')
 
 const handleEvents = () => {
 	let event
@@ -107,7 +108,23 @@ const handleEvents = () => {
 				break
 			}
 
-			case 'keyboard':
+			case 'keyboard': {
+				const window = Globals.windows.all.get(event.window)
+				if (!window) { return }
+				delete event.window
+
+				const { key } = event
+				event.key = mapping[key] ?? (key && Array.from(key).length === 1 ? key : null)
+
+				if (Object.keys(event).length > 0) {
+					window.emit(type, event)
+				} else {
+					window.emit(type)
+				}
+
+				break
+			}
+
 			case 'mouse':
 			case 'text':
 			case 'drop':

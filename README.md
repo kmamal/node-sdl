@@ -1478,7 +1478,7 @@ String values used to represent the types of cursors available on most systems.
 
 ### Enum: BUTTON
 
-Values of this enum are used to represent the buttons on a mouse.
+Used to represent the buttons on a mouse. A mouse can have many buttons, but the values for the three most common ones are represented in this enum.
 
 | Value | Corresponding `SDL_BUTTON_*` |
 | --- | --- |
@@ -1546,7 +1546,6 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 ## sdl.clipboard
 
 ### Event: 'update'
-
 
 Fired when the contents of the clipboard have changed. Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the clipboard.
 
