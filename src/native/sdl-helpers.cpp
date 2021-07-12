@@ -177,6 +177,7 @@ enum_getScancodes (Variant & scancodes)
 {
 	MAKE_MAP(scancodes);
 
+	SET_NUM(scancodes, "UNKNOWN", SDL_SCANCODE_UNKNOWN);
 	SET_NUM(scancodes, "A", SDL_SCANCODE_A);
 	SET_NUM(scancodes, "B", SDL_SCANCODE_B);
 	SET_NUM(scancodes, "C", SDL_SCANCODE_C);

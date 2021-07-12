@@ -842,7 +842,11 @@ keyboard_getKey(napi_env env, napi_callback_info info)
 
 	CALL_SDL_HELPER(keyboard_getKey, scancode, &key);
 
-	CALL_NAPI(napi_create_string_utf8, key, strlen(key), &result);
+	if (key) {
+		CALL_NAPI(napi_create_string_utf8, key, strlen(key), &result);
+	} else {
+		CALL_NAPI(napi_get_null, &result);
+	}
 
 	cleanup:
 	return result;
@@ -866,12 +870,7 @@ keyboard_getScancode(napi_env env, napi_callback_info info)
 	int scancode;
 	CALL_SDL_HELPER(keyboard_getScancode, key, &scancode);
 
-	if (scancode) {
-		CALL_NAPI(napi_create_uint32, scancode, &result);
-	}
-	else {
-		CALL_NAPI(napi_get_null, &result);
-	}
+	CALL_NAPI(napi_create_uint32, scancode, &result);
 
 	cleanup:
 	return result;

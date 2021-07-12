@@ -1060,380 +1060,260 @@ Used to represent physical keys on the keyboard. The same key will always produc
 
 | Value | Corresponding `SDL_Scancode` | Comment |
 | --- | --- | --- |
-| `sdl.keyboard.SCANCODE.A` | `SDL_SCANCODE_A` | aaa |
-| `sdl.keyboard.SCANCODE.B` | `SDL_SCANCODE_B` | aaa |
-| `sdl.keyboard.SCANCODE.C` | `SDL_SCANCODE_C` | aaa |
-| `sdl.keyboard.SCANCODE.D` | `SDL_SCANCODE_D` | aaa |
-| `sdl.keyboard.SCANCODE.E` | `SDL_SCANCODE_E` | aaa |
-| `sdl.keyboard.SCANCODE.F` | `SDL_SCANCODE_F` | aaa |
-| `sdl.keyboard.SCANCODE.G` | `SDL_SCANCODE_G` | aaa |
-| `sdl.keyboard.SCANCODE.H` | `SDL_SCANCODE_H` | aaa |
-| `sdl.keyboard.SCANCODE.I` | `SDL_SCANCODE_I` | aaa |
-| `sdl.keyboard.SCANCODE.J` | `SDL_SCANCODE_J` | aaa |
-| `sdl.keyboard.SCANCODE.K` | `SDL_SCANCODE_K` | aaa |
-| `sdl.keyboard.SCANCODE.L` | `SDL_SCANCODE_L` | aaa |
-| `sdl.keyboard.SCANCODE.M` | `SDL_SCANCODE_M` | aaa |
-| `sdl.keyboard.SCANCODE.N` | `SDL_SCANCODE_N` | aaa |
-| `sdl.keyboard.SCANCODE.O` | `SDL_SCANCODE_O` | aaa |
-| `sdl.keyboard.SCANCODE.P` | `SDL_SCANCODE_P` | aaa |
-| `sdl.keyboard.SCANCODE.Q` | `SDL_SCANCODE_Q` | aaa |
-| `sdl.keyboard.SCANCODE.R` | `SDL_SCANCODE_R` | aaa |
-| `sdl.keyboard.SCANCODE.S` | `SDL_SCANCODE_S` | aaa |
-| `sdl.keyboard.SCANCODE.T` | `SDL_SCANCODE_T` | aaa |
-| `sdl.keyboard.SCANCODE.U` | `SDL_SCANCODE_U` | aaa |
-| `sdl.keyboard.SCANCODE.V` | `SDL_SCANCODE_V` | aaa |
-| `sdl.keyboard.SCANCODE.W` | `SDL_SCANCODE_W` | aaa |
-| `sdl.keyboard.SCANCODE.X` | `SDL_SCANCODE_X` | aaa |
-| `sdl.keyboard.SCANCODE.Y` | `SDL_SCANCODE_Y` | aaa |
-| `sdl.keyboard.SCANCODE.Z` | `SDL_SCANCODE_Z` | aaa |
-| `sdl.keyboard.SCANCODE.1` | `SDL_SCANCODE_1` | aaa |
-| `sdl.keyboard.SCANCODE.2` | `SDL_SCANCODE_2` | aaa |
-| `sdl.keyboard.SCANCODE.3` | `SDL_SCANCODE_3` | aaa |
-| `sdl.keyboard.SCANCODE.4` | `SDL_SCANCODE_4` | aaa |
-| `sdl.keyboard.SCANCODE.5` | `SDL_SCANCODE_5` | aaa |
-| `sdl.keyboard.SCANCODE.6` | `SDL_SCANCODE_6` | aaa |
-| `sdl.keyboard.SCANCODE.7` | `SDL_SCANCODE_7` | aaa |
-| `sdl.keyboard.SCANCODE.8` | `SDL_SCANCODE_8` | aaa |
-| `sdl.keyboard.SCANCODE.9` | `SDL_SCANCODE_9` | aaa |
-| `sdl.keyboard.SCANCODE.0` | `SDL_SCANCODE_0` | aaa |
-| `sdl.keyboard.SCANCODE.RETURN` | `SDL_SCANCODE_RETURN` | aaa |
-| `sdl.keyboard.SCANCODE.ESCAPE` | `SDL_SCANCODE_ESCAPE` | aaa |
-| `sdl.keyboard.SCANCODE.BACKSPACE` | `SDL_SCANCODE_BACKSPACE` | aaa |
-| `sdl.keyboard.SCANCODE.TAB` | `SDL_SCANCODE_TAB` | aaa |
-| `sdl.keyboard.SCANCODE.SPACE` | `SDL_SCANCODE_SPACE` | aaa |
-| `sdl.keyboard.SCANCODE.MINUS` | `SDL_SCANCODE_MINUS` | aaa |
-| `sdl.keyboard.SCANCODE.EQUALS` | `SDL_SCANCODE_EQUALS` | aaa |
-| `sdl.keyboard.SCANCODE.LEFTBRACKET` | `SDL_SCANCODE_LEFTBRACKET` | aaa |
-| `sdl.keyboard.SCANCODE.RIGHTBRACKET` | `SDL_SCANCODE_RIGHTBRACKET` | aaa |
-| `sdl.keyboard.SCANCODE.BACKSLASH` | `SDL_SCANCODE_BACKSLASH` | aaa |
-| `sdl.keyboard.SCANCODE.NONUSHASH` | `SDL_SCANCODE_NONUSHASH` | aaa |
-| `sdl.keyboard.SCANCODE.SEMICOLON` | `SDL_SCANCODE_SEMICOLON` | aaa |
-| `sdl.keyboard.SCANCODE.APOSTROPHE` | `SDL_SCANCODE_APOSTROPHE` | aaa |
-| `sdl.keyboard.SCANCODE.GRAVE` | `SDL_SCANCODE_GRAVE` | aaa |
-| `sdl.keyboard.SCANCODE.COMMA` | `SDL_SCANCODE_COMMA` | aaa |
-| `sdl.keyboard.SCANCODE.PERIOD` | `SDL_SCANCODE_PERIOD` | aaa |
-| `sdl.keyboard.SCANCODE.SLASH` | `SDL_SCANCODE_SLASH` | aaa |
-| `sdl.keyboard.SCANCODE.CAPSLOCK` | `SDL_SCANCODE_CAPSLOCK` | aaa |
-| `sdl.keyboard.SCANCODE.F1` | `SDL_SCANCODE_F1` | aaa |
-| `sdl.keyboard.SCANCODE.F2` | `SDL_SCANCODE_F2` | aaa |
-| `sdl.keyboard.SCANCODE.F3` | `SDL_SCANCODE_F3` | aaa |
-| `sdl.keyboard.SCANCODE.F4` | `SDL_SCANCODE_F4` | aaa |
-| `sdl.keyboard.SCANCODE.F5` | `SDL_SCANCODE_F5` | aaa |
-| `sdl.keyboard.SCANCODE.F6` | `SDL_SCANCODE_F6` | aaa |
-| `sdl.keyboard.SCANCODE.F7` | `SDL_SCANCODE_F7` | aaa |
-| `sdl.keyboard.SCANCODE.F8` | `SDL_SCANCODE_F8` | aaa |
-| `sdl.keyboard.SCANCODE.F9` | `SDL_SCANCODE_F9` | aaa |
-| `sdl.keyboard.SCANCODE.F10` | `SDL_SCANCODE_F10` | aaa |
-| `sdl.keyboard.SCANCODE.F11` | `SDL_SCANCODE_F11` | aaa |
-| `sdl.keyboard.SCANCODE.F12` | `SDL_SCANCODE_F12` | aaa |
-| `sdl.keyboard.SCANCODE.PRINTSCREEN` | `SDL_SCANCODE_PRINTSCREEN` | aaa |
-| `sdl.keyboard.SCANCODE.SCROLLLOCK` | `SDL_SCANCODE_SCROLLLOCK` | aaa |
-| `sdl.keyboard.SCANCODE.PAUSE` | `SDL_SCANCODE_PAUSE` | aaa |
-| `sdl.keyboard.SCANCODE.INSERT` | `SDL_SCANCODE_INSERT` | aaa |
-| `sdl.keyboard.SCANCODE.HOME` | `SDL_SCANCODE_HOME` | aaa |
-| `sdl.keyboard.SCANCODE.PAGEUP` | `SDL_SCANCODE_PAGEUP` | aaa |
-| `sdl.keyboard.SCANCODE.DELETE` | `SDL_SCANCODE_DELETE` | aaa |
-| `sdl.keyboard.SCANCODE.END` | `SDL_SCANCODE_END` | aaa |
-| `sdl.keyboard.SCANCODE.PAGEDOWN` | `SDL_SCANCODE_PAGEDOWN` | aaa |
-| `sdl.keyboard.SCANCODE.RIGHT` | `SDL_SCANCODE_RIGHT` | aaa |
-| `sdl.keyboard.SCANCODE.LEFT` | `SDL_SCANCODE_LEFT` | aaa |
-| `sdl.keyboard.SCANCODE.DOWN` | `SDL_SCANCODE_DOWN` | aaa |
-| `sdl.keyboard.SCANCODE.UP` | `SDL_SCANCODE_UP` | aaa |
-| `sdl.keyboard.SCANCODE.NUMLOCKCLEAR` | `SDL_SCANCODE_NUMLOCKCLEAR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_DIVIDE` | `SDL_SCANCODE_KP_DIVIDE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MULTIPLY` | `SDL_SCANCODE_KP_MULTIPLY` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MINUS` | `SDL_SCANCODE_KP_MINUS` | aaa |
-| `sdl.keyboard.SCANCODE.KP_PLUS` | `SDL_SCANCODE_KP_PLUS` | aaa |
-| `sdl.keyboard.SCANCODE.KP_ENTER` | `SDL_SCANCODE_KP_ENTER` | aaa |
-| `sdl.keyboard.SCANCODE.KP_1` | `SDL_SCANCODE_KP_1` | aaa |
-| `sdl.keyboard.SCANCODE.KP_2` | `SDL_SCANCODE_KP_2` | aaa |
-| `sdl.keyboard.SCANCODE.KP_3` | `SDL_SCANCODE_KP_3` | aaa |
-| `sdl.keyboard.SCANCODE.KP_4` | `SDL_SCANCODE_KP_4` | aaa |
-| `sdl.keyboard.SCANCODE.KP_5` | `SDL_SCANCODE_KP_5` | aaa |
-| `sdl.keyboard.SCANCODE.KP_6` | `SDL_SCANCODE_KP_6` | aaa |
-| `sdl.keyboard.SCANCODE.KP_7` | `SDL_SCANCODE_KP_7` | aaa |
-| `sdl.keyboard.SCANCODE.KP_8` | `SDL_SCANCODE_KP_8` | aaa |
-| `sdl.keyboard.SCANCODE.KP_9` | `SDL_SCANCODE_KP_9` | aaa |
-| `sdl.keyboard.SCANCODE.KP_0` | `SDL_SCANCODE_KP_0` | aaa |
-| `sdl.keyboard.SCANCODE.KP_PERIOD` | `SDL_SCANCODE_KP_PERIOD` | aaa |
-| `sdl.keyboard.SCANCODE.NONUSBACKSLASH` | `SDL_SCANCODE_NONUSBACKSLASH` | aaa |
-| `sdl.keyboard.SCANCODE.APPLICATION` | `SDL_SCANCODE_APPLICATION` | aaa |
-| `sdl.keyboard.SCANCODE.POWER` | `SDL_SCANCODE_POWER` | aaa |
-| `sdl.keyboard.SCANCODE.KP_EQUALS` | `SDL_SCANCODE_KP_EQUALS` | aaa |
-| `sdl.keyboard.SCANCODE.F13` | `SDL_SCANCODE_F13` | aaa |
-| `sdl.keyboard.SCANCODE.F14` | `SDL_SCANCODE_F14` | aaa |
-| `sdl.keyboard.SCANCODE.F15` | `SDL_SCANCODE_F15` | aaa |
-| `sdl.keyboard.SCANCODE.F16` | `SDL_SCANCODE_F16` | aaa |
-| `sdl.keyboard.SCANCODE.F17` | `SDL_SCANCODE_F17` | aaa |
-| `sdl.keyboard.SCANCODE.F18` | `SDL_SCANCODE_F18` | aaa |
-| `sdl.keyboard.SCANCODE.F19` | `SDL_SCANCODE_F19` | aaa |
-| `sdl.keyboard.SCANCODE.F20` | `SDL_SCANCODE_F20` | aaa |
-| `sdl.keyboard.SCANCODE.F21` | `SDL_SCANCODE_F21` | aaa |
-| `sdl.keyboard.SCANCODE.F22` | `SDL_SCANCODE_F22` | aaa |
-| `sdl.keyboard.SCANCODE.F23` | `SDL_SCANCODE_F23` | aaa |
-| `sdl.keyboard.SCANCODE.F24` | `SDL_SCANCODE_F24` | aaa |
-| `sdl.keyboard.SCANCODE.EXECUTE` | `SDL_SCANCODE_EXECUTE` | aaa |
-| `sdl.keyboard.SCANCODE.HELP` | `SDL_SCANCODE_HELP` | aaa |
-| `sdl.keyboard.SCANCODE.MENU` | `SDL_SCANCODE_MENU` | aaa |
-| `sdl.keyboard.SCANCODE.SELECT` | `SDL_SCANCODE_SELECT` | aaa |
-| `sdl.keyboard.SCANCODE.STOP` | `SDL_SCANCODE_STOP` | aaa |
-| `sdl.keyboard.SCANCODE.AGAIN` | `SDL_SCANCODE_AGAIN` | aaa |
-| `sdl.keyboard.SCANCODE.UNDO` | `SDL_SCANCODE_UNDO` | aaa |
-| `sdl.keyboard.SCANCODE.CUT` | `SDL_SCANCODE_CUT` | aaa |
-| `sdl.keyboard.SCANCODE.COPY` | `SDL_SCANCODE_COPY` | aaa |
-| `sdl.keyboard.SCANCODE.PASTE` | `SDL_SCANCODE_PASTE` | aaa |
-| `sdl.keyboard.SCANCODE.FIND` | `SDL_SCANCODE_FIND` | aaa |
-| `sdl.keyboard.SCANCODE.MUTE` | `SDL_SCANCODE_MUTE` | aaa |
-| `sdl.keyboard.SCANCODE.VOLUMEUP` | `SDL_SCANCODE_VOLUMEUP` | aaa |
-| `sdl.keyboard.SCANCODE.VOLUMEDOWN` | `SDL_SCANCODE_VOLUMEDOWN` | aaa |
-| `sdl.keyboard.SCANCODE.KP_COMMA` | `SDL_SCANCODE_KP_COMMA` | aaa |
-| `sdl.keyboard.SCANCODE.KP_EQUALSAS400` | `SDL_SCANCODE_KP_EQUALSAS400` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL1` | `SDL_SCANCODE_INTERNATIONAL1` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL2` | `SDL_SCANCODE_INTERNATIONAL2` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL3` | `SDL_SCANCODE_INTERNATIONAL3` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL4` | `SDL_SCANCODE_INTERNATIONAL4` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL5` | `SDL_SCANCODE_INTERNATIONAL5` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL6` | `SDL_SCANCODE_INTERNATIONAL6` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL7` | `SDL_SCANCODE_INTERNATIONAL7` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL8` | `SDL_SCANCODE_INTERNATIONAL8` | aaa |
-| `sdl.keyboard.SCANCODE.INTERNATIONAL9` | `SDL_SCANCODE_INTERNATIONAL9` | aaa |
-| `sdl.keyboard.SCANCODE.LANG1` | `SDL_SCANCODE_LANG1` | aaa |
-| `sdl.keyboard.SCANCODE.LANG2` | `SDL_SCANCODE_LANG2` | aaa |
-| `sdl.keyboard.SCANCODE.LANG3` | `SDL_SCANCODE_LANG3` | aaa |
-| `sdl.keyboard.SCANCODE.LANG4` | `SDL_SCANCODE_LANG4` | aaa |
-| `sdl.keyboard.SCANCODE.LANG5` | `SDL_SCANCODE_LANG5` | aaa |
-| `sdl.keyboard.SCANCODE.LANG6` | `SDL_SCANCODE_LANG6` | aaa |
-| `sdl.keyboard.SCANCODE.LANG7` | `SDL_SCANCODE_LANG7` | aaa |
-| `sdl.keyboard.SCANCODE.LANG8` | `SDL_SCANCODE_LANG8` | aaa |
-| `sdl.keyboard.SCANCODE.LANG9` | `SDL_SCANCODE_LANG9` | aaa |
-| `sdl.keyboard.SCANCODE.ALTERASE` | `SDL_SCANCODE_ALTERASE` | aaa |
-| `sdl.keyboard.SCANCODE.SYSREQ` | `SDL_SCANCODE_SYSREQ` | aaa |
-| `sdl.keyboard.SCANCODE.CANCEL` | `SDL_SCANCODE_CANCEL` | aaa |
-| `sdl.keyboard.SCANCODE.CLEAR` | `SDL_SCANCODE_CLEAR` | aaa |
-| `sdl.keyboard.SCANCODE.PRIOR` | `SDL_SCANCODE_PRIOR` | aaa |
-| `sdl.keyboard.SCANCODE.RETURN2` | `SDL_SCANCODE_RETURN2` | aaa |
-| `sdl.keyboard.SCANCODE.SEPARATOR` | `SDL_SCANCODE_SEPARATOR` | aaa |
-| `sdl.keyboard.SCANCODE.OUT` | `SDL_SCANCODE_OUT` | aaa |
-| `sdl.keyboard.SCANCODE.OPER` | `SDL_SCANCODE_OPER` | aaa |
-| `sdl.keyboard.SCANCODE.CLEARAGAIN` | `SDL_SCANCODE_CLEARAGAIN` | aaa |
-| `sdl.keyboard.SCANCODE.CRSEL` | `SDL_SCANCODE_CRSEL` | aaa |
-| `sdl.keyboard.SCANCODE.EXSEL` | `SDL_SCANCODE_EXSEL` | aaa |
-| `sdl.keyboard.SCANCODE.KP_00` | `SDL_SCANCODE_KP_00` | aaa |
-| `sdl.keyboard.SCANCODE.KP_000` | `SDL_SCANCODE_KP_000` | aaa |
-| `sdl.keyboard.SCANCODE.THOUSANDSSEPARATOR` | `SDL_SCANCODE_THOUSANDSSEPARATOR` | aaa |
-| `sdl.keyboard.SCANCODE.DECIMALSEPARATOR` | `SDL_SCANCODE_DECIMALSEPARATOR` | aaa |
-| `sdl.keyboard.SCANCODE.CURRENCYUNIT` | `SDL_SCANCODE_CURRENCYUNIT` | aaa |
-| `sdl.keyboard.SCANCODE.CURRENCYSUBUNIT` | `SDL_SCANCODE_CURRENCYSUBUNIT` | aaa |
-| `sdl.keyboard.SCANCODE.KP_LEFTPAREN` | `SDL_SCANCODE_KP_LEFTPAREN` | aaa |
-| `sdl.keyboard.SCANCODE.KP_RIGHTPAREN` | `SDL_SCANCODE_KP_RIGHTPAREN` | aaa |
-| `sdl.keyboard.SCANCODE.KP_LEFTBRACE` | `SDL_SCANCODE_KP_LEFTBRACE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_RIGHTBRACE` | `SDL_SCANCODE_KP_RIGHTBRACE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_TAB` | `SDL_SCANCODE_KP_TAB` | aaa |
-| `sdl.keyboard.SCANCODE.KP_BACKSPACE` | `SDL_SCANCODE_KP_BACKSPACE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_A` | `SDL_SCANCODE_KP_A` | aaa |
-| `sdl.keyboard.SCANCODE.KP_B` | `SDL_SCANCODE_KP_B` | aaa |
-| `sdl.keyboard.SCANCODE.KP_C` | `SDL_SCANCODE_KP_C` | aaa |
-| `sdl.keyboard.SCANCODE.KP_D` | `SDL_SCANCODE_KP_D` | aaa |
-| `sdl.keyboard.SCANCODE.KP_E` | `SDL_SCANCODE_KP_E` | aaa |
-| `sdl.keyboard.SCANCODE.KP_F` | `SDL_SCANCODE_KP_F` | aaa |
-| `sdl.keyboard.SCANCODE.KP_XOR` | `SDL_SCANCODE_KP_XOR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_POWER` | `SDL_SCANCODE_KP_POWER` | aaa |
-| `sdl.keyboard.SCANCODE.KP_PERCENT` | `SDL_SCANCODE_KP_PERCENT` | aaa |
-| `sdl.keyboard.SCANCODE.KP_LESS` | `SDL_SCANCODE_KP_LESS` | aaa |
-| `sdl.keyboard.SCANCODE.KP_GREATER` | `SDL_SCANCODE_KP_GREATER` | aaa |
-| `sdl.keyboard.SCANCODE.KP_AMPERSAND` | `SDL_SCANCODE_KP_AMPERSAND` | aaa |
-| `sdl.keyboard.SCANCODE.KP_DBLAMPERSAND` | `SDL_SCANCODE_KP_DBLAMPERSAND` | aaa |
-| `sdl.keyboard.SCANCODE.KP_VERTICALBAR` | `SDL_SCANCODE_KP_VERTICALBAR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_DBLVERTICALBAR` | `SDL_SCANCODE_KP_DBLVERTICALBAR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_COLON` | `SDL_SCANCODE_KP_COLON` | aaa |
-| `sdl.keyboard.SCANCODE.KP_HASH` | `SDL_SCANCODE_KP_HASH` | aaa |
-| `sdl.keyboard.SCANCODE.KP_SPACE` | `SDL_SCANCODE_KP_SPACE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_AT` | `SDL_SCANCODE_KP_AT` | aaa |
-| `sdl.keyboard.SCANCODE.KP_EXCLAM` | `SDL_SCANCODE_KP_EXCLAM` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMSTORE` | `SDL_SCANCODE_KP_MEMSTORE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMRECALL` | `SDL_SCANCODE_KP_MEMRECALL` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMCLEAR` | `SDL_SCANCODE_KP_MEMCLEAR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMADD` | `SDL_SCANCODE_KP_MEMADD` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMSUBTRACT` | `SDL_SCANCODE_KP_MEMSUBTRACT` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMMULTIPLY` | `SDL_SCANCODE_KP_MEMMULTIPLY` | aaa |
-| `sdl.keyboard.SCANCODE.KP_MEMDIVIDE` | `SDL_SCANCODE_KP_MEMDIVIDE` | aaa |
-| `sdl.keyboard.SCANCODE.KP_PLUSMINUS` | `SDL_SCANCODE_KP_PLUSMINUS` | aaa |
-| `sdl.keyboard.SCANCODE.KP_CLEAR` | `SDL_SCANCODE_KP_CLEAR` | aaa |
-| `sdl.keyboard.SCANCODE.KP_CLEARENTRY` | `SDL_SCANCODE_KP_CLEARENTRY` | aaa |
-| `sdl.keyboard.SCANCODE.KP_BINARY` | `SDL_SCANCODE_KP_BINARY` | aaa |
-| `sdl.keyboard.SCANCODE.KP_OCTAL` | `SDL_SCANCODE_KP_OCTAL` | aaa |
-| `sdl.keyboard.SCANCODE.KP_DECIMAL` | `SDL_SCANCODE_KP_DECIMAL` | aaa |
-| `sdl.keyboard.SCANCODE.KP_HEXADECIMAL` | `SDL_SCANCODE_KP_HEXADECIMAL` | aaa |
-| `sdl.keyboard.SCANCODE.LCTRL` | `SDL_SCANCODE_LCTRL` | aaa |
-| `sdl.keyboard.SCANCODE.LSHIFT` | `SDL_SCANCODE_LSHIFT` | aaa |
-| `sdl.keyboard.SCANCODE.LALT` | `SDL_SCANCODE_LALT` | aaa |
-| `sdl.keyboard.SCANCODE.LGUI` | `SDL_SCANCODE_LGUI` | aaa |
-| `sdl.keyboard.SCANCODE.RCTRL` | `SDL_SCANCODE_RCTRL` | aaa |
-| `sdl.keyboard.SCANCODE.RSHIFT` | `SDL_SCANCODE_RSHIFT` | aaa |
-| `sdl.keyboard.SCANCODE.RALT` | `SDL_SCANCODE_RALT` | aaa |
-| `sdl.keyboard.SCANCODE.RGUI` | `SDL_SCANCODE_RGUI` | aaa |
-| `sdl.keyboard.SCANCODE.MODE` | `SDL_SCANCODE_MODE` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIONEXT` | `SDL_SCANCODE_AUDIONEXT` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOPREV` | `SDL_SCANCODE_AUDIOPREV` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOSTOP` | `SDL_SCANCODE_AUDIOSTOP` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOPLAY` | `SDL_SCANCODE_AUDIOPLAY` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOMUTE` | `SDL_SCANCODE_AUDIOMUTE` | aaa |
-| `sdl.keyboard.SCANCODE.MEDIASELECT` | `SDL_SCANCODE_MEDIASELECT` | aaa |
-| `sdl.keyboard.SCANCODE.WWW` | `SDL_SCANCODE_WWW` | aaa |
-| `sdl.keyboard.SCANCODE.MAIL` | `SDL_SCANCODE_MAIL` | aaa |
-| `sdl.keyboard.SCANCODE.CALCULATOR` | `SDL_SCANCODE_CALCULATOR` | aaa |
-| `sdl.keyboard.SCANCODE.COMPUTER` | `SDL_SCANCODE_COMPUTER` | aaa |
-| `sdl.keyboard.SCANCODE.AC_SEARCH` | `SDL_SCANCODE_AC_SEARCH` | aaa |
-| `sdl.keyboard.SCANCODE.AC_HOME` | `SDL_SCANCODE_AC_HOME` | aaa |
-| `sdl.keyboard.SCANCODE.AC_BACK` | `SDL_SCANCODE_AC_BACK` | aaa |
-| `sdl.keyboard.SCANCODE.AC_FORWARD` | `SDL_SCANCODE_AC_FORWARD` | aaa |
-| `sdl.keyboard.SCANCODE.AC_STOP` | `SDL_SCANCODE_AC_STOP` | aaa |
-| `sdl.keyboard.SCANCODE.AC_REFRESH` | `SDL_SCANCODE_AC_REFRESH` | aaa |
-| `sdl.keyboard.SCANCODE.AC_BOOKMARKS` | `SDL_SCANCODE_AC_BOOKMARKS` | aaa |
-| `sdl.keyboard.SCANCODE.BRIGHTNESSDOWN` | `SDL_SCANCODE_BRIGHTNESSDOWN` | aaa |
-| `sdl.keyboard.SCANCODE.BRIGHTNESSUP` | `SDL_SCANCODE_BRIGHTNESSUP` | aaa |
-| `sdl.keyboard.SCANCODE.DISPLAYSWITCH` | `SDL_SCANCODE_DISPLAYSWITCH` | aaa |
-| `sdl.keyboard.SCANCODE.KBDILLUMTOGGLE` | `SDL_SCANCODE_KBDILLUMTOGGLE` | aaa |
-| `sdl.keyboard.SCANCODE.KBDILLUMDOWN` | `SDL_SCANCODE_KBDILLUMDOWN` | aaa |
-| `sdl.keyboard.SCANCODE.KBDILLUMUP` | `SDL_SCANCODE_KBDILLUMUP` | aaa |
-| `sdl.keyboard.SCANCODE.EJECT` | `SDL_SCANCODE_EJECT` | aaa |
-| `sdl.keyboard.SCANCODE.SLEEP` | `SDL_SCANCODE_SLEEP` | aaa |
-| `sdl.keyboard.SCANCODE.APP1` | `SDL_SCANCODE_APP1` | aaa |
-| `sdl.keyboard.SCANCODE.APP2` | `SDL_SCANCODE_APP2` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOREWIND` | `SDL_SCANCODE_AUDIOREWIND` | aaa |
-| `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD` | `SDL_SCANCODE_AUDIOFASTFORWARD` | aaa |
+| `sdl.keyboard.SCANCODE.UNKNOWN` | `SDL_SCANCODE_UNKNOWN` | value `0` |
+| `sdl.keyboard.SCANCODE.A` | `SDL_SCANCODE_A` | |
+| `sdl.keyboard.SCANCODE.B` | `SDL_SCANCODE_B` | |
+| `sdl.keyboard.SCANCODE.C` | `SDL_SCANCODE_C` | |
+| `sdl.keyboard.SCANCODE.D` | `SDL_SCANCODE_D` | |
+| `sdl.keyboard.SCANCODE.E` | `SDL_SCANCODE_E` | |
+| `sdl.keyboard.SCANCODE.F` | `SDL_SCANCODE_F` | |
+| `sdl.keyboard.SCANCODE.G` | `SDL_SCANCODE_G` | |
+| `sdl.keyboard.SCANCODE.H` | `SDL_SCANCODE_H` | |
+| `sdl.keyboard.SCANCODE.I` | `SDL_SCANCODE_I` | |
+| `sdl.keyboard.SCANCODE.J` | `SDL_SCANCODE_J` | |
+| `sdl.keyboard.SCANCODE.K` | `SDL_SCANCODE_K` | |
+| `sdl.keyboard.SCANCODE.L` | `SDL_SCANCODE_L` | |
+| `sdl.keyboard.SCANCODE.M` | `SDL_SCANCODE_M` | |
+| `sdl.keyboard.SCANCODE.N` | `SDL_SCANCODE_N` | |
+| `sdl.keyboard.SCANCODE.O` | `SDL_SCANCODE_O` | |
+| `sdl.keyboard.SCANCODE.P` | `SDL_SCANCODE_P` | |
+| `sdl.keyboard.SCANCODE.Q` | `SDL_SCANCODE_Q` | |
+| `sdl.keyboard.SCANCODE.R` | `SDL_SCANCODE_R` | |
+| `sdl.keyboard.SCANCODE.S` | `SDL_SCANCODE_S` | |
+| `sdl.keyboard.SCANCODE.T` | `SDL_SCANCODE_T` | |
+| `sdl.keyboard.SCANCODE.U` | `SDL_SCANCODE_U` | |
+| `sdl.keyboard.SCANCODE.V` | `SDL_SCANCODE_V` | |
+| `sdl.keyboard.SCANCODE.W` | `SDL_SCANCODE_W` | |
+| `sdl.keyboard.SCANCODE.X` | `SDL_SCANCODE_X` | |
+| `sdl.keyboard.SCANCODE.Y` | `SDL_SCANCODE_Y` | |
+| `sdl.keyboard.SCANCODE.Z` | `SDL_SCANCODE_Z` | |
+| `sdl.keyboard.SCANCODE.1` | `SDL_SCANCODE_1` | |
+| `sdl.keyboard.SCANCODE.2` | `SDL_SCANCODE_2` | |
+| `sdl.keyboard.SCANCODE.3` | `SDL_SCANCODE_3` | |
+| `sdl.keyboard.SCANCODE.4` | `SDL_SCANCODE_4` | |
+| `sdl.keyboard.SCANCODE.5` | `SDL_SCANCODE_5` | |
+| `sdl.keyboard.SCANCODE.6` | `SDL_SCANCODE_6` | |
+| `sdl.keyboard.SCANCODE.7` | `SDL_SCANCODE_7` | |
+| `sdl.keyboard.SCANCODE.8` | `SDL_SCANCODE_8` | |
+| `sdl.keyboard.SCANCODE.9` | `SDL_SCANCODE_9` | |
+| `sdl.keyboard.SCANCODE.0` | `SDL_SCANCODE_0` | |
+| `sdl.keyboard.SCANCODE.RETURN` | `SDL_SCANCODE_RETURN` | |
+| `sdl.keyboard.SCANCODE.ESCAPE` | `SDL_SCANCODE_ESCAPE` | |
+| `sdl.keyboard.SCANCODE.BACKSPACE` | `SDL_SCANCODE_BACKSPACE` | |
+| `sdl.keyboard.SCANCODE.TAB` | `SDL_SCANCODE_TAB` | |
+| `sdl.keyboard.SCANCODE.SPACE` | `SDL_SCANCODE_SPACE` | |
+| `sdl.keyboard.SCANCODE.MINUS` | `SDL_SCANCODE_MINUS` | |
+| `sdl.keyboard.SCANCODE.EQUALS` | `SDL_SCANCODE_EQUALS` | |
+| `sdl.keyboard.SCANCODE.LEFTBRACKET` | `SDL_SCANCODE_LEFTBRACKET` | |
+| `sdl.keyboard.SCANCODE.RIGHTBRACKET` | `SDL_SCANCODE_RIGHTBRACKET` | |
+| `sdl.keyboard.SCANCODE.BACKSLASH` | `SDL_SCANCODE_BACKSLASH` | Located at the lower left of the return key on ISO keyboards and at the right end of the QWERTY row on ANSI keyboards. Produces REVERSE SOLIDUS (backslash) and VERTICAL LINE in a US layout, REVERSE SOLIDUS and VERTICAL LINE in a UK Mac layout, NUMBER SIGN and TILDE in a UK Windows layout, DOLLAR SIGN and POUND SIGN in a Swiss German layout, NUMBER SIGN and APOSTROPHE in a German layout, GRAVE ACCENT and POUND SIGN in a French Mac layout, and ASTERISK and MICRO SIGN in a French Windows layout. |
+| `sdl.keyboard.SCANCODE.NONUSHASH` | `SDL_SCANCODE_NONUSHASH` | ISO USB keyboards actually use this code instead of 49 for the same key, but all OSes I've seen treat the two codes identically. So, as an implementor, unless your keyboard generates both of those codes and your OS treats them differently, you should generate SDL_SCANCODE_BACKSLASH instead of this code. As a user, you should not rely on this code because SDL will never generate it with most (all?) keyboards. |
+| `sdl.keyboard.SCANCODE.SEMICOLON` | `SDL_SCANCODE_SEMICOLON` | |
+| `sdl.keyboard.SCANCODE.APOSTROPHE` | `SDL_SCANCODE_APOSTROPHE` | |
+| `sdl.keyboard.SCANCODE.GRAVE` | `SDL_SCANCODE_GRAVE` | Located in the top left corner (on both ANSI and ISO keyboards). Produces GRAVE ACCENT and TILDE in a US Windows layout and in US and UK Mac layouts on ANSI keyboards, GRAVE ACCENT and NOT SIGN in a UK Windows layout, SECTION SIGN and PLUS-MINUS SIGN in US and UK Mac layouts on ISO keyboards, SECTION SIGN and DEGREE SIGN in a Swiss German layout (Mac: only on ISO keyboards), CIRCUMFLEX ACCENT and DEGREE SIGN in a German layout (Mac: only on ISO keyboards), SUPERSCRIPT TWO and TILDE in a French Windows layout, COMMERCIAL AT and NUMBER SIGN in a French Mac layout on ISO keyboards, and LESS-THAN SIGN and GREATER-THAN SIGN in a Swiss German, German, or French Mac layout on ANSI keyboards. |
+| `sdl.keyboard.SCANCODE.COMMA` | `SDL_SCANCODE_COMMA` | |
+| `sdl.keyboard.SCANCODE.PERIOD` | `SDL_SCANCODE_PERIOD` | |
+| `sdl.keyboard.SCANCODE.SLASH` | `SDL_SCANCODE_SLASH` | |
+| `sdl.keyboard.SCANCODE.CAPSLOCK` | `SDL_SCANCODE_CAPSLOCK` | |
+| `sdl.keyboard.SCANCODE.F1` | `SDL_SCANCODE_F1` | |
+| `sdl.keyboard.SCANCODE.F2` | `SDL_SCANCODE_F2` | |
+| `sdl.keyboard.SCANCODE.F3` | `SDL_SCANCODE_F3` | |
+| `sdl.keyboard.SCANCODE.F4` | `SDL_SCANCODE_F4` | |
+| `sdl.keyboard.SCANCODE.F5` | `SDL_SCANCODE_F5` | |
+| `sdl.keyboard.SCANCODE.F6` | `SDL_SCANCODE_F6` | |
+| `sdl.keyboard.SCANCODE.F7` | `SDL_SCANCODE_F7` | |
+| `sdl.keyboard.SCANCODE.F8` | `SDL_SCANCODE_F8` | |
+| `sdl.keyboard.SCANCODE.F9` | `SDL_SCANCODE_F9` | |
+| `sdl.keyboard.SCANCODE.F10` | `SDL_SCANCODE_F10` | |
+| `sdl.keyboard.SCANCODE.F11` | `SDL_SCANCODE_F11` | |
+| `sdl.keyboard.SCANCODE.F12` | `SDL_SCANCODE_F12` | |
+| `sdl.keyboard.SCANCODE.PRINTSCREEN` | `SDL_SCANCODE_PRINTSCREEN` | |
+| `sdl.keyboard.SCANCODE.SCROLLLOCK` | `SDL_SCANCODE_SCROLLLOCK` | |
+| `sdl.keyboard.SCANCODE.PAUSE` | `SDL_SCANCODE_PAUSE` | |
+| `sdl.keyboard.SCANCODE.INSERT` | `SDL_SCANCODE_INSERT` | insert on PC, help on some Mac keyboards |
+| `sdl.keyboard.SCANCODE.HOME` | `SDL_SCANCODE_HOME` | |
+| `sdl.keyboard.SCANCODE.PAGEUP` | `SDL_SCANCODE_PAGEUP` | |
+| `sdl.keyboard.SCANCODE.DELETE` | `SDL_SCANCODE_DELETE` | |
+| `sdl.keyboard.SCANCODE.END` | `SDL_SCANCODE_END` | |
+| `sdl.keyboard.SCANCODE.PAGEDOWN` | `SDL_SCANCODE_PAGEDOWN` | |
+| `sdl.keyboard.SCANCODE.RIGHT` | `SDL_SCANCODE_RIGHT` | |
+| `sdl.keyboard.SCANCODE.LEFT` | `SDL_SCANCODE_LEFT` | |
+| `sdl.keyboard.SCANCODE.DOWN` | `SDL_SCANCODE_DOWN` | |
+| `sdl.keyboard.SCANCODE.UP` | `SDL_SCANCODE_UP` | |
+| `sdl.keyboard.SCANCODE.NUMLOCKCLEAR` | `SDL_SCANCODE_NUMLOCKCLEAR` | num lock on PC, clear on Mac keyboards |
+| `sdl.keyboard.SCANCODE.KP_DIVIDE` | `SDL_SCANCODE_KP_DIVIDE` | |
+| `sdl.keyboard.SCANCODE.KP_MULTIPLY` | `SDL_SCANCODE_KP_MULTIPLY` | |
+| `sdl.keyboard.SCANCODE.KP_MINUS` | `SDL_SCANCODE_KP_MINUS` | |
+| `sdl.keyboard.SCANCODE.KP_PLUS` | `SDL_SCANCODE_KP_PLUS` | |
+| `sdl.keyboard.SCANCODE.KP_ENTER` | `SDL_SCANCODE_KP_ENTER` | |
+| `sdl.keyboard.SCANCODE.KP_1` | `SDL_SCANCODE_KP_1` | |
+| `sdl.keyboard.SCANCODE.KP_2` | `SDL_SCANCODE_KP_2` | |
+| `sdl.keyboard.SCANCODE.KP_3` | `SDL_SCANCODE_KP_3` | |
+| `sdl.keyboard.SCANCODE.KP_4` | `SDL_SCANCODE_KP_4` | |
+| `sdl.keyboard.SCANCODE.KP_5` | `SDL_SCANCODE_KP_5` | |
+| `sdl.keyboard.SCANCODE.KP_6` | `SDL_SCANCODE_KP_6` | |
+| `sdl.keyboard.SCANCODE.KP_7` | `SDL_SCANCODE_KP_7` | |
+| `sdl.keyboard.SCANCODE.KP_8` | `SDL_SCANCODE_KP_8` | |
+| `sdl.keyboard.SCANCODE.KP_9` | `SDL_SCANCODE_KP_9` | |
+| `sdl.keyboard.SCANCODE.KP_0` | `SDL_SCANCODE_KP_0` | |
+| `sdl.keyboard.SCANCODE.KP_PERIOD` | `SDL_SCANCODE_KP_PERIOD` | |
+| `sdl.keyboard.SCANCODE.NONUSBACKSLASH` | `SDL_SCANCODE_NONUSBACKSLASH` | This is the additional key that ISO keyboards have over ANSI ones, located between left shift and Y. Produces GRAVE ACCENT and TILDE in a US or UK Mac layout, REVERSE SOLIDUS (backslash) and VERTICAL LINE in a US or UK Windows layout, and LESS-THAN SIGN and GREATER-THAN SIGN in a Swiss German, German, or French layout. |
+| `sdl.keyboard.SCANCODE.APPLICATION` | `SDL_SCANCODE_APPLICATION` | windows contextual menu, compose |
+| `sdl.keyboard.SCANCODE.POWER` | `SDL_SCANCODE_POWER` | The USB document says this is a status flag, not a physical key - but some Mac keyboards do have a power key. |
+| `sdl.keyboard.SCANCODE.KP_EQUALS` | `SDL_SCANCODE_KP_EQUALS` | |
+| `sdl.keyboard.SCANCODE.F13` | `SDL_SCANCODE_F13` | |
+| `sdl.keyboard.SCANCODE.F14` | `SDL_SCANCODE_F14` | |
+| `sdl.keyboard.SCANCODE.F15` | `SDL_SCANCODE_F15` | |
+| `sdl.keyboard.SCANCODE.F16` | `SDL_SCANCODE_F16` | |
+| `sdl.keyboard.SCANCODE.F17` | `SDL_SCANCODE_F17` | |
+| `sdl.keyboard.SCANCODE.F18` | `SDL_SCANCODE_F18` | |
+| `sdl.keyboard.SCANCODE.F19` | `SDL_SCANCODE_F19` | |
+| `sdl.keyboard.SCANCODE.F20` | `SDL_SCANCODE_F20` | |
+| `sdl.keyboard.SCANCODE.F21` | `SDL_SCANCODE_F21` | |
+| `sdl.keyboard.SCANCODE.F22` | `SDL_SCANCODE_F22` | |
+| `sdl.keyboard.SCANCODE.F23` | `SDL_SCANCODE_F23` | |
+| `sdl.keyboard.SCANCODE.F24` | `SDL_SCANCODE_F24` | |
+| `sdl.keyboard.SCANCODE.EXECUTE` | `SDL_SCANCODE_EXECUTE` | |
+| `sdl.keyboard.SCANCODE.HELP` | `SDL_SCANCODE_HELP` | |
+| `sdl.keyboard.SCANCODE.MENU` | `SDL_SCANCODE_MENU` | |
+| `sdl.keyboard.SCANCODE.SELECT` | `SDL_SCANCODE_SELECT` | |
+| `sdl.keyboard.SCANCODE.STOP` | `SDL_SCANCODE_STOP` | |
+| `sdl.keyboard.SCANCODE.AGAIN` | `SDL_SCANCODE_AGAIN` | redo |
+| `sdl.keyboard.SCANCODE.UNDO` | `SDL_SCANCODE_UNDO` | |
+| `sdl.keyboard.SCANCODE.CUT` | `SDL_SCANCODE_CUT` | |
+| `sdl.keyboard.SCANCODE.COPY` | `SDL_SCANCODE_COPY` | |
+| `sdl.keyboard.SCANCODE.PASTE` | `SDL_SCANCODE_PASTE` | |
+| `sdl.keyboard.SCANCODE.FIND` | `SDL_SCANCODE_FIND` | |
+| `sdl.keyboard.SCANCODE.MUTE` | `SDL_SCANCODE_MUTE` | |
+| `sdl.keyboard.SCANCODE.VOLUMEUP` | `SDL_SCANCODE_VOLUMEUP` | |
+| `sdl.keyboard.SCANCODE.VOLUMEDOWN` | `SDL_SCANCODE_VOLUMEDOWN` | |
+| `sdl.keyboard.SCANCODE.KP_COMMA` | `SDL_SCANCODE_KP_COMMA` | |
+| `sdl.keyboard.SCANCODE.KP_EQUALSAS400` | `SDL_SCANCODE_KP_EQUALSAS400` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL1` | `SDL_SCANCODE_INTERNATIONAL1` | used on Asian keyboards, see footnotes in USB doc |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL2` | `SDL_SCANCODE_INTERNATIONAL2` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL3` | `SDL_SCANCODE_INTERNATIONAL3` | Yen |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL4` | `SDL_SCANCODE_INTERNATIONAL4` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL5` | `SDL_SCANCODE_INTERNATIONAL5` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL6` | `SDL_SCANCODE_INTERNATIONAL6` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL7` | `SDL_SCANCODE_INTERNATIONAL7` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL8` | `SDL_SCANCODE_INTERNATIONAL8` | |
+| `sdl.keyboard.SCANCODE.INTERNATIONAL9` | `SDL_SCANCODE_INTERNATIONAL9` | |
+| `sdl.keyboard.SCANCODE.LANG1` | `SDL_SCANCODE_LANG1` | Hangul/English toggle |
+| `sdl.keyboard.SCANCODE.LANG2` | `SDL_SCANCODE_LANG2` | Hanja conversion |
+| `sdl.keyboard.SCANCODE.LANG3` | `SDL_SCANCODE_LANG3` | Katakana |
+| `sdl.keyboard.SCANCODE.LANG4` | `SDL_SCANCODE_LANG4` | Hiragana |
+| `sdl.keyboard.SCANCODE.LANG5` | `SDL_SCANCODE_LANG5` | Zenkaku/Hankaku |
+| `sdl.keyboard.SCANCODE.LANG6` | `SDL_SCANCODE_LANG6` | |
+| `sdl.keyboard.SCANCODE.LANG7` | `SDL_SCANCODE_LANG7` | |
+| `sdl.keyboard.SCANCODE.LANG8` | `SDL_SCANCODE_LANG8` | |
+| `sdl.keyboard.SCANCODE.LANG9` | `SDL_SCANCODE_LANG9` | |
+| `sdl.keyboard.SCANCODE.ALTERASE` | `SDL_SCANCODE_ALTERASE` | Erase-Eaze |
+| `sdl.keyboard.SCANCODE.SYSREQ` | `SDL_SCANCODE_SYSREQ` | |
+| `sdl.keyboard.SCANCODE.CANCEL` | `SDL_SCANCODE_CANCEL` | |
+| `sdl.keyboard.SCANCODE.CLEAR` | `SDL_SCANCODE_CLEAR` | |
+| `sdl.keyboard.SCANCODE.PRIOR` | `SDL_SCANCODE_PRIOR` | |
+| `sdl.keyboard.SCANCODE.RETURN2` | `SDL_SCANCODE_RETURN2` | |
+| `sdl.keyboard.SCANCODE.SEPARATOR` | `SDL_SCANCODE_SEPARATOR` | |
+| `sdl.keyboard.SCANCODE.OUT` | `SDL_SCANCODE_OUT` | |
+| `sdl.keyboard.SCANCODE.OPER` | `SDL_SCANCODE_OPER` | |
+| `sdl.keyboard.SCANCODE.CLEARAGAIN` | `SDL_SCANCODE_CLEARAGAIN` | |
+| `sdl.keyboard.SCANCODE.CRSEL` | `SDL_SCANCODE_CRSEL` | |
+| `sdl.keyboard.SCANCODE.EXSEL` | `SDL_SCANCODE_EXSEL` | |
+| `sdl.keyboard.SCANCODE.KP_00` | `SDL_SCANCODE_KP_00` | |
+| `sdl.keyboard.SCANCODE.KP_000` | `SDL_SCANCODE_KP_000` | |
+| `sdl.keyboard.SCANCODE.THOUSANDSSEPARATOR` | `SDL_SCANCODE_THOUSANDSSEPARATOR` | |
+| `sdl.keyboard.SCANCODE.DECIMALSEPARATOR` | `SDL_SCANCODE_DECIMALSEPARATOR` | |
+| `sdl.keyboard.SCANCODE.CURRENCYUNIT` | `SDL_SCANCODE_CURRENCYUNIT` | |
+| `sdl.keyboard.SCANCODE.CURRENCYSUBUNIT` | `SDL_SCANCODE_CURRENCYSUBUNIT` | |
+| `sdl.keyboard.SCANCODE.KP_LEFTPAREN` | `SDL_SCANCODE_KP_LEFTPAREN` | |
+| `sdl.keyboard.SCANCODE.KP_RIGHTPAREN` | `SDL_SCANCODE_KP_RIGHTPAREN` | |
+| `sdl.keyboard.SCANCODE.KP_LEFTBRACE` | `SDL_SCANCODE_KP_LEFTBRACE` | |
+| `sdl.keyboard.SCANCODE.KP_RIGHTBRACE` | `SDL_SCANCODE_KP_RIGHTBRACE` | |
+| `sdl.keyboard.SCANCODE.KP_TAB` | `SDL_SCANCODE_KP_TAB` | |
+| `sdl.keyboard.SCANCODE.KP_BACKSPACE` | `SDL_SCANCODE_KP_BACKSPACE` | |
+| `sdl.keyboard.SCANCODE.KP_A` | `SDL_SCANCODE_KP_A` | |
+| `sdl.keyboard.SCANCODE.KP_B` | `SDL_SCANCODE_KP_B` | |
+| `sdl.keyboard.SCANCODE.KP_C` | `SDL_SCANCODE_KP_C` | |
+| `sdl.keyboard.SCANCODE.KP_D` | `SDL_SCANCODE_KP_D` | |
+| `sdl.keyboard.SCANCODE.KP_E` | `SDL_SCANCODE_KP_E` | |
+| `sdl.keyboard.SCANCODE.KP_F` | `SDL_SCANCODE_KP_F` | |
+| `sdl.keyboard.SCANCODE.KP_XOR` | `SDL_SCANCODE_KP_XOR` | |
+| `sdl.keyboard.SCANCODE.KP_POWER` | `SDL_SCANCODE_KP_POWER` | |
+| `sdl.keyboard.SCANCODE.KP_PERCENT` | `SDL_SCANCODE_KP_PERCENT` | |
+| `sdl.keyboard.SCANCODE.KP_LESS` | `SDL_SCANCODE_KP_LESS` | |
+| `sdl.keyboard.SCANCODE.KP_GREATER` | `SDL_SCANCODE_KP_GREATER` | |
+| `sdl.keyboard.SCANCODE.KP_AMPERSAND` | `SDL_SCANCODE_KP_AMPERSAND` | |
+| `sdl.keyboard.SCANCODE.KP_DBLAMPERSAND` | `SDL_SCANCODE_KP_DBLAMPERSAND` | |
+| `sdl.keyboard.SCANCODE.KP_VERTICALBAR` | `SDL_SCANCODE_KP_VERTICALBAR` | |
+| `sdl.keyboard.SCANCODE.KP_DBLVERTICALBAR` | `SDL_SCANCODE_KP_DBLVERTICALBAR` | |
+| `sdl.keyboard.SCANCODE.KP_COLON` | `SDL_SCANCODE_KP_COLON` | |
+| `sdl.keyboard.SCANCODE.KP_HASH` | `SDL_SCANCODE_KP_HASH` | |
+| `sdl.keyboard.SCANCODE.KP_SPACE` | `SDL_SCANCODE_KP_SPACE` | |
+| `sdl.keyboard.SCANCODE.KP_AT` | `SDL_SCANCODE_KP_AT` | |
+| `sdl.keyboard.SCANCODE.KP_EXCLAM` | `SDL_SCANCODE_KP_EXCLAM` | |
+| `sdl.keyboard.SCANCODE.KP_MEMSTORE` | `SDL_SCANCODE_KP_MEMSTORE` | |
+| `sdl.keyboard.SCANCODE.KP_MEMRECALL` | `SDL_SCANCODE_KP_MEMRECALL` | |
+| `sdl.keyboard.SCANCODE.KP_MEMCLEAR` | `SDL_SCANCODE_KP_MEMCLEAR` | |
+| `sdl.keyboard.SCANCODE.KP_MEMADD` | `SDL_SCANCODE_KP_MEMADD` | |
+| `sdl.keyboard.SCANCODE.KP_MEMSUBTRACT` | `SDL_SCANCODE_KP_MEMSUBTRACT` | |
+| `sdl.keyboard.SCANCODE.KP_MEMMULTIPLY` | `SDL_SCANCODE_KP_MEMMULTIPLY` | |
+| `sdl.keyboard.SCANCODE.KP_MEMDIVIDE` | `SDL_SCANCODE_KP_MEMDIVIDE` | |
+| `sdl.keyboard.SCANCODE.KP_PLUSMINUS` | `SDL_SCANCODE_KP_PLUSMINUS` | |
+| `sdl.keyboard.SCANCODE.KP_CLEAR` | `SDL_SCANCODE_KP_CLEAR` | |
+| `sdl.keyboard.SCANCODE.KP_CLEARENTRY` | `SDL_SCANCODE_KP_CLEARENTRY` | |
+| `sdl.keyboard.SCANCODE.KP_BINARY` | `SDL_SCANCODE_KP_BINARY` | |
+| `sdl.keyboard.SCANCODE.KP_OCTAL` | `SDL_SCANCODE_KP_OCTAL` | |
+| `sdl.keyboard.SCANCODE.KP_DECIMAL` | `SDL_SCANCODE_KP_DECIMAL` | |
+| `sdl.keyboard.SCANCODE.KP_HEXADECIMAL` | `SDL_SCANCODE_KP_HEXADECIMAL` | |
+| `sdl.keyboard.SCANCODE.LCTRL` | `SDL_SCANCODE_LCTRL` | |
+| `sdl.keyboard.SCANCODE.LSHIFT` | `SDL_SCANCODE_LSHIFT` | |
+| `sdl.keyboard.SCANCODE.LALT` | `SDL_SCANCODE_LALT` | alt, option |
+| `sdl.keyboard.SCANCODE.LGUI` | `SDL_SCANCODE_LGUI` | windows, command (apple), meta |
+| `sdl.keyboard.SCANCODE.RCTRL` | `SDL_SCANCODE_RCTRL` | |
+| `sdl.keyboard.SCANCODE.RSHIFT` | `SDL_SCANCODE_RSHIFT` | |
+| `sdl.keyboard.SCANCODE.RALT` | `SDL_SCANCODE_RALT` | alt gr, option |
+| `sdl.keyboard.SCANCODE.RGUI` | `SDL_SCANCODE_RGUI` | windows, command (apple), meta |
+| `sdl.keyboard.SCANCODE.MODE` | `SDL_SCANCODE_MODE` | |
+| `sdl.keyboard.SCANCODE.AUDIONEXT` | `SDL_SCANCODE_AUDIONEXT` | |
+| `sdl.keyboard.SCANCODE.AUDIOPREV` | `SDL_SCANCODE_AUDIOPREV` | |
+| `sdl.keyboard.SCANCODE.AUDIOSTOP` | `SDL_SCANCODE_AUDIOSTOP` | |
+| `sdl.keyboard.SCANCODE.AUDIOPLAY` | `SDL_SCANCODE_AUDIOPLAY` | |
+| `sdl.keyboard.SCANCODE.AUDIOMUTE` | `SDL_SCANCODE_AUDIOMUTE` | |
+| `sdl.keyboard.SCANCODE.MEDIASELECT` | `SDL_SCANCODE_MEDIASELECT` | |
+| `sdl.keyboard.SCANCODE.WWW` | `SDL_SCANCODE_WWW` | |
+| `sdl.keyboard.SCANCODE.MAIL` | `SDL_SCANCODE_MAIL` | |
+| `sdl.keyboard.SCANCODE.CALCULATOR` | `SDL_SCANCODE_CALCULATOR` | |
+| `sdl.keyboard.SCANCODE.COMPUTER` | `SDL_SCANCODE_COMPUTER` | |
+| `sdl.keyboard.SCANCODE.AC_SEARCH` | `SDL_SCANCODE_AC_SEARCH` | |
+| `sdl.keyboard.SCANCODE.AC_HOME` | `SDL_SCANCODE_AC_HOME` | |
+| `sdl.keyboard.SCANCODE.AC_BACK` | `SDL_SCANCODE_AC_BACK` | |
+| `sdl.keyboard.SCANCODE.AC_FORWARD` | `SDL_SCANCODE_AC_FORWARD` | |
+| `sdl.keyboard.SCANCODE.AC_STOP` | `SDL_SCANCODE_AC_STOP` | |
+| `sdl.keyboard.SCANCODE.AC_REFRESH` | `SDL_SCANCODE_AC_REFRESH` | |
+| `sdl.keyboard.SCANCODE.AC_BOOKMARKS` | `SDL_SCANCODE_AC_BOOKMARKS` | |
+| `sdl.keyboard.SCANCODE.BRIGHTNESSDOWN` | `SDL_SCANCODE_BRIGHTNESSDOWN` | |
+| `sdl.keyboard.SCANCODE.BRIGHTNESSUP` | `SDL_SCANCODE_BRIGHTNESSUP` | |
+| `sdl.keyboard.SCANCODE.DISPLAYSWITCH` | `SDL_SCANCODE_DISPLAYSWITCH` | display mirroring/dual display switch, video mode switch |
+| `sdl.keyboard.SCANCODE.KBDILLUMTOGGLE` | `SDL_SCANCODE_KBDILLUMTOGGLE` | |
+| `sdl.keyboard.SCANCODE.KBDILLUMDOWN` | `SDL_SCANCODE_KBDILLUMDOWN` | |
+| `sdl.keyboard.SCANCODE.KBDILLUMUP` | `SDL_SCANCODE_KBDILLUMUP` | |
+| `sdl.keyboard.SCANCODE.EJECT` | `SDL_SCANCODE_EJECT` | |
+| `sdl.keyboard.SCANCODE.SLEEP` | `SDL_SCANCODE_SLEEP` | |
+| `sdl.keyboard.SCANCODE.APP1` | `SDL_SCANCODE_APP1` | |
+| `sdl.keyboard.SCANCODE.APP2` | `SDL_SCANCODE_APP2` | |
+| `sdl.keyboard.SCANCODE.AUDIOREWIND` | `SDL_SCANCODE_AUDIOREWIND` | |
+| `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD` | `SDL_SCANCODE_AUDIOFASTFORWARD` | |
 
 ### Virtual keys
 
-String values used to represent virtual keys in the context of the current keyboard mapping. A Key can be either one of the values below __or__ any unicode character. Keys that produce characters are represented by that character, and all others are represented by the values below.
+String values used to represent virtual keys in the context of the current keyboard mapping. Note that some keys do not correspond to any virtual key. A Key can be either one of the values below __or__ any unicode character. Keys that produce characters are represented by that character. All others are represented by one of these values:
 
-| Value |
-| --- |
-| `'&&'` |
-| `'+/-'` |
-| `'\|\|'` |
-| `'00'` |
-| `'000'` |
-| `'again'` |
-| `'alt'` |
-| `'altErase'` |
-| `'app1'` |
-| `'app2'` |
-| `'application'` |
-| `'audioFastForward'` |
-| `'audioMute'` |
-| `'audioNext'` |
-| `'audioPlay'` |
-| `'audioPrev'` |
-| `'audioRewind'` |
-| `'audioStop'` |
-| `'back'` |
-| `'binary'` |
-| `'bookmarks'` |
-| `'brightnessDown'` |
-| `'brightnessUp'` |
-| `'calculator'` |
-| `'cancel'` |
-| `'capsLock'` |
-| `'clear'` |
-| `'clear/again'` |
-| `'clearEntry'` |
-| `'computer'` |
-| `'copy'` |
-| `'crSel'` |
-| `'ctrl'` |
-| `'currencySubUnit'` |
-| `'currencyUnit'` |
-| `'cut'` |
-| `'decimal'` |
-| `'decimalSeparator'` |
-| `'delete'` |
-| `'displaySwitch'` |
-| `'down'` |
-| `'eject'` |
-| `'end'` |
-| `'execute'` |
-| `'exSel'` |
-| `'f1'` |
-| `'f2'` |
-| `'f3'` |
-| `'f4'` |
-| `'f5'` |
-| `'f6'` |
-| `'f7'` |
-| `'f8'` |
-| `'f9'` |
-| `'f10'` |
-| `'f11'` |
-| `'f12'` |
-| `'f13'` |
-| `'f14'` |
-| `'f15'` |
-| `'f16'` |
-| `'f17'` |
-| `'f18'` |
-| `'f19'` |
-| `'f20'` |
-| `'f21'` |
-| `'f22'` |
-| `'f23'` |
-| `'f24'` |
-| `'find'` |
-| `'forward'` |
-| `'gui'` |
-| `'help'` |
-| `'hexadecimal'` |
-| `'home'` |
-| `'illumDown'` |
-| `'illumToggle'` |
-| `'illumUp'` |
-| `'insert'` |
-| `'left'` |
-| `'mail'` |
-| `'mediaSelect'` |
-| `'memAdd'` |
-| `'memClear'` |
-| `'memDivide'` |
-| `'memMultiply'` |
-| `'memRecall'` |
-| `'memStore'` |
-| `'memSubtract'` |
-| `'menu'` |
-| `'modeSwitch'` |
-| `'mute'` |
-| `'numlock'` |
-| `'octal'` |
-| `'oper'` |
-| `'out'` |
-| `'pageDown'` |
-| `'pageUp'` |
-| `'paste'` |
-| `'pause'` |
-| `'power'` |
-| `'printScreen'` |
-| `'prior'` |
-| `'refresh'` |
-| `'right'` |
-| `'scrollLock'` |
-| `'search'` |
-| `'select'` |
-| `'separator'` |
-| `'shift'` |
-| `'sleep'` |
-| `'stop'` |
-| `'sysReq'` |
-| `'thousandsSeparator'` |
-| `'undo'` |
-| `'up'` |
-| `'volumeDown'` |
-| `'volumeUp'` |
-| `'www'` |
-| `'xor'` |
+`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clear/again'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'stop'`, `'sysReq'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
 
 ### sdl.keyboard.getKey(scancode)
 
 * `scancode: `[`<Scancode>`](#enum-scancode)
-* Returns: [`<Key>`](#virtual-keys)
+* Returns: [`<Key>`](#virtual-keys)`|<null>`
 
 Maps a scancode to the corresponding key based on the current keyboard mapping.
 
