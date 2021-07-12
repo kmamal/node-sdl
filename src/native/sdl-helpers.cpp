@@ -1107,7 +1107,7 @@ audio_getQueueSize (int device_id, unsigned int * size)
 ErrorMessage *
 audio_clearQueue (int device_id)
 {
-	SDL_clearQueuedAudio(device_id);
+	SDL_ClearQueuedAudio(device_id);
 
 	return nullptr;
 }
