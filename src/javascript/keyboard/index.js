@@ -16,7 +16,9 @@ const keyboard = {
 	getScancode (key) {
 		if (typeof key !== 'string') { throw Object.assign(new Error("key must be a string"), { key }) }
 
-		const _key = reverseMapping[key] ?? (Array.from(key).length === 1 ? key : 0)
+		const _key = reverseMapping[key] ?? (Array.from(key).length === 1 ? key : null)
+		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
+
 		return Bindings.keyboard_getScancode(_key)
 	},
 
