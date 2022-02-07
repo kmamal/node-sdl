@@ -10,9 +10,11 @@ const ext = gl.getExtension('STACKGL_resize_drawingbuffer')
 const vertexShader = gl.createShader(gl.VERTEX_SHADER)
 gl.shaderSource(vertexShader, `
 	attribute vec2 position;
+	varying vec2 uv;
 
 	void main() {
 		gl_Position = vec4(position, 0.0, 1.0);
+		uv = (position + vec2(1.0)) / 2.0;
 	}
 `)
 gl.compileShader(vertexShader)
@@ -24,13 +26,10 @@ if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
 const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
 gl.shaderSource(fragmentShader, `
 	precision highp float;
-	uniform float width;
-	uniform float height;
+	varying vec2 uv;
+
 	void main() {
-		vec2 pos = vec2(gl_FragCoord);
-		float red = pos.y / height;
-		float green = pos.x / width;
-		gl_FragColor = vec4(red, green, 0.0, 1.0);
+		gl_FragColor = vec4(uv.y, uv.x, 0.5, 1.0);
 	}
 `)
 gl.compileShader(fragmentShader)
@@ -43,14 +42,15 @@ const program = gl.createProgram()
 gl.attachShader(program, vertexShader)
 gl.attachShader(program, fragmentShader)
 gl.linkProgram(program)
-gl.detachShader(program, vertexShader)
-gl.detachShader(program, fragmentShader)
-gl.deleteShader(vertexShader)
-gl.deleteShader(fragmentShader)
+gl.validateProgram(program)
 if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
 	console.log("linking error:", gl.getProgramInfoLog(program))
 	process.exit()
 }
+gl.detachShader(program, vertexShader)
+gl.detachShader(program, fragmentShader)
+gl.deleteShader(vertexShader)
+gl.deleteShader(fragmentShader)
 
 const arrayBuffer = gl.createBuffer()
 gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer)
@@ -64,9 +64,6 @@ const attribPosition = gl.getAttribLocation(program, 'position')
 gl.vertexAttribPointer(attribPosition, 2, gl.FLOAT, false, 0, 0)
 gl.enableVertexAttribArray(attribPosition)
 
-const uniformWidth = gl.getUniformLocation(program, 'width')
-const uniformHeight = gl.getUniformLocation(program, 'height')
-
 gl.useProgram(program)
 
 gl.clearColor(0, 0, 0, 1)
@@ -77,8 +74,6 @@ window.on('resize', () => {
 	gl.viewport(0, 0, w, h)
 
 	gl.clear(gl.COLOR_BUFFER_BIT)
-	gl.uniform1f(uniformWidth, w)
-	gl.uniform1f(uniformHeight, h)
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
 	const buffer = new Uint8Array(w * h * 4)

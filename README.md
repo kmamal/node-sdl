@@ -446,7 +446,7 @@ Fired to indicate that the user has requested the window to close (usually by cl
 
 ### Event: 'close'
 
-Indicates that the application is about to be destroyed. Handle any cleanup here. This event will be followed by a call to `window.destroy()`.
+Indicates that the window is about to be destroyed. Handle any cleanup here. This event will be followed by a call to `window.destroy()`.
 
 ### Event: 'keyDown'
 
