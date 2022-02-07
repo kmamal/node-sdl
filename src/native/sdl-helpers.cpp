@@ -968,35 +968,32 @@ window_render (
 	unsigned int format,
 	void * pixels
 ) {
-	// Update Window
-	{
-		SDL_Window * window = SDL_GetWindowFromID(window_id);
-		if (window == nullptr) {
-			RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
-		}
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
 
-		SDL_Surface* src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
-		SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
-		if (src_surface == nullptr) {
-			RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
-		}
-		SDL_Rect src_rect = { 0, 0, w, h };
+	SDL_Surface* src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+	SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
+	if (src_surface == nullptr) {
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
+	}
+	SDL_Rect src_rect = { 0, 0, w, h };
 
-		SDL_Surface * window_surface = SDL_GetWindowSurface(window);
-		if (window_surface == nullptr) {
-			RETURN_ERROR("SDL_GetWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
-		}
-		SDL_Rect window_rect = { 0, 0, window_surface->w, window_surface->h };
+	SDL_Surface * window_surface = SDL_GetWindowSurface(window);
+	if (window_surface == nullptr) {
+		RETURN_ERROR("SDL_GetWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
+	}
+	SDL_Rect window_rect = { 0, 0, window_surface->w, window_surface->h };
 
-		if (SDL_LowerBlit(src_surface, &src_rect, window_surface, &window_rect) != 0) {
-			RETURN_ERROR("SDL_LowerBlit(%d) error: %s\n", window_id, SDL_GetError());
-		}
+	if (SDL_LowerBlit(src_surface, &src_rect, window_surface, &window_rect) != 0) {
+		RETURN_ERROR("SDL_LowerBlit(%d) error: %s\n", window_id, SDL_GetError());
+	}
 
-		SDL_FreeSurface(src_surface);
+	SDL_FreeSurface(src_surface);
 
-		if (SDL_UpdateWindowSurface(window) != 0) {
-			RETURN_ERROR("SDL_UpdateWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
-		}
+	if (SDL_UpdateWindowSurface(window) != 0) {
+		RETURN_ERROR("SDL_UpdateWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
 	return nullptr;
@@ -1198,7 +1195,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 			SET_STRING(object, "type", event.type == SDL_KEYDOWN
 				? "keyDown"
 				: "keyUp");
-			SET_NUM(object, "window", event.window.windowID);
+			SET_NUM(object, "window", event.key.windowID);
 
 			SDL_Keysym symbol = event.key.keysym;
 			SET_NUM(object, "scancode", symbol.scancode);
@@ -1236,7 +1233,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 		case SDL_MOUSEMOTION: {
 			SET_STRING(object, "family", "mouse");
 			SET_STRING(object, "type", "mouseMove");
-			SET_NUM(object, "window", event.window.windowID);
+			SET_NUM(object, "window", event.motion.windowID);
 			SET_BOOL(object, "touch", event.motion.which == SDL_TOUCH_MOUSEID);
 			SET_NUM(object, "x", event.motion.x);
 			SET_NUM(object, "y", event.motion.y);
@@ -1248,8 +1245,8 @@ packageEvent (const SDL_Event & event, Variant & object)
 			SET_STRING(object, "type", event.type == SDL_MOUSEBUTTONDOWN
 				? "mouseButtonDown"
 				: "mouseButtonUp");
-			SET_NUM(object, "window", event.window.windowID);
-			SET_BOOL(object, "touch", event.motion.which == SDL_TOUCH_MOUSEID);
+			SET_NUM(object, "window", event.button.windowID);
+			SET_BOOL(object, "touch", event.button.which == SDL_TOUCH_MOUSEID);
 			SET_NUM(object, "button", event.button.button);
 			SET_NUM(object, "x", event.button.x);
 			SET_NUM(object, "y", event.button.y);
@@ -1258,11 +1255,11 @@ packageEvent (const SDL_Event & event, Variant & object)
 		case SDL_MOUSEWHEEL: {
 			SET_STRING(object, "family", "mouse");
 			SET_STRING(object, "type", "mouseWheel");
-			SET_NUM(object, "window", event.window.windowID);
-			SET_BOOL(object, "touch", event.motion.which == SDL_TOUCH_MOUSEID);
+			SET_NUM(object, "window", event.wheel.windowID);
+			SET_BOOL(object, "touch", event.wheel.which == SDL_TOUCH_MOUSEID);
 
 			int x, y;
-			SDL_GetGlobalMouseState(&x, &y);
+			SDL_GetMouseState(&x, &y);
 			SET_NUM(object, "x", x);
 			SET_NUM(object, "y", y);
 
