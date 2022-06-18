@@ -33,6 +33,7 @@ jobs:
           mkdir SDL2
           tar.exe -xf SDL2.zip -C SDL2 --strip 1
           del SDL2.zip
+          npm config set msvs_version 2022
 
       - id: npm-cache
         run: echo "::set-output name=dir::$(npm config get cache)"
