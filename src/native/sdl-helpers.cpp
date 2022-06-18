@@ -978,15 +978,13 @@ window_render (
 	if (src_surface == nullptr) {
 		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
 	}
-	SDL_Rect src_rect = { 0, 0, w, h };
 
 	SDL_Surface * window_surface = SDL_GetWindowSurface(window);
 	if (window_surface == nullptr) {
 		RETURN_ERROR("SDL_GetWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
 	}
-	SDL_Rect window_rect = { 0, 0, window_surface->w, window_surface->h };
 
-	if (SDL_LowerBlit(src_surface, &src_rect, window_surface, &window_rect) != 0) {
+	if (SDL_BlitSurface(src_surface, NULL, window_surface, NULL) != 0) {
 		RETURN_ERROR("SDL_LowerBlit(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
