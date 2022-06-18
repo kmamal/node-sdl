@@ -704,7 +704,7 @@ Will be `true` if the mouse is over the window.
 
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
 
-Displays an image in the window. The provided image's dimensions should be the same as the window's `width` and `height`.
+Displays an image in the window. This functions preforms no scaling (or positioning). To fill the whole window you must provide an image that matches the window's `width` and `height`.
 
 ### window.setIcon(width, height, stride, format, buffer)
 
