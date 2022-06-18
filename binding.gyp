@@ -55,7 +55,7 @@
 						'src/native/asprintf.c',
 					],
 					'cflags': [ '-D_REENTRANT' ],
-					'include_dirs': [ '..\\SDL2\\include' ],
+					'include_dirs': [ 'SDL2\\include' ],
 					'libraries': [ '-l..\\SDL2\\lib\\x64\\SDL2.lib' ],
 					'msbuild_settings': {
 						'ClCompile': {
