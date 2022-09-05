@@ -1,5 +1,5 @@
 
-declare namespace Events {
+export namespace Events {
 
 	interface BaseEvent {}
 
@@ -112,7 +112,7 @@ declare namespace Events {
 }
 
 
-declare namespace Sdl {
+export namespace Sdl {
 
 	interface Info {
 		readonly version: {
@@ -731,5 +731,5 @@ declare namespace Sdl {
 	}
 }
 
-declare const sdl: Sdl.Module
-export default sdl
+const sdl: Sdl.Module
+export = sdl
