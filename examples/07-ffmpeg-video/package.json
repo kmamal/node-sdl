@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-ffmpeg",
+  "name": "sdl-example-ffmpeg-video",
   "main": "index.js",
   "type": "module",
   "dependencies": {

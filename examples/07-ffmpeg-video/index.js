@@ -12,8 +12,8 @@ let lastIndex = null
 
 const dir = path.dirname(import.meta.url)
 const [ image, video ] = await Promise.all([
-	loadImage(path.join(dir, 'image.png'), { width, height }),
-	loadVideo(path.join(dir, 'video.mp4'), { width, height, framerate }),
+	loadImage(path.join(dir, 'assets/image.png'), { width, height }),
+	loadVideo(path.join(dir, 'assets/video.mp4'), { width, height, framerate }),
 ])
 
 const window = sdl.video.createWindow({ width, height })

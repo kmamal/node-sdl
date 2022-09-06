@@ -1,0 +1,10 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-ffmpeg-audio",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "ffmpeg-static": "*"
+  }
+}
