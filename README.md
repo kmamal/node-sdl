@@ -442,11 +442,11 @@ Fired when the mouse leaves the window.
 
 * `prevent: <function (void) => void>` Call this to prevent the window from closing.
 
-Fired to indicate that the user has requested the window to close (usually by clicking the "x" button). If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually. If `prevent` is not called, then this event will be followed by a `'close'` event.
+Fired to indicate that the user has requested the window to close (usually by clicking the "x" button). If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually. If `prevent` is not called, then this event will be followed by a [`'close'`](#event-close) event.
 
 ### Event: 'close'
 
-Indicates that the window is about to be destroyed. Handle any cleanup here. This event will be followed by a call to `window.destroy()`.
+Indicates that the window is about to be destroyed. Handle any cleanup here. This event will be followed by a call to [`window.destroy()`](#windowdestroy).
 
 ### Event: 'keyDown'
 
