@@ -1060,7 +1060,7 @@ window_render (
 		RETURN_ERROR("SDL_GetWindowData(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
-	uint texture_format;
+	unsigned int texture_format;
 	int texture_width, texture_height;
 	if (SDL_QueryTexture(texture, &texture_format, nullptr, &texture_width, &texture_height)) {
 		RETURN_ERROR("SDL_QueryTexture(%d) error: %s\n", window_id, SDL_GetError());
