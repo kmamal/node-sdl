@@ -716,6 +716,64 @@ video_getDisplays(Variant & list)
 }
 
 ErrorMessage *
+_updateTexture(
+	SDL_Window * window,
+	SDL_Renderer * renderer,
+	int format, int width, int height,
+	SDL_Texture ** texture_dst
+) {
+	int window_id = SDL_GetWindowID(window);
+
+	SDL_Texture * texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+	if (texture == nullptr) {
+		RETURN_ERROR("SDL_CreateTexture(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE)) {
+		RETURN_ERROR("SDL_SetTextureBlendMode(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Texture * old_texture = (SDL_Texture *) SDL_SetWindowData(window, "texture", texture);
+	if (old_texture != nullptr) { SDL_DestroyTexture(old_texture); }
+
+	if (texture_dst != nullptr) { *texture_dst = texture; }
+
+	return nullptr;
+}
+
+ErrorMessage *
+_updateRenderer(
+	SDL_Window * window,
+	bool accelerated,
+	bool vsync
+) {
+	int window_id = SDL_GetWindowID(window);
+
+	SDL_Renderer * old_renderer = SDL_GetRenderer(window);
+	if (old_renderer != nullptr) { SDL_DestroyRenderer(old_renderer); }
+
+	int renderer_flags = 0
+		| (accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
+		| (accelerated && vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
+
+	SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_CreateRenderer(%d, %d) error: %s\n", window_id, renderer_flags, SDL_GetError());
+	}
+
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+
+	int width, height;
+	SDL_GetWindowSize(window, &width, &height);
+	int format = SDL_GetWindowPixelFormat(window);
+	ErrorMessage * error = _updateTexture(window, renderer, format, width, height, nullptr);
+	if (error != nullptr) { return error; }
+
+	return nullptr;
+}
+
+ErrorMessage *
 window_create (
 	const char * title, int display,
 	int ** x, int ** y, int ** width, int ** height,
@@ -723,6 +781,8 @@ window_create (
 	bool fullscreen,
 	bool resizable,
 	bool borderless,
+	bool accelerated,
+	bool vsync,
 	bool opengl,
 	int * window_id, void ** native_pointer, int * native_pointer_size
 ) {
@@ -767,7 +827,7 @@ window_create (
 	SDL_VERSION(&(info.version));
 	bool got_info = SDL_GetWindowWMInfo(window, &info);
 	if (!got_info) {
-		RETURN_ERROR("SDL_GetWindowWMInfo() error: %s\n", SDL_GetError());
+		RETURN_ERROR("SDL_GetWindowWMInfo(%d) error: %s\n", *window_id, SDL_GetError());
 	}
 
 	int size = sizeof(NativeWindow);
@@ -775,6 +835,9 @@ window_create (
 	*pointer = GET_WINDOW(info);
 	*native_pointer = pointer;
 	*native_pointer_size = size;
+
+	ErrorMessage * error = _updateRenderer(window, accelerated, vsync);
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -855,6 +918,20 @@ window_setBorderless (int window_id, bool borderless)
 	}
 
 	SDL_SetWindowBordered(window, borderless ? SDL_FALSE : SDL_TRUE);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setAcceleratedAndVsync (int window_id, bool accelerated, bool vsync)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	ErrorMessage * error = _updateRenderer(window, accelerated, vsync);
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -951,7 +1028,7 @@ window_setIcon (
 
 	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
 	if (surface == nullptr) {
-		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
 	}
 
 	SDL_SetWindowIcon(window, surface);
@@ -973,26 +1050,63 @@ window_render (
 		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
-	SDL_Surface* src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
-	SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Texture * texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
+	if (texture == nullptr) {
+		RETURN_ERROR("SDL_GetWindowData(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	uint texture_format;
+	int texture_width, texture_height;
+	if (SDL_QueryTexture(texture, &texture_format, nullptr, &texture_width, &texture_height)) {
+		RETURN_ERROR("SDL_QueryTexture(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	int window_width, window_height;
+	SDL_GetWindowSize(window, &window_width, &window_height);
+
+	if (window_width != texture_width || window_height != texture_height) {
+		int format = SDL_GetWindowPixelFormat(window);
+		ErrorMessage * error = _updateTexture(window, renderer, format, window_width, window_height, &texture);
+		if (error != nullptr) { return error; }
+	}
+
+	SDL_Surface * src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
 	if (src_surface == nullptr) {
-		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d) error: %s\n", w, h, format, SDL_GetError());
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
 	}
 
-	SDL_Surface * window_surface = SDL_GetWindowSurface(window);
-	if (window_surface == nullptr) {
-		RETURN_ERROR("SDL_GetWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
+	if (SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE)) {
+		RETURN_ERROR("SDL_SetTextureBlendMode(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
-	if (SDL_BlitSurface(src_surface, NULL, window_surface, NULL) != 0) {
-		RETURN_ERROR("SDL_LowerBlit(%d) error: %s\n", window_id, SDL_GetError());
+	void *texture_pixels;
+	int texture_stride;
+	SDL_LockTexture(texture, nullptr, &texture_pixels, &texture_stride);
+
+	SDL_Surface * dst_surface = SDL_CreateRGBSurfaceWithFormatFrom(texture_pixels, texture_width, texture_height, SDL_BITSPERPIXEL(texture_format), texture_stride, texture_format);
+	if (dst_surface == nullptr) {
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, texture_width, texture_height, texture_format, SDL_GetError());
 	}
+
+	if (SDL_BlitSurface(src_surface, NULL, dst_surface, NULL) != 0) {
+		RETURN_ERROR("SDL_BlitSurface(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_UnlockTexture(texture);
+
+	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr)) {
+		RETURN_ERROR("SDL_RenderCopy(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RenderPresent(renderer);
 
 	SDL_FreeSurface(src_surface);
-
-	if (SDL_UpdateWindowSurface(window) != 0) {
-		RETURN_ERROR("SDL_UpdateWindowSurface(%d) error: %s\n", window_id, SDL_GetError());
-	}
+	SDL_FreeSurface(dst_surface);
 
 	return nullptr;
 }
@@ -1005,6 +1119,15 @@ window_destroy (int window_id)
 		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Texture * texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
+
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
 	return nullptr;

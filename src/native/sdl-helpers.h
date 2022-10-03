@@ -53,6 +53,8 @@ ErrorMessage * window_create (
 	bool fullscreen,
 	bool resizable,
 	bool borderless,
+	bool accelerated,
+	bool vsync,
 	bool opengl,
 	int * window_id, void ** native_pointer, int * native_pointer_size
 );
@@ -62,6 +64,7 @@ ErrorMessage * window_setSize (int window_id, int width, int height);
 ErrorMessage * window_setFullscreen (int window_id, bool fullscreen);
 ErrorMessage * window_setResizable (int window_id, bool resizable);
 ErrorMessage * window_setBorderless (int window_id, bool borderless);
+ErrorMessage * window_setAcceleratedAndVsync (int window_id, bool accelerated, bool vsync);
 ErrorMessage * window_focus (int window_id);
 ErrorMessage * window_show (int window_id);
 ErrorMessage * window_hide (int window_id);

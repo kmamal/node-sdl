@@ -45,6 +45,8 @@ class Window extends EventsViaPoll {
 			fullscreen = false,
 			resizable = false,
 			borderless = false,
+			accelerated = true,
+			vsync = true,
 			opengl = false,
 		} = options
 
@@ -64,6 +66,8 @@ class Window extends EventsViaPoll {
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
 		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
+		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
 		if (display && (Number.isFinite(x) || Number.isFinite(y))) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
@@ -87,6 +91,8 @@ class Window extends EventsViaPoll {
 			fullscreen,
 			resizable,
 			borderless,
+			accelerated,
+			vsync,
 			opengl,
 		)
 
@@ -102,6 +108,8 @@ class Window extends EventsViaPoll {
 		this._fullscreen = fullscreen
 		this._resizable = resizable
 		this._borderless = borderless
+		this._accelerated = accelerated
+		this._vsync = vsync
 		this._opengl = opengl
 
 		this._focused = false
@@ -112,8 +120,10 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
+		// Keep node.js alive while windows are open
 		this.once('close', () => {})
 
+		// Manually emit an initial resize event (for convenience)
 		process.nextTick(() => {
 			this.emit('resize', {
 				width: this._width,
@@ -194,6 +204,24 @@ class Window extends EventsViaPoll {
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
 		this._borderless = borderless
 		Bindings.window_setBorderless(this._id, borderless)
+	}
+
+	get accelerated () { return this._accelerated }
+	setAccelerated (accelerated) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		this._accelerated = accelerated
+		Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
+	}
+
+	get vsync () { return this._vsync }
+	setVsync (vsync) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
+		this._vsync = vsync
+		Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
 	}
 
 	get opengl () { return this._opengl }

@@ -93,6 +93,7 @@ class AudioInstance {
 
 		return Bindings.audio_getQueueSize(this._id)
 	}
+
 	clearQueue () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
