@@ -706,10 +706,10 @@ Changes the window's accelerated property.
 * `<boolean>`
 
 Will be `true` if the window is using vsync.
-A window with vsync enabled will have its frame rate synchronized to the display's refresh rate.
+A window with vsync enabled will have its frame rate synchronized to the display's refresh rate to prevent tearing.
 Note that vsync can only be used if that window is also [`accelerated`](#windowaccelerated)
 
-### window.setvsync(vsync)
+### window.setVsync(vsync)
 
 * `vsync: <boolean>` The new value of the property.
 
