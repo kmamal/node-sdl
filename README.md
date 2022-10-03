@@ -7,7 +7,7 @@
 
 SDL2 bindings for Node.js.
 Provides window management, input events, audio playback/recording, and clipboard manipulation.
-Use together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) for WebGL drawing.
+You can use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures.
@@ -29,9 +29,20 @@ npm install @kmamal/sdl
 ## Example
 
 ```js
-import sdl from '@kmamal/sdl'
+const sdl = require('@kmamal/sdl')
+const createContext = require('@kmamal/gl')
 
-sdl.video.createWindow({ title: "Hello, World!" })
+const window = sdl.video.createWindow({
+  title: "Hello, World!"
+  opengl: true,
+})
+
+// Clear screen to red
+const { width, height, native } = window
+const gl = createContext(width, height, { window: native })
+gl.clearColor(1, 0, 0, 1)
+gl.clear(gl.COLOR_BUFFER_BIT)
+gl.swap()
 ```
 
 There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples), covering several common use cases, including how to draw using Canvas and WebGL, as well as how to package the application for distribution.
