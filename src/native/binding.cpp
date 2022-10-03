@@ -1227,6 +1227,7 @@ init (napi_env env, napi_value exports)
 		{ "audio_getQueueSize", NULL, audio_getQueueSize, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_enqueue", NULL, audio_enqueue, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_dequeue", NULL, audio_dequeue, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_clearQueue", NULL, audio_clearQueue, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "events_poll", NULL, events_poll, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "events_wait", NULL, events_wait, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getKey", NULL, keyboard_getKey, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1250,7 +1251,7 @@ init (napi_env env, napi_value exports)
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 48, desc);
+	CALL_NAPI(napi_define_properties, exports, 49, desc);
 
 	cleanup:
 	return exports;
