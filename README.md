@@ -5,14 +5,19 @@
 [![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/%2540kmamal%252Fsdl)](https://snyk.io/test/npm/@kmamal/sdl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-SDL2 bindings for Node.js. Provides window management, input events, audio playback/recording, and clipboard manipulation. Use together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) for WebGL drawing.
+SDL2 bindings for Node.js.
+Provides window management, input events, audio playback/recording, and clipboard manipulation.
+Use together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) for WebGL drawing.
 
-It should work on Linux, Mac, and Windows. Prebuilt binaries are available for x64 architectures.
+It should work on Linux, Mac, and Windows.
+Prebuilt binaries are available for x64 architectures.
 
 
 ## Installation
 
-SDL2 is bundled along with the binaries so a separate installation is not necessary. This package is self-contained. Just run:
+SDL2 is bundled along with the binaries so a separate installation is not necessary.
+This package is self-contained.
+Just run:
 
 ```
 npm install @kmamal/sdl
@@ -92,6 +97,10 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.setResizable(resizable)](#windowsetresizableresizable)
     * [window.borderless](#windowborderless)
     * [window.setBorderless(borderless)](#windowsetborderlessborderless)
+    * [window.accelerated](#windowaccelerated)
+    * [window.setAccelerated(accelerated)](#windowsetacceleratedaccelerated)
+    * [window.vsync](#windowvsync)
+    * [window.setVsync(vsync)](#windowsetvsyncvsync)
     * [window.opengl](#windowopengl)
     * [window.native](#windownative)
     * [window.maximized](#windowmaximized)
@@ -173,11 +182,15 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 
 * `prevent: <function (void) => void>` Call this to prevent the application from closing.
 
-Fired to indicate that the user has requested the application to close (usually by closing the last window). If you need to display any confirmation dialogs you should call `event.prevent()` and handle termination manually. If `prevent` is not called, then this event will be followed by a [`'quit'`](#event-quit) event.
+Fired to indicate that the user has requested the application to close (usually by closing the last window).
+If you need to display any confirmation dialogs you should call `event.prevent()` and handle termination manually.
+If `prevent` is not called, then this event will be followed by a [`'quit'`](#event-quit) event.
 
 ### Event: 'quit'
 
-Indicates that the application is about to close. Handle any cleanup here. This event will be followed by a call to `process.exit()`.
+Indicates that the application is about to close.
+Handle any cleanup here.
+This event will be followed by a call to `process.exit()`.
 
 ### sdl.info
 
@@ -196,7 +209,9 @@ Indicates that the application is about to close. Handle any cleanup here. This 
       * `all: <string>[]` A list of all audio drivers.
       * `current: <string>` The audio driver that is currently selected.
 
-This object is filled with the information produced during the initialization of SDL2. All the values will remain constant throughout the execution of the program. If you want to initialize SDL2 with drivers other than the default ones, you can do so via its [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
+This object is filled with the information produced during the initialization of SDL2.
+All the values will remain constant throughout the execution of the program.
+If you want to initialize SDL2 with drivers other than the default ones, you can do so via its [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
 
 Sample data for Ubuntu:
 
@@ -315,7 +330,9 @@ String values used to represent how the pixels of an image are stored in a Buffe
     * `vertical: <number>` The vertical density.
     * `diagonal: <number>` The diagonal density.
 
-A list of all detected displays. Sample output for two side-to-side monitors is below. Notice how the geometries don't overlap:
+A list of all detected displays.
+Sample output for two side-to-side monitors is below.
+Notice how the geometries don't overlap:
 
 ```js
 [
@@ -369,6 +386,8 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   * `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   * `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
   * `borderless: <boolean>` Set to `true` to completely hide the window's borders and title bar. Default: `false`
+  * `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
+  * `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
   * `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
 * Returns: [`<Window>`](#class-window) an object representing the new window.
 
@@ -377,12 +396,15 @@ Creates a new window.
 The following restrictions apply:
 * If you specify the `display` option, you can't also specify the `x` or `y` options, and vice-versa.
 * The `resizable` and `borderless` options can't both be true.
+* The `vsync` option only applies to windows that are also `accelerated`.
 
-If you set the `opengl` option, then you can only render to the window with OpenGL calls. Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+If you set the `opengl` option, then you can only render to the window with OpenGL calls.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 ## class Window
 
-This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.video.createWindow()`](#sdlvideocreatewindowoptions) are of this type.
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.video.createWindow()`](#sdlvideocreatewindowoptions) are of this type.
 
 ### Event: 'show'
 
@@ -442,11 +464,15 @@ Fired when the mouse leaves the window.
 
 * `prevent: <function (void) => void>` Call this to prevent the window from closing.
 
-Fired to indicate that the user has requested the window to close (usually by clicking the "x" button). If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually. If `prevent` is not called, then this event will be followed by a [`'close'`](#event-close) event.
+Fired to indicate that the user has requested the window to close (usually by clicking the "x" button).
+If you need to display any confirmation dialogs you should call `event.prevent()` and handle destruction manually.
+If `prevent` is not called, then this event will be followed by a [`'close'`](#event-close) event.
 
 ### Event: 'close'
 
-Indicates that the window is about to be destroyed. Handle any cleanup here. This event will be followed by a call to [`window.destroy()`](#windowdestroy).
+Indicates that the window is about to be destroyed.
+Handle any cleanup here.
+This event will be followed by a call to [`window.destroy()`](#windowdestroy).
 
 ### Event: 'keyDown'
 
@@ -604,7 +630,8 @@ Will be `true` if the window is visible.
 
 ### window.show([show])
 
-* `show: <boolean>` Set to `true` to make the window visible, `false` to hide it. Default: `true`
+* `show: <boolean>` Set to `true` to make the window visible, `false` to hide it.
+Default: `true`
 
 Shows or hides the window.
 
@@ -616,7 +643,8 @@ Equivalent to [`window.show(false)`](#windowshowshow).
 
 * `<boolean>`
 
-Will be `true` if the window is fullscreen. A fullscreen window is displayed over the entire screen.
+Will be `true` if the window is fullscreen.
+A fullscreen window is displayed over the entire screen.
 
 ### window.setFullscreen(fullscreen)
 
@@ -628,7 +656,8 @@ Changes the window's fullscreen property.
 
 * `<boolean>`
 
-Will be `true` if the window is resizable. A resizable window can be resized by dragging it's borders.
+Will be `true` if the window is resizable.
+A resizable window can be resized by dragging it's borders.
 
 ### window.setResizable(resizable)
 
@@ -640,7 +669,8 @@ Changes the window's resizable property.
 
 * `<boolean>`
 
-Will be `true` if the window is borderless. A borderless window has no borders or title bar.
+Will be `true` if the window is borderless.
+A borderless window has no borders or title bar.
 
 ### window.setBorderless(borderless)
 
@@ -648,17 +678,46 @@ Will be `true` if the window is borderless. A borderless window has no borders o
 
 Changes the window's borderless property.
 
+### window.accelerated
+
+* `<boolean>`
+
+Will be `true` if the window is using hardware accelerated rendering.
+
+### window.setAccelerated(accelerated)
+
+* `accelerated: <boolean>` The new value of the property.
+
+Changes the window's accelerated property.
+
+### window.vsync
+
+* `<boolean>`
+
+Will be `true` if the window is using vsync.
+A window with vsync enabled will have its frame rate synchronized to the display's refresh rate.
+Note that vsync can only be used if that window is also [`accelerated`](#windowaccelerated)
+
+### window.setvsync(vsync)
+
+* `vsync: <boolean>` The new value of the property.
+
+Changes the window's vsync property.
+
 ### window.opengl
 
 * `<boolean>`
 
-Will be `true` if the window was created in OpenGl mode. In OpenGL mode, you can only render to the window with OpenGL calls. Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+Will be `true` if the window was created in OpenGl mode.
+In OpenGL mode, you can only render to the window with OpenGL calls.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 ### window.native
 
 * `<any>`
 
-Holds a copy of the native (platform-specific) representation of the window. Only used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme).
+Holds a copy of the native (platform-specific) representation of the window.
+Only used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme).
 
 ### window.maximized
 
@@ -704,7 +763,9 @@ Will be `true` if the mouse is over the window.
 
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
 
-Displays an image in the window. This functions preforms no scaling (or positioning). To fill the whole window you must provide an image that matches the window's `width` and `height`.
+Displays an image in the window.
+This functions preforms no scaling (or positioning).
+To fill the whole window you must provide an image that matches the window's `width` and `height`.
 
 ### window.setIcon(width, height, stride, format, buffer)
 
@@ -716,7 +777,8 @@ Set's the window's icon, usually displayed in the title bar and the taskbar.
 
 * `<boolean>`
 
-Will be `true` if the window is destroyed. A destroyed window object should not be used any further.
+Will be `true` if the window is destroyed.
+A destroyed window object should not be used any further.
 
 ### window.destroy()
 
@@ -727,9 +789,14 @@ Destroys the window.
 
 ### Audio data
 
-The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output. The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
+The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output.
+The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
 
-Audio data are a sequence of frames, with each frame being a sequence of samples. A _sample_ is a single number representing the intensity of a single audio channel at a specific point in time. For audio with multiple channels, each point in time is represented by one sample per channel. This is called a _frame_. The samples in a frame are arranged as follows:
+Audio data are a sequence of frames, with each frame being a sequence of samples.
+A _sample_ is a single number representing the intensity of a single audio channel at a specific point in time.
+For audio with multiple channels, each point in time is represented by one sample per channel.
+This is called a _frame_.
+The samples in a frame are arranged as follows:
 * For 1 channel (mono) a frame contains just the one sample.
 * For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
 * For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
@@ -802,13 +869,16 @@ String values used to represent how audio samples are stored in a Buffer.
 
 * `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
 
-Fired when a new audio device becomes available. Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
+Fired when a new audio device becomes available.
+Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
 
 ### Event: 'deviceRemove'
 
 * `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
 
-Fired when an existing audio device is removed. Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices. When this event is emitted, all instances that were opened from the removed device are closed automatically.
+Fired when an existing audio device is removed.
+Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
+When this event is emitted, all instances that were opened from the removed device are closed automatically.
 
 ### sdl.audio.bytesPerSample(format)
 
@@ -845,7 +915,8 @@ Helper function which maps each sample format to the sample value that correspon
 * `offset: <number>` The position from which to read the sample. Default: `0`
 * Returns: `<number>` The value of the sample read.
 
-Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument. For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
+For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
@@ -855,7 +926,8 @@ Helper function which calls the appropriate `read*` method of `Buffer` based on 
 * `offset: <number>` The position at which to write the sample. Default: `0`
 * Returns: `<number>` The updated `offset`.
 
-Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument. For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
+For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
 ### sdl.audio.devices
 
@@ -863,7 +935,8 @@ Helper function which calls the appropriate `write*` method of `Buffer` based on
   * `name: <string>` The name of the device.
   * `recording: <boolean>` Will be `true` if this is a recording device.
 
-A list of all the detected audio devices. Sample output for PulseAudio:
+A list of all the detected audio devices.
+Sample output for PulseAudio:
 
 ```js
 [
@@ -883,16 +956,21 @@ A list of all the detected audio devices. Sample output for PulseAudio:
   * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
 * Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
 
-Initializes an audio device for playback/recording and returns a corresponding instance. If the opened device is a playback device, then the returned object will be an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it will be an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+Initializes an audio device for playback/recording and returns a corresponding instance.
+If the opened device is a playback device, then the returned object will be an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it will be an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
 
-The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the instance will look like. See also the section on [audio data](#audio-data).
+The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the instance will look like.
+See also the section on [audio data](#audio-data).
 
-The `buffered` option specifies the "delay" that you will experience between the application and the audio driver. With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently. Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
+The `buffered` option specifies the "delay" that you will experience between the application and the audio driver.
+With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently.
+Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
 
 
 ## class AudioInstance
 
-This class is not directly exposed by the API so you can't use it with the `new` operator. It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
 
 ### audioInstance.id
 
@@ -960,7 +1038,8 @@ The sample value that corresponds to silence, based on the format the instance w
 * `offset: <number>` The position from which to read the sample. Default: `0`
 * Returns: `<number>` The value of the sample read.
 
-Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with. For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
+For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
 ### audioInstance.writeSample(buffer, value[, offset])
 
@@ -969,7 +1048,8 @@ Helper function which calls the appropriate `read*` method of `Buffer` based on 
 * `offset: <number>` The position at which to write the sample. Default: `0`
 * Returns: `<number>` The updated `offset`.
 
-Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with. For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
+For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
 ### audioInstance.buffered
 
@@ -1007,7 +1087,8 @@ Clears the queued data.
 
 * `<boolean>`
 
-Will be `true` if the instance is closed. A closed instance object should not be used any further.
+Will be `true` if the instance is closed.
+A closed instance object should not be used any further.
 
 ### audioInstance.close()
 
@@ -1016,7 +1097,8 @@ Closes the instance.
 
 ## class AudioPlaybackInstance extends AudioInstance
 
-This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a playback device is opened.
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a playback device is opened.
 
 ### playbackInstance.enqueue(buffer[, bytes])
 
@@ -1028,7 +1110,8 @@ Takes generated audio data from the buffer, and writes it to the queue, from whi
 
 ## class AudioRecordingInstance extends AudioInstance
 
-This class is not directly exposed by the API so you can't use it with the `new` operator. Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a recording device is opened.
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a recording device is opened.
 
 ### recordingInstance.dequeue(buffer[, bytes])
 
@@ -1043,20 +1126,32 @@ Takes recorded audio data that has been put on the queue, and writes it to the p
 
 There are three levels at which you can deal with the keyboard: physical keys ([scancodes](#enum-scancode)), virtual keys ([keys](#virtual-keys)), and text ([`'textInput'`](#event-textinput) events).
 
-On the physical level, each of the physical keys corresponds to a number: the key's scancode. For any given keyboard, the same key will always produce the same scancode. If your application cares about the layout of the keyboard (for example using the "WASD" keys as a substitute for arrow keys), then you should handle key events at this level using the `scancode` property of [`'keyDown'`](#event-keydown) and [`'keyUp'`](#event-keyup) events.
+On the physical level, each of the physical keys corresponds to a number: the key's scancode.
+For any given keyboard, the same key will always produce the same scancode.
+If your application cares about the layout of the keyboard (for example using the "WASD" keys as a substitute for arrow keys), then you should handle key events at this level using the `scancode` property of [`'keyDown'`](#event-keydown) and [`'keyUp'`](#event-keyup) events.
 
 For the most part it's better to treat scancode values as arbitrary/meaningless, but SDL does provide a scancode enumeration with values based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf) so you should be able to derive some meaning from the scancodes if your keyboard is compatible.
 
-More commonly, you don't care about the physical key itself but about the "meaning" associated with each key: the character that it produces ("a", "b", "@", " ", .e.t.c) or the function that it corresponds to ("Esc", "F4", "Ctrl",  e.t.c.). Your operating system provides a "keyboard mapping" that associates physical keys with their corresponding meaning. Changing the keyboard mapping (for example by changing the language from English to German) will also change the corresponding meaning for each key (in the English-German example: the "y" and "z" keys will be switched). These meanings are represented as [virtual key strings](#virtual-keys). If your application cares about the meaning associated with individual keys then you should handle key events at this level using the `key` property of [`'keyDown'`](#event-keydown) and [`'keyUp'`](#event-keyup) events.
+More commonly, you don't care about the physical key itself but about the "meaning" associated with each key: the character that it produces ("a", "b", "@", " ", .e.t.c) or the function that it corresponds to ("Esc", "F4", "Ctrl",  e.t.c.).
+Your operating system provides a "keyboard mapping" that associates physical keys with their corresponding meaning.
+Changing the keyboard mapping (for example by changing the language from English to German) will also change the corresponding meaning for each key (in the English-German example: the "y" and "z" keys will be switched).
+These meanings are represented as [virtual key strings](#virtual-keys).
+If your application cares about the meaning associated with individual keys then you should handle key events at this level using the `key` property of [`'keyDown'`](#event-keydown) and [`'keyUp'`](#event-keyup) events.
 
-Note that not all physical keys correspond to a well-defined meaning and thus don't have a virtual key value associated with them. The key events for these keys will have a `null` value for the `key` property.
+Note that not all physical keys correspond to a well-defined meaning and thus don't have a virtual key value associated with them.
+The key events for these keys will have a `null` value for the `key` property.
 
-But sometimes the application doesn't care about individual keys at all, but about the resulting text that the user is entering. Consider for example what happens when a user on a Greek keyboard layout enters an accent mark "´" followed by the letter "α" to produce the character "ά": Two keys were pressed, but only a single character was produced. Trying to handle text input by manually translating key presses to text is not a very viable solution. It's better to let the OS handle all the text logic, and get the final text by handling the rasulting ([`'textInput'`](#event-textinput)) events.
+But sometimes the application doesn't care about individual keys at all, but about the resulting text that the user is entering.
+Consider for example what happens when a user on a Greek keyboard layout enters an accent mark "´" followed by the letter "α" to produce the character "ά": Two keys were pressed, but only a single character was produced.
+Trying to handle text input by manually translating key presses to text is not a very viable solution.
+It's better to let the OS handle all the text logic, and get the final text by handling the rasulting ([`'textInput'`](#event-textinput)) events.
 
 
 ### Enum: SCANCODE
 
-Used to represent physical keys on the keyboard. The same key will always produce the same scancode. Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
+Used to represent physical keys on the keyboard.
+The same key will always produce the same scancode.
+Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
 
 | Value | Corresponding `SDL_Scancode` | Comment |
 | --- | --- | --- |
@@ -1306,7 +1401,11 @@ Used to represent physical keys on the keyboard. The same key will always produc
 
 ### Virtual keys
 
-String values used to represent virtual keys in the context of the current keyboard mapping. Note that some keys do not correspond to any virtual key. A Key can be either one of the values below __or__ any unicode character. Keys that produce characters are represented by that character. All others are represented by one of these values:
+String values used to represent virtual keys in the context of the current keyboard mapping.
+Note that some keys do not correspond to any virtual key.
+A Key can be either one of the values below __or__ any unicode character.
+Keys that produce characters are represented by that character.
+All others are represented by one of these values:
 
 `'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'space'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
 
@@ -1322,13 +1421,15 @@ Maps a scancode to the corresponding key based on the current keyboard mapping.
 * `key: `[`<Key>`](#virtual-keys)
 * Returns: [`<Scancode>`](#enum-scancode)
 
-Maps a key to the corresponding scancode based on the current keyboard mapping. If multiple physical keys produce the same virtual key, then only the first one will be returned.
+Maps a key to the corresponding scancode based on the current keyboard mapping.
+If multiple physical keys produce the same virtual key, then only the first one will be returned.
 
 ### sdl.keyboard.getState()
 
 * Returns: `<boolean[]>` an object representing the state of each key.
 
-The returned array can be indexed with [`Scancode`](#enum-scancode) values. Pressed keys will correspond to `true` values.
+The returned array can be indexed with [`Scancode`](#enum-scancode) values.
+Pressed keys will correspond to `true` values.
 
 
 ## sdl.mouse
@@ -1354,7 +1455,8 @@ String values used to represent the types of cursors available on most systems.
 
 ### Enum: BUTTON
 
-Used to represent the buttons on a mouse. A mouse can have many buttons, but the values for the three most common ones are represented in this enum.
+Used to represent the buttons on a mouse.
+A mouse can have many buttons, but the values for the three most common ones are represented in this enum.
 
 | Value | Corresponding `SDL_BUTTON_*` |
 | --- | --- |
@@ -1396,11 +1498,13 @@ Changes the icon that is displayed for the mouse cursor.
 * `x: <number>` The x position of the cursor image's hotspot.
 * `y: <number>` The y position of the cursor image's hotspot.
 
-Sets a image to be the mouse cursor. The hotspot represents the pixel that is considered to be under the mouse.
+Sets a image to be the mouse cursor.
+The hotspot represents the pixel that is considered to be under the mouse.
 
 ### sdl.mouse.showCursor([show])
 
-* `show: <boolean>` If `true` then the mouse cursor will be visible. Default `true`.
+* `show: <boolean>` If `true` then the mouse cursor will be visible.
+Default `true`.
 
 Changes the visibility of the mouse cursor.
 
@@ -1410,7 +1514,8 @@ Equivalent to [`sdl.mouse.showCursor(false)`](#sdlmouseshowcursorshow).
 
 ### sdl.mouse.capture([capture])
 
-* `capture: <boolean>` If `true` the mouse will be captured by the current window. Default `true`.
+* `capture: <boolean>` If `true` the mouse will be captured by the current window.
+Default `true`.
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
 
@@ -1423,7 +1528,8 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 ### Event: 'update'
 
-Fired when the contents of the clipboard have changed. Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the clipboard.
+Fired when the contents of the clipboard have changed.
+Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the clipboard.
 
 ### sdl.clipboard.text
 
@@ -1446,7 +1552,8 @@ Changes the text contents of the clipboard.
 
 This should not be necessary, since this package bundles the SDL2 runtime library along with its binaries, but you never know...
 
-This package depends on SDL2 `>=2.0.5`. To install it on your system you might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
+This package depends on SDL2 `>=2.0.5`.
+To install it on your system you might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
 * __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
 * __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
 * __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
