@@ -40,7 +40,6 @@ while (!window.destroyed) {
 	await setTimeout(100)
 
 	const numChanges = Math.ceil(text.length / 100)
-	console.log(numChanges)
 
 	for (let i = 0; i < numChanges; i++) {
 		const chars = [ ...text ]

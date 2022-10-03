@@ -5,12 +5,12 @@ const TWO_PI = 2 * Math.PI
 const device = sdl.audio.devices.find(({ recording }) => !recording)
 const playbackInstance = sdl.audio.openDevice(device)
 const {
-  channels,
-  frequency,
-  bytesPerSample,
-  minSampleValue,
-  maxSampleValue,
-  zeroSampleValue,
+	channels,
+	frequency,
+	bytesPerSample,
+	minSampleValue,
+	maxSampleValue,
+	zeroSampleValue,
 } = playbackInstance
 const range = maxSampleValue - minSampleValue
 const amplitude = range / 2
