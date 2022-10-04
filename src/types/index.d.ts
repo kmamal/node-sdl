@@ -256,6 +256,12 @@ export namespace Sdl {
 			readonly borderless: boolean
 			setBorderless (borderless: boolean): void
 
+			readonly accelerated: boolean
+			setAccelerated (accelerated: boolean): void
+
+			readonly vsync: boolean
+			setVsync (vsync: boolean): void
+
 			readonly native: unknown
 
 			readonly maximized: boolean
@@ -297,6 +303,8 @@ export namespace Sdl {
 				fullscreen?: boolean
 				resizable?: boolean
 				borderless?: boolean
+				accelerated?: boolean
+				vsync?: boolean
 				opengl?: boolean
 			}): Window
 		}
