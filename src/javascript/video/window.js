@@ -301,6 +301,79 @@ class Window extends EventsViaPoll {
 		Bindings.window_setIcon(this._id, width, height, stride, _format, buffer)
 	}
 
+	setDrawColor(red, green, blue, alpha) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		const a = alpha || 255
+
+		if (!Number.isFinite(red)) { throw Object.assign(new Error("red must be a number"), { red }) }
+		if (red < 0 || red > 255) { throw Object.assign(new Error("invalid red"), { red }) }
+		if (!Number.isFinite(green)) { throw Object.assign(new Error("green must be a number"), { green }) }
+		if (green < 0 || green > 255) { throw Object.assign(new Error("invalid green"), { green }) }
+		if (!Number.isFinite(blue)) { throw Object.assign(new Error("blue must be a number"), { blue }) }
+		if (blue < 0 || blue > 255) { throw Object.assign(new Error("invalid blue"), { blue }) }
+		if (!Number.isFinite(a)) { throw Object.assign(new Error("alpha must be a number"), { a }) }
+		if (a < 0 || a > 255) { throw Object.assign(new Error("invalid alpha"), { a }) }
+
+		Bindings.window_setDrawColor(this._id, red, green, blue, a)
+	}
+
+	drawRect(x, y, width, height, fill) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		const f = fill || false;
+
+		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (x <= 0) { throw Object.assign(new Error("invalid x"), { x }) }
+		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (y <= 0) { throw Object.assign(new Error("invalid y"), { y }) }
+		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (typeof f !== 'boolean') { throw Object.assign(new Error("fill must be a boolean"), { f }) }
+
+		Bindings.window_drawRect(this._id, x, y, width, height, f)
+	}
+
+	drawLine(x1, y1, x2, y2) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (!Number.isFinite(x1)) { throw Object.assign(new Error("x1 must be a number"), { x1 }) }
+		if (x1 <= 0) { throw Object.assign(new Error("invalid x1"), { x1 }) }
+		if (!Number.isFinite(y1)) { throw Object.assign(new Error("y1 must be a number"), { y1 }) }
+		if (y1 <= 0) { throw Object.assign(new Error("invalid y1"), { y1 }) }
+		if (!Number.isFinite(x2)) { throw Object.assign(new Error("x2 must be a number"), { x2 }) }
+		if (x2 <= 0) { throw Object.assign(new Error("invalid x2"), { x2 }) }
+		if (!Number.isFinite(y2)) { throw Object.assign(new Error("y2 must be a number"), { y2 }) }
+		if (y2 <= 0) { throw Object.assign(new Error("invalid y2"), { y2 }) }
+
+		Bindings.window_drawLine(this._id, x1, y1, x2, y2)
+	}
+
+	drawPoint(x, y) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (x <= 0) { throw Object.assign(new Error("invalid x"), { x }) }
+		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (y <= 0) { throw Object.assign(new Error("invalid y"), { y }) }
+
+		Bindings.window_drawPoint(this._id, x, y)
+	}
+
+	present() {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		Bindings.window_present(this._id)
+	}
+
+	clear() {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		Bindings.window_clear(this._id)
+	}
+
 	get destroyed () { return this._destroyed }
 	destroy () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }

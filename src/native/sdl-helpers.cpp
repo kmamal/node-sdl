@@ -1112,6 +1112,126 @@ window_render (
 }
 
 ErrorMessage *
+window_present (int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RenderPresent(renderer);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_clear (int window_id)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RenderClear(renderer);
+
+	return nullptr;
+}
+
+
+ErrorMessage *
+window_setDrawColor (int window_id, int r, int g, int b, int a)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_drawRect (int window_id, int x, int y, int w, int h, bool fill)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Rect rect;
+	rect.x = x;
+	rect.y = y;
+	rect.w = w;
+	rect.h = h;
+
+	if (fill) {
+		SDL_RenderFillRect(renderer, &rect);
+	} else {
+		SDL_RenderDrawRect(renderer, &rect);
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_drawLine (int window_id, int x1, int y1, int x2, int y2)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_drawPoint (int window_id, int x, int y)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_RenderDrawPoint(renderer, x, y);
+
+	return nullptr;
+}
+
+
+ErrorMessage *
 window_destroy (int window_id)
 {
 	SDL_Window * window = SDL_GetWindowFromID(window_id);

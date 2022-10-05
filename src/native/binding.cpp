@@ -619,6 +619,127 @@ window_render(napi_env env, napi_callback_info info)
 }
 
 napi_value
+window_present(napi_env env, napi_callback_info info)
+{
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	CALL_SDL_HELPER(window_present, window_id);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+window_clear(napi_env env, napi_callback_info info)
+{
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	CALL_SDL_HELPER(window_clear, window_id);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+window_setDrawColor(napi_env env, napi_callback_info info)
+{
+	napi_value argv[5];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	int r, g, b, a;
+	CALL_NAPI(napi_get_value_int32, argv[1], &r);
+	CALL_NAPI(napi_get_value_int32, argv[2], &g);
+	CALL_NAPI(napi_get_value_int32, argv[3], &b);
+	CALL_NAPI(napi_get_value_int32, argv[4], &a);
+
+	CALL_SDL_HELPER(window_setDrawColor, window_id, r, g, b, a);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+window_drawRect(napi_env env, napi_callback_info info)
+{
+	napi_value argv[6];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	int x, y, w, h;
+	CALL_NAPI(napi_get_value_int32, argv[1], &x);
+	CALL_NAPI(napi_get_value_int32, argv[2], &y);
+	CALL_NAPI(napi_get_value_int32, argv[3], &w);
+	CALL_NAPI(napi_get_value_int32, argv[4], &h);
+
+	bool fill;
+	CALL_NAPI(napi_get_value_bool, argv[5], &fill);
+
+	CALL_SDL_HELPER(window_drawRect, window_id, x, y, w, h, fill);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+window_drawLine(napi_env env, napi_callback_info info)
+{
+	napi_value argv[5];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	int x1, y1, x2, y2;
+	CALL_NAPI(napi_get_value_int32, argv[1], &x1);
+	CALL_NAPI(napi_get_value_int32, argv[2], &y1);
+	CALL_NAPI(napi_get_value_int32, argv[3], &x2);
+	CALL_NAPI(napi_get_value_int32, argv[4], &y2);
+
+	CALL_SDL_HELPER(window_drawLine, window_id, x1, y1, x2, y2);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+window_drawPoint(napi_env env, napi_callback_info info)
+{
+	napi_value argv[3];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	int x, y;
+	CALL_NAPI(napi_get_value_int32, argv[1], &x);
+	CALL_NAPI(napi_get_value_int32, argv[2], &y);
+
+	CALL_SDL_HELPER(window_drawPoint, window_id, x, y);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
 window_destroy(napi_env env, napi_callback_info info)
 {
 	napi_value argv[1];
@@ -1219,6 +1340,12 @@ init (napi_env env, napi_value exports)
 		{ "window_restore", NULL, window_restore, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_setIcon", NULL, window_setIcon, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_render", NULL, window_render, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_present", NULL, window_present, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_clear", NULL, window_clear, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_setDrawColor", NULL, window_setDrawColor, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_drawRect", NULL, window_drawRect, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_drawLine", NULL, window_drawLine, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_drawPoint", NULL, window_drawPoint, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_destroy", NULL, window_destroy, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_getDevices", NULL, audio_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_openDevice", NULL, audio_openDevice, NULL, NULL, NULL, napi_enumerable, NULL },

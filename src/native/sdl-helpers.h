@@ -83,6 +83,13 @@ ErrorMessage * window_render (
 	unsigned int format,
 	void * pixels
 );
+ErrorMessage * window_present (int window_id);
+ErrorMessage * window_clear (int window_id);
+ErrorMessage * window_setDrawColor (int window_id, int r, int g, int b, int a);
+ErrorMessage * window_setDrawColor (int window_id, int r, int g, int b, int a);
+ErrorMessage * window_drawRect (int window_id, int x, int y, int w, int h, bool fill);
+ErrorMessage * window_drawLine (int window_id, int x1, int y1, int x2, int y2);
+ErrorMessage * window_drawPoint (int window_id, int x, int y);
 ErrorMessage * window_destroy (int window_id);
 
 ErrorMessage * audio_getDevices (bool capture, Variant & list);
