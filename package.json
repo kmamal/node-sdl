@@ -30,9 +30,9 @@
     "rebuild": "node-gyp rebuild --verbose",
     "prebuild": "prebuild --runtime napi --include-regex \"\\.(node|dll|dylib|so\\.0)$\" --verbose",
     "install": "run-script-os",
-    "install:darwin": "prebuild-install --runtime napi --verbose || node scripts/fetch-deps.js && node-gyp rebuild --verbose",
-    "install:linux": "prebuild-install --runtime napi --verbose || node scripts/fetch-deps.js && node-gyp rebuild --verbose",
-    "install:win32": "prebuild-install --runtime napi --verbose || node scripts\\fetch-deps.js && node-gyp rebuild --verbose"
+    "install:darwin": "prebuild-install --runtime napi --verbose || (node scripts/fetch-deps.js && node-gyp rebuild --verbose)",
+    "install:linux": "prebuild-install --runtime napi --verbose || (node scripts/fetch-deps.js && node-gyp rebuild --verbose)",
+    "install:win32": "prebuild-install --runtime napi --verbose || (node scripts\\fetch-deps.js && node-gyp rebuild --verbose)"
   },
   "binary": {
     "napi_versions": [
