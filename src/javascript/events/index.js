@@ -46,18 +46,24 @@ const handleEvents = () => {
 					}
 
 					case 'minimize': {
+						window._visible = false
 						window._minimized = true
 						window._maximized = false
+						window._fullscreen = false
 						break
 					}
 					case 'maximize': {
+						window._visible = true
 						window._minimized = false
 						window._maximized = true
+						window._fullscreen = false
 						break
 					}
 					case 'restore': {
+						window._visible = true
 						window._minimized = false
 						window._maximized = false
+						window._fullscreen = false
 						break
 					}
 

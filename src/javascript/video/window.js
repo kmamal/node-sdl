@@ -101,15 +101,15 @@ class Window extends EventsViaPoll {
 		this._y = result.y
 		this._width = result.width
 		this._height = result.height
+		this._fullscreen = result.fullscreen
+		this._resizable = result.resizable
+		this._borderless = result.borderless
+		this._accelerated = result.accelerated
+		this._vsync = result.vsync
 		this._native = result.native
 
 		this._title = title
 		this._visible = visible
-		this._fullscreen = fullscreen
-		this._resizable = resizable
-		this._borderless = borderless
-		this._accelerated = accelerated
-		this._vsync = vsync
 		this._opengl = opengl
 
 		this._focused = false
@@ -139,8 +139,9 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
-		this._title = title
+
 		Bindings.window_setTitle(this._id, title)
+		this._title = title
 	}
 
 	get x () { return this._x }
@@ -150,9 +151,10 @@ class Window extends EventsViaPoll {
 
 		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
 		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+
+		Bindings.window_setPosition(this._id, x, y)
 		this._x = x
 		this._y = y
-		Bindings.window_setPosition(this._id, x, y)
 	}
 
 	get width () { return this._width }
@@ -164,17 +166,20 @@ class Window extends EventsViaPoll {
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+
 		Bindings.window_setSize(this._id, width, height)
+		this._width = width
+		this._height = height
 	}
 
 	get visible () { return this._visible }
 	show (show = true) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
+		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
+
+		show ? Bindings.window_show(this._id) : Bindings.window_hide(this._id)
 		this._visible = show
-		show
-			? Bindings.window_show(this._id)
-			: Bindings.window_hide(this._id)
 	}
 
 	hide () { this.show(false) }
@@ -184,8 +189,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
-		this._fullscreen = fullscreen
-		Bindings.window_setFullscreen(this._id, fullscreen)
+
+		this._fullscreen = Bindings.window_setFullscreen(this._id, fullscreen)
 	}
 
 	get resizable () { return this._resizable }
@@ -193,8 +198,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
-		this._resizable = resizable
-		Bindings.window_setResizable(this._id, resizable)
+
+		this._resizable = Bindings.window_setResizable(this._id, resizable)
 	}
 
 	get borderless () { return this._borderless }
@@ -202,8 +207,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
-		this._borderless = borderless
-		Bindings.window_setBorderless(this._id, borderless)
+
+		this._borderless = Bindings.window_setBorderless(this._id, borderless)
 	}
 
 	get accelerated () { return this._accelerated }
@@ -211,8 +216,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
-		this._accelerated = accelerated
-		Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
+
+		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
 	}
 
 	get vsync () { return this._vsync }
@@ -220,8 +225,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
-		this._vsync = vsync
-		Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
+
+		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
 	}
 
 	get opengl () { return this._opengl }
@@ -231,25 +236,32 @@ class Window extends EventsViaPoll {
 	minimize () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		this._minimized = true
 		Bindings.window_minimize(this._id)
+		this._visible = false
+		this._minimized = true
+		this._maximized = false
+		this._fullscreen = false
 	}
 
 	get maximized () { return this._maximized }
 	maximize () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		this._maximized = true
-		this._visible = true
 		Bindings.window_maximize(this._id)
+		this._visible = true
+		this._minimized = false
+		this._maximized = true
+		this._fullscreen = false
 	}
 
 	restore () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		this._maximized = false
-		this._minimized = false
 		Bindings.window_restore(this._id)
+		this._visible = true
+		this._minimized = false
+		this._maximized = false
+		this._fullscreen = false
 	}
 
 	get focused () { return this._focused }
@@ -257,6 +269,8 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		Bindings.window_focus(this._id)
+		this._focused = true
+		Globals.windows.focused = this
 	}
 
 	get hovered () { return this._hovered }
@@ -307,8 +321,10 @@ class Window extends EventsViaPoll {
 
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
-		this._destroyed = true
+
 		Bindings.window_destroy(this._id)
+		this._destroyed = true
+
 		Globals.windows.all.delete(this._id)
 
 		maybeTriggerQuit()

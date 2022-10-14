@@ -283,7 +283,7 @@ window_create(napi_env env, napi_callback_info info)
 	CALL_SDL_HELPER(window_create,
 		title, display,
 		&x, &y, &width, &height,
-		visible, fullscreen, resizable, borderless, accelerated, vsync, opengl,
+		visible, &fullscreen, &resizable, &borderless, &accelerated, &vsync, opengl,
 		&window_id, &native_pointer, &native_pointer_size
 	);
 
@@ -308,6 +308,31 @@ window_create(napi_env env, napi_callback_info info)
 
 	CALL_NAPI(napi_create_int32, *height, &value);
 	CALL_NAPI(napi_create_string_latin1, "height", 6, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, fullscreen, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "fullscreen", 10, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, resizable, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "resizable", 9, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, borderless, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "borderless", 10, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, accelerated, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "accelerated", 11, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, vsync, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "vsync", 5, &key);
 	CALL_NAPI(napi_set_property, result, key, value);
 
 	if (native_pointer) {
@@ -394,6 +419,8 @@ window_setSize(napi_env env, napi_callback_info info)
 napi_value
 window_setFullscreen(napi_env env, napi_callback_info info)
 {
+	napi_value result = nullptr;
+
 	napi_value argv[2];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
@@ -404,15 +431,20 @@ window_setFullscreen(napi_env env, napi_callback_info info)
 	bool fullscreen;
 	CALL_NAPI(napi_get_value_bool, argv[1], &fullscreen);
 
-	CALL_SDL_HELPER(window_setFullscreen, window_id, fullscreen);
+	CALL_SDL_HELPER(window_setFullscreen, window_id, &fullscreen);
+
+	CALL_NAPI(napi_create_int32, fullscreen, &result);
+	CALL_NAPI(napi_coerce_to_bool, result, &result);
 
 	cleanup:
-	return nullptr;
+	return result;
 }
 
 napi_value
 window_setResizable(napi_env env, napi_callback_info info)
 {
+	napi_value result = nullptr;
+
 	napi_value argv[2];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
@@ -423,15 +455,20 @@ window_setResizable(napi_env env, napi_callback_info info)
 	bool resizable;
 	CALL_NAPI(napi_get_value_bool, argv[1], &resizable);
 
-	CALL_SDL_HELPER(window_setResizable, window_id, resizable);
+	CALL_SDL_HELPER(window_setResizable, window_id, &resizable);
+
+	CALL_NAPI(napi_create_int32, resizable, &result);
+	CALL_NAPI(napi_coerce_to_bool, result, &result);
 
 	cleanup:
-	return nullptr;
+	return result;
 }
 
 napi_value
 window_setBorderless(napi_env env, napi_callback_info info)
 {
+	napi_value result = nullptr;
+
 	napi_value argv[2];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
@@ -442,15 +479,20 @@ window_setBorderless(napi_env env, napi_callback_info info)
 	bool borderless;
 	CALL_NAPI(napi_get_value_bool, argv[1], &borderless);
 
-	CALL_SDL_HELPER(window_setBorderless, window_id, borderless);
+	CALL_SDL_HELPER(window_setBorderless, window_id, &borderless);
+
+	CALL_NAPI(napi_create_int32, borderless, &result);
+	CALL_NAPI(napi_coerce_to_bool, result, &result);
 
 	cleanup:
-	return nullptr;
+	return result;
 }
 
 napi_value
 window_setAcceleratedAndVsync(napi_env env, napi_callback_info info)
 {
+	napi_value result = nullptr;
+
 	napi_value argv[3];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
@@ -462,10 +504,21 @@ window_setAcceleratedAndVsync(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_value_bool, argv[1], &accelerated);
 	CALL_NAPI(napi_get_value_bool, argv[2], &vsync);
 
-	CALL_SDL_HELPER(window_setAcceleratedAndVsync, window_id, accelerated, vsync);
+	CALL_SDL_HELPER(window_setAcceleratedAndVsync, window_id, &accelerated, &vsync);
+
+	CALL_NAPI(napi_create_array, &result);
+	napi_value value;
+
+	CALL_NAPI(napi_create_int32, accelerated, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_set_element, result, 0, value);
+
+	CALL_NAPI(napi_create_int32, vsync, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_set_element, result, 1, value);
 
 	cleanup:
-	return nullptr;
+	return result;
 }
 
 napi_value
