@@ -1,0 +1,55 @@
+name: Build and upload binaries
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build and upload
+
+    strategy:
+      matrix:
+        platform:
+          - { name: 'Linux', os: ubuntu-latest }
+          - { name: 'Mac', os: macos-latest }
+          - { name: 'Mac (M1)', os: macos-latest, m1: true }
+          - { name: 'Windows', os: windows-2019 }
+
+    runs-on: ${{ matrix.platform.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
+        run: |
+          cd SDL
+          ./configure && make -j$(nproc)
+          # TODO upload
+          cd ..
+
+      - if: ${{ startsWith(matrix.platform.os, 'macos-') && !matrix.platform.m1 }}
+        run: |
+          cd SDL
+          ./configure && make -j$(nproc)
+          # TODO upload
+          cd ..
+
+      - if: ${{ startsWith(matrix.platform.os, 'macos-') && matrix.platform.m1 }}
+        run: |
+          cd SDL
+          # TODO crosscompile
+          ./configure && make -j$(nproc)
+          # TODO upload
+          cd ..
+
+      - if: ${{ startsWith(matrix.platform.os, 'windows-') }}
+        run: |
+          cd SDL
+          ./configure && make -j$(nproc)
+          # TODO upload
+          cd ..
+
+      - run: npm install --no-save prebuild
+      - run: npm run prebuild
+      - run: npx prebuild --upload-all ${{ secrets.GITHUB_TOKEN }}

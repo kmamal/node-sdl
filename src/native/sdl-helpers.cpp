@@ -1,4 +1,6 @@
 #include "sdl-helpers.h"
+#include <SDL_revision.h>
+#include <SDL_config.h>
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <cstdio>
