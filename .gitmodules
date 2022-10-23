@@ -1,3 +1,0 @@
-[submodule "SDL"]
-	path = SDL
-	url = git@github.com:kmamal/SDL.git
