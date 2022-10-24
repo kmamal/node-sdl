@@ -2,7 +2,21 @@
   "version": "0.4.5",
   "name": "@kmamal/sdl",
   "description": "SDL2 bindings for Node.js",
-  "keywords": [ "sdl", "sdl2", "gui", "window", "screen", "video", "audio", "sound", "input", "mouse", "keyboard", "clipboard", "game" ],
+  "keywords": [
+    "sdl",
+    "sdl2",
+    "gui",
+    "window",
+    "screen",
+    "video",
+    "audio",
+    "sound",
+    "input",
+    "mouse",
+    "keyboard",
+    "clipboard",
+    "game"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -12,16 +26,25 @@
   "types": "src/types/index.d.ts",
   "gypfile": true,
   "scripts": {
-    "test": "cd tests; node run-all.js",
-    "build-lib": "npx node-gyp rebuild --verbose",
-    "build-sdl": "cd scripts; node build-sdl.js",
-    "publish": "cd scripts; node upload-bins.js",
-    "install": "cd scripts; node fetch-bins.js || (node fetch-deps.js && npm run build-lib)"
+    "test": "cd tests; node run-all.mjs",
+    "install": "cd scripts; node install.mjs",
+    "fetch-bins": "cd scripts; node fetch-bins.mjs",
+    "fetch-sdl": "cd scripts; node fetch-sdl.mjs",
+    "rebuild-sdl": "cd scripts; node rebuild-sdl.mjs",
+    "rebuild-lib": "cd scripts; node rebuild-lib.mjs",
+    "build": "cd scripts; node build.mjs",
+    "publish": "cd scripts; node publish.mjs"
+  },
+  "sdl": {
+    "version": "2.24.1"
   },
   "dependencies": {
     "bindings": "^1.5.0"
   },
   "devDependencies": {
-    "node-gyp": "^9.3.0"
+    "globby": "^13.1.2",
+    "node-gyp": "^9.3.0",
+    "tar": "^6.1.11",
+    "undici": "^5.11.0"
   }
 }

@@ -1,7 +1,6 @@
 .github
 tests
 examples
-deps
 build
-prebuilds
+SDL
 NOTES.txt
