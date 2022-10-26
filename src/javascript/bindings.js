@@ -1,3 +1,5 @@
-const loadBindings = require('bindings')
+const Path = require('path')
 
-module.exports = loadBindings('sdl.node')
+const path = Path.resolve(__dirname, '../../dist/sdl.node')
+
+module.exports = require(path)

@@ -1,4 +1,5 @@
 node_modules
 build
-SDL
+dist
+publish
 NOTES.txt

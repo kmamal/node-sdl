@@ -1,6 +1,8 @@
 .github
+.eslintrc.js
 tests
 examples
 build
-SDL
+dist
+publish
 NOTES.txt

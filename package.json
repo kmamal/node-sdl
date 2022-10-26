@@ -26,25 +26,21 @@
   "types": "src/types/index.d.ts",
   "gypfile": true,
   "scripts": {
-    "test": "cd tests; node run-all.mjs",
-    "install": "cd scripts; node install.mjs",
-    "fetch-bins": "cd scripts; node fetch-bins.mjs",
-    "fetch-sdl": "cd scripts; node fetch-sdl.mjs",
-    "rebuild-sdl": "cd scripts; node rebuild-sdl.mjs",
-    "rebuild-lib": "cd scripts; node rebuild-lib.mjs",
-    "build": "cd scripts; node build.mjs",
-    "publish": "cd scripts; node publish.mjs"
+    "test": "cd scripts && zx test.mjs",
+    "install": "cd scripts && zx install.mjs",
+    "download-release": "cd scripts && zx download-release.mjs",
+    "build": "cd scripts && zx build.mjs",
+    "download-sdl": "cd scripts && zx download-sdl.mjs",
+    "make": "cd scripts && zx make.mjs",
+    "upload-release": "cd scripts && zx upload-release.mjs",
+    "release": "cd scripts && zx release.mjs",
+    "clean": "cd scripts && zx clean.mjs"
   },
   "sdl": {
     "version": "2.24.1"
   },
-  "dependencies": {
-    "bindings": "^1.5.0"
-  },
   "devDependencies": {
-    "globby": "^13.1.2",
     "node-gyp": "^9.3.0",
-    "tar": "^6.1.11",
-    "undici": "^5.11.0"
+    "zx": "^7.1.1"
   }
 }

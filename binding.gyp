@@ -1,4 +1,8 @@
 {
+	'variables' : {
+		'sdl_inc': '<!(echo $SDL_INC)',
+		'sdl_lib': '<!(echo $SDL_LIB)',
+	},
 	'targets': [{
 		'target_name': 'sdl',
 		'sources': [
@@ -10,21 +14,16 @@
 		'conditions': [
 			['OS=="linux"', {
 				'cflags_cc': [ '-std=c++17' ],
-				'include_dirs': [
-					'<(module_root_dir)/SDL/build/include',
-					'<(module_root_dir)/SDL/include',
-				],
-				'libraries': [
-					'-L<(module_root_dir)/SDL/build/build/.libs',
-					'-lSDL2',
-				],
+				'include_dirs': [ '<(sdl_inc)' ],
+				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
 				'link_settings': {
 					'libraries': [ "-Wl,-rpath,'$$ORIGIN'" ],
 				},
 			}],
 			['OS=="mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
-				'libraries': [ '<!(sdl2-config --libs)' ],
+				'include_dirs': [ '<(sdl_inc)' ],
+				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
 				'xcode_settings': {
 					'OTHER_CFLAGS': [ '-std=c++17', '<!(sdl2-config --cflags)' ],
 				},
@@ -34,8 +33,8 @@
 			}],
 			['OS=="win"', {
 				'sources': [ 'src/native/asprintf.c' ],
-				'include_dirs': [ '.\\SDL\\include' ],
-				'libraries': [ '-l.\\lib\\SDL2.lib' ],
+				'include_dirs': [ '<(sdl_inc)' ],
+				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
 				'msbuild_settings': {
 					'ClCompile': {
 						'LanguageStandard': 'stdcpp17',
@@ -44,29 +43,4 @@
 			}],
 		],
 	}],
-	'conditions': [
-		['OS=="mac"', {
-			'targets': [
-				{
-					'target_name': "action_after_build",
-					'type': 'none',
-					'dependencies': [ 'sdl' ],
-					'actions': [
-						{
-							'action_name': "fix_dylib",
-							'inputs': [ '<(module_root_dir)/build/Release/sdl.node' ],
-							'outputs': [ 'foo' ],
-							'action': [
-								'install_name_tool',
-								'-change',
-								'/usr/local/opt/sdl2/lib/libSDL2-2.0.0.dylib',
-								'@rpath/libSDL2-2.0.0.dylib',
-								'<(module_root_dir)/build/Release/sdl.node'
-							],
-						},
-					],
-				},
-			],
-		}],
-	]
 }

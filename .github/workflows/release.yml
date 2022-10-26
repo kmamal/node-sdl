@@ -9,47 +9,34 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: 'Linux', os: ubuntu-latest }
-          - { name: 'Mac', os: macos-latest }
-          - { name: 'Mac (M1)', os: macos-latest, m1: true }
-          - { name: 'Windows', os: windows-2019 }
+          - { name: 'Linux'   , os: ubuntu-22.04 ,shell: 'bash'                }
+          - { name: 'Mac'     , os: macos-12     ,shell: 'bash'                }
+          - { name: 'Mac (M1)', os: macos-12,    ,shell: 'bash'      ,m1: true }
+          - { name: 'Windows' , os: windows-2022 ,shell: 'msys2 {0}'           }
 
     runs-on: ${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell }}
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
 
-      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
-        run: |
-          cd SDL
-          ./configure && make -j$(nproc)
-          # TODO upload
-          cd ..
-
-      - if: ${{ startsWith(matrix.platform.os, 'macos-') && !matrix.platform.m1 }}
-        run: |
-          cd SDL
-          ./configure && make -j$(nproc)
-          # TODO upload
-          cd ..
-
-      - if: ${{ startsWith(matrix.platform.os, 'macos-') && matrix.platform.m1 }}
-        run: |
-          cd SDL
-          # TODO crosscompile
-          ./configure && make -j$(nproc)
-          # TODO upload
-          cd ..
+      - if: ${{ matrix.platform.m1 }}
+        run: echo "M1=1" >> $GITHUB_ENV
 
       - if: ${{ startsWith(matrix.platform.os, 'windows-') }}
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: mingw64
+          install: >-
+            mingw-w64-x86_64-cc
+            mingw-w64-x86_64-cmake
+      - if: ${{ startsWith(matrix.platform.os, 'windows-') }}
         run: |
-          cd SDL
-          ./configure && make -j$(nproc)
-          # TODO upload
-          cd ..
+          echo 'PATH="${PATH}:/c/Program Files/nodejs/"' >> /etc/profile
+          echo 'export PATH' >> /etc/profile
 
-      - run: npm install --no-save prebuild
-      - run: npm run prebuild
-      - run: npx prebuild --upload-all ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          npm install --no-save zx
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} npm run release
