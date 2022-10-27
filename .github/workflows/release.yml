@@ -1,4 +1,4 @@
-name: Build and upload binaries
+name: Build and upload
 
 on: workflow_dispatch
 
@@ -9,10 +9,10 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: 'Linux'   , os: ubuntu-22.04 ,shell: 'bash'                }
-          - { name: 'Mac'     , os: macos-12     ,shell: 'bash'                }
-          - { name: 'Mac (M1)', os: macos-12,    ,shell: 'bash'      ,m1: true }
-          - { name: 'Windows' , os: windows-2022 ,shell: 'msys2 {0}'           }
+          - { name: 'Linux'    ,os: ubuntu-22.04 ,shell: 'bash'                }
+          - { name: 'Mac'      ,os: macos-12     ,shell: 'bash'                }
+          - { name: 'Mac (M1)' ,os: macos-12,    ,shell: 'bash'      ,m1: true }
+          - { name: 'Windows'  ,os: windows-2022 ,shell: 'msys2 {0}'           }
 
     runs-on: ${{ matrix.platform.os }}
     defaults:
@@ -20,7 +20,7 @@ jobs:
         shell: ${{ matrix.platform.shell }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - if: ${{ matrix.platform.m1 }}
         run: echo "M1=1" >> $GITHUB_ENV
