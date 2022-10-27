@@ -22,7 +22,7 @@ if (areVarsMissing) {
 		process.env.SDL_LIB = path.posix.join(posixSdlPath, 'lib')
 	} catch (error) {
 		echo("failed to use sdl via @kmamal/build-sdl")
-		process.exit()
+		process.exit(1)
 	}
 }
 
