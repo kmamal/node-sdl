@@ -10,9 +10,9 @@
 			'src/native/sdl-helpers.cpp',
 		],
 		'defines': [ 'NAPI_VERSION=<(napi_build_version)' ],
-		'cflags': [ '-D_REENTRANT' ],
 		'conditions': [
 			['OS=="linux"', {
+				'cflags': [ '-D_REENTRANT' ],
 				'cflags_cc': [ '-std=c++17' ],
 				'include_dirs': [ '<(sdl_inc)' ],
 				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
@@ -21,11 +21,12 @@
 				},
 			}],
 			['OS=="mac"', {
+				'cflags': [ '-D_THREAD_SAFE' ],
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'include_dirs': [ '<(sdl_inc)' ],
 				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
 				'xcode_settings': {
-					'OTHER_CFLAGS': [ '-std=c++17', '<!(sdl2-config --cflags)' ],
+					'OTHER_CFLAGS': [ '-std=c++17' ],
 				},
 				'link_settings': {
 					'libraries': [ '-Wl,-rpath,@loader_path' ],
