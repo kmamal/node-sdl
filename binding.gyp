@@ -21,7 +21,6 @@
 				},
 			}],
 			['OS=="mac"', {
-				'cflags': [ '-D_THREAD_SAFE' ],
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'include_dirs': [
 					'<(sdl_inc)',
@@ -31,7 +30,10 @@
 					'-L<(sdl_lib)', '-lSDL2',
 				],
 				'xcode_settings': {
-					'OTHER_CFLAGS': [ '-std=c++17' ],
+					'OTHER_CFLAGS': [
+						'-std=c++17',
+						'-D_THREAD_SAFE',
+					],
 				},
 				'link_settings': {
 					'libraries': [ '-Wl,-rpath,@loader_path' ],

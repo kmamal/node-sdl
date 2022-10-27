@@ -1,6 +1,7 @@
 import {
+	platform,
 	sysRootDir,
-	posixBuildDir, posixDistDir,
+	posixRootDir, posixBuildDir, posixDistDir,
 	sdlSharedLibsPattern,
 } from './common.mjs'
 
@@ -28,6 +29,11 @@ if (areVarsMissing) {
 		echo("failed to use sdl via @kmamal/build-sdl")
 		process.exit(1)
 	}
+}
+
+if (platform === 'darwin') {
+	process.env.CC = `sh ${path.posix.join(posixRootDir, 'scripts/clang-fat.sh')}`
+	process.env.CXX = `sh ${path.posix.join(posixRootDir, 'scripts/clang++-fat.sh')}`
 }
 
 cd(sysRootDir)
