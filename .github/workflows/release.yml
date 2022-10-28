@@ -9,31 +9,20 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: 'Linux'   ,os: ubuntu-22.04 ,shell: 'bash'      }
-          - { name: 'Mac'     ,os: macos-12     ,shell: 'bash'      }
-          - { name: 'Windows' ,os: windows-2022 ,shell: 'msys2 {0}' }
+          - { name: 'Linux (x64)'   ,os: ubuntu-22.04           }
+          - { name: 'Windows (x64)' ,os: windows-2022           }
+          - { name: 'Mac (x64)'     ,os: macos-12               }
+          - { name: 'Mac (arm64)'   ,os: macos-12     ,m1: true }
 
     runs-on: ${{ matrix.platform.os }}
     defaults:
       run:
-        shell: ${{ matrix.platform.shell }}
+        shell: 'bash'
 
     steps:
       - uses: actions/checkout@v3
 
       - if: ${{ matrix.platform.m1 }}
-        run: echo "M1=1" >> $GITHUB_ENV
-
-      - if: ${{ startsWith(matrix.platform.os, 'windows-') }}
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: mingw64
-          install: >-
-            mingw-w64-x86_64-cc
-            mingw-w64-x86_64-cmake
-      - if: ${{ startsWith(matrix.platform.os, 'windows-') }}
-        run: |
-          echo 'PATH="${PATH}:/c/Program Files/nodejs/"' >> /etc/profile
-          echo 'export PATH' >> /etc/profile
+        run: echo "CROSS_COMPILE_ARCH=arm64" >> $GITHUB_ENV
 
       - run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} npm run release
