@@ -1,7 +1,7 @@
 {
 	'variables' : {
-		'sdl_inc': '<!(echo $SDL_INC)',
-		'sdl_lib': '<!(echo $SDL_LIB)',
+		'sdl_inc': "<!(bash -c 'echo $SDL_INC')",
+		'sdl_lib': "<!(bash -c 'echo $SDL_LIB')",
 	},
 	'targets': [{
 		'target_name': 'sdl',
