@@ -41,11 +41,6 @@
 				'sources': [ 'src/native/asprintf.c' ],
 				'include_dirs': [ '<(sdl_inc)' ],
 				'libraries': [ '-L<(sdl_lib)', '-lSDL2.lib' ],
-				'msbuild_settings': {
-					'ClCompile': {
-						'LanguageStandard': 'stdcpp17',
-					},
-				},
 			}],
 		],
 	}],
