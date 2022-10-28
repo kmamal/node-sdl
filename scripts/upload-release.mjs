@@ -1,5 +1,5 @@
 import {
-	owner, repo, libVersion,
+	owner, repo, version,
 	sysDistDir, posixPublishDir,
 	assetName,
 } from './common.mjs'
@@ -12,22 +12,22 @@ const commonHeaders = {
 let response
 
 getRelease: {
-	echo("get release", libVersion)
+	echo("get release", version)
 
 	$.verbose = false
 	response = await fetch(
-		`https://api.github.com/repos/${owner}/${repo}/releases/tags/v${libVersion}`,
+		`https://api.github.com/repos/${owner}/${repo}/releases/tags/v${version}`,
 		{ headers: commonHeaders },
 	)
 	$.verbose = true
 
 	if (response.ok) {
-		echo("release exists", libVersion)
+		echo("release exists", version)
 		break getRelease
 	}
 
 	echo("bad status code", response.status)
-	echo("create release", libVersion)
+	echo("create release", version)
 
 	$.verbose = false
 	response = await fetch(
@@ -36,8 +36,8 @@ getRelease: {
 			headers: commonHeaders,
 			method: 'POST',
 			body: JSON.stringify({
-				tag_name: `v${libVersion}`, // eslint-disable-line camelcase
-				name: `v${libVersion}`,
+				tag_name: `v${version}`, // eslint-disable-line camelcase
+				name: `v${version}`,
 			}),
 		},
 	)

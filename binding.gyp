@@ -11,7 +11,7 @@
 		],
 		'defines': [ 'NAPI_VERSION=<(napi_build_version)' ],
 		'conditions': [
-			['OS=="linux"', {
+			['OS == "linux"', {
 				'cflags': [ '-D_REENTRANT' ],
 				'cflags_cc': [ '-std=c++17' ],
 				'include_dirs': [ '<(sdl_inc)' ],
@@ -20,34 +20,32 @@
 					'libraries': [ "-Wl,-rpath,'$$ORIGIN'" ],
 				},
 			}],
-			['OS=="mac"', {
+			['OS == "mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
-				'include_dirs': [
-					'<(sdl_inc)',
-					'/opt/X11/include',
-				],
-				'libraries': [
-					'-L<(sdl_lib)', '-lSDL2',
-				],
 				'xcode_settings': {
 					'OTHER_CFLAGS': [
 						'-std=c++17',
 						'-D_THREAD_SAFE',
-					],
+					]
 				},
+				'include_dirs': [
+					'<(sdl_inc)',
+					'/opt/X11/include',
+				],
+				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
 				'link_settings': {
 					'libraries': [ '-Wl,-rpath,@loader_path' ],
 				},
 			}],
-			['OS=="win"', {
+			['OS == "win"', {
 				'sources': [ 'src/native/asprintf.c' ],
 				'include_dirs': [ '<(sdl_inc)' ],
-				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
+				'libraries': [ '-L<(sdl_lib)', '-lSDL2.lib' ],
 				'msbuild_settings': {
 					'ClCompile': {
 						'LanguageStandard': 'stdcpp17',
 					},
-				}
+				},
 			}],
 		],
 	}],

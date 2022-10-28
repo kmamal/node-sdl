@@ -26,21 +26,19 @@
   "types": "src/types/index.d.ts",
   "gypfile": true,
   "scripts": {
-    "test": "cd scripts && zx test.mjs",
-    "install": "cd scripts && zx install.mjs",
-    "download-release": "cd scripts && zx download-release.mjs",
-    "build": "cd scripts && zx build.mjs",
-    "download-sdl": "cd scripts && zx download-sdl.mjs",
-    "make": "cd scripts && zx make.mjs",
-    "upload-release": "cd scripts && zx upload-release.mjs",
-    "release": "cd scripts && zx release.mjs",
-    "clean": "cd scripts && zx clean.mjs"
-  },
-  "sdl": {
-    "version": "2.24.1"
+    "test": "cd scripts && npx -y zx test.mjs",
+    "install": "cd scripts && npx -y zx install.mjs",
+    "download-release": "cd scripts && npx -y zx download-release.mjs",
+    "build": "cd scripts && npx -y zx build.mjs",
+    "upload-release": "cd scripts && npx -y zx upload-release.mjs",
+    "release": "cd scripts && npx -y zx release.mjs",
+    "clean": "cd scripts && npx -y zx clean.mjs"
   },
   "devDependencies": {
     "node-gyp": "^9.3.0",
     "zx": "^7.1.1"
+  },
+  "dependencies": {
+    "@kmamal/build-sdl": "~2.24.1-0"
   }
 }

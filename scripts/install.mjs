@@ -1,13 +1,11 @@
-import { execSync } from 'node:child_process'
 
 if (!process.env.FROM_SOURCE) {
 	try {
-		execSync('npm run download-release', { stdio: 'inherit' })
+		await $`npm run download-release`
 		process.exit()
-	} catch (_) {}
+	} catch (error) {}
 } else {
-	console.log("build from source")
+	echo("build from source")
 }
 
-execSync('npm install --no-save zx', { stdio: 'inherit' })
-execSync('npm run build', { stdio: 'inherit' })
+await $`npm run build`

@@ -17,15 +17,12 @@ export const posixDistDir = path.posix.join(posixRootDir, 'dist')
 export const posixPublishDir = path.posix.join(posixRootDir, 'publish')
 
 const pkg = await fs.readJson(path.join(sysRootDir, 'package.json'))
-export const libVersion = pkg.version
-export const sdlVersion = pkg.sdl.version
+export const version = pkg.version
 export const [ , owner, repo ] = pkg.repository.url.match(/([^/:]+)\/([^/]+).git$/u)
 
-export const { platform } = process
-export const arch = os.arch()
-export const targetArch = platform === 'darwin' ? 'x64_arm64' : arch
-
-export const assetName = `sdl.node-v${libVersion}-${platform}-${targetArch}.tar.gz`
+export const { platform, arch } = process
+export const targetArch = process.env.CROSS_COMPILE_ARCH ?? arch
+export const assetName = `sdl.node-v${version}-${platform}-${targetArch}.tar.gz`
 
 export const sdlSharedLibsPattern = {
 	darwin: 'libSDL2*.dylib',

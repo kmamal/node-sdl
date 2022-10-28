@@ -1,10 +1,10 @@
 import {
-	owner, repo, libVersion,
+	owner, repo, version,
 	posixDistDir,
 	assetName,
 } from './common.mjs'
 
-const url = `https://github.com/${owner}/${repo}/releases/download/v${libVersion}/${assetName}`
+const url = `https://github.com/${owner}/${repo}/releases/download/v${version}/${assetName}`
 
 echo("fetch", url)
 $.verbose = false

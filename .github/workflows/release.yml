@@ -36,6 +36,4 @@ jobs:
           echo 'PATH="${PATH}:/c/Program Files/nodejs/"' >> /etc/profile
           echo 'export PATH' >> /etc/profile
 
-      - run: |
-          npm install --no-save zx
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} npm run release
+      - run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} npm run release
