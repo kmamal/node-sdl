@@ -22,6 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
+        run: npm run install-deps-mac
+
       - if: ${{ matrix.platform.m1 }}
         run: echo "CROSS_COMPILE_ARCH=arm64" >> $GITHUB_ENV
 

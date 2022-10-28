@@ -1,5 +1,5 @@
 
 await $`npm run clean`
-process.env.FROM_SOURCE = 1
-await $`npm install --include=dev`
+process.env.KMAMAL_SDL_FROM_SOURCE = 1
+await $`npm install`
 await $`npm run upload-release`

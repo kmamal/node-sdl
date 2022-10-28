@@ -32,13 +32,13 @@
     "build": "cd scripts && npx -y zx build.mjs",
     "upload-release": "cd scripts && npx -y zx upload-release.mjs",
     "release": "cd scripts && npx -y zx release.mjs",
-    "clean": "cd scripts && npx -y zx clean.mjs"
-  },
-  "devDependencies": {
-    "node-gyp": "^9.3.0",
-    "zx": "^7.1.1"
+    "clean": "cd scripts && npx -y zx clean.mjs",
+    "install-deps-mac": "./scripts/install-deps-mac.sh"
   },
   "dependencies": {
-    "@kmamal/build-sdl": "~2.24.1-0"
+    "@kmamal/build-sdl": "~2.24.1-3"
+  },
+  "devDependencies": {
+    "node-gyp": "^9.3.0"
   }
 }

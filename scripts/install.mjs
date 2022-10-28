@@ -1,5 +1,5 @@
 
-if (!process.env.FROM_SOURCE) {
+if (!process.env.KMAMAL_SDL_FROM_SOURCE) {
 	try {
 		await $`npm run download-release`
 		process.exit()

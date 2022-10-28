@@ -1,8 +1,13 @@
 import {
 	sysRootDir,
 	posixBuildDir, posixDistDir,
-	sdlSharedLibsPattern,
 } from './common.mjs'
+
+await $`rm -rf ${posixBuildDir} ${posixDistDir}`
+await Promise.all([
+	$`mkdir -p ${posixBuildDir}`,
+	$`mkdir -p ${posixDistDir}`,
+])
 
 cd(sysRootDir)
 
@@ -15,8 +20,5 @@ await $`npx node-gyp rebuild --verbose`
 await $`mkdir -p ${posixDistDir}`
 await Promise.all([
 	$`cp ${posixBuildDir}/Release/sdl.node ${posixDistDir}`,
-	(async () => {
-		const files = await glob(`${process.env.SDL_LIB}/${sdlSharedLibsPattern}`)
-		await $`cp ${files} ${posixDistDir}`
-	})(),
+	await $`cp -a ${process.env.SDL_LIB}/* ${posixDistDir}`,
 ])

@@ -23,9 +23,3 @@ export const [ , owner, repo ] = pkg.repository.url.match(/([^/:]+)\/([^/]+).git
 export const { platform, arch } = process
 export const targetArch = process.env.CROSS_COMPILE_ARCH ?? arch
 export const assetName = `sdl.node-v${version}-${platform}-${targetArch}.tar.gz`
-
-export const sdlSharedLibsPattern = {
-	darwin: 'libSDL2*.dylib',
-	linux: 'libSDL2*.so*',
-	win32: 'SDL2.dll*',
-}[platform]
