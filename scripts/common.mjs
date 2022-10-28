@@ -10,7 +10,7 @@ export const posixRootDir = await within(async () => {
 	cd(sysRootDir)
 	const { stdout } = await $`pwd`
 	$.verbose = true
-	return stdout.trim()
+	return stdout.split('\n')[0].trim()
 })
 export const posixBuildDir = path.posix.join(posixRootDir, 'build')
 export const posixDistDir = path.posix.join(posixRootDir, 'dist')
