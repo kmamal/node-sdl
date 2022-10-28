@@ -23,7 +23,7 @@
 			['OS == "mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'cflags': [ '-D_THREAD_SAFE' ],
-				'cflags_cc': [ '-std=c++17' ],
+				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
 				'include_dirs': [
 					'<(sdl_inc)',
 					'/opt/X11/include',
@@ -36,7 +36,11 @@
 			['OS == "win"', {
 				'sources': [ 'src/native/asprintf.c' ],
 				'cflags': [ '-D_REENTRANT' ],
-				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
+				'msvs_settings': {
+					'VCCLCompilerTool': {
+						'AdditionalOptions': [ '-std:c++17' ]
+					}
+				},
 				'include_dirs': [ '<(sdl_inc)' ],
 				'libraries': [ '-L<(sdl_lib)', '-lSDL2.lib' ],
 			}],
