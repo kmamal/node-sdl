@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    name: Build and upload
+    name: ${{ matrix.platform.name }}
 
     strategy:
       fail-fast: false

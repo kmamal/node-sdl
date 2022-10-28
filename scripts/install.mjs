@@ -5,7 +5,7 @@ if (!process.env.NODE_SDL_FROM_SOURCE) {
 		process.exit()
 	} catch (error) {}
 } else {
-	echo("build from source")
+	echo("skip download and build from source")
 }
 
 await $`npm run build`
