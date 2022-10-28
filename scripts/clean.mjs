@@ -5,11 +5,11 @@ import {
 	posixPublishDir,
 } from './common.mjs'
 
-const dirs = [
+await Promise.all([
+	path.join(sysRootDir, 'node_modules'),
 	posixBuildDir,
 	posixDistDir,
 	posixPublishDir,
-]
-
-cd(sysRootDir)
-await $`rm -rf node_modules ${dirs}`
+].map(async (dir) => {
+	await fs.rm(dir, { recursive: true }).catch(() => {})
+}))
