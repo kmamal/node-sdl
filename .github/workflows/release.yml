@@ -7,6 +7,7 @@ jobs:
     name: Build and upload
 
     strategy:
+      fail-fast: false
       matrix:
         platform:
           - { name: 'Linux (x64)'   ,os: ubuntu-22.04           }
