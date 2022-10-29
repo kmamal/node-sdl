@@ -37,13 +37,13 @@
 			['OS == "win"', {
 				'sources': [ 'src/native/asprintf.c' ],
 				'cflags': [ '-D_REENTRANT' ],
-				'msvs_settings': {
-					'VCCLCompilerTool': {
-						'AdditionalOptions': [ '-std:c++17' ]
-					}
-				},
-				# 'include_dirs': [ '<!(echo %SDL_INC%)' ],
-				# 'libraries': [ '-L<!(echo %SDL_LIB%)', '-lSDL2.lib' ],
+				# 'msvs_settings': {
+				# 	'VCCLCompilerTool': {
+				# 		'AdditionalOptions': [ '-std:c++17' ]
+				# 	}
+				# },
+				'include_dirs': [ '<!(echo %SDL_INC%)' ],
+				'libraries': [ '-L<!(echo %SDL_LIB%)', '-lSDL2.lib' ],
 			}],
 		],
 	}],
