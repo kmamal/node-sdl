@@ -19,7 +19,12 @@
 			['OS == "mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'cflags': [ '-D_THREAD_SAFE' ],
-				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
+				'xcode_settings': {
+					'OTHER_CFLAGS': [
+						'-std=c++17',
+						'$(ARCH_FLAG)'
+					]
+				},
 				'include_dirs': [
 					'$(SDL_INC)',
 					'/opt/X11/include',
@@ -37,8 +42,8 @@
 						'AdditionalOptions': [ '-std:c++17' ]
 					}
 				},
-				'include_dirs': [ '<!(echo %SDL_INC%)' ],
-				'libraries': [ '-L<!(echo %SDL_LIB%)', '-lSDL2.lib' ],
+				# 'include_dirs': [ '<!(echo %SDL_INC%)' ],
+				# 'libraries': [ '-L<!(echo %SDL_LIB%)', '-lSDL2.lib' ],
 			}],
 		],
 	}],
