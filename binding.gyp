@@ -37,8 +37,8 @@
 						'AdditionalOptions': [ '-std:c++17' ]
 					}
 				},
-				'include_dirs': [ '%SDL_INC%' ],
-				'libraries': [ '-L%SDL_LIB%', '-lSDL2.lib' ],
+				'include_dirs': [ '<!(echo %SDL_INC%)' ],
+				'libraries': [ '-L<!(echo %SDL_LIB%)', '-lSDL2.lib' ],
 			}],
 		],
 	}],
