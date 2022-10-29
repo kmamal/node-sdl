@@ -1,5 +1,10 @@
+import { execSync } from 'node:child_process'
 
-await $`npm run clean`
+await import('./clean.mjs')
+
 process.env.NODE_SDL_FROM_SOURCE = 1
-await $`npm install`
-await $`npm run upload-release`
+execSync('npm install', {
+	stdio: 'inherit',
+})
+
+await import('./upload-release.mjs')

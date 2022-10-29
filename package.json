@@ -26,16 +26,17 @@
   "types": "src/types/index.d.ts",
   "gypfile": true,
   "scripts": {
-    "test": "cd scripts && npx -y zx test.mjs",
-    "install": "cd scripts && npx -y zx install.mjs",
-    "download-release": "cd scripts && npx -y zx download-release.mjs",
-    "build": "cd scripts && npx -y zx build.mjs",
-    "upload-release": "cd scripts && npx -y zx upload-release.mjs",
-    "release": "cd scripts && npx -y zx release.mjs",
-    "clean": "cd scripts && npx -y zx clean.mjs",
+    "test": "cd scripts && node test.mjs",
+    "install": "cd scripts && node install.mjs",
+    "download-release": "cd scripts && node download-release.mjs",
+    "build": "cd scripts && node build.mjs",
+    "upload-release": "cd scripts && node upload-release.mjs",
+    "release": "cd scripts && node release.mjs",
+    "clean": "cd scripts && node clean.mjs",
     "install-deps-mac": "./scripts/install-deps-mac.sh"
   },
   "dependencies": {
-    "@kmamal/build-sdl": "~2.24.1-4"
+    "@kmamal/build-sdl": "~2.24.1-5",
+    "tar": "^6.1.11"
   }
 }

@@ -1,23 +1,41 @@
-import {
-	sysRootDir,
-	posixBuildDir, posixDistDir,
-} from './common.mjs'
+import Fs from 'node:fs'
+import Path from 'node:path'
+import { execSync } from 'node:child_process'
+import C from './util/common.js'
 
 await Promise.all([
-	posixBuildDir,
-	posixDistDir,
+	C.dir.build,
+	C.dir.dist,
+	C.dir.publish,
 ].map(async (dir) => {
-	await fs.rm(dir, { recursive: true }).catch(() => {})
-	await fs.mkdir(dir, { recursive: true })
+	await Fs.promises.rm(dir, { recursive: true }).catch(() => {})
 }))
 
-cd(sysRootDir)
-const sysSdlPath = require('@kmamal/build-sdl')
-process.env.SDL_INC = path.join(sysSdlPath, 'include')
-process.env.SDL_LIB = path.join(sysSdlPath, 'lib')
-await $`npx node-gyp rebuild --verbose`
+console.log("load @kmamal/build-sdl")
+process.chdir(C.dir.root)
+const { default: sdlPath } = await import('@kmamal/build-sdl')
 
+console.log("build in", C.dir.build)
+process.env.SDL_INC = Path.join(sdlPath, 'include')
+process.env.SDL_LIB = Path.join(sdlPath, 'lib')
+execSync(`npx node-gyp rebuild --verbose`)
+
+console.log("install to", C.dir.dist)
+await Fs.promises.rm(C.dir.dist, { recursive: true }).catch(() => {})
+await Fs.promises.mkdir(C.dir.dist, { recursive: true })
 await Promise.all([
-	$`cp ${posixBuildDir}/Release/sdl.node ${posixDistDir}`,
-	await $`cp -a ${process.env.SDL_LIB}/* ${posixDistDir}`,
+	Fs.promises.copyFile(
+		Path.join(C.dir.build, 'Release/sdl.node'),
+		Path.join(C.dir.dist, 'sdl.node'),
+	),
+	(async () => {
+		const libs = await Fs.promises.readdir(process.env.SDL_LIB)
+		await Promise.all(libs.map(async (name) => {
+			await Fs.promises.cp(
+				Path.join(process.env.SDL_LIB, name),
+				Path.join(C.dir.dist, name),
+				{ verbatimSymlinks: true },
+			)
+		}))
+	})(),
 ])

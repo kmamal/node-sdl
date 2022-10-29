@@ -13,12 +13,9 @@ jobs:
           - { name: 'Linux (x64)'   ,os: ubuntu-22.04           }
           - { name: 'Windows (x64)' ,os: windows-2022           }
           - { name: 'Mac (x64)'     ,os: macos-12               }
-          # - { name: 'Mac (arm64)'   ,os: macos-12     ,m1: true }
+          # - { name: 'Mac (arm64)'   ,os: macos-12     ,arch: true }
 
     runs-on: ${{ matrix.platform.os }}
-    defaults:
-      run:
-        shell: 'bash'
 
     steps:
       - uses: actions/checkout@v3
@@ -26,7 +23,7 @@ jobs:
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
         run: npm run install-deps-mac
 
-      - if: ${{ matrix.platform.m1 }}
-        run: echo "CROSS_COMPILE_ARCH=arm64" >> $GITHUB_ENV
-
-      - run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} npm run release
+      - run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}

@@ -1,8 +1,4 @@
 {
-	'variables' : {
-		'sdl_inc': "<!(bash -c 'echo $SDL_INC')",
-		'sdl_lib': "<!(bash -c 'echo $SDL_LIB')",
-	},
 	'targets': [{
 		'target_name': 'sdl',
 		'sources': [
@@ -14,8 +10,8 @@
 			['OS == "linux"', {
 				'cflags': [ '-D_REENTRANT' ],
 				'cflags_cc': [ '-std=c++17' ],
-				'include_dirs': [ '<(sdl_inc)' ],
-				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
+				'include_dirs': [ '$(SDL_INC)' ],
+				'libraries': [ '-L$(SDL_LIB)', '-lSDL2' ],
 				'link_settings': {
 					'libraries': [ "-Wl,-rpath,'$$ORIGIN'" ],
 				},
@@ -25,10 +21,10 @@
 				'cflags': [ '-D_THREAD_SAFE' ],
 				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
 				'include_dirs': [
-					'<(sdl_inc)',
+					'$(SDL_INC)',
 					'/opt/X11/include',
 				],
-				'libraries': [ '-L<(sdl_lib)', '-lSDL2' ],
+				'libraries': [ '-L$(SDL_LIB)', '-lSDL2' ],
 				'link_settings': {
 					'libraries': [ '-Wl,-rpath,@loader_path' ],
 				},
@@ -41,8 +37,8 @@
 						'AdditionalOptions': [ '-std:c++17' ]
 					}
 				},
-				'include_dirs': [ '<(sdl_inc)' ],
-				'libraries': [ '-L<(sdl_lib)', '-lSDL2.lib' ],
+				'include_dirs': [ '$(SDL_INC)' ],
+				'libraries': [ '-L$(SDL_LIB)', '-lSDL2.lib' ],
 			}],
 		],
 	}],

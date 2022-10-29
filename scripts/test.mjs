@@ -1,5 +1,10 @@
+import Path from 'node:path'
+import { execSync } from 'node:child_process'
+import { fstat } from 'node:fs'
 
-cd(path.join(__dirname, '..', 'tests'))
-for (const name of await glob('*.test.js')) {
-	await $`node ${name}`
+process.chdir(Path.resolve(__dirname, '../tests'))
+const files = await fstat.readdir('.')
+for (const name of files) {
+	if (!name.endsWith('.test.js')) { continue }
+	execSync(`node ${name}`, { stdio: 'inherit' })
 }
