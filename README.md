@@ -1573,7 +1573,7 @@ You will need to have cmake installed for that to work.
 
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package. There are some npm scripts in `package.json` that you could be of use to you:
 * `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
-* `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do. You are here because this failed.
+* `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
 * `npm run download-sdl` downloads the SDL2 headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
 * `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
 * `NODE_SDL_FROM_SOURCE=1 npm install`, runs the install script normally, but skips the initla atempt to download the prebuilts, and goes straight to building from source.
@@ -1581,3 +1581,5 @@ You could also have found your way to the "Building from source" section because
 The SDL2 headers and libs get downloaded to the `sdl/`, he build happens in `build/`, and the final binaries get collected into `dist/`.
 
 The way I normally work is I run `npm run clean` to start fresh, then run `NODE_SDL_FROM_SOURCE=1 npm i` once to prepare everything, then as I make changes I run `npm run build` ro re-build the package.
+
+Have fun!
