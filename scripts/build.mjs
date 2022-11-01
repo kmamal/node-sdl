@@ -18,10 +18,15 @@ const { default: sdlPath } = await import('@kmamal/build-sdl')
 console.log("build in", C.dir.build)
 process.env.SDL_INC = Path.join(sdlPath, 'include')
 process.env.SDL_LIB = Path.join(sdlPath, 'lib')
-if (process.env.CROSS_COMPILE_ARCH) {
-	process.env.ARCH_FLAG = `-march=${process.env.CROSS_COMPILE_ARCH}`
+
+if (C.platform === 'darwin') {
+	process.env.CC = 'clang'
+	if (process.env.CROSS_COMPILE_ARCH) {
+		process.env.CFLAGS = `-arch ${process.env.CROSS_COMPILE_ARCH}`
+	}
 }
-execSync(`npx node-gyp rebuild --verbose`)
+
+execSync(`npx node-gyp rebuild --verbose`, { stdio: 'inherit' })
 
 console.log("install to", C.dir.dist)
 await Fs.promises.rm(C.dir.dist, { recursive: true }).catch(() => {})
