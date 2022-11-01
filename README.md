@@ -10,7 +10,7 @@ Provides window management, input events, audio playback/recording, and clipboar
 You can use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
-Prebuilt binaries are available for x64 architectures.
+Prebuilt binaries are available for x64 architectures, as well as arm-based Macs.
 
 
 ## Installation

@@ -36,7 +36,11 @@
     "install-deps-mac": "./scripts/install-deps-mac.sh"
   },
   "dependencies": {
-    "@kmamal/build-sdl": "~2.24.1-5",
     "tar": "^6.1.11"
+  },
+  "sdl": {
+    "owner": "kmamal",
+    "repo": "build-sdl",
+    "version": "2.24.1"
   }
 }

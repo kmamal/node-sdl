@@ -2,6 +2,7 @@
 .eslintrc.js
 tests
 examples
+sdl
 build
 dist
 publish

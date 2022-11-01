@@ -11,13 +11,13 @@ await Promise.all([
 	await Fs.promises.rm(dir, { recursive: true }).catch(() => {})
 }))
 
-console.log("load @kmamal/build-sdl")
+console.log("download @kmamal/build-sdl to", C.dir.sdl)
 process.chdir(C.dir.root)
-const { default: sdlPath } = await import('@kmamal/build-sdl')
+await import('./download-sdl.mjs')
 
 console.log("build in", C.dir.build)
-process.env.SDL_INC = Path.join(sdlPath, 'include')
-process.env.SDL_LIB = Path.join(sdlPath, 'lib')
+process.env.SDL_INC = Path.join(C.dir.sdl, 'include')
+process.env.SDL_LIB = Path.join(C.dir.sdl, 'lib')
 
 let archFlag = ''
 if (process.env.CROSS_COMPILE_ARCH) {
