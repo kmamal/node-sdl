@@ -22,7 +22,7 @@ process.env.SDL_LIB = Path.join(sdlPath, 'lib')
 if (C.platform === 'darwin') {
 	process.env.CC = 'clang'
 	if (process.env.CROSS_COMPILE_ARCH) {
-		process.env.CMAKE_OSX_ARCHITECTURES = `"process.env.CROSS_COMPILE_ARCH"`
+		process.env.ARCH_FLAG = `-arch ${process.env.CROSS_COMPILE_ARCH}`
 	}
 }
 
