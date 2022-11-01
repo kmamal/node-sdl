@@ -1569,7 +1569,7 @@ These will be downloaded automatically through the [@kmamal/build-sdl](https://g
 If `@kmamal/build-sdl` has no prebuilt library for your platform, it will try to compile one on the spot.
 You will need to have cmake installed for that to work.
 
-===
+---
 
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package. There are some npm scripts in `package.json` that you could be of use to you:
 * `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
