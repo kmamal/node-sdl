@@ -1567,7 +1567,7 @@ You can do that via `brew install xquartz`.
 You don't need to install any SDL2 libraries or headers.
 These will be downloaded automatically through the [@kmamal/build-sdl](https://github.com/kmamal/build-sdl) package.
 If `@kmamal/build-sdl` has no prebuilt library for your platform, it will try to compile one on the spot.
-You will need to have cmake installed for that to work.
+You will need to have `cmake` installed for that to work.
 
 ---
 
