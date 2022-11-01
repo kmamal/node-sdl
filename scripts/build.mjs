@@ -22,7 +22,7 @@ process.env.SDL_LIB = Path.join(sdlPath, 'lib')
 if (C.platform === 'darwin') {
 	process.env.CC = 'clang'
 	if (process.env.CROSS_COMPILE_ARCH) {
-		process.env.CFLAGS = `-arch ${process.env.CROSS_COMPILE_ARCH}`
+		process.env.CMAKE_OSX_ARCHITECTURES = `"process.env.CROSS_COMPILE_ARCH"`
 	}
 }
 
@@ -39,6 +39,7 @@ await Promise.all([
 	(async () => {
 		const libs = await Fs.promises.readdir(process.env.SDL_LIB)
 		await Promise.all(libs.map(async (name) => {
+			if (C.platform === 'win32' && name !== 'SDL2.dll') { return }
 			await Fs.promises.cp(
 				Path.join(process.env.SDL_LIB, name),
 				Path.join(C.dir.dist, name),
