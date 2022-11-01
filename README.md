@@ -23,7 +23,7 @@ Just run:
 npm install @kmamal/sdl
 ```
 
-(But if things go wrong do look over [here](#installing-sdl2))
+(But if things go wrong do look over [here](#building-from-source))
 
 
 ## Example
@@ -1554,21 +1554,17 @@ The current text value on the clipboard.
 Changes the text contents of the clipboard.
 
 
+## Building from source
 
-## Miscellanea
+If there are no prebuilt binaries available for your platform, `@kmamal/sdl` will try to compile itself during installation.
+A few prerequisites are necessary for that to work:
 
+First, make sure you have installed [node-gyp](https://github.com/nodejs/node-gyp#installation) as well as its dependencies.
 
-### Installing SDL2
+On Mac, you will also need to install `xquartz` so that SDL2 can find the X11 headers it needs.
+You can do that via `brew install xquartz`.
 
-This should not be necessary, since this package bundles the SDL2 runtime library along with its binaries, but you never know...
-
-This package depends on SDL2 `>=2.0.5`.
-To install it on your system you might have to download one of the [SDL2 Runtime Binaries](https://www.libsdl.org/download-2.0.php).
-* __Linux:__ Run `sudo apt install libsdl2-2.0-0` or whatever the equivalent command is for your package manager.
-* __Mac:__ Download the `.dmg` file, open it, and copy the `SDL2.framework` to `/Library/Frameworks`.
-* __Windows:__ Download the `.zip` file, extract it, and copy the `.dll` files to a path Node.js can link them from. This will usually be your system directory (`C:\Windows`) but see [here](https://docs.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) for other paths where Windows will look for `.dll` files to link.
-
-
-### Building from source
-
-// TODO
+You don't need to install any SDL2 libraries or headers.
+These will be downloaded automatically through the [@kmamal/build-sdl](https://github.com/kmamal/build-sdl) package.
+If `@kmamal/build-sdl` has no prebuilt library for your platform, it will try to compile one on the spot.
+You will need to have cmake installed for that to work.
