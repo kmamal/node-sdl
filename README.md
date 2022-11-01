@@ -1568,3 +1568,9 @@ You don't need to install any SDL2 libraries or headers.
 These will be downloaded automatically through the [@kmamal/build-sdl](https://github.com/kmamal/build-sdl) package.
 If `@kmamal/build-sdl` has no prebuilt library for your platform, it will try to compile one on the spot.
 You will need to have cmake installed for that to work.
+
+Other than the obvious `npm install` command which will build the package, there are a number of npm scripts that could be useful:
+* `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
+* `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do. You are here because this failed.
+* `npm run download-sdl` downloads the SDL2 headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
+* `npm run build` prepares the environment variables and calls `node-gyp`.

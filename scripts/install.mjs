@@ -8,4 +8,5 @@ if (!process.env.NODE_SDL_FROM_SOURCE) {
 	console.log("skip download and build from source")
 }
 
+await import('./download-sdl.mjs')
 await import('./build.mjs')

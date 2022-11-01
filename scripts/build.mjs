@@ -11,10 +11,6 @@ await Promise.all([
 	await Fs.promises.rm(dir, { recursive: true }).catch(() => {})
 }))
 
-console.log("download @kmamal/build-sdl to", C.dir.sdl)
-process.chdir(C.dir.root)
-await import('./download-sdl.mjs')
-
 console.log("build in", C.dir.build)
 process.env.SDL_INC = Path.join(C.dir.sdl, 'include')
 process.env.SDL_LIB = Path.join(C.dir.sdl, 'lib')
@@ -24,6 +20,7 @@ if (process.env.CROSS_COMPILE_ARCH) {
 	archFlag = `--arch ${process.env.CROSS_COMPILE_ARCH}`
 }
 
+process.chdir(C.dir.root)
 execSync(`npx node-gyp rebuild ${archFlag} -j max --verbose`, { stdio: 'inherit' })
 
 console.log("install to", C.dir.dist)
