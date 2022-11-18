@@ -9,14 +9,16 @@ module.exports = {
 		playback: [],
 		recording: [],
 	},
-	audioInstances: {
-		all: new Map(),
+	audioInstances: new Map(),
+	joystickDevices: [],
+	joystickInstances: {
+		all: new Set(),
+		byId: new Map(),
 	},
-	joysticks: {
-		all: new Map(),
-	},
-	controllers: {
-		all: new Map(),
+	controllerDevices: [],
+	controllerInstances: {
+		all: new Set(),
+		byId: new Map(),
 	},
 
 	events: null, // Set later to { startPolling, stopPolling }

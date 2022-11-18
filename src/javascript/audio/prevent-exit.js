@@ -12,7 +12,7 @@ process.on('beforeExit', (code) => {
 
 	let duration = 0
 
-	for (const instance of Globals.audioInstances.all.values()) {
+	for (const instance of Globals.audioInstances.values()) {
 		if (!(instance instanceof AudioPlaybackInstance)) { continue }
 		const { queued, playing, buffered } = instance
 		if (!queued || !playing) { continue }

@@ -1,14 +1,11 @@
 import sdl from '@kmamal/sdl'
 import { setTimeout } from 'timers/promises'
 
-const recordingDevice = sdl.audio.devices.find(({ recording }) => recording)
-const playbackDevice = sdl.audio.devices.find(({ recording }) => !recording)
-
 const buffered = 128
 const options = { buffered }
 
-const recordingInstance = sdl.audio.openDevice(recordingDevice, options)
-const playbackInstance = sdl.audio.openDevice(playbackDevice, options)
+const recordingInstance = sdl.audio.openDevice({ type: 'recording' }, options)
+const playbackInstance = sdl.audio.openDevice({ type: 'playback' }, options)
 
 const { frequency, bytesPerSample } = playbackInstance
 

@@ -51,7 +51,7 @@ fromVariant(napi_env env, const SdlHelpers::Variant & variant, napi_value * resu
 		for (auto it = variant_map.begin(); it != variant_map.end(); ++it) {
 			napi_value key;
 			int length = strlen(it->first);
-			CALL_NAPI(napi_create_string_latin1, it->first, length, &key);
+			CALL_NAPI(napi_create_string_utf8, it->first, length, &key);
 
 			napi_value value;
 			CALL_NAPI(fromVariant, it->second, &value);
@@ -102,8 +102,7 @@ fromVariant(napi_env env, const SdlHelpers::Variant & variant, napi_value * resu
 
 void
 freePointer(napi_env env, void * data, void * pointer) {
-	if (!pointer) { return; }
-	free(pointer);
+	if (pointer) { free(pointer); }
 }
 
 
@@ -113,6 +112,24 @@ getEnums(napi_env env, napi_callback_info info)
 	napi_value result = nullptr;
 	napi_value key, value;
 	CALL_NAPI(napi_create_object, &result);
+
+	{
+		SdlHelpers::Variant event_families;
+		CALL_SDL_HELPER(enum_getEventFamilies, event_families);
+
+		CALL_NAPI(fromVariant, event_families, &value);
+		CALL_NAPI(napi_create_string_latin1, "eventFamily", 11, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
+	{
+		SdlHelpers::Variant event_types;
+		CALL_SDL_HELPER(enum_getEventTypes, event_types);
+
+		CALL_NAPI(fromVariant, event_types, &value);
+		CALL_NAPI(napi_create_string_latin1, "eventType", 9, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
 
 	{
 		SdlHelpers::Variant pixel_formats;
@@ -177,6 +194,33 @@ getEnums(napi_env env, napi_callback_info info)
 		CALL_NAPI(napi_set_property, result, key, value);
 	}
 
+	{
+		SdlHelpers::Variant joystick_types;
+		CALL_SDL_HELPER(enum_getJoystickTypes, joystick_types);
+
+		CALL_NAPI(fromVariant, joystick_types, &value);
+		CALL_NAPI(napi_create_string_latin1, "joystickType", 12, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
+	{
+		SdlHelpers::Variant controller_axes;
+		CALL_SDL_HELPER(enum_getControllerAxes, controller_axes);
+
+		CALL_NAPI(fromVariant, controller_axes, &value);
+		CALL_NAPI(napi_create_string_latin1, "controllerAxis", 14, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
+	{
+		SdlHelpers::Variant controller_buttons;
+		CALL_SDL_HELPER(enum_getControllerButtons, controller_buttons);
+
+		CALL_NAPI(fromVariant, controller_buttons, &value);
+		CALL_NAPI(napi_create_string_latin1, "controllerButton", 16, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
 	cleanup:
 	return result;
 }
@@ -195,13 +239,41 @@ initialize(napi_env env, napi_callback_info info)
 	return result;
 }
 
+
 napi_value
-cleanup(napi_env env, napi_callback_info info)
+events_poll(napi_env env, napi_callback_info info)
 {
-	CALL_SDL_HELPER(cleanup);
+	napi_value result = nullptr;
+
+	SdlHelpers::Variant event;
+	CALL_SDL_HELPER(events_poll, event);
+
+	CALL_NAPI(fromVariant, event, &result);
 
 	cleanup:
-	return nullptr;
+	return result;
+}
+
+napi_value
+events_wait(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	SdlHelpers::Variant event;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int timeout;
+	CALL_NAPI(napi_get_value_int32, argv[0], &timeout);
+
+	CALL_SDL_HELPER(events_wait, timeout, event);
+
+	CALL_NAPI(fromVariant, event, &result);
+
+	cleanup:
+	return result;
 }
 
 
@@ -236,9 +308,9 @@ window_create(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
 	size_t title_length;
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], nullptr, 0, &title_length);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], nullptr, 0, &title_length);
 	title = (char *) malloc(title_length + 1);
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], title, title_length + 1, nullptr);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], title, title_length + 1, nullptr);
 
 	int display;
 	CALL_NAPI(napi_get_value_int32, argv[1], &display);
@@ -344,11 +416,11 @@ window_create(napi_env env, napi_callback_info info)
 	}
 
 	cleanup:
-	free(title);
-	free(x);
-	free(y);
-	free(width);
-	free(height);
+	if (title) { free(title); }
+	if (x) { free(x); }
+	if (y) { free(y); }
+	if (width) { free(width); }
+	if (height) { free(height); }
 	return result;
 }
 
@@ -365,14 +437,14 @@ window_setTitle(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
 
 	size_t title_length;
-	CALL_NAPI(napi_get_value_string_latin1, argv[1], nullptr, 0, &title_length);
+	CALL_NAPI(napi_get_value_string_utf8, argv[1], nullptr, 0, &title_length);
 	title = (char *) malloc(title_length + 1);
-	CALL_NAPI(napi_get_value_string_latin1, argv[1], title, title_length + 1, nullptr);
+	CALL_NAPI(napi_get_value_string_utf8, argv[1], title, title_length + 1, nullptr);
 
 	CALL_SDL_HELPER(window_setTitle, window_id, title);
 
 	cleanup:
-	free(title);
+	if (title) { free(title); }
 	return nullptr;
 }
 
@@ -689,220 +761,6 @@ window_destroy(napi_env env, napi_callback_info info)
 
 
 napi_value
-audio_getDevices(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-	SdlHelpers::Variant devices;
-
-	napi_value argv[1];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	bool capture;
-	CALL_NAPI(napi_get_value_bool, argv[0], &capture);
-
-	CALL_SDL_HELPER(audio_getDevices, capture, devices);
-
-	CALL_NAPI(fromVariant, devices, &result);
-
-	cleanup:
-	return result;
-}
-
-napi_value
-audio_openDevice(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-
-	char * name = nullptr;
-
-	napi_value argv[6];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	size_t name_length;
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], nullptr, 0, &name_length);
-	name = (char *) malloc(name_length + 1);
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], name, name_length + 1, nullptr);
-
-	bool capture;
-	CALL_NAPI(napi_get_value_bool, argv[1], &capture);
-
-	int freq, format, channels, samples;
-	CALL_NAPI(napi_get_value_int32, argv[2], &freq);
-	CALL_NAPI(napi_get_value_int32, argv[3], &format);
-	CALL_NAPI(napi_get_value_int32, argv[4], &channels);
-	CALL_NAPI(napi_get_value_int32, argv[5], &samples);
-
-	int device_id;
-	CALL_SDL_HELPER(audio_openDevice, name, capture, freq, format, channels, samples, &device_id);
-
-	CALL_NAPI(napi_create_uint32, device_id, &result);
-
-	cleanup:
-	free(name);
-	return result;
-}
-
-napi_value
-audio_close(napi_env env, napi_callback_info info)
-{
-	napi_value argv[1];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	CALL_SDL_HELPER(audio_close, device_id);
-
-	cleanup:
-	return nullptr;
-}
-
-napi_value
-audio_play(napi_env env, napi_callback_info info)
-{
-	napi_value argv[2];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	bool play;
-	CALL_NAPI(napi_get_value_bool, argv[1], &play);
-
-	CALL_SDL_HELPER(audio_play, device_id, play);
-
-	cleanup:
-	return nullptr;
-}
-
-napi_value
-audio_getQueueSize(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-
-	napi_value argv[1];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	unsigned int size;
-	CALL_SDL_HELPER(audio_getQueueSize, device_id, &size);
-
-	CALL_NAPI(napi_create_uint32, size, &result);
-
-	cleanup:
-	return result;
-}
-
-napi_value
-audio_clearQueue(napi_env env, napi_callback_info info)
-{
-	napi_value argv[1];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	CALL_SDL_HELPER(audio_clearQueue, device_id);
-
-	cleanup:
-	return nullptr;
-}
-
-napi_value
-audio_enqueue(napi_env env, napi_callback_info info)
-{
-	napi_value argv[3];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	void * src;
-	CALL_NAPI(napi_get_buffer_info, argv[1], &src, nullptr);
-
-	int size;
-	CALL_NAPI(napi_get_value_int32, argv[2], &size);
-
-	CALL_SDL_HELPER(audio_enqueue, device_id, src, size);
-
-	cleanup:
-	return nullptr;
-}
-
-napi_value
-audio_dequeue(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-
-	napi_value argv[3];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
-
-	void * dst;
-	CALL_NAPI(napi_get_buffer_info, argv[1], &dst, nullptr);
-
-	int size;
-	CALL_NAPI(napi_get_value_int32, argv[2], &size);
-
-	int num;
-	CALL_SDL_HELPER(audio_dequeue, device_id, dst, size, &num);
-
-	CALL_NAPI(napi_create_uint32, num, &result);
-
-	cleanup:
-	return result;
-}
-
-
-napi_value
-events_poll(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-
-	SdlHelpers::Variant event;
-	CALL_SDL_HELPER(events_poll, event);
-
-	CALL_NAPI(fromVariant, event, &result);
-
-	cleanup:
-	return result;
-}
-
-napi_value
-events_wait(napi_env env, napi_callback_info info)
-{
-	napi_value result = nullptr;
-
-	SdlHelpers::Variant event;
-
-	napi_value argv[1];
-	size_t argc = sizeof(argv) / sizeof(napi_value);
-	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
-
-	int timeout;
-	CALL_NAPI(napi_get_value_int32, argv[0], &timeout);
-
-	CALL_SDL_HELPER(events_wait, timeout, event);
-
-	CALL_NAPI(fromVariant, event, &result);
-
-	cleanup:
-	return result;
-}
-
-napi_value
 keyboard_getKey(napi_env env, napi_callback_info info)
 {
 	napi_value result = nullptr;
@@ -938,9 +796,9 @@ keyboard_getScancode(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
 	size_t key_length;
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], nullptr, 0, &key_length);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], nullptr, 0, &key_length);
 	key = (char *) malloc(key_length + 1);
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], key, key_length + 1, nullptr);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], key, key_length + 1, nullptr);
 
 	int scancode;
 	CALL_SDL_HELPER(keyboard_getScancode, key, &scancode);
@@ -1115,7 +973,7 @@ joystick_open(napi_env env, napi_callback_info info)
 {
 	napi_value result = nullptr;
 
-	SdlHelpers::Variant device;
+	SdlHelpers::Variant object;
 
 	napi_value argv[1];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
@@ -1124,12 +982,11 @@ joystick_open(napi_env env, napi_callback_info info)
 	int index;
 	CALL_NAPI(napi_get_value_int32, argv[0], &index);
 
-	CALL_SDL_HELPER(joystick_open, index, device);
+	CALL_SDL_HELPER(joystick_open, index, object);
 
-	CALL_NAPI(fromVariant, device, &result);
+	CALL_NAPI(fromVariant, object, &result);
 
 	cleanup:
-	//
 	return result;
 }
 
@@ -1140,10 +997,10 @@ joystick_close(napi_env env, napi_callback_info info)
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
 
-	CALL_SDL_HELPER(joystick_close, device_id);
+	CALL_SDL_HELPER(joystick_close, joystick_id);
 
 	cleanup:
 	return nullptr;
@@ -1158,13 +1015,103 @@ joystick_getPower(napi_env env, napi_callback_info info)
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
 
 	int power;
-	CALL_SDL_HELPER(joystick_getPower, device_id, &power);
+	CALL_SDL_HELPER(joystick_getPower, joystick_id, &power);
 
 	CALL_NAPI(napi_create_int32, power, &result);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+joystick_setLed(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[4];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
+
+	double red, green, blue;
+	CALL_NAPI(napi_get_value_double, argv[1], &red);
+	CALL_NAPI(napi_get_value_double, argv[2], &green);
+	CALL_NAPI(napi_get_value_double, argv[3], &blue);
+
+	CALL_SDL_HELPER(joystick_setLed, joystick_id, red, green, blue);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+joystick_setPlayer(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[2];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
+
+	int player;
+	CALL_NAPI(napi_get_value_int32, argv[1], &player);
+
+	CALL_SDL_HELPER(joystick_setPlayer, joystick_id, player);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+joystick_rumble(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[4];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
+
+	double low_freq_rumble, high_freq_rumble, duration;
+	CALL_NAPI(napi_get_value_double, argv[1], &low_freq_rumble);
+	CALL_NAPI(napi_get_value_double, argv[2], &high_freq_rumble);
+	CALL_NAPI(napi_get_value_double, argv[3], &duration);
+
+	CALL_SDL_HELPER(joystick_rumble, joystick_id, low_freq_rumble, high_freq_rumble, duration);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+joystick_rumbleTriggers(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[4];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int joystick_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &joystick_id);
+
+	double left_rumble, right_rumble, duration;
+	CALL_NAPI(napi_get_value_double, argv[1], &left_rumble);
+	CALL_NAPI(napi_get_value_double, argv[2], &right_rumble);
+	CALL_NAPI(napi_get_value_double, argv[3], &duration);
+
+	CALL_SDL_HELPER(joystick_rumbleTriggers, joystick_id, left_rumble, right_rumble, duration);
 
 	cleanup:
 	return result;
@@ -1190,7 +1137,6 @@ controller_open(napi_env env, napi_callback_info info)
 	CALL_NAPI(fromVariant, device, &result);
 
 	cleanup:
-	//
 	return result;
 }
 
@@ -1201,13 +1147,225 @@ controller_close(napi_env env, napi_callback_info info)
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
-	int device_id;
-	CALL_NAPI(napi_get_value_int32, argv[0], &device_id);
+	int controller_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &controller_id);
 
-	CALL_SDL_HELPER(controller_close, device_id);
+	CALL_SDL_HELPER(controller_close, controller_id);
 
 	cleanup:
 	return nullptr;
+}
+
+napi_value
+controller_addMappings(napi_env env, napi_callback_info info)
+{
+	char ** mappings = nullptr;
+	int num_allocated = 0;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	unsigned int array_length;
+	CALL_NAPI(napi_get_array_length, argv[0], &array_length);
+
+	mappings = (char **) malloc(array_length * sizeof(char *));
+	napi_value value;
+	size_t string_length;
+	for (unsigned int i = 0; i < array_length; i++) {
+		CALL_NAPI(napi_get_element, argv[0], i, &value);
+		CALL_NAPI(napi_get_value_string_utf8, value, nullptr, 0, &string_length);
+		mappings[i] = (char *) malloc(string_length + 1);
+		num_allocated++;
+		CALL_NAPI(napi_get_value_string_utf8, value, mappings[i], string_length + 1, nullptr);
+	}
+
+	CALL_SDL_HELPER(controller_addMappings, mappings, array_length);
+
+	cleanup:
+	if (mappings) {
+		for (int i = 0; i < num_allocated; i++) { free(mappings[i]); }
+		free(mappings);
+	}
+	return nullptr;
+}
+
+
+napi_value
+audio_getDevices(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+	SdlHelpers::Variant devices;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	bool capture;
+	CALL_NAPI(napi_get_value_bool, argv[0], &capture);
+
+	CALL_SDL_HELPER(audio_getDevices, capture, devices);
+
+	CALL_NAPI(fromVariant, devices, &result);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+audio_openDevice(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	char * name = nullptr;
+
+	napi_value argv[6];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	size_t name_length;
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], nullptr, 0, &name_length);
+	name = (char *) malloc(name_length + 1);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], name, name_length + 1, nullptr);
+
+	bool capture;
+	CALL_NAPI(napi_get_value_bool, argv[1], &capture);
+
+	int freq, format, channels, samples;
+	CALL_NAPI(napi_get_value_int32, argv[2], &freq);
+	CALL_NAPI(napi_get_value_int32, argv[3], &format);
+	CALL_NAPI(napi_get_value_int32, argv[4], &channels);
+	CALL_NAPI(napi_get_value_int32, argv[5], &samples);
+
+	int audio_id;
+	CALL_SDL_HELPER(audio_openDevice, name, capture, freq, format, channels, samples, &audio_id);
+
+	CALL_NAPI(napi_create_uint32, audio_id, &result);
+
+	cleanup:
+	if (name) { free(name); }
+	return result;
+}
+
+napi_value
+audio_close(napi_env env, napi_callback_info info)
+{
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	CALL_SDL_HELPER(audio_close, audio_id);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+audio_play(napi_env env, napi_callback_info info)
+{
+	napi_value argv[2];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	bool play;
+	CALL_NAPI(napi_get_value_bool, argv[1], &play);
+
+	CALL_SDL_HELPER(audio_play, audio_id, play);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+audio_getQueueSize(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	unsigned int size;
+	CALL_SDL_HELPER(audio_getQueueSize, audio_id, &size);
+
+	CALL_NAPI(napi_create_uint32, size, &result);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+audio_clearQueue(napi_env env, napi_callback_info info)
+{
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	CALL_SDL_HELPER(audio_clearQueue, audio_id);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+audio_enqueue(napi_env env, napi_callback_info info)
+{
+	napi_value argv[3];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	void * src;
+	CALL_NAPI(napi_get_buffer_info, argv[1], &src, nullptr);
+
+	int size;
+	CALL_NAPI(napi_get_value_int32, argv[2], &size);
+
+	CALL_SDL_HELPER(audio_enqueue, audio_id, src, size);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+audio_dequeue(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	napi_value argv[3];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int audio_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &audio_id);
+
+	void * dst;
+	CALL_NAPI(napi_get_buffer_info, argv[1], &dst, nullptr);
+
+	int size;
+	CALL_NAPI(napi_get_value_int32, argv[2], &size);
+
+	int num;
+	CALL_SDL_HELPER(audio_dequeue, audio_id, dst, size, &num);
+
+	CALL_NAPI(napi_create_uint32, num, &result);
+
+	cleanup:
+	return result;
 }
 
 
@@ -1221,7 +1379,7 @@ clipboard_getText(napi_env env, napi_callback_info info)
 
 	if (!text) { return nullptr; }
 
-	CALL_NAPI(napi_create_string_latin1, text, strlen(text), &result);
+	CALL_NAPI(napi_create_string_utf8, text, strlen(text), &result);
 
 	cleanup:
 	return result;
@@ -1237,14 +1395,24 @@ clipboard_setText(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
 	size_t text_length;
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], nullptr, 0, &text_length);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], nullptr, 0, &text_length);
 	text = (char *) malloc(text_length + 1);
-	CALL_NAPI(napi_get_value_string_latin1, argv[0], text, text_length + 1, nullptr);
+	CALL_NAPI(napi_get_value_string_utf8, argv[0], text, text_length + 1, nullptr);
 
 	CALL_SDL_HELPER(clipboard_setText, text);
 
 	cleanup:
-	free(text);
+	if (text) { free(text); }
+	return nullptr;
+}
+
+
+napi_value
+cleanup(napi_env env, napi_callback_info info)
+{
+	CALL_SDL_HELPER(cleanup);
+
+	cleanup:
 	return nullptr;
 }
 
@@ -1255,6 +1423,8 @@ init (napi_env env, napi_value exports)
 	napi_property_descriptor desc[] = {
 		{ "getEnums", NULL, getEnums, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "initialize", NULL, initialize, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "events_poll", NULL, events_poll, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "events_wait", NULL, events_wait, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "video_getDisplays", NULL, video_getDisplays, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_create", NULL, window_create, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_setTitle", NULL, window_setTitle, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1273,16 +1443,6 @@ init (napi_env env, napi_value exports)
 		{ "window_setIcon", NULL, window_setIcon, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_render", NULL, window_render, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_destroy", NULL, window_destroy, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_getDevices", NULL, audio_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_openDevice", NULL, audio_openDevice, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_close", NULL, audio_close, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_play", NULL, audio_play, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_getQueueSize", NULL, audio_getQueueSize, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_enqueue", NULL, audio_enqueue, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_dequeue", NULL, audio_dequeue, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "audio_clearQueue", NULL, audio_clearQueue, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "events_poll", NULL, events_poll, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "events_wait", NULL, events_wait, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getKey", NULL, keyboard_getKey, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getScancode", NULL, keyboard_getScancode, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getState", NULL, keyboard_getState, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1297,14 +1457,27 @@ init (napi_env env, napi_value exports)
 		{ "joystick_open", NULL, joystick_open, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "joystick_close", NULL, joystick_close, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "joystick_getPower", NULL, joystick_getPower, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "joystick_setLed", NULL, joystick_setLed, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "joystick_setPlayer", NULL, joystick_setPlayer, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "joystick_rumble", NULL, joystick_rumble, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "joystick_rumbleTriggers", NULL, joystick_rumbleTriggers, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "controller_open", NULL, controller_open, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "controller_close", NULL, controller_close, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "controller_addMappings", NULL, controller_addMappings, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_getDevices", NULL, audio_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_openDevice", NULL, audio_openDevice, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_close", NULL, audio_close, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_play", NULL, audio_play, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_getQueueSize", NULL, audio_getQueueSize, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_enqueue", NULL, audio_enqueue, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_dequeue", NULL, audio_dequeue, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "audio_clearQueue", NULL, audio_clearQueue, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "clipboard_getText", NULL, clipboard_getText, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "clipboard_setText", NULL, clipboard_setText, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 49, desc);
+	CALL_NAPI(napi_define_properties, exports, 54, desc);
 
 	cleanup:
 	return exports;

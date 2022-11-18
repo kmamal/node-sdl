@@ -7,10 +7,9 @@ const { width, height } = window
 const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
-const device = sdl.audio.devices.find(({ recording }) => recording)
 const channels = 1
 const buffered = 128
-const recordingInstance = sdl.audio.openDevice(device, {
+const recordingInstance = sdl.audio.openDevice({ type: 'recording' }, {
 	channels,
 	buffered,
 })

@@ -93,6 +93,71 @@ export namespace Events {
 
 	}
 
+	namespace Joystick {
+
+		interface DeviceEvent extends BaseEvent {
+			readonly device: Sdl.Joystick.Device
+		}
+
+		interface DeviceAdd extends DeviceEvent {}
+		interface DeviceRemove extends DeviceEvent {}
+
+		interface JoystickEvent extends BaseEvent {}
+
+		interface AxisMotion extends JoystickEvent {
+			axis: number,
+			value: number
+		}
+
+		interface BallMotion extends JoystickEvent {
+			ball: number,
+			x: number
+			y: number
+		}
+
+		interface ButtonEvent extends JoystickEvent {
+			button: number
+		}
+		interface ButtonDown extends ButtonEvent {}
+		interface ButtonUp extends ButtonEvent {}
+
+		interface HatMotion extends JoystickEvent {
+			hat: number,
+			value: Sdl.Joystick.HatPosition
+		}
+
+		// interface Close extends JoystickEvent {}
+
+	}
+
+	namespace Controller {
+
+		interface DeviceEvent extends BaseEvent {
+			readonly device: Sdl.Controller.Device
+		}
+
+		interface DeviceAdd extends DeviceEvent {}
+		interface DeviceRemove extends DeviceEvent {}
+
+		interface ControllerEvent extends BaseEvent {}
+
+		interface AxisMotion extends ControllerEvent {
+			axis: number,
+			value: number
+		}
+
+		interface ButtonEvent extends ControllerEvent {
+			button: number
+		}
+		interface ButtonDown extends ButtonEvent {}
+		interface ButtonUp extends ButtonEvent {}
+
+		interface Remap extends ControllerEvent {}
+
+		// interface Close extends ControllerEvent {}
+
+	}
+
 	namespace Audio {
 
 		interface DeviceEvent extends BaseEvent {
@@ -102,6 +167,8 @@ export namespace Events {
 		interface DeviceAdd extends DeviceEvent {}
 		interface DeviceRemove extends DeviceEvent {}
 
+		// interface AudioEvent extends BaseEvent {}
+		// interface Close extends AudioEvent {}
 	}
 
 	namespace Clipboard {
@@ -230,7 +297,7 @@ export namespace Sdl {
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
 			on (event: 'dropComplete', listener: () => void): this
 
-			readonly id: any
+			readonly id: number
 
 			readonly title: string
 			setTitle (title: string): void
@@ -307,104 +374,6 @@ export namespace Sdl {
 				vsync?: boolean
 				opengl?: boolean
 			}): Window
-		}
-	}
-
-	namespace Audio {
-
-		type Format
-		= 's8'
-		| 'u8'
-		| 's16lsb'
-		| 's16msb'
-		| 's16sys'
-		| 's16'
-		| 'u16lsb'
-		| 'u16msb'
-		| 'u16sys'
-		| 'u16'
-		| 's32lsb'
-		| 's32msb'
-		| 's32sys'
-		| 's32'
-		| 'f32lsb'
-		| 'f32msb'
-		| 'f32sys'
-		| 'f32'
-
-		interface Device {
-			readonly name: string
-			readonly recording: boolean
-		}
-
-		interface PlaybackDevice {
-			readonly name: string
-			readonly recording: false
-		}
-
-		interface RecordingDevice {
-			readonly name: string
-			readonly recording: true
-		}
-
-		class AudioInstance {
-			readonly id: any
-			readonly device: Device
-			readonly name: string
-			readonly channels: number
-			readonly frequency: number
-			readonly format: Format
-			readonly buffered: number
-
-			readonly playing: boolean
-			play (play?: boolean): void
-			pause (): void
-
-			readonly queued: number
-			clearQueue (): void
-
-			readonly bytesPerSample: number
-			readonly minSampleValue: number
-			readonly maxSampleValue: number
-			readonly zeroSampleValue: number
-			readSample (buffer: Buffer, offset?: number): number
-			writeSample (buffer: Buffer, value: number, offset?: number): number
-
-			readonly closed: boolean
-			close (): void
-		}
-
-		class AudioPlaybackInstance extends AudioInstance {
-			enqueue (buffer: Buffer, bytes?: number): void
-		}
-
-		class AudioRecordingInstance extends AudioInstance {
-			dequeue (buffer: Buffer, bytes?: number): number
-		}
-
-		interface AudioOptions {
-			name?: string
-			channels?: 1 | 2 | 4 | 6
-			frequency?: number
-			format?: Format
-			buffered?: number
-		}
-
-		interface Module {
-			on (event: 'deviceAdd', listener: (event: Events.Audio.DeviceAdd) => void): this
-			on (event: 'deviceRemove', listener: (event: Events.Audio.DeviceRemove) => void): this
-
-			readonly devices: Device[]
-
-			openDevice (device: PlaybackDevice, options?: AudioOptions): AudioPlaybackInstance
-			openDevice (device: RecordingDevice, options?: AudioOptions): AudioRecordingInstance
-
-			bytesPerSample (format: Format): number
-			minSampleValue (format: Format): number
-			maxSampleValue (format: Format): number
-			zeroSampleValue (format: Format): number
-			readSample (format: Format, buffer: Buffer, offset?: number): number
-			writeSample (format: Format, buffer: Buffer, value: number, offset?: number): number
 		}
 	}
 
@@ -715,6 +684,277 @@ export namespace Sdl {
 
 	}
 
+	namespace Joystick {
+
+		interface BallPosition {
+			x: number
+			y: number
+		}
+
+		type HatPosition
+		= 'centered'
+		| 'up'
+		| 'right'
+		| 'down'
+		| 'left'
+		| 'rightup'
+		| 'rightdown'
+		| 'leftup'
+		| 'leftdown'
+
+		type PowerLevel
+		= 'unknown'
+		| 'empty'
+		| 'low'
+		| 'medium'
+		| 'full'
+		| 'wired'
+		| 'max'
+
+		interface Device {
+			readonly id: number
+			readonly type: string
+			readonly name: string
+			readonly path: string
+			readonly guid: string
+			readonly vendor: number
+			readonly product: number
+			readonly version: number
+			readonly player: number
+		}
+
+		class JoystickInstance {
+			on (event: 'axisMotion', listener: (event: Events.Joystick.AxisMotion) => void): this
+			on (event: 'ballMotion', listener: (event: Events.Joystick.BallMotion) => void): this
+			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
+			on (event: 'buttonUp', listener: (event: Events.Joystick.ButtonUp) => void): this
+			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
+			on (event: 'close', listener: () => void): this
+
+			readonly id: number
+			readonly device: Device
+			readonly firmwareVersion: number
+			readonly serialNumber: string
+
+			readonly axes: number[]
+			readonly balls: BallPosition[]
+			readonly hats: HatPosition[]
+			readonly buttons: boolean[]
+
+			readonly power: PowerLevel
+
+			readonly hasLed: boolean
+			setLed (red: number, green: number, blue: number): void
+
+			readonly hasRumble: boolean
+			rumble (lowFreqRumble: number, highFreqRumble: number, duration: number): void
+			stopRumble (): void
+
+			readonly hasRumbleTriggers: boolean
+			rumbleTriggers (leftRumble: number, rightRumble: number, duration: number): void
+			stopRumbleTriggers (): void
+
+			readonly closed: boolean
+			close (): void
+		}
+
+		interface Module {
+			on (event: 'deviceAdd', listener: (event: Events.Joystick.DeviceAdd) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.Joystick.DeviceRemove) => void): this
+
+			readonly devices: Device[]
+
+			openDevice (device: Device): JoystickInstance
+		}
+
+	}
+
+	namespace Controller {
+
+		interface Device {
+			readonly id: number
+			readonly type: string
+			readonly name: string
+			readonly path: string
+			readonly guid: string
+			readonly vendor: number
+			readonly product: number
+			readonly version: number
+			readonly player: number
+			readonly mapping: string
+		}
+
+		class ControllerInstance {
+			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
+			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
+			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
+			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
+			on (event: 'close', listener: () => void): this
+
+			readonly id: number
+			readonly device: Device
+			readonly firmwareVersion: number
+			readonly serialNumber: string
+
+			readonly axes: {
+				readonly leftStickX: number,
+				readonly leftStickY: number,
+				readonly rightStickX: number,
+				readonly rightStickY: number,
+				readonly leftTrigger: number,
+				readonly rightTrigger: number,
+			}
+
+			readonly buttons: {
+				readonly dpadLeft: boolean,
+				readonly dpadRight: boolean,
+				readonly dpadUp: boolean,
+				readonly dpadDown: boolean,
+				readonly a: boolean,
+				readonly b: boolean,
+				readonly x: boolean,
+				readonly y: boolean,
+				readonly guide: boolean,
+				readonly back: boolean,
+				readonly start: boolean,
+				readonly leftStick: boolean,
+				readonly rightStick: boolean,
+				readonly leftShoulder: boolean,
+				readonly rightShoulder: boolean,
+				readonly paddle1: boolean,
+				readonly paddle2: boolean,
+				readonly paddle3: boolean,
+				readonly paddle4: boolean,
+			}
+
+			readonly power: PowerLevel
+
+			readonly hasLed: boolean
+			setLed (red: number, green: number, blue: number): void
+
+			readonly hasRumble: boolean
+			rumble (lowFreqRumble: number, highFreqRumble: number, duration: number): void
+			stopRumble (): void
+
+			readonly hasRumbleTriggers: boolean
+			rumbleTriggers (leftRumble: number, rightRumble: number, duration: number): void
+			stopRumbleTriggers (): void
+
+			readonly closed: boolean
+			close (): void
+		}
+
+		interface Module {
+			on (event: 'deviceAdd', listener: (event: Events.Controller.DeviceAdd) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.Controller.DeviceRemove) => void): this
+
+			addMappings (mappings: string[]): void
+
+			readonly devices: Device[]
+
+			openDevice (device: Device): ControllerInstance
+		}
+
+	}
+
+	namespace Audio {
+
+		type Format
+		= 's8'
+		| 'u8'
+		| 's16lsb'
+		| 's16msb'
+		| 's16sys'
+		| 's16'
+		| 'u16lsb'
+		| 'u16msb'
+		| 'u16sys'
+		| 'u16'
+		| 's32lsb'
+		| 's32msb'
+		| 's32sys'
+		| 's32'
+		| 'f32lsb'
+		| 'f32msb'
+		| 'f32sys'
+		| 'f32'
+
+		interface Device {
+			readonly type: "recording"|"playback"
+			readonly name: string
+		}
+
+		interface PlaybackDevice extends Device {
+			readonly type: "playback"
+		}
+
+		interface RecordingDevice extends Device {
+			readonly type: "recording"
+		}
+
+		class AudioInstance {
+			on (event: 'close', listener: () => void): this
+
+			readonly id: number
+			readonly device: Device
+			readonly name: string
+			readonly channels: number
+			readonly frequency: number
+			readonly format: Format
+			readonly buffered: number
+
+			readonly playing: boolean
+			play (play?: boolean): void
+			pause (): void
+
+			readonly queued: number
+			clearQueue (): void
+
+			readonly bytesPerSample: number
+			readonly minSampleValue: number
+			readonly maxSampleValue: number
+			readonly zeroSampleValue: number
+			readSample (buffer: Buffer, offset?: number): number
+			writeSample (buffer: Buffer, value: number, offset?: number): number
+
+			readonly closed: boolean
+			close (): void
+		}
+
+		class AudioPlaybackInstance extends AudioInstance {
+			enqueue (buffer: Buffer, bytes?: number): void
+		}
+
+		class AudioRecordingInstance extends AudioInstance {
+			dequeue (buffer: Buffer, bytes?: number): number
+		}
+
+		interface AudioOptions {
+			name?: string
+			channels?: 1 | 2 | 4 | 6
+			frequency?: number
+			format?: Format
+			buffered?: number
+		}
+
+		interface Module {
+			on (event: 'deviceAdd', listener: (event: Events.Audio.DeviceAdd) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.Audio.DeviceRemove) => void): this
+
+			readonly devices: Device[]
+
+			openDevice (device: PlaybackDevice, options?: AudioOptions): AudioPlaybackInstance
+			openDevice (device: RecordingDevice, options?: AudioOptions): AudioRecordingInstance
+
+			bytesPerSample (format: Format): number
+			minSampleValue (format: Format): number
+			maxSampleValue (format: Format): number
+			zeroSampleValue (format: Format): number
+			readSample (format: Format, buffer: Buffer, offset?: number): number
+			writeSample (format: Format, buffer: Buffer, value: number, offset?: number): number
+		}
+	}
+
 	namespace Clipboard {
 
 		interface Module {
@@ -732,9 +972,11 @@ export namespace Sdl {
 
 		readonly info: Info
 		readonly video: Video.Module
-		readonly audio: Audio.Module
 		readonly keyboard: Keyboard.Module
 		readonly mouse: Mouse.Module
+		readonly joystick: Joystick.Module
+		readonly controller: Controller.Module
+		readonly audio: Audio.Module
 		readonly clipboard: Clipboard.Module
 	}
 }

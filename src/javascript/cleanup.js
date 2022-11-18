@@ -12,17 +12,17 @@ process.on('exit', (code) => {
 	}
 
 	// Close all audio instances
-	for (const instance of Globals.audioInstances.all.values()) {
+	for (const instance of Globals.audioInstances.values()) {
 		instance.close()
 	}
 
 	// Close all joysticks
-	for (const joystick of Globals.joysticks.all.values()) {
+	for (const joystick of Globals.joystickInstances.all.values()) {
 		joystick.close()
 	}
 
 	// Close all controllers
-	for (const controller of Globals.controllers.all.values()) {
+	for (const controller of Globals.controllerInstances.all.values()) {
 		controller.close()
 	}
 

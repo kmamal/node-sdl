@@ -17,7 +17,7 @@ const audio = new class extends EventsViaPoll {
 	}
 
 	openDevice (device, options = {}) {
-		return device.recording
+		return device.type === "recording"
 			? new AudioRecordingInstance(device, options)
 			: new AudioPlaybackInstance(device, options)
 	}

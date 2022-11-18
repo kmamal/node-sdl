@@ -1,15 +1,16 @@
 const Bindings = require('../bindings')
-const { enums } = require('../enums')
+const Enums = require('../enums')
 const Globals = require('../globals')
+const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioFormatHelpers } = require('./format-helpers')
 
-Globals.audioDevices.playback = Bindings.audio_getDevices(false)
-Globals.audioDevices.recording = Bindings.audio_getDevices(true)
+const validEvents = [ 'close' ]
 
-class AudioInstance {
+class AudioInstance extends EventsViaPoll {
 	constructor (device, options) {
-		const { name: deviceName, recording } = device
-		const name = options.name || deviceName
+		super(validEvents)
+
+		const { name, type } = device
 
 		const {
 			channels = 1,
@@ -18,7 +19,7 @@ class AudioInstance {
 			buffered = 4096,
 		} = options
 
-		const _format = enums.audioFormat[format] ?? null
+		const _format = Enums.audioFormat[format] ?? null
 
 		if (!Number.isFinite(channels)) { throw Object.assign(new Error("channels must be a number"), { channels }) }
 		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
@@ -29,7 +30,7 @@ class AudioInstance {
 		if (!Number.isFinite(buffered)) { throw Object.assign(new Error("buffered must be a number"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 
-		this._id = Bindings.audio_openDevice(name, recording, frequency, _format, channels, buffered)
+		this._id = Bindings.audio_openDevice(name, type === 'recording', frequency, _format, channels, buffered)
 
 		this._device = device
 		this._name = name
@@ -49,7 +50,7 @@ class AudioInstance {
 		this._reader = helper.reader
 		this._writer = helper.writer
 
-		Globals.audioInstances.all.set(this._id, this)
+		Globals.audioInstances.set(this._id, this)
 	}
 
 	get id () { return this._id }
@@ -105,9 +106,12 @@ class AudioInstance {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
+		this.emit('close')
+		this.removeAllListeners()
 		this._closed = true
+
 		Bindings.audio_close(this._id)
-		Globals.audioInstances.all.delete(this._id)
+		Globals.audioInstances.delete(this._id)
 	}
 }
 

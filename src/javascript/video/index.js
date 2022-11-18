@@ -1,13 +1,13 @@
 const Bindings = require('../bindings')
 const Globals = require('../globals')
-const { enums } = require('../enums')
+const Enums = require('../enums')
 const { Window } = require('./window')
 
 const video = {
 	get displays () {
 		const displays = Bindings.video_getDisplays()
 		for (const display of displays) {
-			display.format = enums.pixelFormatNames[display.format]
+			display.format = Enums.pixelFormatNames[display.format]
 		}
 		return displays
 	},

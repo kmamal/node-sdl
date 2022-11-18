@@ -1,6 +1,6 @@
 const Bindings = require('../bindings')
 const Globals = require('../globals')
-const { enums } = require('../enums')
+const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { maybeTriggerQuit } = require('../events/quit')
 
@@ -120,8 +120,10 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
-		// Keep node.js alive while windows are open
-		this.once('close', () => {})
+		// This also keeps Node.js alive while windows are open
+		this.on('close', () => {
+			this.removeAllListeners()
+		})
 
 		// Manually emit an initial resize event (for convenience)
 		process.nextTick(() => {
@@ -280,7 +282,7 @@ class Window extends EventsViaPoll {
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 
-		const _format = enums.pixelFormat[format] ?? null
+		const _format = Enums.pixelFormat[format] ?? null
 
 		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
@@ -299,7 +301,7 @@ class Window extends EventsViaPoll {
 	setIcon (width, height, stride, format, buffer) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		const _format = enums.pixelFormat[format] ?? null
+		const _format = Enums.pixelFormat[format] ?? null
 
 		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }

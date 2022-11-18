@@ -2,8 +2,7 @@ import sdl from '@kmamal/sdl'
 
 const TWO_PI = 2 * Math.PI
 
-const device = sdl.audio.devices.find(({ recording }) => !recording)
-const playbackInstance = sdl.audio.openDevice(device)
+const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
 const {
 	channels,
 	frequency,

@@ -2,11 +2,9 @@ import sdl from '@kmamal/sdl'
 import path from 'path'
 import { loadAudio } from './ffmpeg.js'
 
-const playbackDevice = sdl.audio.devices.find((x) => x.recording === false)
-
 const channels = 1
 const frequency = 48e3
-const audioInstance = sdl.audio.openDevice(playbackDevice, {
+const audioInstance = sdl.audio.openDevice({ type: 'playback' }, {
 	channels,
 	frequency,
 	format: 'f32lsb',

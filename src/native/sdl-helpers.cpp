@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <map>
 
 #if defined(_WIN32)
 	#include "asprintf.h"
@@ -39,10 +38,30 @@ static char * allocated_drop_file = nullptr ;
 static char * allocated_clipboard = nullptr ;
 static SDL_Cursor * allocated_cursor = nullptr;
 
+struct AllocString {
+	char * buffer;
+	AllocString * next;
+};
+static AllocString * allocated_guid_strings = nullptr;
+char * _allocateString (int size) {
+	AllocString * node = (AllocString*) malloc(sizeof(AllocString));
+	node->buffer = (char *) malloc(size);
+	AllocString * head = allocated_guid_strings;
+	allocated_guid_strings = node;
+	node->next = head;
+	return node->buffer;
+}
+
 static const Uint8 * keys;
 static int num_keys;
 
 static char text_input[32];
+
+const static int SDL_JOYSTICK_AXIS_RANGE = SDL_JOYSTICK_AXIS_MAX - SDL_JOYSTICK_AXIS_MIN;
+
+double _joystickMapAxis (int value) {
+	return (value - SDL_JOYSTICK_AXIS_MIN) / (SDL_JOYSTICK_AXIS_RANGE / 2.0) - 1;
+}
 
 
 namespace SdlHelpers {
@@ -97,6 +116,122 @@ ErrorMessage::
 {
 	if (!this->should_dispose) { return; }
 	free((void *) this->message);
+}
+
+
+enum class EventFamily {
+	APP,
+	WINDOW,
+	KEYBOARD,
+	MOUSE,
+	TEXT,
+	DROP,
+	JOYSTICK_DEVICE,
+	JOYSTICK,
+	CONTROLLER,
+	AUDIO_DEVICE,
+	CLIPBOARD,
+};
+
+ErrorMessage *
+enum_getEventFamilies (Variant & families)
+{
+	MAKE_MAP(families);
+
+	SET_NUM(families, "app", (int) EventFamily::APP);
+	SET_NUM(families, "window", (int) EventFamily::WINDOW);
+	SET_NUM(families, "keyboard", (int) EventFamily::KEYBOARD);
+	SET_NUM(families, "mouse", (int) EventFamily::MOUSE);
+	SET_NUM(families, "text", (int) EventFamily::TEXT);
+	SET_NUM(families, "drop", (int) EventFamily::DROP);
+	SET_NUM(families, "joystickDevice", (int) EventFamily::JOYSTICK_DEVICE);
+	SET_NUM(families, "joystick", (int) EventFamily::JOYSTICK);
+	SET_NUM(families, "controller", (int) EventFamily::CONTROLLER);
+	SET_NUM(families, "audioDevice", (int) EventFamily::AUDIO_DEVICE);
+	SET_NUM(families, "clipboard", (int) EventFamily::CLIPBOARD);
+
+	return nullptr;
+}
+
+
+enum class EventType {
+	QUIT,
+	SHOW,
+	HIDE,
+	EXPOSE,
+	MOVE,
+	RESIZE,
+	MINIMIZE,
+	MAXIMIZE,
+	RESTORE,
+	FOCUS,
+	BLUR,
+	HOVER,
+	LEAVE,
+	CLOSE,
+	DROP_BEGIN,
+	DROP_COMPLETE,
+	DROP_FILE,
+	DROP_TEXT,
+	KEY_DOWN,
+	KEY_UP,
+	TEXT_INPUT,
+	MOUSE_MOVE,
+	MOUSE_BUTTON_DOWN,
+	MOUSE_BUTTON_UP,
+	MOUSE_WHEEL,
+	DEVICE_ADD,
+	DEVICE_REMOVE,
+	AXIS_MOTION,
+	BALL_MOTION,
+	BUTTON_DOWN,
+	BUTTON_UP,
+	HAT_MOTION,
+	REMAP,
+	UPDATE,
+};
+
+ErrorMessage *
+enum_getEventTypes (Variant & types)
+{
+	MAKE_MAP(types);
+
+	SET_NUM(types, "quit", (int) EventType::QUIT);
+	SET_NUM(types, "show", (int) EventType::SHOW);
+	SET_NUM(types, "hide", (int) EventType::HIDE);
+	SET_NUM(types, "expose", (int) EventType::EXPOSE);
+	SET_NUM(types, "move", (int) EventType::MOVE);
+	SET_NUM(types, "resize", (int) EventType::RESIZE);
+	SET_NUM(types, "minimize", (int) EventType::MINIMIZE);
+	SET_NUM(types, "maximize", (int) EventType::MAXIMIZE);
+	SET_NUM(types, "restore", (int) EventType::RESTORE);
+	SET_NUM(types, "focus", (int) EventType::FOCUS);
+	SET_NUM(types, "blur", (int) EventType::BLUR);
+	SET_NUM(types, "hover", (int) EventType::HOVER);
+	SET_NUM(types, "leave", (int) EventType::LEAVE);
+	SET_NUM(types, "close", (int) EventType::CLOSE);
+	SET_NUM(types, "dropBegin", (int) EventType::DROP_BEGIN);
+	SET_NUM(types, "dropComplete", (int) EventType::DROP_COMPLETE);
+	SET_NUM(types, "dropFile", (int) EventType::DROP_FILE);
+	SET_NUM(types, "dropText", (int) EventType::DROP_TEXT);
+	SET_NUM(types, "keyDown", (int) EventType::KEY_DOWN);
+	SET_NUM(types, "keyUp", (int) EventType::KEY_UP);
+	SET_NUM(types, "textInput", (int) EventType::TEXT_INPUT);
+	SET_NUM(types, "mouseMove", (int) EventType::MOUSE_MOVE);
+	SET_NUM(types, "mouseButtonDown", (int) EventType::MOUSE_BUTTON_DOWN);
+	SET_NUM(types, "mouseButtonUp", (int) EventType::MOUSE_BUTTON_UP);
+	SET_NUM(types, "mouseWheel", (int) EventType::MOUSE_WHEEL);
+	SET_NUM(types, "deviceAdd", (int) EventType::DEVICE_ADD);
+	SET_NUM(types, "deviceRemove", (int) EventType::DEVICE_REMOVE);
+	SET_NUM(types, "axisMotion", (int) EventType::AXIS_MOTION);
+	SET_NUM(types, "ballMotion", (int) EventType::BALL_MOTION);
+	SET_NUM(types, "buttonDown", (int) EventType::BUTTON_DOWN);
+	SET_NUM(types, "buttonUp", (int) EventType::BUTTON_UP);
+	SET_NUM(types, "hatMotion", (int) EventType::HAT_MOTION);
+	SET_NUM(types, "remap", (int) EventType::REMAP);
+	SET_NUM(types, "update", (int) EventType::UPDATE);
+
+	return nullptr;
 }
 
 
@@ -491,6 +626,68 @@ enum_getPowerLevels (Variant & levels)
 	return nullptr;
 }
 
+ErrorMessage *
+enum_getJoystickTypes (Variant & types)
+{
+	MAKE_MAP(types);
+
+	SET_NUM(types, "unknown", SDL_JOYSTICK_TYPE_UNKNOWN);
+	SET_NUM(types, "gamecontroller", SDL_JOYSTICK_TYPE_GAMECONTROLLER);
+	SET_NUM(types, "wheel", SDL_JOYSTICK_TYPE_WHEEL);
+	SET_NUM(types, "arcadestick", SDL_JOYSTICK_TYPE_ARCADE_STICK);
+	SET_NUM(types, "flightstick", SDL_JOYSTICK_TYPE_FLIGHT_STICK);
+	SET_NUM(types, "dancepad", SDL_JOYSTICK_TYPE_DANCE_PAD);
+	SET_NUM(types, "guitar", SDL_JOYSTICK_TYPE_GUITAR);
+	SET_NUM(types, "drumkit", SDL_JOYSTICK_TYPE_DRUM_KIT);
+	SET_NUM(types, "arcadepad", SDL_JOYSTICK_TYPE_ARCADE_PAD);
+	SET_NUM(types, "throttle", SDL_JOYSTICK_TYPE_THROTTLE);
+
+	return nullptr;
+}
+
+ErrorMessage *
+enum_getControllerAxes (Variant & axes)
+{
+	MAKE_MAP(axes);
+
+	SET_NUM(axes, "leftStickX", SDL_CONTROLLER_AXIS_LEFTX);
+	SET_NUM(axes, "leftStickY", SDL_CONTROLLER_AXIS_LEFTY);
+	SET_NUM(axes, "rightStickX", SDL_CONTROLLER_AXIS_RIGHTX);
+	SET_NUM(axes, "rightStickY", SDL_CONTROLLER_AXIS_RIGHTY);
+	SET_NUM(axes, "leftTrigger", SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+	SET_NUM(axes, "rightTrigger", SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+
+	return nullptr;
+}
+
+ErrorMessage *
+enum_getControllerButtons (Variant & buttons)
+{
+	MAKE_MAP(buttons);
+
+	SET_NUM(buttons, "dpadLeft", SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+	SET_NUM(buttons, "dpadRight", SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+	SET_NUM(buttons, "dpadUp", SDL_CONTROLLER_BUTTON_DPAD_UP);
+	SET_NUM(buttons, "dpadDown", SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+	SET_NUM(buttons, "a", SDL_CONTROLLER_BUTTON_A);
+	SET_NUM(buttons, "b", SDL_CONTROLLER_BUTTON_B);
+	SET_NUM(buttons, "x", SDL_CONTROLLER_BUTTON_X);
+	SET_NUM(buttons, "y", SDL_CONTROLLER_BUTTON_Y);
+	SET_NUM(buttons, "guide", SDL_CONTROLLER_BUTTON_GUIDE);
+	SET_NUM(buttons, "back", SDL_CONTROLLER_BUTTON_BACK);
+	SET_NUM(buttons, "start", SDL_CONTROLLER_BUTTON_START);
+	SET_NUM(buttons, "leftStick", SDL_CONTROLLER_BUTTON_LEFTSTICK);
+	SET_NUM(buttons, "rightStick", SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+	SET_NUM(buttons, "leftShoulder", SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+	SET_NUM(buttons, "rightShoulder", SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+	SET_NUM(buttons, "paddle1", SDL_CONTROLLER_BUTTON_PADDLE1);
+	SET_NUM(buttons, "paddle2", SDL_CONTROLLER_BUTTON_PADDLE2);
+	SET_NUM(buttons, "paddle3", SDL_CONTROLLER_BUTTON_PADDLE3);
+	SET_NUM(buttons, "paddle4", SDL_CONTROLLER_BUTTON_PADDLE4);
+
+	return nullptr;
+}
+
 
 ErrorMessage *
 initialize (Variant & object)
@@ -500,9 +697,12 @@ initialize (Variant & object)
 	// Init
 	{
 		int subsystems = 0
+			| SDL_INIT_EVENTS
 			| SDL_INIT_VIDEO
-			| SDL_INIT_AUDIO
-			| SDL_INIT_GAMECONTROLLER;
+			| SDL_INIT_JOYSTICK
+			| SDL_INIT_GAMECONTROLLER
+			| SDL_INIT_HAPTIC
+			| SDL_INIT_AUDIO;
 		if (SDL_Init(subsystems) != 0) {
 			RETURN_ERROR("SDL_Init(0) error: %s\n", SDL_GetError());
 		}
@@ -633,6 +833,397 @@ initialize (Variant & object)
 
 
 ErrorMessage *
+_controllerGetState (SDL_GameController * controller, Variant & object)
+{
+	{
+		Variant axes;
+		MAKE_MAP(axes);
+
+		SET_NUM(axes, "leftStickX", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX)));
+		SET_NUM(axes, "leftStickY", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY)));
+		SET_NUM(axes, "rightStickX", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX)));
+		SET_NUM(axes, "rightStickY", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY)));
+		SET_NUM(axes, "leftTrigger", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT)));
+		SET_NUM(axes, "rightTrigger", _joystickMapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT)));
+
+		SET_MAP(object, "axes", axes);
+	}
+
+	{
+		Variant buttons;
+		MAKE_MAP(buttons);
+
+		SET_BOOL(buttons, "dpadLeft", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+		SET_BOOL(buttons, "dpadRight", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+		SET_BOOL(buttons, "dpadUp", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP));
+		SET_BOOL(buttons, "dpadDown", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+		SET_BOOL(buttons, "a", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A));
+		SET_BOOL(buttons, "b", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B));
+		SET_BOOL(buttons, "x", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X));
+		SET_BOOL(buttons, "y", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y));
+		SET_BOOL(buttons, "guide", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_GUIDE));
+		SET_BOOL(buttons, "back", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK));
+		SET_BOOL(buttons, "start", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START));
+		SET_BOOL(buttons, "leftStick", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK));
+		SET_BOOL(buttons, "rightStick", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+		SET_BOOL(buttons, "leftShoulder", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+		SET_BOOL(buttons, "rightShoulder", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+		SET_BOOL(buttons, "paddle1", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE1));
+		SET_BOOL(buttons, "paddle2", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE2));
+		SET_BOOL(buttons, "paddle3", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE3));
+		SET_BOOL(buttons, "paddle4", SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE4));
+
+		SET_MAP(object, "buttons", buttons);
+	}
+
+	return nullptr;
+}
+
+
+ErrorMessage *
+packageEvent (const SDL_Event & event, Variant & object)
+{
+	if (allocated_drop_file) {
+		SDL_free(allocated_drop_file);
+		allocated_drop_file = nullptr;
+	}
+	if (allocated_clipboard) {
+		SDL_free(allocated_clipboard);
+		allocated_clipboard = nullptr;
+	}
+	while (allocated_guid_strings != nullptr) {
+		AllocString * tmp = allocated_guid_strings;
+		allocated_guid_strings = allocated_guid_strings->next;
+		free(tmp->buffer);
+		free(tmp);
+	}
+
+	MAKE_MAP(object);
+
+	Variant value;
+	switch (event.type) {
+		case SDL_QUIT: {
+			SET_NUM(object, "family", (int) EventFamily::APP);
+			SET_NUM(object, "type", (int) EventType::QUIT);
+			break;
+		}
+
+		case SDL_WINDOWEVENT: {
+			SET_NUM(object, "family", (int) EventFamily::WINDOW);
+			SET_NUM(object, "windowId", event.window.windowID);
+
+			switch (event.window.event) {
+				case SDL_WINDOWEVENT_SHOWN: { SET_NUM(object, "type", (int) EventType::SHOW); break; }
+				case SDL_WINDOWEVENT_HIDDEN: { SET_NUM(object, "type", (int) EventType::HIDE); break; }
+				case SDL_WINDOWEVENT_EXPOSED: { SET_NUM(object, "type", (int) EventType::EXPOSE); break; }
+				case SDL_WINDOWEVENT_MOVED: {
+					SET_NUM(object, "type", (int) EventType::MOVE);
+					SET_NUM(object, "x", event.window.data1);
+					SET_NUM(object, "y", event.window.data2);
+					break;
+				}
+				case SDL_WINDOWEVENT_SIZE_CHANGED: {
+					SET_NUM(object, "type", (int) EventType::RESIZE);
+					SET_NUM(object, "width", event.window.data1);
+					SET_NUM(object, "height", event.window.data2);
+					break;
+				}
+				case SDL_WINDOWEVENT_MINIMIZED: { SET_NUM(object, "type", (int) EventType::MINIMIZE); break; }
+				case SDL_WINDOWEVENT_MAXIMIZED: { SET_NUM(object, "type", (int) EventType::MAXIMIZE); break; }
+				case SDL_WINDOWEVENT_RESTORED: { SET_NUM(object, "type", (int) EventType::RESTORE); break; }
+				case SDL_WINDOWEVENT_FOCUS_GAINED: { SET_NUM(object, "type", (int) EventType::FOCUS); break; }
+				case SDL_WINDOWEVENT_FOCUS_LOST: { SET_NUM(object, "type", (int) EventType::BLUR); break; }
+				case SDL_WINDOWEVENT_ENTER: { SET_NUM(object, "type", (int) EventType::HOVER); break; }
+				case SDL_WINDOWEVENT_LEAVE: { SET_NUM(object, "type", (int) EventType::LEAVE); break; }
+				case SDL_WINDOWEVENT_CLOSE: { SET_NUM(object, "type", (int) EventType::CLOSE); break; }
+			}
+			break;
+		}
+
+		case SDL_DROPBEGIN:
+		case SDL_DROPCOMPLETE: {
+			SET_NUM(object, "family", (int) EventFamily::DROP);
+			SET_NUM(object, "type", (int) (event.type == SDL_DROPBEGIN
+				? EventType::DROP_BEGIN
+				: EventType::DROP_COMPLETE));
+			SET_NUM(object, "windowId", event.drop.windowID);
+			break;
+		}
+		case SDL_DROPFILE:
+		case SDL_DROPTEXT: {
+			SET_NUM(object, "family", (int) EventFamily::DROP);
+			bool is_file = event.type == SDL_DROPFILE;
+			SET_NUM(object, "type", (int) (is_file
+				? EventType::DROP_FILE
+				: EventType::DROP_TEXT));
+			SET_NUM(object, "windowId", event.drop.windowID);
+
+			allocated_drop_file = event.drop.file;
+			SET_STRING(object, is_file ? "file" : "text", allocated_drop_file);
+			break;
+		}
+
+		case SDL_KEYDOWN:
+		case SDL_KEYUP: {
+			SET_NUM(object, "family", (int) EventFamily::KEYBOARD);
+			SET_NUM(object, "type", (int) (event.type == SDL_KEYDOWN
+				? EventType::KEY_DOWN
+				: EventType::KEY_UP));
+			SET_NUM(object, "windowId", event.key.windowID);
+
+			SDL_Keysym symbol = event.key.keysym;
+			SET_NUM(object, "scancode", symbol.scancode);
+
+			const char * name = SDL_GetKeyName(symbol.sym);
+			if (name[0] != '\0') {
+				SET_STRING(object, "key", name);
+			}
+			else {
+				SET_NULL(object, "key");
+			}
+
+			if (event.type == SDL_KEYDOWN) {
+				SET_BOOL(object, "repeat", !!event.key.repeat);
+			}
+
+			SET_BOOL(object, "alt", !!(symbol.mod & KMOD_ALT));
+			SET_BOOL(object, "ctrl", !!(symbol.mod & KMOD_CTRL));
+			SET_BOOL(object, "shift", !!(symbol.mod & KMOD_SHIFT));
+			SET_BOOL(object, "super", !!(symbol.mod & KMOD_GUI));
+			SET_BOOL(object, "altgr", !!(symbol.mod & KMOD_MODE));
+			SET_BOOL(object, "numlock", !!(symbol.mod & KMOD_NUM));
+			SET_BOOL(object, "capslock", !!(symbol.mod & KMOD_CAPS));
+			break;
+		}
+
+		case SDL_TEXTINPUT: {
+			SET_NUM(object, "family", (int) EventFamily::TEXT);
+			SET_NUM(object, "type", (int) EventType::TEXT_INPUT);
+			SET_NUM(object, "windowId", event.text.windowID);
+			strcpy(text_input, event.text.text);
+			SET_STRING(object, "text", text_input);
+			break ;
+		}
+
+		case SDL_MOUSEMOTION: {
+			SET_NUM(object, "family", (int) EventFamily::MOUSE);
+			SET_NUM(object, "type", (int) EventType::MOUSE_MOVE);
+			SET_NUM(object, "windowId", event.motion.windowID);
+			SET_BOOL(object, "touch", event.motion.which == SDL_TOUCH_MOUSEID);
+			SET_NUM(object, "x", event.motion.x);
+			SET_NUM(object, "y", event.motion.y);
+			break;
+		}
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP: {
+			SET_NUM(object, "family", (int) EventFamily::MOUSE);
+			SET_NUM(object, "type", (int) (event.type == SDL_MOUSEBUTTONDOWN
+				? EventType::MOUSE_BUTTON_DOWN
+				: EventType::MOUSE_BUTTON_UP));
+			SET_NUM(object, "windowId", event.button.windowID);
+			SET_BOOL(object, "touch", event.button.which == SDL_TOUCH_MOUSEID);
+			SET_NUM(object, "button", event.button.button);
+			SET_NUM(object, "x", event.button.x);
+			SET_NUM(object, "y", event.button.y);
+			break;
+		}
+		case SDL_MOUSEWHEEL: {
+			SET_NUM(object, "family", (int) EventFamily::MOUSE);
+			SET_NUM(object, "type", (int) EventType::MOUSE_WHEEL);
+			SET_NUM(object, "windowId", event.wheel.windowID);
+			SET_BOOL(object, "touch", event.wheel.which == SDL_TOUCH_MOUSEID);
+
+			int x, y;
+			SDL_GetMouseState(&x, &y);
+			SET_NUM(object, "x", x);
+			SET_NUM(object, "y", y);
+
+			SET_NUM(object, "dx", event.wheel.x);
+			SET_NUM(object, "dy", event.wheel.y);
+			SET_BOOL(object, "flipped", event.wheel.direction);
+			break;
+		}
+
+		case SDL_JOYDEVICEADDED: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK_DEVICE);
+			SET_NUM(object, "type", (int) EventType::DEVICE_ADD);
+
+			Variant devices;
+			ErrorMessage * error = joystick_getDevices(devices);
+			if (error) { return error; }
+			SET_LIST(object, "devices", devices);
+			break;
+		}
+		case SDL_JOYDEVICEREMOVED: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK_DEVICE);
+			SET_NUM(object, "type", (int) EventType::DEVICE_REMOVE);
+			SET_NUM(object, "joystickId", event.jdevice.which);
+
+			Variant devices;
+			ErrorMessage * error = joystick_getDevices(devices);
+			if (error) { return error; }
+			SET_LIST(object, "devices", devices);
+			break;
+		}
+
+		case SDL_JOYAXISMOTION: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK);
+			SET_NUM(object, "type", (int) EventType::AXIS_MOTION);
+			SET_NUM(object, "joystickId", event.jaxis.which);
+			SET_NUM(object, "axis", event.jaxis.axis);
+			SET_NUM(object, "value", _joystickMapAxis(event.jaxis.value));
+			break ;
+		}
+		case SDL_JOYBALLMOTION: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK);
+			SET_NUM(object, "type", (int) EventType::BALL_MOTION);
+			SET_NUM(object, "joystickId", event.jball.which);
+			SET_NUM(object, "ball", event.jball.ball);
+			SET_NUM(object, "x", event.jball.xrel);
+			SET_NUM(object, "y", event.jball.yrel);
+			break ;
+		}
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK);
+			SET_NUM(object, "type", (int) (event.type == SDL_JOYBUTTONDOWN
+				? EventType::BUTTON_DOWN
+				: EventType::BUTTON_UP));
+			SET_NUM(object, "joystickId", event.jbutton.which);
+			SET_NUM(object, "button", event.jbutton.button);
+			break ;
+		}
+		case SDL_JOYHATMOTION: {
+			SET_NUM(object, "family", (int) EventFamily::JOYSTICK);
+			SET_NUM(object, "type", (int) EventType::HAT_MOTION);
+			SET_NUM(object, "joystickId", event.jhat.which);
+			SET_NUM(object, "hat", event.jhat.hat);
+			SET_NUM(object, "value", event.jhat.value);
+			break ;
+		}
+
+		case SDL_CONTROLLERDEVICEREMAPPED: {
+			SET_NUM(object, "family", (int) EventFamily::CONTROLLER);
+			SET_NUM(object, "type", (int) EventType::REMAP);
+			SDL_JoystickID controllerId = event.cdevice.which;
+			SET_NUM(object, "controllerId", controllerId);
+
+			SDL_GameController * controller = SDL_GameControllerFromInstanceID(controllerId);
+			if (controller) {
+				ErrorMessage * error = _controllerGetState(controller, object);
+				if (error) { return error ; }
+			}
+			break;
+		}
+
+		case SDL_CONTROLLERAXISMOTION: {
+			SET_NUM(object, "family", (int) EventFamily::CONTROLLER);
+			SET_NUM(object, "type", (int) EventType::AXIS_MOTION);
+			SET_NUM(object, "controllerId", event.caxis.which);
+			SET_NUM(object, "axis", event.caxis.axis);
+			SET_NUM(object, "value", _joystickMapAxis(event.caxis.value));
+			break;
+		}
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_CONTROLLERBUTTONUP: {
+			SET_NUM(object, "family", (int) EventFamily::CONTROLLER);
+			SET_NUM(object, "type", (int) (event.type == SDL_CONTROLLERBUTTONDOWN
+				? EventType::BUTTON_DOWN
+				: EventType::BUTTON_UP));
+			SET_NUM(object, "controllerId", event.cbutton.which);
+			SET_NUM(object, "button", event.cbutton.button);
+			break;
+		}
+
+		case SDL_AUDIODEVICEADDED: {
+			SET_NUM(object, "family", (int) EventFamily::AUDIO_DEVICE);
+			SET_NUM(object, "type", (int) EventType::DEVICE_ADD);
+			bool is_capture = event.adevice.iscapture;
+			SET_BOOL(object, "isRecorder", is_capture);
+
+			Variant devices;
+			ErrorMessage * error = audio_getDevices(is_capture, devices);
+			if (error) { return error; }
+			SET_LIST(object, "devices", devices);
+			break;
+		}
+		case SDL_AUDIODEVICEREMOVED: {
+			SET_NUM(object, "family", (int) EventFamily::AUDIO_DEVICE);
+			SET_NUM(object, "type", (int) EventType::DEVICE_REMOVE);
+			SET_NUM(object, "audioId", event.adevice.which);
+			bool is_capture = event.adevice.iscapture;
+			SET_BOOL(object, "isRecorder", is_capture);
+
+			Variant devices;
+			ErrorMessage * error = audio_getDevices(is_capture, devices);
+			if (error) { return error; }
+			SET_LIST(object, "devices", devices);
+			break;
+		}
+
+		case SDL_CLIPBOARDUPDATE: {
+			SET_NUM(object, "family", (int) EventFamily::CLIPBOARD);
+			SET_NUM(object, "type", (int) EventType::UPDATE);
+			break;
+		}
+
+		// case SDL_FINGERUP:
+		// case SDL_FINGERDOWN: {
+		// 	SET_STRING(object, "type", event.type == SDL_FINGERUP
+		// 		? "fingerUp"
+		// 		: "fingerDown");
+		// 	SET_NUM(object, "touch_id", event.tfinger.touchId);
+		// 	SET_NUM(object, "finger_id", event.tfinger.fingerId);
+		// 	SET_NUM(object, "pressure", event.tfinger.pressure);
+		// 	SET_NUM(object, "x", event.tfinger.x);
+		// 	SET_NUM(object, "y", event.tfinger.y);
+		// 	break;
+		// }
+		// case SDL_FINGERMOTION: {
+		// 	SET_STRING(object, "type", "fingerMotion");
+		// 	SET_NUM(object, "touch_id", event.tfinger.touchId);
+		// 	SET_NUM(object, "finger_id", event.tfinger.fingerId);
+		// 	SET_NUM(object, "pressure", event.tfinger.pressure);
+		// 	SET_NUM(object, "x", event.tfinger.x);
+		// 	SET_NUM(object, "y", event.tfinger.y);
+		// 	SET_NUM(object, "dx", event.tfinger.dx);
+		// 	SET_NUM(object, "dy", event.tfinger.dy);
+		// 	break;
+		// }
+	}
+	return nullptr;
+}
+
+ErrorMessage *
+events_poll (Variant & object)
+{
+	SDL_Event event;
+	bool got_event = SDL_PollEvent(&event);
+
+	if (!got_event) { return nullptr; }
+
+	packageEvent(event, object);
+
+	return nullptr;
+}
+
+ErrorMessage *
+events_wait (int timeout, Variant & object)
+{
+	SDL_Event event;
+
+	bool got_event = SDL_WaitEventTimeout(&event, timeout);
+	SDL_ClearError();
+
+	if (!got_event) { return nullptr; }
+
+	packageEvent(event, object);
+
+	return nullptr;
+}
+
+
+ErrorMessage *
 video_getDisplays(Variant & list)
 {
 	int num_displays = SDL_GetNumVideoDisplays();
@@ -716,7 +1307,7 @@ video_getDisplays(Variant & list)
 }
 
 ErrorMessage *
-_updateTexture(
+_windowUpdateTexture(
 	SDL_Window * window,
 	SDL_Renderer * renderer,
 	int format, int width, int height,
@@ -742,7 +1333,7 @@ _updateTexture(
 }
 
 ErrorMessage *
-_updateRenderer(
+_windowUpdateRenderer(
 	SDL_Window * window,
 	bool * accelerated,
 	bool * vsync
@@ -770,7 +1361,7 @@ _updateRenderer(
 	int width, height;
 	SDL_GetWindowSize(window, &width, &height);
 	int format = SDL_GetWindowPixelFormat(window);
-	ErrorMessage * error = _updateTexture(window, renderer, format, width, height, nullptr);
+	ErrorMessage * error = _windowUpdateTexture(window, renderer, format, width, height, nullptr);
 	if (error != nullptr) { return error; }
 
 	return nullptr;
@@ -844,7 +1435,7 @@ window_create (
 	*native_pointer = pointer;
 	*native_pointer_size = size;
 
-	ErrorMessage * error = _updateRenderer(window, accelerated, vsync);
+	ErrorMessage * error = _windowUpdateRenderer(window, accelerated, vsync);
 	if (error != nullptr) { return error; }
 
 	return nullptr;
@@ -947,7 +1538,7 @@ window_setAcceleratedAndVsync (int window_id, bool * accelerated, bool * vsync)
 		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
-	ErrorMessage * error = _updateRenderer(window, accelerated, vsync);
+	ErrorMessage * error = _windowUpdateRenderer(window, accelerated, vsync);
 	if (error != nullptr) { return error; }
 
 	return nullptr;
@@ -1088,7 +1679,7 @@ window_render (
 
 	if (window_width != texture_width || window_height != texture_height) {
 		int format = SDL_GetWindowPixelFormat(window);
-		ErrorMessage * error = _updateTexture(window, renderer, format, window_width, window_height, &texture);
+		ErrorMessage * error = _windowUpdateTexture(window, renderer, format, window_width, window_height, &texture);
 		if (error != nullptr) { return error; }
 	}
 
@@ -1146,422 +1737,6 @@ window_destroy (int window_id)
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-
-	return nullptr;
-}
-
-
-ErrorMessage *
-audio_getDevices(bool capture, Variant & list)
-{
-	MAKE_LIST(list);
-
-	int num_devices = SDL_GetNumAudioDevices(capture ? 1 : 0);
-	if (num_devices == -1) {
-		const char * error = SDL_GetError();
-		if (error != no_error) {
-			RETURN_ERROR("SDL_GetNumAudioDevices(%d) error: %s\n", capture, error);
-		}
-		else {
-			Variant device;
-			MAKE_MAP(device);
-
-			SET_NULL(device, "name");
-			SET_BOOL(device, "recording", capture);
-
-			APPEND(list, device);
-		}
-	}
-	else {
-		for (int i = 0; i < num_devices; i++) {
-			const char * name = SDL_GetAudioDeviceName(i, capture);
-			if (name == nullptr) {
-				RETURN_ERROR("SDL_GetAudioDeviceName(%d, %d) error: %s\n", i, capture, SDL_GetError());
-			}
-
-			Variant device;
-			MAKE_MAP(device);
-
-			SET_STRING(device, "name", name);
-			SET_BOOL(device, "recording", capture);
-
-			APPEND(list, device);
-		}
-	}
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_openDevice (
-	const char * name, bool capture,
-	int freq, int format, int channels, int samples,
-	int * device_id
-) {
-	SDL_AudioSpec desired;
-	SDL_memset(&desired, 0, sizeof(desired));
-	desired.freq = freq;
-	desired.format = format;
-	desired.channels = channels;
-	desired.samples = samples;
-
-	SDL_AudioDeviceID audio_device = SDL_OpenAudioDevice(nullptr, capture ? 1 : 0, &desired, nullptr, 0);
-	if (audio_device == 0) {
-		RETURN_ERROR("SDL_OpenAudioDevice() error: %s\n", SDL_GetError());
-	}
-
-	*device_id = audio_device;
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_close (int device_id)
-{
-	SDL_PauseAudioDevice(device_id, 1);
-	SDL_CloseAudioDevice(device_id);
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_play (int device_id, bool play)
-{
-	SDL_PauseAudioDevice(device_id, play ? 0 : 1);
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_getQueueSize (int device_id, unsigned int * size)
-{
-	*size = SDL_GetQueuedAudioSize(device_id);
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_clearQueue (int device_id)
-{
-	SDL_ClearQueuedAudio(device_id);
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_enqueue (int device_id, void * src, int size)
-{
-	if (SDL_QueueAudio(device_id, src, size) != 0) {
-		RETURN_ERROR("SDL_QueueAudio() error: %s\n", SDL_GetError());
-	}
-
-	return nullptr;
-}
-
-ErrorMessage *
-audio_dequeue (int device_id, void * dst, int size, int * num)
-{
-	*num = SDL_DequeueAudio(device_id, dst, size);
-
-	return nullptr;
-}
-
-
-ErrorMessage *
-packageEvent (const SDL_Event & event, Variant & object)
-{
-	if (allocated_drop_file) {
-		SDL_free(allocated_drop_file);
-		allocated_drop_file = nullptr;
-	}
-	if (allocated_clipboard) {
-		SDL_free(allocated_clipboard);
-		allocated_clipboard = nullptr;
-	}
-
-	MAKE_MAP(object);
-
-	Variant value;
-	switch (event.type) {
-		case SDL_QUIT: {
-			SET_STRING(object, "family", "app");
-			SET_STRING(object, "type", "quit");
-			break;
-		}
-
-		case SDL_WINDOWEVENT: {
-			SET_STRING(object, "family", "window");
-			SET_NUM(object, "window", event.window.windowID);
-
-			switch (event.window.event) {
-				case SDL_WINDOWEVENT_SHOWN: { SET_STRING(object, "type", "show"); break; }
-				case SDL_WINDOWEVENT_HIDDEN: { SET_STRING(object, "type", "hide"); break; }
-				case SDL_WINDOWEVENT_EXPOSED: { SET_STRING(object, "type", "expose"); break; }
-				case SDL_WINDOWEVENT_MOVED: {
-					SET_STRING(object, "type", "move");
-					SET_NUM(object, "x", event.window.data1);
-					SET_NUM(object, "y", event.window.data2);
-					break;
-				}
-				// case SDL_WINDOWEVENT_RESIZED: {
-				// 	SET_STRING(object, "type", "resized");
-				// 	SET_NUM(object, "width", event.window.data1);
-				// 	SET_NUM(object, "height", event.window.data2);
-				// 	break;
-				// }
-				case SDL_WINDOWEVENT_SIZE_CHANGED: {
-					SET_STRING(object, "type", "resize");
-					SET_NUM(object, "width", event.window.data1);
-					SET_NUM(object, "height", event.window.data2);
-					break;
-				}
-				case SDL_WINDOWEVENT_MINIMIZED: { SET_STRING(object, "type", "minimize"); break; }
-				case SDL_WINDOWEVENT_MAXIMIZED: { SET_STRING(object, "type", "maximize"); break; }
-				case SDL_WINDOWEVENT_RESTORED: { SET_STRING(object, "type", "restore"); break; }
-				case SDL_WINDOWEVENT_FOCUS_GAINED: { SET_STRING(object, "type", "focus"); break; }
-				case SDL_WINDOWEVENT_FOCUS_LOST: { SET_STRING(object, "type", "blur"); break; }
-				case SDL_WINDOWEVENT_ENTER: { SET_STRING(object, "type", "hover"); break; }
-				case SDL_WINDOWEVENT_LEAVE: { SET_STRING(object, "type", "leave"); break; }
-				case SDL_WINDOWEVENT_CLOSE: { SET_STRING(object, "type", "close"); break; }
-			}
-			break;
-		}
-
-		case SDL_KEYDOWN:
-		case SDL_KEYUP: {
-			SET_STRING(object, "family", "keyboard");
-			SET_STRING(object, "type", event.type == SDL_KEYDOWN
-				? "keyDown"
-				: "keyUp");
-			SET_NUM(object, "window", event.key.windowID);
-
-			SDL_Keysym symbol = event.key.keysym;
-			SET_NUM(object, "scancode", symbol.scancode);
-			const char * name = SDL_GetKeyName(symbol.sym);
-			if (name[0] != '\0') {
-				SET_STRING(object, "key", name);
-			}
-			else {
-				SET_NULL(object, "key");
-			}
-
-			if (event.type == SDL_KEYDOWN) {
-				SET_BOOL(object, "repeat", !!event.key.repeat);
-			}
-
-			SET_BOOL(object, "alt", !!(symbol.mod & KMOD_ALT));
-			SET_BOOL(object, "ctrl", !!(symbol.mod & KMOD_CTRL));
-			SET_BOOL(object, "shift", !!(symbol.mod & KMOD_SHIFT));
-			SET_BOOL(object, "super", !!(symbol.mod & KMOD_GUI));
-			SET_BOOL(object, "altgr", !!(symbol.mod & KMOD_MODE));
-			SET_BOOL(object, "numlock", !!(symbol.mod & KMOD_NUM));
-			SET_BOOL(object, "capslock", !!(symbol.mod & KMOD_CAPS));
-			break;
-		}
-
-		case SDL_TEXTINPUT: {
-			SET_STRING(object, "family", "text");
-			SET_STRING(object, "type", "textInput");
-			SET_NUM(object, "window", event.text.windowID);
-			strcpy(text_input, event.text.text);
-			SET_STRING(object, "text", text_input);
-			break ;
-		}
-
-		case SDL_MOUSEMOTION: {
-			SET_STRING(object, "family", "mouse");
-			SET_STRING(object, "type", "mouseMove");
-			SET_NUM(object, "window", event.motion.windowID);
-			SET_BOOL(object, "touch", event.motion.which == SDL_TOUCH_MOUSEID);
-			SET_NUM(object, "x", event.motion.x);
-			SET_NUM(object, "y", event.motion.y);
-			break;
-		}
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP: {
-			SET_STRING(object, "family", "mouse");
-			SET_STRING(object, "type", event.type == SDL_MOUSEBUTTONDOWN
-				? "mouseButtonDown"
-				: "mouseButtonUp");
-			SET_NUM(object, "window", event.button.windowID);
-			SET_BOOL(object, "touch", event.button.which == SDL_TOUCH_MOUSEID);
-			SET_NUM(object, "button", event.button.button);
-			SET_NUM(object, "x", event.button.x);
-			SET_NUM(object, "y", event.button.y);
-			break;
-		}
-		case SDL_MOUSEWHEEL: {
-			SET_STRING(object, "family", "mouse");
-			SET_STRING(object, "type", "mouseWheel");
-			SET_NUM(object, "window", event.wheel.windowID);
-			SET_BOOL(object, "touch", event.wheel.which == SDL_TOUCH_MOUSEID);
-
-			int x, y;
-			SDL_GetMouseState(&x, &y);
-			SET_NUM(object, "x", x);
-			SET_NUM(object, "y", y);
-
-			SET_NUM(object, "dx", event.wheel.x);
-			SET_NUM(object, "dy", event.wheel.y);
-			SET_BOOL(object, "flipped", event.wheel.direction);
-			break;
-		}
-
-		case SDL_JOYAXISMOTION: {
-			SET_STRING(object, "type", "joystickAxisMotion");
-			SET_NUM(object, "joystick", event.jaxis.which);
-			SET_NUM(object, "axis", event.jaxis.axis);
-			SET_NUM(object, "value", event.jaxis.value);
-			break ;
-		}
-		case SDL_JOYBALLMOTION: {
-			SET_STRING(object, "type", "joystickBallMotion");
-			SET_NUM(object, "joystick", event.jball.which);
-			SET_NUM(object, "x", event.jball.xrel);
-			SET_NUM(object, "y", event.jball.yrel);
-			break ;
-		}
-		case SDL_JOYHATMOTION: {
-			SET_STRING(object, "type", "joystickHatMotion");
-			SET_NUM(object, "joystick", event.jhat.which);
-			SET_NUM(object, "hat", event.jhat.hat);
-			SET_NUM(object, "value", event.jhat.value);
-			break ;
-		}
-		case SDL_JOYBUTTONUP:
-		case SDL_JOYBUTTONDOWN: {
-			SET_STRING(object, "type", event.type == SDL_JOYBUTTONUP
-				? "joystickButtonUp"
-				: "joystickButtonDown");
-			SET_NUM(object, "joystick", event.jbutton.which);
-			SET_NUM(object, "button", event.jbutton.button);
-			break ;
-		}
-		case SDL_JOYDEVICEADDED: {
-			SET_STRING(object, "type", "joystickDeviceAdd");
-			SET_NUM(object, "index", event.jdevice.which);
-			break;
-		}
-		case SDL_JOYDEVICEREMOVED: {
-			SET_STRING(object, "type", "joystickDeviceRemove");
-			SET_NUM(object, "joystick", event.jdevice.which);
-			break ;
-		}
-
-		case SDL_CONTROLLERAXISMOTION: {
-			SET_STRING(object, "type", "controllerAxisMotion");
-			break;
-		}
-		case SDL_CONTROLLERBUTTONDOWN: {
-			SET_STRING(object, "type", "controllerButtonDown");
-			break;
-		}
-		case SDL_CONTROLLERBUTTONUP: {
-			SET_STRING(object, "type", "controllerButtonDown");
-			break;
-		}
-		case SDL_CONTROLLERDEVICEADDED: {
-			SET_STRING(object, "type", "controllerDeviceAdded");
-			break;
-		}
-		case SDL_CONTROLLERDEVICEREMOVED: {
-			SET_STRING(object, "type", "controllerDeviceRemoved");
-			break;
-		}
-		case SDL_CONTROLLERDEVICEREMAPPED: {
-			SET_STRING(object, "type", "controllerDeviceRemapped");
-			break;
-		}
-
-		case SDL_FINGERUP:
-		case SDL_FINGERDOWN: {
-			SET_STRING(object, "type", event.type == SDL_FINGERUP
-				? "fingerUp"
-				: "fingerDown");
-			SET_NUM(object, "touch_id", event.tfinger.touchId);
-			SET_NUM(object, "finger_id", event.tfinger.fingerId);
-			SET_NUM(object, "pressure", event.tfinger.pressure);
-			SET_NUM(object, "x", event.tfinger.x);
-			SET_NUM(object, "y", event.tfinger.y);
-			break;
-		}
-		case SDL_FINGERMOTION: {
-			SET_STRING(object, "type", "fingerMotion");
-			SET_NUM(object, "touch_id", event.tfinger.touchId);
-			SET_NUM(object, "finger_id", event.tfinger.fingerId);
-			SET_NUM(object, "pressure", event.tfinger.pressure);
-			SET_NUM(object, "x", event.tfinger.x);
-			SET_NUM(object, "y", event.tfinger.y);
-			SET_NUM(object, "dx", event.tfinger.dx);
-			SET_NUM(object, "dy", event.tfinger.dy);
-			break;
-		}
-
-		case SDL_CLIPBOARDUPDATE: {
-			SET_STRING(object, "family", "clipboard");
-			SET_STRING(object, "type", "update");
-			break;
-		}
-
-		case SDL_DROPBEGIN:
-		case SDL_DROPCOMPLETE: {
-			SET_STRING(object, "family", "drop");
-			SET_STRING(object, "type", event.type == SDL_DROPBEGIN
-				? "dropBegin"
-				: "dropComplete");
-			SET_NUM(object, "window", event.drop.windowID);
-			break;
-		}
-		case SDL_DROPFILE:
-		case SDL_DROPTEXT: {
-			SET_STRING(object, "family", "drop");
-			bool is_file = event.type == SDL_DROPFILE;
-			SET_STRING(object, "type", is_file ? "dropFile" : "dropText");
-			SET_NUM(object, "window", event.drop.windowID);
-
-			allocated_drop_file = event.drop.file;
-			SET_STRING(object, is_file ? "file" : "text", allocated_drop_file);
-			break;
-		}
-
-		case SDL_AUDIODEVICEADDED:
-		case SDL_AUDIODEVICEREMOVED: {
-			SET_STRING(object, "family", "audioDevice");
-			SET_STRING(object, "type", event.type == SDL_AUDIODEVICEADDED
-				? "deviceAdd"
-				: "deviceRemove");
-			SET_NUM(object, "index", event.adevice.which);
-			SET_BOOL(object, "recording", event.adevice.iscapture);
-			break;
-		}
-	}
-	return nullptr;
-}
-
-ErrorMessage *
-events_poll (Variant & object)
-{
-	SDL_Event event;
-	bool got_event = SDL_PollEvent(&event);
-
-	if (!got_event) { return nullptr; }
-
-	packageEvent(event, object);
-
-	return nullptr;
-}
-
-ErrorMessage *
-events_wait (int timeout, Variant & object)
-{
-	SDL_Event event;
-
-	bool got_event = SDL_WaitEventTimeout(&event, timeout);
-	SDL_ClearError();
-
-	if (!got_event) { return nullptr; }
-
-	packageEvent(event, object);
 
 	return nullptr;
 }
@@ -1693,27 +1868,66 @@ mouse_showCursor (bool show)
 ErrorMessage *
 joystick_getDevices(Variant & list)
 {
-	int num_joysticks = SDL_NumJoysticks();
-	if (num_joysticks < 0) {
+	int num_devices = SDL_NumJoysticks();
+	if (num_devices < 0) {
 		RETURN_ERROR("SDL_NumJoysticks() error: %s\n", SDL_GetError());
 	}
 
 	MAKE_LIST(list);
 
-	for (int i = 0; i < num_joysticks; i++) {
+	for (int i = 0; i < num_devices; i++) {
+		Variant device;
+		MAKE_MAP(device);
+
+		SET_NUM(device, "_index", i);
+
+		int id = SDL_JoystickGetDeviceInstanceID(i);
+		SET_NUM(device, "id", id);
+
+		int type = SDL_JoystickGetDeviceType(i);
+		SET_NUM(device, "type", type);
+
 		const char * name = SDL_JoystickNameForIndex(i);
 		if (name == nullptr) {
 			RETURN_ERROR("SDL_JoystickNameForIndex(%d) error: %s\n", i, SDL_GetError());
 		}
+		SET_STRING(device, "name", name);
 
-		Variant joystick;
-		MAKE_MAP(joystick);
+		const char * path = SDL_JoystickPathForIndex(i);
+		if (path == nullptr) {
+			RETURN_ERROR("SDL_JoystickPathForIndex(%d) error: %s\n", i, SDL_GetError());
+		}
+		SET_STRING(device, "path", path);
 
-		SET_STRING(joystick, "name", name);
-		SET_NUM(joystick, "index", i);
-		SET_NUM(joystick, "controller", SDL_IsGameController(i));
+		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(i);
+		char * guid_string = _allocateString(33);
+		SDL_JoystickGetGUIDString(guid, guid_string, 33);
+		SET_STRING(device, "guid", guid_string);
 
-		APPEND(list, joystick);
+		int vendor = SDL_JoystickGetDeviceVendor(i);
+		SET_NUM(device, "vendor", vendor);
+
+		int product = SDL_JoystickGetDeviceProduct(i);
+		SET_NUM(device, "product", product);
+
+		int version = SDL_JoystickGetDeviceProductVersion(i);
+		SET_NUM(device, "version", version);
+
+		int player = SDL_JoystickGetDevicePlayerIndex(i);
+		SET_NUM(device, "player", player);
+
+		bool is_controller = SDL_IsGameController(i);
+		SET_BOOL(device, "isController", is_controller);
+		if (is_controller) {
+			const char * mapping = SDL_GameControllerMappingForDeviceIndex(i);
+			if (mapping != nullptr) {
+				SET_STRING(device, "mapping", mapping);
+			} else {
+				SET_NULL(device, "mapping");
+			}
+		}
+
+		APPEND(list, device);
 	}
 
 	return nullptr;
@@ -1730,18 +1944,24 @@ joystick_open (int index, Variant & object)
 	MAKE_MAP(object);
 
 	{
-		SDL_JoystickID device_id = SDL_JoystickInstanceID(joystick);
-		if (device_id < 0) {
+		SDL_JoystickID joystick_id = SDL_JoystickInstanceID(joystick);
+		if (joystick_id < 0) {
 			RETURN_ERROR("SDL_JoystickInstanceID(%d) error: %s\n", index, SDL_GetError());
 		}
-		SET_NUM(object, "id", device_id);
-	}
+		SET_NUM(object, "id", joystick_id);
 
-	{
-		SDL_JoystickGUID guid = SDL_JoystickGetGUID(joystick);
-		char guid_string[33];
-		SDL_JoystickGetGUIDString(guid, guid_string, sizeof(guid_string));
-		SET_STRING(object, "guid", guid_string);
+		SET_NUM(object, "firmwareVersion", SDL_JoystickGetFirmwareVersion(joystick));
+
+		const char * serial = SDL_JoystickGetSerial(joystick);
+		if (serial != nullptr) {
+			SET_STRING(object, "serialNumber", serial);
+		} else {
+			SET_NULL(object, "serialNumber");
+		}
+
+		SET_BOOL(object, "hasLed", SDL_JoystickHasLED(joystick));
+		SET_BOOL(object, "hasRumble", SDL_JoystickHasRumble(joystick));
+		SET_BOOL(object, "hasRumbleTriggers", SDL_JoystickHasRumbleTriggers(joystick));
 	}
 
 	{
@@ -1757,7 +1977,7 @@ joystick_open (int index, Variant & object)
 			Sint16 value = SDL_JoystickGetAxis(joystick, i);
 
 			Variant axis;
-			MAKE_NUM(axis, value);
+			MAKE_NUM(axis, _joystickMapAxis(value));
 			APPEND(axes, axis);
 		}
 
@@ -1802,7 +2022,7 @@ joystick_open (int index, Variant & object)
 			int pressed = SDL_JoystickGetButton(joystick, i);
 
 			Variant button;
-			MAKE_NUM(button, pressed);
+			MAKE_BOOL(button, pressed);
 			APPEND(buttons, button);
 		}
 
@@ -1833,11 +2053,11 @@ joystick_open (int index, Variant & object)
 }
 
 ErrorMessage *
-joystick_close (int device_id)
+joystick_close (int joystick_id)
 {
-	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(device_id);
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
 	if (joystick == nullptr) {
-		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", device_id, SDL_GetError());
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
 	}
 
 	SDL_JoystickClose(joystick);
@@ -1846,11 +2066,11 @@ joystick_close (int device_id)
 }
 
 ErrorMessage *
-joystick_getPower (int device_id, int * power)
+joystick_getPower (int joystick_id, int * power)
 {
-	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(device_id);
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
 	if (joystick == nullptr) {
-		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", device_id, SDL_GetError());
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
 	}
 
 	*power = SDL_JoystickCurrentPowerLevel(joystick);
@@ -1858,6 +2078,65 @@ joystick_getPower (int device_id, int * power)
 	return nullptr;
 }
 
+ErrorMessage *
+joystick_rumble (
+	int joystick_id,
+	double low_freq_rumble,
+	double high_freq_rumble,
+	int duration
+) {
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
+	if (joystick == nullptr) {
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
+
+	SDL_JoystickRumble(joystick, low_freq_rumble * 0xFFFF, high_freq_rumble * 0xFFFF, duration);
+
+	return nullptr;
+}
+
+ErrorMessage *
+joystick_setLed (int joystick_id, double red, double green, double blue)
+{
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
+	if (joystick == nullptr) {
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
+
+	SDL_JoystickSetLED(joystick, red * 0xFF, green * 0xFF, blue * 0xFF);
+
+	return nullptr;
+}
+
+ErrorMessage *
+joystick_setPlayer (int joystick_id, int player)
+{
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
+	if (joystick == nullptr) {
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
+
+	SDL_JoystickSetPlayerIndex(joystick, player);
+
+	return nullptr;
+}
+
+ErrorMessage *
+joystick_rumbleTriggers (
+	int joystick_id,
+	double left_rumble,
+	double right_rumble,
+	int duration
+) {
+	SDL_Joystick * joystick = SDL_JoystickFromInstanceID(joystick_id);
+	if (joystick == nullptr) {
+		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
+
+	SDL_JoystickRumbleTriggers(joystick, left_rumble * 0xFFFF, right_rumble * 0xFFFF, duration);
+
+	return nullptr;
+}
 
 ErrorMessage *
 controller_open (int index, Variant & object)
@@ -1875,142 +2154,159 @@ controller_open (int index, Variant & object)
 			RETURN_ERROR("SDL_GameControllerGetJoystick(%d) error: %s\n", index, SDL_GetError());
 		}
 
-		SDL_JoystickID device_id = SDL_JoystickInstanceID(joystick);
-		if (device_id < 0) {
+		SDL_JoystickID joystick_id = SDL_JoystickInstanceID(joystick);
+		if (joystick_id < 0) {
 			RETURN_ERROR("SDL_JoystickInstanceID(%d) error: %s\n", index, SDL_GetError());
 		}
-		SET_NUM(object, "id", device_id);
+		SET_NUM(object, "id", joystick_id);
 
-		SDL_JoystickGUID guid = SDL_JoystickGetGUID(joystick);
-		char guid_string[33];
-		SDL_JoystickGetGUIDString(guid, guid_string, sizeof(guid_string));
-		SET_STRING(object, "guid", guid_string);
-	}
+		SET_NUM(object, "firmwareVersion", SDL_JoystickGetFirmwareVersion(joystick));
 
-	{
-		Variant sticks;
-		MAKE_MAP(sticks);
-
-		{
-			Variant left;
-			MAKE_MAP(left);
-
-			Sint16 x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-			SET_NUM(left, "x", x);
-
-			Sint16 y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-			SET_NUM(left, "y", y);
-
-			Sint16 button = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK);
-			SET_NUM(left, "button", button);
-
-			SET_MAP(sticks, "left", left);
+		const char * serial = SDL_JoystickGetSerial(joystick);
+		if (serial != nullptr) {
+			SET_STRING(object, "serialNumber", serial);
+		} else {
+			SET_NULL(object, "serialNumber");
 		}
 
-		{
-			Variant right;
-			MAKE_MAP(right);
+		SET_BOOL(object, "hasLed", SDL_JoystickHasLED(joystick));
+		SET_BOOL(object, "hasRumble", SDL_JoystickHasRumble(joystick));
+		SET_BOOL(object, "hasRumbleTriggers", SDL_JoystickHasRumbleTriggers(joystick));
+	}
 
-			Sint16 x = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
-			SET_NUM(right, "x", x);
+	ErrorMessage * error = _controllerGetState(controller, object);
+	if (error) { return error; }
 
-			Sint16 y = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
-			SET_NUM(right, "y", y);
+	return nullptr;
+}
 
-			Sint16 button = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
-			SET_NUM(right, "button", button);
+ErrorMessage *
+controller_close (int controller_id)
+{
+	SDL_GameController * controller = SDL_GameControllerFromInstanceID(controller_id);
+	if (controller == nullptr) {
+		RETURN_ERROR("SDL_GameControllerFromInstanceID(%d) error: %s\n", controller_id, SDL_GetError());
+	}
 
-			SET_MAP(sticks, "right", right);
+	SDL_GameControllerClose(controller);
+
+	return nullptr;
+}
+
+ErrorMessage *
+controller_addMappings (char ** mappings, int length)
+{
+	for (int i = 0; i < length; i++) {
+		if (SDL_GameControllerAddMapping(mappings[i]) == -1) {
+			RETURN_ERROR("SDL_GameControllerAddMapping(%s) error: %s\n", mappings[i], error);
 		}
+	}
+	return nullptr;
+}
 
-		SET_MAP(object, "sticks", sticks);
+
+ErrorMessage *
+audio_getDevices(bool capture, Variant & list)
+{
+	MAKE_LIST(list);
+
+	int num_devices = SDL_GetNumAudioDevices(capture ? 1 : 0);
+	if (num_devices == -1) {
+		const char * error = SDL_GetError();
+		if (error != no_error) {
+			RETURN_ERROR("SDL_GetNumAudioDevices(%d) error: %s\n", capture, error);
+		}
+		return nullptr;
 	}
 
-	{
-		Variant triggers;
-		MAKE_MAP(triggers);
+	for (int i = 0; i < num_devices; i++) {
+		Variant device;
+		MAKE_MAP(device);
 
-		Sint16 left = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-		SET_NUM(triggers, "left", left);
+		SET_BOOL(device, "isRecorder", capture);
 
-		Sint16 right = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-		SET_NUM(triggers, "right", right);
+		const char * name = SDL_GetAudioDeviceName(i, capture);
+		if (name == nullptr) {
+			RETURN_ERROR("SDL_GetAudioDeviceName(%d, %d) error: %s\n", i, capture, SDL_GetError());
+		}
+		SET_STRING(device, "name", name);
 
-		SET_MAP(object, "triggers", triggers);
-	}
-
-	{
-		Variant shoulders;
-		MAKE_MAP(shoulders);
-
-		Sint16 left = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-		SET_NUM(shoulders, "left", left);
-
-		Sint16 right = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-		SET_NUM(shoulders, "right", right);
-
-		SET_MAP(object, "shoulders", shoulders);
-	}
-
-	{
-		Variant dpad;
-		MAKE_MAP(dpad);
-
-		Sint16 left = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-		SET_NUM(dpad, "left", left);
-
-		Sint16 right = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-		SET_NUM(dpad, "right", right);
-
-		Sint16 up = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
-		SET_NUM(dpad, "up", up);
-
-		Sint16 down = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-		SET_NUM(dpad, "down", down);
-
-		SET_MAP(object, "dpad", dpad);
-	}
-
-	{
-		Variant buttons;
-		MAKE_MAP(buttons);
-
-		Sint16 a = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A);
-		SET_NUM(buttons, "a", a);
-
-		Sint16 b = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B);
-		SET_NUM(buttons, "b", b);
-
-		Sint16 x = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X);
-		SET_NUM(buttons, "x", x);
-
-		Sint16 y = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y);
-		SET_NUM(buttons, "y", y);
-
-		Sint16 guide = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_GUIDE);
-		SET_NUM(buttons, "guide", guide);
-
-		Sint16 back = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK);
-		SET_NUM(buttons, "back", back);
-
-		Sint16 start = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START);
-		SET_NUM(buttons, "start", start);
-
-		SET_MAP(object, "buttons", buttons);
+		APPEND(list, device);
 	}
 
 	return nullptr;
 }
 
 ErrorMessage *
-controller_close (int device_id)
-{
-	SDL_GameController * controller = SDL_GameControllerFromInstanceID(device_id);
-	if (controller == nullptr) {
-		RETURN_ERROR("SDL_GameControllerFromInstanceID(%d) error: %s\n", device_id, SDL_GetError());
+audio_openDevice (
+	const char * name, bool capture,
+	int freq, int format, int channels, int samples,
+	int * audio_id
+) {
+	SDL_AudioSpec desired;
+	SDL_memset(&desired, 0, sizeof(desired));
+	desired.freq = freq;
+	desired.format = format;
+	desired.channels = channels;
+	desired.samples = samples;
+
+	SDL_AudioDeviceID audio_device = SDL_OpenAudioDevice(name, capture ? 1 : 0, &desired, nullptr, 0);
+	if (audio_device == 0) {
+		RETURN_ERROR("SDL_OpenAudioDevice() error: %s\n", SDL_GetError());
 	}
 
-	SDL_GameControllerClose(controller);
+	*audio_id = audio_device;
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_close (int audio_id)
+{
+	SDL_PauseAudioDevice(audio_id, 1);
+	SDL_CloseAudioDevice(audio_id);
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_play (int audio_id, bool play)
+{
+	SDL_PauseAudioDevice(audio_id, play ? 0 : 1);
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_getQueueSize (int audio_id, unsigned int * size)
+{
+	*size = SDL_GetQueuedAudioSize(audio_id);
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_clearQueue (int audio_id)
+{
+	SDL_ClearQueuedAudio(audio_id);
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_enqueue (int audio_id, void * src, int size)
+{
+	if (SDL_QueueAudio(audio_id, src, size) != 0) {
+		RETURN_ERROR("SDL_QueueAudio() error: %s\n", SDL_GetError());
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+audio_dequeue (int audio_id, void * dst, int size, int * num)
+{
+	*num = SDL_DequeueAudio(audio_id, dst, size);
 
 	return nullptr;
 }

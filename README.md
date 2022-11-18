@@ -5,8 +5,8 @@
 [![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/%2540kmamal%252Fsdl)](https://snyk.io/test/npm/@kmamal/sdl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-SDL2 bindings for Node.js.
-Provides window management, input events, audio playback/recording, and clipboard manipulation.
+SDL bindings for Node.js.
+Provides window management, input events (keyboard, mouse, joystick, and controller), audio playback/recording, and clipboard manipulation.
 You can use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
@@ -33,7 +33,7 @@ const sdl = require('@kmamal/sdl')
 const createContext = require('@kmamal/gl')
 
 const window = sdl.video.createWindow({
-  title: "Hello, World!"
+  title: "Hello, World!",
   opengl: true,
 })
 
@@ -126,11 +126,62 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
+* [sdl.keyboard](#sdlkeyboard)
+  * [Virtual keys](#virtual-keys)
+  * [Enum: SCANCODE](#enum-scancode)
+  * [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
+  * [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
+  * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
+* [sdl.mouse](#sdlmouse)
+  * [Mouse cursors](#mouse-cursors)
+  * [Enum: BUTTON](#enum-buttons)
+  * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
+  * [sdl.mouse.position](#sdlmouseposition)
+  * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
+  * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursor)
+  * [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
+  * [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
+  * [sdl.mouse.hideCursor()](#sdlmousehidecursor)
+  * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
+  * [sdl.mouse.uncapture()](#sdlmousecapture)
+* [sdl.joystick](#sdljoystick)
+  * [Joystick types](#joystick-types)
+  * [Hat positions](#hat-positions)
+  * [Power levels](#power-levels)
+  * [Event: 'deviceAdd'](#joystick-event-device-add)
+  * [Event: 'deviceRemove'](#joystick-event-device-remove)
+  * [sdl.joystick.devices](#sdljoystickdevices)
+  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
+  * [class JoystickInstance](#class-joystickinstance)
+    * [Event: 'close'](#joystick-instance-event-close)
+    * [joystickInstance.device](#joystickinstancedevice)
+    * [joystickInstance.axes](#joystickinstanceaxes)
+    * [joystickInstance.balls](#joystickinstanceballs)
+    * [joystickInstance.buttons](#joystickinstancebuttons)
+    * [joystickInstance.hats](#joystickinstancehats)
+    * [joystickInstance.power](#joystickinstancepower)
+    * [joystickInstance.closed](#joystickinstanceclosed)
+    * [joystickInstance.close()](#joystickinstanceclose)
+* [sdl.controller](#sdlcontroller)
+  * [Event: 'deviceAdd'](#controller-event-device-add)
+  * [Event: 'deviceRemove'](#controller-event-device-remove)
+  * [Event: 'deviceRemap'](#controller-event-device-remap)
+  * [sdl.controller.devices](#sdlcontrollerdevices)
+  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
+  * [class controllerInstance](#class-controllerinstance)
+    * [Event: 'close'](#controller-instance-event-close)
+    * [controllerInstance.id](#controllerinstanceid)
+    * [controllerInstance.device](#controllerinstancedevice)
+    * [controllerInstance.axes](#controllerinstanceaxes)
+    * [controllerInstance.buttons](#controllerinstancebuttons)
+    * [controllerInstance.power](#controllerinstancepower)
+    * [controllerInstance.closed](#controllerinstanceclosed)
+    * [controllerInstance.close()](#controllerinstanceclose)
 * [sdl.audio](#sdlaudio)
   * [Audio data](#audio-data)
   * [Sample formats](#sample-formats)
-  * [Event: 'deviceAdd'](#event-deviceadd)
-  * [Event: 'deviceRemove'](#event-deviceremove)
+  * [Event: 'deviceAdd'](#audio-event-device-add)
+  * [Event: 'deviceRemove'](#audio-event-device-remove)
   * [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
   * [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
   * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
@@ -140,6 +191,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioInstance](#class-audioinstance)
+    * [Event: 'close'](#audio-instance-event-close)
     * [audioInstance.id](#audioinstanceid)
     * [audioInstance.name](#audioinstancename)
     * [audioInstance.channels](#audioinstancechannels)
@@ -163,24 +215,6 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [playbackInstance.enqueue(buffer[, bytes])](#playbackinstanceenqueuebuffer-bytes)
   * [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
     * [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
-* [sdl.keyboard](#sdlkeyboard)
-  * [Virtual keys](#virtual-keys)
-  * [Enum: SCANCODE](#enum-scancode)
-  * [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
-  * [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
-  * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
-* [sdl.mouse](#sdlmouse)
-  * [Mouse cursors](#mouse-cursors)
-  * [Enum: BUTTON](#enum-buttons)
-  * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
-  * [sdl.mouse.position](#sdlmouseposition)
-  * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
-  * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursor)
-  * [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
-  * [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
-  * [sdl.mouse.hideCursor()](#sdlmousehidecursor)
-  * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
-  * [sdl.mouse.uncapture()](#sdlmousecapture)
 * [sdl.clipboard](#sdlclipboard)
   * [Event: 'update'](#event-update)
   * [sdl.clipboard.text](#sdlclipboardtext)
@@ -406,7 +440,7 @@ Creates a new window.
 
 The following restrictions apply:
 * If you specify the `display` option, you can't also specify the `x` or `y` options, and vice-versa.
-* The `resizable` and `borderless` options can't both be true.
+* The `resizable` and `borderless` options are mutually exclusive.
 * The `vsync` option only applies to windows that are also `accelerated`.
 
 If you set the `opengl` option, then you can only render to the window with OpenGL calls.
@@ -795,343 +829,6 @@ A destroyed window object should not be used any further.
 Destroys the window.
 
 
-## sdl.audio
-
-### Audio data
-
-The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output.
-The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
-
-Audio data are a sequence of frames, with each frame being a sequence of samples.
-A _sample_ is a single number representing the intensity of a single audio channel at a specific point in time.
-For audio with multiple channels, each point in time is represented by one sample per channel.
-This is called a _frame_.
-The samples in a frame are arranged as follows:
-* For 1 channel (mono) a frame contains just the one sample.
-* For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
-* For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
-* For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
-
-So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, you could do:
-
-```js
-const TWO_PI = 2 * Math.PI
-
-const {
-  channels,
-  frequency,
-  bytesPerSample,
-  minSampleValue,
-  maxSampleValue,
-  zeroSampleValue,
-} = playbackInstance
-
-const range = maxSampleValue - minSampleValue
-const amplitude = range / 2
-
-const sineAmplitude = 0.3 * amplitude
-const sineNote = 440
-const sinePeriod = 1 / sineNote
-
-const duration = 3
-const numFrames = duration * frequency
-const numSamples = numFrames * channels
-const numBytes = numSamples * bytesPerSample
-const buffer = Buffer.alloc(numBytes)
-
-let offset = 0
-for (let i = 0; i < numFrames; i++) {
-  const time = i / frequency
-  const angle = time / sinePeriod * TWO_PI
-  const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
-  for (let j = 0; j < channels; j++) {
-    offset = playbackInstance.writeSample(buffer, sample, offset)
-  }
-}
-```
-
-### Sample formats
-
-String values used to represent how audio samples are stored in a Buffer.
-
-| Value | Corresponding `SDL_AudioFormat` | Comment |
-| --- | --- | --- |
-| `'s8'` | `AUDIO_S8` | signed 8-bit samples |
-| `'u8'` | `AUDIO_U8` | unsigned 8-bit samples |
-| `'s16lsb'` | `AUDIO_S16LSB` | signed 16-bit samples in little-endian byte order |
-| `'s16msb'` | `AUDIO_S16MSB` | signed 16-bit samples in big-endian byte order |
-| `'s16sys'` | `AUDIO_S16SYS` | signed 16-bit samples in native byte order |
-| `'s16'` | `AUDIO_S16` | alias for `'s16lsb'` |
-| `'u16lsb'` | `AUDIO_U16LSB` | unsigned 16-bit samples in little-endian byte order |
-| `'u16msb'` | `AUDIO_U16MSB` | unsigned 16-bit samples in big-endian byte order |
-| `'u16sys'` | `AUDIO_U16SYS` | unsigned 16-bit samples in native byte order |
-| `'u16'` | `AUDIO_U16` | alias for `'u16lsb'` |
-| `'s32lsb'` | `AUDIO_S32LSB` | 32-bit integer samples in little-endian byte order |
-| `'s32msb'` | `AUDIO_S32MSB` | 32-bit integer samples in big-endian byte order |
-| `'s32sys'` | `AUDIO_S32SYS` | 32-bit integer samples in native byte order |
-| `'s32'` | `AUDIO_S32` | alias for `'s32lsb'` |
-| `'f32lsb'` | `AUDIO_F32LSB` | 32-bit floating point samples in little-endian byte order |
-| `'f32msb'` | `AUDIO_F32MSB` | 32-bit floating point samples in big-endian byte order |
-| `'f32sys'` | `AUDIO_F32SYS` | 32-bit floating point samples in native byte order |
-| `'f32'` | `AUDIO_F32` | alias for `'f32lsb'` |
-
-### Event: 'deviceAdd'
-
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
-
-Fired when a new audio device becomes available.
-Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
-
-### Event: 'deviceRemove'
-
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudioinstances) indicating the device that caused the event.
-
-Fired when an existing audio device is removed.
-Check [`sdl.audio.devices`](#sdlaudioinstances) to get the new list of audio devices.
-When this event is emitted, all instances that were opened from the removed device are closed automatically.
-
-### sdl.audio.bytesPerSample(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The number of bytes.
-
-Helper function which maps each sample format to the corresponding number of bytes its samples take up.
-
-### sdl.audio.minSampleValue(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The minimum sample value.
-
-Helper function which maps each sample format to the corresponding minimum value its samples can take.
-
-### sdl.audio.maxSampleValue(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The maximum sample value.
-
-Helper function which maps each sample format to the corresponding maximum value its samples can take.
-
-### sdl.audio.zeroSampleValue(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The zero sample value.
-
-Helper function which maps each sample format to the sample value that corresponds to silence.
-
-### sdl.audio.readSample(format, buffer[, offset])
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* `buffer: <Buffer>` The buffer to read the sample from.
-* `offset: <number>` The position from which to read the sample. Default: `0`
-* Returns: `<number>` The value of the sample read.
-
-Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
-For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
-
-### sdl.audio.writeSample(format, buffer, value[, offset])
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* `buffer: <Buffer>` The buffer to write the sample to.
-* `value: <number>` The value of the sample to write.
-* `offset: <number>` The position at which to write the sample. Default: `0`
-* Returns: `<number>` The updated `offset`.
-
-Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
-For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
-
-### sdl.audio.devices
-
-* `<object>[]`
-  * `name: <string>` The name of the device.
-  * `recording: <boolean>` Will be `true` if this is a recording device.
-
-A list of all the detected audio devices.
-Sample output for PulseAudio:
-
-```js
-[
-  { name: 'Built-in Audio Analog Stereo', recording: false },
-  { name: 'Built-in Audio Analog Stereo', recording: true }
-]
-```
-
-### sdl.audio.openDevice(device[, options])
-
-* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices) that should be opened.
-* `options: <object>`
-  * `name: <string>`: Some drivers accept custom names, such as a hostname/IP address for a remote audio server, or a filename in the diskaudio driver. Default: `device.name`.
-  * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
-  * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
-  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default `'f32'`.
-  * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
-* Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
-
-Initializes an audio device for playback/recording and returns a corresponding instance.
-If the opened device is a playback device, then the returned object will be an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it will be an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
-
-The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the instance will look like.
-See also the section on [audio data](#audio-data).
-
-The `buffered` option specifies the "delay" that you will experience between the application and the audio driver.
-With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently.
-Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
-
-
-## class AudioInstance
-
-This class is not directly exposed by the API so you can't use it with the `new` operator.
-It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
-
-### audioInstance.id
-
-* `<number>`
-
-A unique identifier for the instance.
-
-### audioInstance.device
-
-* `<object>`
-
-The [device](#sdlaudiodevices) from which this instance was opened.
-
-### audioInstance.name
-
-* `<string>`
-
-The name the instance was opened with.
-
-### audioInstance.channels
-
-* `<number>`
-
-The number of channels the instance was opened with.
-
-### audioInstance.frequency
-
-* `<number>`
-
-The sampling frequency (in frames per second) the instance was opened with.
-
-### audioInstance.format
-
-* [`<SampleFormat>`](#sample-formats)
-
-The audio sample format the instance was opened with.
-
-### audioInstance.bytesPerSample
-
-* `<number>`
-
-The number of bytes that make up a single audio sample, based on the format the instance was opened with.
-
-### audioInstance.minSampleValue
-
-* `<number>`
-
-The minimum value a sample can take, based on the format the instance was opened with.
-
-### audioInstance.maxSampleValue
-
-* `<number>`
-
-The maximum value a sample can take, based on the format the instance was opened with.
-
-### audioInstance.zeroSampleValue
-
-* `<number>`
-
-The sample value that corresponds to silence, based on the format the instance was opened with.
-
-### audioInstance.readSample(buffer[, offset])
-
-* `buffer: <Buffer>` The buffer to read the sample from.
-* `offset: <number>` The position from which to read the sample. Default: `0`
-* Returns: `<number>` The value of the sample read.
-
-Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
-For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
-
-### audioInstance.writeSample(buffer, value[, offset])
-
-* `buffer: <Buffer>` The buffer to write the sample to.
-* `value: <number>` The value of the sample to write.
-* `offset: <number>` The position at which to write the sample. Default: `0`
-* Returns: `<number>` The updated `offset`.
-
-Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
-For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
-
-### audioInstance.buffered
-
-* `<number>`
-
-The buffer size (in frames) the instance was opened with.
-
-### audioInstance.playing
-
-* `<boolean>`
-
-Will be `true` if the instance is currently playing.
-
-### audioInstance.play([play])
-
-* `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
-
-Starts or stops the instance.
-
-### audioInstance.pause()
-
-Equivalent to [`audioInstance.play(false)`](#audioinstanceplayplay)
-
-### audioInstance.queued
-
-* `<number>`
-
-The number of bytes that are currently queued up, waiting to be either played by the instance or dequeued by the user.
-
-### audioInstance.clearQueue()
-
-Clears the queued data.
-
-### audioInstance.closed
-
-* `<boolean>`
-
-Will be `true` if the instance is closed.
-A closed instance object should not be used any further.
-
-### audioInstance.close()
-
-Closes the instance.
-
-
-## class AudioPlaybackInstance extends AudioInstance
-
-This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a playback device is opened.
-
-### playbackInstance.enqueue(buffer[, bytes])
-
-* `buffer: <Buffer>` The buffer to read data from.
-* `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
-
-Takes generated audio data from the buffer, and writes it to the queue, from which it will be played back.
-
-
-## class AudioRecordingInstance extends AudioInstance
-
-This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a recording device is opened.
-
-### recordingInstance.dequeue(buffer[, bytes])
-
-* `buffer: <Buffer>` The buffer to write data to.
-* `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
-* Returns: `<number>` The actual number of bytes read.
-
-Takes recorded audio data that has been put on the queue, and writes it to the provided buffer.
-
-
 ## sdl.keyboard
 
 There are three levels at which you can deal with the keyboard: physical keys ([scancodes](#enum-scancode)), virtual keys ([keys](#virtual-keys)), and text ([`'textInput'`](#event-textinput) events).
@@ -1439,7 +1136,7 @@ If multiple physical keys produce the same virtual key, then only the first one 
 * Returns: `<boolean[]>` an object representing the state of each key.
 
 The returned array can be indexed with [`Scancode`](#enum-scancode) values.
-Pressed keys will correspond to `true` values.
+The values will be `true` for keys that are pressed and `false` otherwise.
 
 
 ## sdl.mouse
@@ -1532,6 +1229,541 @@ When the mouse has been captured you will continue receiving mouse events even i
 ### sdl.mouse.uncapture()
 
 Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
+
+
+## sdl.joystick
+
+### Joystick types
+
+String values used to represent the type of a joystick device.
+
+| Value | Corresponding `SDL_JoystickType` |
+| --- | --- | --- |
+| `'unknown'` | `SDL_JOYSTICK_TYPE_UNKNOWN` |
+| `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
+| `'wheel'` | `SDL_JOYSTICK_TYPE_WHEEL` |
+| `'arcadestick'` | `SDL_JOYSTICK_TYPE_ARCADE_STICK` |
+| `'flightstick'` | `SDL_JOYSTICK_TYPE_FLIGHT_STICK` |
+| `'dancepad'` | `SDL_JOYSTICK_TYPE_DANCE_PAD` |
+| `'guitar'` | `SDL_JOYSTICK_TYPE_GUITAR` |
+| `'drumkit'` | `SDL_JOYSTICK_TYPE_DRUM_KIT` |
+| `'arcadepad'` | `SDL_JOYSTICK_TYPE_ARCADE_PAD` |
+| `'throttle'` | `SDL_JOYSTICK_TYPE_THROTTLE` |
+
+### Hat positions
+
+String values used to represent the positions of a joystick hat
+
+| Value | Corresponding SDL2 enum |
+| --- | --- | --- |
+| `'centered'` | `SDL_HAT_CENTERED` |
+| `'up'` | `SDL_HAT_UP` |
+| `'right'` | `SDL_HAT_RIGHT` |
+| `'down'` | `SDL_HAT_DOWN` |
+| `'left'` | `SDL_HAT_LEFT` |
+| `'rightup'` | `SDL_HAT_RIGHTUP` |
+| `'rightdown'` | `SDL_HAT_RIGHTDOWN` |
+| `'leftup'` | `SDL_HAT_LEFTUP` |
+| `'leftdown'` | `SDL_HAT_LEFTDOWN` |
+
+### Power levels
+
+String values used to represent the power level of a joystick device.
+
+| Value | Corresponding `SDL_JoystickPowerLevel` |
+| --- | --- | --- |
+| `'unknown'` | `SDL_JOYSTICK_POWER_UNKNOWN` |
+| `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
+| `'low'` | `SDL_JOYSTICK_POWER_LOW` |
+| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
+| `'full'` | `SDL_JOYSTICK_POWER_FULL` |
+| `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
+| `'max'` | `SDL_JOYSTICK_POWER_MAX` |
+
+<a id="joystick-event-device-add"></a>
+
+### Event: 'deviceAdd'
+
+* `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
+
+Fired when a new joystick device becomes available.
+Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
+
+<a id="joystick-event-device-remove"></a>
+
+### Event: 'deviceRemove'
+
+* `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
+
+Fired when an existing joystick device is removed.
+Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
+When this event is emitted, all instances that were opened from the removed device are closed automatically.
+
+### sdl.joystick.devices
+
+* `<object>[]`
+  * `id: <number>` The unique id for the device.
+  * `type:`[`<JoystickType>`](#joystick-types) The type of the device.
+  * `name: <string>` The name of the device.
+  * `path: <string>` The implementation dependent path of the device.
+  * `guid: <string>` The GUID of the device.
+  * `vendor: <number>` The USB vendor ID of the device.
+  * `product: <number>` The USB product ID of the device.
+  * `version: <number>` The USB product version of the device.
+  * `player: <number>` The player index for the device.
+
+A list of all the detected joystick devices.
+Sample output:
+
+```js
+[
+  {
+    id: 0,
+    type: 'gamecontroller',
+    name: 'Generic USB Joystick',
+    guid: '03000000790000000600000010010000',
+    vendor: 121,
+    product: 6,
+    version: 272,
+    player: 0,
+  },
+]
+```
+
+### sdl.joystick.openDevice(device[, options])
+
+* `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that should be opened.
+* Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
+
+Initializes an joystick device and returns a corresponding instance.
+
+## class JoystickInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice) are of this type.
+
+<a id="joystick-instance-event-close"></a>
+
+### Event: 'close'
+
+Fired when the instance is about to close.
+Handle cleanup here.
+
+### joystickInstance.device
+
+* `<object>`
+
+The [device](#sdljoystickdevices) from which this instance was opened.
+
+### joystickInstance.axes
+
+* `<number>[]`
+
+An array of values, each corresponding to the position of one of the joystick's axes.
+The values are normalized from `-1` to `+1`.
+It may be necessary to impose certain tolerances on these values to account for jitter.
+
+### joystickInstance.balls
+
+* `<object>[]`
+  * `x: <number>` The horizontal position of the joystick's ball.
+  * `y: <number>` The vertical position of the joystick's ball.
+
+An array of values, each corresponding to the position of one of the joystick's balls.
+
+### joystickInstance.buttons
+
+* `<boolean>[]`
+
+An array of values, each corresponding to the state of one of the joystick's buttons.
+The values will be `true` for buttons that are pressed and `false` otherwise.
+
+### joystickInstance.hats
+
+* [`<HatPosition>`](#hat-positions)`[]`
+
+An array of values, each corresponding to the position of one of the joystick's hats.
+
+### joystickInstance.power
+
+* [`<PowerLevel>`](#power-levels)
+
+The current power level of the joystick device.
+
+### joystickInstance.closed
+
+* `<boolean>`
+
+Will be `true` if the instance is closed.
+A closed instance object should not be used any further.
+
+### joystickInstance.close()
+
+Closes the instance.
+
+
+## sdl.controller
+
+// TODO: mention https://github.com/gabomdq/SDL_GameControllerDB
+
+
+## sdl.audio
+
+### Audio data
+
+The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output.
+The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
+
+An audio buffer is a sequence of frames, and each frame is a sequence of samples.
+A _sample_ is a single number representing the intensity of an audio channel at a point in time.
+For audio with multiple channels, each point in time is represented by multiple samples (one per channel) that together make up a _frame_.
+The samples in a frame are arranged as follows:
+* For 1 channel (mono) a frame contains just the one sample.
+* For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
+* For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
+* For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
+
+So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, you could do:
+
+```js
+const TWO_PI = 2 * Math.PI
+
+const {
+  channels,
+  frequency,
+  bytesPerSample,
+  minSampleValue,
+  maxSampleValue,
+  zeroSampleValue,
+} = playbackInstance
+
+const range = maxSampleValue - minSampleValue
+const amplitude = range / 2
+
+const sineAmplitude = 0.3 * amplitude
+const sineNote = 440
+const sinePeriod = 1 / sineNote
+
+const duration = 3
+const numFrames = duration * frequency
+const numSamples = numFrames * channels
+const numBytes = numSamples * bytesPerSample
+const buffer = Buffer.alloc(numBytes)
+
+let offset = 0
+for (let i = 0; i < numFrames; i++) {
+  const time = i / frequency
+  const angle = time / sinePeriod * TWO_PI
+  const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
+  for (let j = 0; j < channels; j++) {
+    offset = playbackInstance.writeSample(buffer, sample, offset)
+  }
+}
+```
+
+### Sample formats
+
+String values used to represent how audio samples are stored in a Buffer.
+
+| Value | Corresponding `SDL_AudioFormat` | Comment |
+| --- | --- | --- |
+| `'s8'` | `AUDIO_S8` | signed 8-bit samples |
+| `'u8'` | `AUDIO_U8` | unsigned 8-bit samples |
+| `'s16lsb'` | `AUDIO_S16LSB` | signed 16-bit samples in little-endian byte order |
+| `'s16msb'` | `AUDIO_S16MSB` | signed 16-bit samples in big-endian byte order |
+| `'s16sys'` | `AUDIO_S16SYS` | signed 16-bit samples in native byte order |
+| `'s16'` | `AUDIO_S16` | alias for `'s16lsb'` |
+| `'u16lsb'` | `AUDIO_U16LSB` | unsigned 16-bit samples in little-endian byte order |
+| `'u16msb'` | `AUDIO_U16MSB` | unsigned 16-bit samples in big-endian byte order |
+| `'u16sys'` | `AUDIO_U16SYS` | unsigned 16-bit samples in native byte order |
+| `'u16'` | `AUDIO_U16` | alias for `'u16lsb'` |
+| `'s32lsb'` | `AUDIO_S32LSB` | 32-bit integer samples in little-endian byte order |
+| `'s32msb'` | `AUDIO_S32MSB` | 32-bit integer samples in big-endian byte order |
+| `'s32sys'` | `AUDIO_S32SYS` | 32-bit integer samples in native byte order |
+| `'s32'` | `AUDIO_S32` | alias for `'s32lsb'` |
+| `'f32lsb'` | `AUDIO_F32LSB` | 32-bit floating point samples in little-endian byte order |
+| `'f32msb'` | `AUDIO_F32MSB` | 32-bit floating point samples in big-endian byte order |
+| `'f32sys'` | `AUDIO_F32SYS` | 32-bit floating point samples in native byte order |
+| `'f32'` | `AUDIO_F32` | alias for `'f32lsb'` |
+
+<a id="audio-event-device-add"></a>
+
+### Event: 'deviceAdd'
+
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+
+Fired when a new audio device becomes available.
+Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
+
+<a id="audio-event-device-remove"></a>
+
+### Event: 'deviceRemove'
+
+* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+
+Fired when an existing audio device is removed.
+Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
+When this event is emitted, all instances that were opened from the removed device are closed automatically.
+
+### sdl.audio.bytesPerSample(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The number of bytes.
+
+Helper function which maps each sample format to the corresponding number of bytes its samples take up.
+
+### sdl.audio.minSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The minimum sample value.
+
+Helper function which maps each sample format to the corresponding minimum value its samples can take.
+
+### sdl.audio.maxSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The maximum sample value.
+
+Helper function which maps each sample format to the corresponding maximum value its samples can take.
+
+### sdl.audio.zeroSampleValue(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<number>` The zero sample value.
+
+Helper function which maps each sample format to the sample value that corresponds to silence.
+
+### sdl.audio.readSample(format, buffer[, offset])
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* `buffer: <Buffer>` The buffer to read the sample from.
+* `offset: <number>` The position from which to read the sample. Default: `0`
+* Returns: `<number>` The value of the sample read.
+
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
+For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+
+### sdl.audio.writeSample(format, buffer, value[, offset])
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* `buffer: <Buffer>` The buffer to write the sample to.
+* `value: <number>` The value of the sample to write.
+* `offset: <number>` The position at which to write the sample. Default: `0`
+* Returns: `<number>` The updated `offset`.
+
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
+For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+
+### sdl.audio.devices
+
+* `<object>[]`
+  * `type: <string>` Will be either `'playback'` or `'recording'`.
+  * `name: <string>` The name of the device.
+
+A list of all the detected audio devices.
+Sample output for PulseAudio:
+
+```js
+[
+  { name: 'Built-in Audio Analog Stereo', type: 'playback' },
+  { name: 'Built-in Audio Analog Stereo', type: 'recording' },
+]
+```
+
+Note that this list can sometimes be empty.
+Despite that, in many common cases, it is still possible to successfully open the default device by only passing `type` to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) like this:
+
+```js
+const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
+```
+
+### sdl.audio.openDevice(device[, options])
+
+* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices), or a custom device.
+  * `type: <string>`: Should be either `'playback'` or `'recording'`.
+  * `name: <string>|<null>`: The name of the device. Optional.
+* `options: <object>`
+  * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
+  * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
+  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default `'f32'`.
+  * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
+* Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
+
+Initializes an audio device for playback/recording and returns a corresponding instance.
+If the opened device is a playback device, then the returned object will be an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it will be an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+
+Most of the time you will be passing objects from [`sdl.audio.devices`](#sdlaudiodevices) as the first argument to this function.
+It is also possible to let SDL pick the most appropriate device by only passing the `type` property without a `name` like this:
+
+```js
+const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
+```
+
+Some audio drivers also support arbitrary and driver-specific strings for the device `name` such as hostname/IP address for a remote audio server, or a filename in the diskaudio driver.
+These drivers will usually return an empty list for [`sdl.audio.devices`](#sdlaudiodevices).
+
+The `channels`, `frequency` and `format` options together define what the data in the `Buffer` objects you read from or write to the instance will look like.
+See also the section on [audio data](#audio-data).
+
+The `buffered` option specifies the "delay" that you will experience between the application and the audio driver.
+With smaller values you will have smaller delays, but you will also have to read/write data from/to the driver more frequently.
+Applications such as virtual instruments that need to play audio in reaction to user input will want to change this option to lower values.
+
+
+## class AudioInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+
+<a id="audio-instance-event-close"></a>
+
+### Event: 'close'
+
+Fired when the audio instance is about to close.
+Handle cleanup here.
+
+### audioInstance.id
+
+* `<number>`
+
+A unique identifier for the instance.
+
+### audioInstance.device
+
+* `<object>`
+
+The device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when this instance was opened.
+
+### audioInstance.channels
+
+* `<number>`
+
+The number of channels the instance was opened with.
+
+### audioInstance.frequency
+
+* `<number>`
+
+The sampling frequency (in frames per second) the instance was opened with.
+
+### audioInstance.format
+
+* [`<SampleFormat>`](#sample-formats)
+
+The audio sample format the instance was opened with.
+
+### audioInstance.bytesPerSample
+
+* `<number>`
+
+The number of bytes that make up a single audio sample, based on the format the instance was opened with.
+
+### audioInstance.minSampleValue
+
+* `<number>`
+
+The minimum value a sample can take, based on the format the instance was opened with.
+
+### audioInstance.maxSampleValue
+
+* `<number>`
+
+The maximum value a sample can take, based on the format the instance was opened with.
+
+### audioInstance.zeroSampleValue
+
+* `<number>`
+
+The sample value that corresponds to silence, based on the format the instance was opened with.
+
+### audioInstance.readSample(buffer[, offset])
+
+* `buffer: <Buffer>` The buffer to read the sample from.
+* `offset: <number>` The position from which to read the sample. Default: `0`
+* Returns: `<number>` The value of the sample read.
+
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
+For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+
+### audioInstance.writeSample(buffer, value[, offset])
+
+* `buffer: <Buffer>` The buffer to write the sample to.
+* `value: <number>` The value of the sample to write.
+* `offset: <number>` The position at which to write the sample. Default: `0`
+* Returns: `<number>` The updated `offset`.
+
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
+For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+
+### audioInstance.buffered
+
+* `<number>`
+
+The buffer size (in frames) the instance was opened with.
+
+### audioInstance.playing
+
+* `<boolean>`
+
+Will be `true` if the instance is currently playing.
+
+### audioInstance.play([play])
+
+* `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
+
+Starts or stops the instance.
+
+### audioInstance.pause()
+
+Equivalent to [`audioInstance.play(false)`](#audioinstanceplayplay)
+
+### audioInstance.queued
+
+* `<number>`
+
+The number of bytes that are currently queued up, waiting to be either played by the instance or dequeued by the user.
+
+### audioInstance.clearQueue()
+
+Clears the queued data.
+
+### audioInstance.closed
+
+* `<boolean>`
+
+Will be `true` if the instance is closed.
+A closed instance object should not be used any further.
+
+### audioInstance.close()
+
+Closes the instance.
+
+
+## class AudioPlaybackInstance extends AudioInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a playback device is opened.
+
+### playbackInstance.enqueue(buffer[, bytes])
+
+* `buffer: <Buffer>` The buffer to read data from.
+* `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
+
+Takes generated audio data from the buffer, and writes it to the queue, from which it will be played back.
+
+
+## class AudioRecordingInstance extends AudioInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of this type, if a recording device is opened.
+
+### recordingInstance.dequeue(buffer[, bytes])
+
+* `buffer: <Buffer>` The buffer to write data to.
+* `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
+* Returns: `<number>` The actual number of bytes read.
+
+Takes recorded audio data that has been put on the queue, and writes it to the provided buffer.
 
 
 ## sdl.clipboard

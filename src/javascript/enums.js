@@ -10,4 +10,4 @@ for (const [ key, obj ] of Object.entries(enums)) {
 	enums[`${key}Names`] = names
 }
 
-module.exports = { enums }
+module.exports = enums

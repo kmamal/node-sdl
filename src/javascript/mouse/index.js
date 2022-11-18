@@ -1,8 +1,8 @@
 const Bindings = require('../bindings')
-const { enums } = require('../enums')
+const Enums = require('../enums')
 
 const mouse = {
-	get BUTTON () { return enums.button },
+	get BUTTON () { return Enums.button },
 
 	getButton (button) {
 		if (!Number.isFinite(button)) { throw Object.assign(new Error("button must be a number"), { button }) }
@@ -27,7 +27,7 @@ const mouse = {
 	},
 
 	setCursor (cursor) {
-		const _cursor = enums.cursor[cursor]
+		const _cursor = Enums.cursor[cursor]
 		if (typeof cursor !== 'string') { throw Object.assign(new Error("cursor must be a string"), { cursor }) }
 		if (!_cursor) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
 
@@ -35,7 +35,7 @@ const mouse = {
 	},
 
 	setCursorImage (width, height, stride, format, buffer, x, y) {
-		const _format = enums.pixelFormat[format] ?? null
+		const _format = Enums.pixelFormat[format] ?? null
 
 		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
