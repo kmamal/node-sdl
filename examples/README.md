@@ -26,6 +26,8 @@ There are 2 problems:
 1. The buffer we get is upside down. The `readPixels` function lets you specify a rectangle of pixels to copy, but its origin is at the lower left corner (what's called "cartesian coordinates") vs the more familiar upper left corner ("screen coordinates"). This is only a minor annoyance since you can arrange you drawing code to accommodate this (as we did in this example).
 1. To render anything this way, you have to send the data to the GPU, then read back the result to memory, only to send it back to the GPU to be displayed. This is inelegant.
 
+(Note also that we had to set `accelerated: false` for the window because `gl` interferes with hardware-accelerated windows.)
+
 ## [5. (Direct) WebGL Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/05-webgl-drawing)
 
 Same example, but this time with the [`@kmamal/gl`](https://github.com/kmamal/headless-gl#readme) library. Note that the call to `render` is gone. It has instead been replaced by the call to `gl.swap()`. Note also that, because the window is double-buffered, we need to call `gl.swap()` twice when the window is resized.

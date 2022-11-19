@@ -1225,8 +1225,10 @@ audio_openDevice(napi_env env, napi_callback_info info)
 
 	size_t name_length;
 	CALL_NAPI(napi_get_value_string_utf8, argv[0], nullptr, 0, &name_length);
-	name = (char *) malloc(name_length + 1);
-	CALL_NAPI(napi_get_value_string_utf8, argv[0], name, name_length + 1, nullptr);
+	if (name_length > 0) {
+		name = (char *) malloc(name_length + 1);
+		CALL_NAPI(napi_get_value_string_utf8, argv[0], name, name_length + 1, nullptr);
+	}
 
 	bool capture;
 	CALL_NAPI(napi_get_value_bool, argv[1], &capture);

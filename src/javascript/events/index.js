@@ -320,9 +320,13 @@ const handleEvents = () => {
 					} break
 
 					case Enums.eventType.remap: {
+						const { axes, buttons } = event
+						delete event.axes
+						delete event.buttons
+
 						for (const controllerInstance of collection.values()) {
-							Object.assign(controllerInstance._axes, event.axes)
-							Object.assign(controllerInstance._buttons, event.buttons)
+							Object.assign(controllerInstance._axes, axes)
+							Object.assign(controllerInstance._buttons, buttons)
 							controllerInstance.emit('remap', event)
 						}
 					} break

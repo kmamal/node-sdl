@@ -1,7 +1,10 @@
 import sdl from '@kmamal/sdl'
 import createContext from 'gl'
 
-const window = sdl.video.createWindow({ resizable: true })
+const window = sdl.video.createWindow({
+	resizable: true,
+	accelerated: false,
+})
 
 const { width, height } = window
 const gl = createContext(width, height)

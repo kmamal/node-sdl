@@ -731,7 +731,6 @@ export namespace Sdl {
 			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
 			on (event: 'close', listener: () => void): this
 
-			readonly id: number
 			readonly device: Device
 			readonly firmwareVersion: number
 			readonly serialNumber: string
@@ -773,7 +772,6 @@ export namespace Sdl {
 
 		interface Device {
 			readonly id: number
-			readonly type: string
 			readonly name: string
 			readonly path: string
 			readonly guid: string
@@ -791,7 +789,6 @@ export namespace Sdl {
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
 			on (event: 'close', listener: () => void): this
 
-			readonly id: number
 			readonly device: Device
 			readonly firmwareVersion: number
 			readonly serialNumber: string
@@ -827,7 +824,7 @@ export namespace Sdl {
 				readonly paddle4: boolean,
 			}
 
-			readonly power: PowerLevel
+			readonly power: Joystick.PowerLevel
 
 			readonly hasLed: boolean
 			setLed (red: number, green: number, blue: number): void
@@ -881,7 +878,7 @@ export namespace Sdl {
 
 		interface Device {
 			readonly type: "recording"|"playback"
-			readonly name: string
+			readonly name?: string
 		}
 
 		interface PlaybackDevice extends Device {
@@ -897,7 +894,7 @@ export namespace Sdl {
 
 			readonly id: number
 			readonly device: Device
-			readonly name: string
+
 			readonly channels: number
 			readonly frequency: number
 			readonly format: Format
@@ -930,7 +927,6 @@ export namespace Sdl {
 		}
 
 		interface AudioOptions {
-			name?: string
 			channels?: 1 | 2 | 4 | 6
 			frequency?: number
 			format?: Format

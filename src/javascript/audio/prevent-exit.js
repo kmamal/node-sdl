@@ -4,7 +4,10 @@ const { AudioPlaybackInstance } = require('./audio-playback-instance')
 let timeout
 
 const resetTimeout = () => {
-	if (timeout) { clearTimeout(timeout) }
+	if (timeout) {
+		clearTimeout(timeout)
+		timeout = null
+	}
 }
 
 process.on('beforeExit', (code) => {

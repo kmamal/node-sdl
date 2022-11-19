@@ -6,11 +6,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SDL bindings for Node.js.
-Provides window management, input events (keyboard, mouse, joystick, and controller), audio playback/recording, and clipboard manipulation.
+Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, and clipboard manipulation.
 You can use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
-Prebuilt binaries are available for x64 architectures, as well as arm-based Macs.
+Prebuilt binaries are available for x64 architectures, and arm-based Macs.
 
 
 ## Installation
@@ -153,28 +153,56 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.joystick.devices](#sdljoystickdevices)
   * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
   * [class JoystickInstance](#class-joystickinstance)
+    * [Event: 'axisMotion'](#joystick-instance-event-axismotion)
+    * [Event: 'ballMotion'](#event-ballmotion)
+    * [Event: 'buttonDown'](#joystick-instance-event-buttondown)
+    * [Event: 'buttonUp'](#joystick-instance-event-buttonup)
+    * [Event: 'hatMotion'](#event-hatmotion)
     * [Event: 'close'](#joystick-instance-event-close)
     * [joystickInstance.device](#joystickinstancedevice)
+    * [joystickInstance.firmwareversion](#joystickinstancefirmwareversion)
+    * [joystickInstance.serialnumber](#joystickinstanceserialnumber)
     * [joystickInstance.axes](#joystickinstanceaxes)
     * [joystickInstance.balls](#joystickinstanceballs)
     * [joystickInstance.buttons](#joystickinstancebuttons)
     * [joystickInstance.hats](#joystickinstancehats)
     * [joystickInstance.power](#joystickinstancepower)
+    * [joystickInstance.hasLed](#joystickinstancehasled)
+    * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledredgreenblue)
+    * [joystickInstance.hasRumble](#joystickinstancehasrumble)
+    * [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelowhighduration)
+    * [joystickInstance.stopRumble()](#joystickinstancestoprumble)
+    * [joystickInstance.hasRumbleTriggers](#joystickinstancehasrumbletriggers)
+    * [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleftrightduration)
+    * [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
     * [joystickInstance.closed](#joystickinstanceclosed)
     * [joystickInstance.close()](#joystickinstanceclose)
 * [sdl.controller](#sdlcontroller)
   * [Event: 'deviceAdd'](#controller-event-device-add)
   * [Event: 'deviceRemove'](#controller-event-device-remove)
-  * [Event: 'deviceRemap'](#controller-event-device-remap)
+  * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
   * [sdl.controller.devices](#sdlcontrollerdevices)
   * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
   * [class controllerInstance](#class-controllerinstance)
+    * [Event: 'axisMotion'](#controller-instance-event-axismotion)
+    * [Event: 'buttonDown'](#controller-instance-event-buttondown)
+    * [Event: 'buttonUp'](#controller-instance-event-buttonup)
+    * [Event: 'remap'](#event-remap)
     * [Event: 'close'](#controller-instance-event-close)
-    * [controllerInstance.id](#controllerinstanceid)
     * [controllerInstance.device](#controllerinstancedevice)
+    * [controllerInstance.firmwareversion](#controllerinstancefirmwareversion)
+    * [controllerInstance.serialnumber](#controllerinstanceserialnumber)
     * [controllerInstance.axes](#controllerinstanceaxes)
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
+    * [controllerInstance.hasLed](#controllerinstancehasled)
+    * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledredgreenblue)
+    * [controllerInstance.hasRumble](#controllerinstancehasrumble)
+    * [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelowhighduration)
+    * [controllerInstance.stopRumble()](#controllerinstancestoprumble)
+    * [controllerInstance.hasRumbleTriggers](#controllerinstancehasrumbletriggers)
+    * [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleftrightduration)
+    * [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
     * [controllerInstance.closed](#controllerinstanceclosed)
     * [controllerInstance.close()](#controllerinstanceclose)
 * [sdl.audio](#sdlaudio)
@@ -1320,7 +1348,8 @@ Sample output:
   {
     id: 0,
     type: 'gamecontroller',
-    name: 'Generic USB Joystick',
+    name: 'DragonRise Inc. Generic USB Joystick',
+    path: '/dev/input/event21',
     guid: '03000000790000000600000010010000',
     vendor: 121,
     product: 6,
@@ -1335,12 +1364,52 @@ Sample output:
 * `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that should be opened.
 * Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
 
-Initializes an joystick device and returns a corresponding instance.
+Initializes a joystick device and returns a corresponding instance.
 
 ## class JoystickInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
 Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice) are of this type.
+
+<a id="joystick-instance-event-axismotion"></a>
+
+### Event: 'axisMotion'
+
+* `axis: <number>` The index of the axis that moved.
+* `value: <number>` The new axis position.
+
+Fired when one of the joystick's axes moves.
+
+### Event: 'ballMotion'
+
+* `ball: <number>` The index of the ball that moved.
+* `x: <number>` The new x-position of the ball.
+* `y: <number>` The new y-position of the ball.
+
+Fired when one of the joystick's balls moves.
+
+<a id="joystick-instance-event-buttondown"></a>
+
+### Event: 'buttonDown'
+
+* `button: <number>` The index of the button that was pressed.
+
+Fired when one of the joystick's buttons is pressed.
+
+<a id="joystick-instance-event-buttonup"></a>
+
+### Event: 'buttonUp'
+
+* `button: <number>` The index of the button that was released.
+
+Fired when one of the joystick's buttons is released.
+
+### Event: 'hatMotion'
+
+* `hat: <number>` The index of the hat that was moved.
+* `value: `[`<HatPosition>`](#hat-positions) The new hat position.
+
+Fired when one of the joystick's hats is moved.
 
 <a id="joystick-instance-event-close"></a>
 
@@ -1354,6 +1423,18 @@ Handle cleanup here.
 * `<object>`
 
 The [device](#sdljoystickdevices) from which this instance was opened.
+
+### joystickInstance.firmwareVersion
+
+* `<number>`
+
+The joystick's firmware version.
+
+### joystickInstance.serialNumber
+
+* `<string>|<null>`
+
+The joystick's serial number, or `null` if it's not available.
 
 ### joystickInstance.axes
 
@@ -1390,6 +1471,60 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 The current power level of the joystick device.
 
+### joystickInstance.hasLed
+
+* `<boolean>`
+
+Will be `true` if there is a LED light on the joystick, whose color can be controlled.
+
+### joystickInstance.setLed(red, green, blue)
+
+* `red: <number>` The red component of the led color, from `0` to `1`.
+* `green: <number>` The green component of the led color, from `0` to `1`.
+* `blue: <number>` The blue component of the led color, from `0` to `1`.
+
+Sets the color of the LED light on the joystick.
+
+### joystickInstance.hasRumble
+
+* `<boolean>`
+
+Will be `true` if the joystick has rumble motors.
+
+### joystickInstance.rumble([low, [high, [duration]]])
+
+* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default `1`.
+* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default `1`.
+* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+
+Makes the joystick rumble for a set `duration`.
+Calling this function again before `duration` has ran out, overrides the previous call.
+
+### joystickInstance.stopRumble()
+
+Stops the joystick rumbling.
+Equivalent to `joystickInstance.rumble(0, 0)`.
+
+### joystickInstance.hasRumbleTriggers
+
+* `<boolean>`
+
+Will be `true` if the joystick has rumble motors on the triggers.
+
+### joystickInstance.rumbleTriggers([left, [right, [duration]]])
+
+* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default `1`.
+* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default `1`.
+* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+
+Makes the joystick triggers rumble for a set `duration`.
+Calling this function again before `duration` has ran out, overrides the previous call.
+
+### joystickInstance.stopRumbleTriggers()
+
+Stops the joystick trigger rumbling.
+Equivalent to `joystickInstance.rumbleTriggers(0, 0)`.
+
 ### joystickInstance.closed
 
 * `<boolean>`
@@ -1404,8 +1539,232 @@ Closes the instance.
 
 ## sdl.controller
 
-// TODO: mention https://github.com/gabomdq/SDL_GameControllerDB
+An SDL controller is an abstraction over [`joysticks`](#sdljoystick) based on the xbox360 controller: They have a DPAD, two analog sticks, 4 buttons on the right (called A, B, X, Y), shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
+The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the X-Axis of the left Analog Stick, or `controllerInstance.buttons.b` is always the rightmost buttons of the 4 buttons on the right.
+This makes it easy to provide consistent input bindings, like "press B to jump, move around with the left analog stick".
+With a pure joystick instance it's impossible to know which axis or button corresponds to which physical axis/button on the device.
 
+Because controllers are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a controller device have the same id, then they refer to the same underlying physical device).
+For a joystick device to also be available as a controller device it needs a "mapping".
+A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name. See the sample output [`here`](#sdlcontrolerdevices) for an example.
+SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on https://github.com/gabomdq/SDL_GameControllerDB.
+You can add them via:
+```js
+const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
+const result = await fetch(url)
+const text = await result.text()
+const mappings = text.split('\n')
+sdl.controller.addMappings(mappings)
+```
+
+### Event: 'deviceAdd'
+
+* `device: <object>`: An object from [`sdl.controler.devices`](#sdlcontrolerdevices) indicating the device that caused the event.
+
+Fired when a new controler device becomes available.
+Check [`sdl.controler.devices`](#sdlcontrolerdevices) to get the new list of controler devices.
+
+<a id="controler-event-device-remove"></a>
+
+### Event: 'deviceRemove'
+
+* `device: <object>`: An object from [`sdl.controler.devices`](#sdlcontrolerdevices) indicating the device that caused the event.
+
+Fired when an existing controler device is removed.
+Check [`sdl.controler.devices`](#sdlcontrolerdevices) to get the new list of controler devices.
+When this event is emitted, all instances that were opened from the removed device are closed automatically.
+
+### sdl.controler.addMappings(mappings)
+
+* `mappings: <string>[]` An array of mappings to register.
+
+Registers new mappings for controllers.
+This can cause already opened controller instances to be [remapped](#event-remap).
+
+### sdl.controler.devices
+
+* `<object>[]`
+  * `id: <number>` The unique id for the device.
+  * `name: <string>` The name of the device.
+  * `path: <string>` The implementation dependent path of the device.
+  * `guid: <string>` The GUID of the device.
+  * `vendor: <number>` The USB vendor ID of the device.
+  * `product: <number>` The USB product ID of the device.
+  * `version: <number>` The USB product version of the device.
+  * `player: <number>` The player index for the device.
+  * `mapping: <string>` The axis and button mapping for this device.
+
+A list of all the detected controler devices.
+Sample output:
+
+```js
+[
+  {
+    id: 0,
+    name: 'DragonRise Inc. Generic USB Joystick',
+    path: '/dev/input/event21',
+    guid: '03000000790000000600000010010000',
+    vendor: 121,
+    product: 6,
+    version: 272,
+    player: 0,
+    mapping: '03000000790000000600000010010000,DragonRise Inc. Generic USB Joystick,a:b2,b:b1,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a3,righty:a4,start:b9,x:b3,y:b0,',
+  },
+]
+```
+
+### sdl.controler.openDevice(device[, options])
+
+* `device: <object>` An object from [`sdl.controler.devices`](#sdlcontrolerdevices) that should be opened.
+* Returns: [`<ControlerInstance>`](#class-controlerinstance) an object representing the opened controler device instance.
+
+Initializes an controler device and returns a corresponding instance.
+
+## class ControlerInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.controler.openDevice()`](#sdlcontroleropendevicedevice) are of this type.
+
+<a id="controler-instance-event-axismotion"></a>
+
+### Event: 'axisMotion'
+
+* `axis: <string>` The name of the axis that moved.
+* `value: <number>` The new axis position.
+
+Fired when one of the controller's axes moves.
+
+<a id="controler-instance-event-buttondown"></a>
+
+### Event: 'buttonDown'
+
+* `button: <string>` The name of the button that was pressed.
+
+Fired when one of the controller's buttons is pressed.
+
+<a id="controler-instance-event-buttonup"></a>
+
+### Event: 'buttonUp'
+
+* `button: <number>` The index of the button that was released.
+
+Fired when one of the controller's buttons is released.
+
+### Event: 'remap'
+
+Fired when a new mapping for this controller is applied (usually via [`sdl.controller.addMappings()`](#sdlcontrolleraddmappingsmappings)).
+This can cause all of the controller's axes and buttons to aquire new values.
+
+<a id="controler-instance-event-close"></a>
+
+### Event: 'close'
+
+Fired when the instance is about to close.
+Handle cleanup here.
+
+### controlerInstance.device
+
+* `<object>`
+
+The [device](#sdlcontrolerdevices) from which this instance was opened.
+
+### controlerInstance.firmwareVersion
+
+* `<number>`
+
+The controller's firmware version.
+
+### controlerInstance.serialNumber
+
+* `<string>|<null>`
+
+The controller's serial number, or `null` if it's not available.
+
+### controlerInstance.axes
+
+* `<number>[]`
+
+An array of values, each corresponding to the position of one of the controler's axes.
+The values are normalized from `-1` to `+1`.
+It may be necessary to impose certain tolerances on these values to account for jitter.
+
+### controlerInstance.buttons
+
+* `<boolean>[]`
+
+An array of values, each corresponding to the state of one of the controler's buttons.
+The values will be `true` for buttons that are pressed and `false` otherwise.
+
+### controlerInstance.power
+
+* [`<PowerLevel>`](#power-levels)
+
+The current power level of the controler device.
+
+### controlerInstance.hasLed
+
+* `<boolean>`
+
+Will be `true` if there is a LED light on the controller, whose color can be controlled.
+
+### controlerInstance.setLed(red, green, blue)
+
+* `red: <number>` The red component of the led color, from `0` to `1`.
+* `green: <number>` The green component of the led color, from `0` to `1`.
+* `blue: <number>` The blue component of the led color, from `0` to `1`.
+
+Sets the color of the LED light on the controller.
+
+### controlerInstance.hasRumble
+
+* `<boolean>`
+
+Will be `true` if the controller has rumble motors.
+
+### controlerInstance.rumble([low, [high, [duration]]])
+
+* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default `1`.
+* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default `1`.
+* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+
+Makes the controller rumble for a set `duration`.
+Calling this function again before `duration` has ran out, overrides the previous call.
+
+### controlerInstance.stopRumble()
+
+Stops the controller rumbling.
+Equivalent to `controllerInstance.rumble(0, 0)`.
+
+### controlerInstance.hasRumbleTriggers
+
+* `<boolean>`
+
+Will be `true` if the controller has rumble motors on the triggers.
+
+### controlerInstance.rumbleTriggers([left, [right, [duration]]])
+
+* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default `1`.
+* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default `1`.
+* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+
+Makes the controller triggers rumble for a set `duration`.
+Calling this function again before `duration` has ran out, overrides the previous call.
+
+### controlerInstance.stopRumbleTriggers()
+
+Stops the controller trigger rumbling.
+Equivalent to `controllerInstance.rumbleTriggers(0, 0)`.
+
+### controlerInstance.closed
+
+* `<boolean>`
+
+Will be `true` if the instance is closed.
+A closed instance object should not be used any further.
+
+### controlerInstance.close()
+
+Closes the instance.
 
 ## sdl.audio
 

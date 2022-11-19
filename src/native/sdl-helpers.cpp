@@ -883,11 +883,11 @@ _controllerGetState (SDL_GameController * controller, Variant & object)
 ErrorMessage *
 packageEvent (const SDL_Event & event, Variant & object)
 {
-	if (allocated_drop_file) {
+	if (allocated_drop_file != nullptr) {
 		SDL_free(allocated_drop_file);
 		allocated_drop_file = nullptr;
 	}
-	if (allocated_clipboard) {
+	if (allocated_clipboard != nullptr) {
 		SDL_free(allocated_clipboard);
 		allocated_clipboard = nullptr;
 	}
@@ -1050,7 +1050,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 			Variant devices;
 			ErrorMessage * error = joystick_getDevices(devices);
-			if (error) { return error; }
+			if (error != nullptr) { return error; }
 			SET_LIST(object, "devices", devices);
 			break;
 		}
@@ -1061,7 +1061,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 			Variant devices;
 			ErrorMessage * error = joystick_getDevices(devices);
-			if (error) { return error; }
+			if (error != nullptr) { return error; }
 			SET_LIST(object, "devices", devices);
 			break;
 		}
@@ -1109,9 +1109,9 @@ packageEvent (const SDL_Event & event, Variant & object)
 			SET_NUM(object, "controllerId", controllerId);
 
 			SDL_GameController * controller = SDL_GameControllerFromInstanceID(controllerId);
-			if (controller) {
+			if (controller != nullptr) {
 				ErrorMessage * error = _controllerGetState(controller, object);
-				if (error) { return error ; }
+				if (error != nullptr) { return error ; }
 			}
 			break;
 		}
@@ -1143,7 +1143,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 			Variant devices;
 			ErrorMessage * error = audio_getDevices(is_capture, devices);
-			if (error) { return error; }
+			if (error != nullptr) { return error; }
 			SET_LIST(object, "devices", devices);
 			break;
 		}
@@ -1156,7 +1156,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 			Variant devices;
 			ErrorMessage * error = audio_getDevices(is_capture, devices);
-			if (error) { return error; }
+			if (error != nullptr) { return error; }
 			SET_LIST(object, "devices", devices);
 			break;
 		}
@@ -1310,11 +1310,12 @@ ErrorMessage *
 _windowUpdateTexture(
 	SDL_Window * window,
 	SDL_Renderer * renderer,
-	int format, int width, int height,
+	int width, int height,
 	SDL_Texture ** texture_dst
 ) {
 	int window_id = SDL_GetWindowID(window);
 
+	int format = SDL_GetWindowPixelFormat(window);
 	SDL_Texture * texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 	if (texture == nullptr) {
 		RETURN_ERROR("SDL_CreateTexture(%d) error: %s\n", window_id, SDL_GetError());
@@ -1360,8 +1361,7 @@ _windowUpdateRenderer(
 
 	int width, height;
 	SDL_GetWindowSize(window, &width, &height);
-	int format = SDL_GetWindowPixelFormat(window);
-	ErrorMessage * error = _windowUpdateTexture(window, renderer, format, width, height, nullptr);
+	ErrorMessage * error = _windowUpdateTexture(window, renderer, width, height, nullptr);
 	if (error != nullptr) { return error; }
 
 	return nullptr;
@@ -1399,7 +1399,7 @@ window_create (
 		**height = 480;
 	}
 	int desired_flags = 0
-		| (visible ? 0 : SDL_WINDOW_HIDDEN)
+		| SDL_WINDOW_HIDDEN
 		| (*fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
 		| (*resizable ? SDL_WINDOW_RESIZABLE : 0)
 		| (*borderless ? SDL_WINDOW_BORDERLESS : 0)
@@ -1422,21 +1422,25 @@ window_create (
 		RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
 	}
 
-	SDL_SysWMinfo info;
-	SDL_VERSION(&(info.version));
-	bool got_info = SDL_GetWindowWMInfo(window, &info);
-	if (!got_info) {
-		RETURN_ERROR("SDL_GetWindowWMInfo(%d) error: %s\n", *window_id, SDL_GetError());
-	}
+	if (opengl) {
+		SDL_SysWMinfo info;
+		SDL_VERSION(&(info.version));
+		bool got_info = SDL_GetWindowWMInfo(window, &info);
+		if (!got_info) {
+			RETURN_ERROR("SDL_GetWindowWMInfo(%d) error: %s\n", *window_id, SDL_GetError());
+		}
 
-	int size = sizeof(NativeWindow);
-	NativeWindow * pointer = (NativeWindow *) malloc(size);
-	*pointer = GET_WINDOW(info);
-	*native_pointer = pointer;
-	*native_pointer_size = size;
+		int size = sizeof(NativeWindow);
+		NativeWindow * pointer = (NativeWindow *) malloc(size);
+		*pointer = GET_WINDOW(info);
+		*native_pointer = pointer;
+		*native_pointer_size = size;
+	}
 
 	ErrorMessage * error = _windowUpdateRenderer(window, accelerated, vsync);
 	if (error != nullptr) { return error; }
+
+	if (visible) { SDL_ShowWindow(window); }
 
 	return nullptr;
 }
@@ -1678,18 +1682,19 @@ window_render (
 	SDL_GetWindowSize(window, &window_width, &window_height);
 
 	if (window_width != texture_width || window_height != texture_height) {
-		int format = SDL_GetWindowPixelFormat(window);
-		ErrorMessage * error = _windowUpdateTexture(window, renderer, format, window_width, window_height, &texture);
+		ErrorMessage * error = _windowUpdateTexture(window, renderer, window_width, window_height, &texture);
 		if (error != nullptr) { return error; }
+		texture_width = window_width;
+		texture_height = window_height;
 	}
 
 	SDL_Surface * src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
 	if (src_surface == nullptr) {
-		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d, %d) error: %s\n", window_id, w, h, stride, format, SDL_GetError());
 	}
 
-	if (SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE)) {
-		RETURN_ERROR("SDL_SetTextureBlendMode(%d) error: %s\n", window_id, SDL_GetError());
+	if (SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE) != 0) {
+		RETURN_ERROR("SDL_SetSurfaceBlendMode(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
 	void *texture_pixels;
@@ -1698,7 +1703,7 @@ window_render (
 
 	SDL_Surface * dst_surface = SDL_CreateRGBSurfaceWithFormatFrom(texture_pixels, texture_width, texture_height, SDL_BITSPERPIXEL(texture_format), texture_stride, texture_format);
 	if (dst_surface == nullptr) {
-		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, texture_width, texture_height, texture_format, SDL_GetError());
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d, %d) error: %s\n", window_id, texture_width, texture_height, texture_stride, texture_format, SDL_GetError());
 	}
 
 	if (SDL_BlitSurface(src_surface, NULL, dst_surface, NULL) != 0) {
@@ -1707,7 +1712,7 @@ window_render (
 
 	SDL_UnlockTexture(texture);
 
-	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr)) {
+	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr) != 0) {
 		RETURN_ERROR("SDL_RenderCopy(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
@@ -1817,13 +1822,13 @@ mouse_capture (bool capture)
 ErrorMessage *
 mouse_setCursor (int cursor_id)
 {
-	if (allocated_cursor) {
+	if (allocated_cursor != nullptr) {
 		SDL_FreeCursor(allocated_cursor);
 		allocated_cursor = nullptr;
 	}
 
 	allocated_cursor = SDL_CreateSystemCursor((SDL_SystemCursor) cursor_id);
-	if (!allocated_cursor) {
+	if (allocated_cursor == nullptr) {
 		RETURN_ERROR("SDL_CreateSystemCursor(%d) error: %s\n", cursor_id, SDL_GetError());
 	}
 
@@ -1845,7 +1850,7 @@ mouse_setCursorImage (
 	}
 
 	allocated_cursor = SDL_CreateColorCursor(surface, x, y);
-		if (!allocated_cursor) {
+		if (allocated_cursor == nullptr) {
 		RETURN_ERROR("SDL_CreateColorCursor(%d, %d) error: %s\n", x, y, SDL_GetError());
 	}
 

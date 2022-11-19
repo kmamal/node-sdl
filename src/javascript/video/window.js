@@ -106,7 +106,7 @@ class Window extends EventsViaPoll {
 		this._borderless = result.borderless
 		this._accelerated = result.accelerated
 		this._vsync = result.vsync
-		this._native = result.native
+		this._native = result.native ?? null
 
 		this._title = title
 		this._visible = visible
@@ -125,7 +125,7 @@ class Window extends EventsViaPoll {
 			this.removeAllListeners()
 		})
 
-		// Manually emit an initial resize event (for convenience)
+		// Manually emit an initial resize event for convenience
 		process.nextTick(() => {
 			this.emit('resize', {
 				width: this._width,

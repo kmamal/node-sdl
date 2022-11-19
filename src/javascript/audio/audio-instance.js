@@ -21,6 +21,9 @@ class AudioInstance extends EventsViaPoll {
 
 		const _format = Enums.audioFormat[format] ?? null
 
+		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("name must be a string"), { name }) }
+		if (typeof type !== 'string') { throw Object.assign(new Error("type must be a string"), { type }) }
+		if (type !== 'playback' && type !== 'recording') { throw Object.assign(new Error("type must be either 'playback' or 'recording'"), { type }) }
 		if (!Number.isFinite(channels)) { throw Object.assign(new Error("channels must be a number"), { channels }) }
 		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
 		if (!Number.isFinite(frequency)) { throw Object.assign(new Error("frequency must be a number"), { frequency }) }
@@ -30,7 +33,7 @@ class AudioInstance extends EventsViaPoll {
 		if (!Number.isFinite(buffered)) { throw Object.assign(new Error("buffered must be a number"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 
-		this._id = Bindings.audio_openDevice(name, type === 'recording', frequency, _format, channels, buffered)
+		this._id = Bindings.audio_openDevice(name ?? '', type === 'recording', frequency, _format, channels, buffered)
 
 		this._device = device
 		this._name = name
