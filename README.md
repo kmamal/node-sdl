@@ -26,7 +26,7 @@ npm install @kmamal/sdl
 (But if things go wrong do look over [here](#building-from-source))
 
 
-## Hello world example
+## "Hello, World!" example
 
 ```js
 const sdl = require('@kmamal/sdl')
@@ -35,13 +35,13 @@ const window = sdl.video.createWindow({ title: "Hello, World!" })
 window.on('*', console.log)
 ```
 
-## OpenGL example
+## WebGL example
 ```js
 const sdl = require('@kmamal/sdl')
 const createContext = require('@kmamal/gl')
 
 const window = sdl.video.createWindow({
-  title: "OpenGL!",
+  title: "WebGL!",
   opengl: true,
 })
 
@@ -1274,7 +1274,7 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 String values used to represent the type of a joystick device.
 
 | Value | Corresponding `SDL_JoystickType` |
-| --- | --- | --- |
+| --- | --- |
 | `'unknown'` | `SDL_JOYSTICK_TYPE_UNKNOWN` |
 | `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
 | `'wheel'` | `SDL_JOYSTICK_TYPE_WHEEL` |
@@ -1291,7 +1291,7 @@ String values used to represent the type of a joystick device.
 String values used to represent the positions of a joystick hat
 
 | Value | Corresponding SDL enum |
-| --- | --- | --- |
+| --- | --- |
 | `'centered'` | `SDL_HAT_CENTERED` |
 | `'up'` | `SDL_HAT_UP` |
 | `'right'` | `SDL_HAT_RIGHT` |
