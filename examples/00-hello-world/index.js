@@ -1,3 +1,4 @@
 import sdl from '@kmamal/sdl'
 
-sdl.video.createWindow({ title: "Hello, World!" })
+const window = sdl.video.createWindow({ title: "Hello, World!" })
+window.on('*', console.log)

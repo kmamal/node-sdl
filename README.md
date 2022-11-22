@@ -15,7 +15,7 @@ Prebuilt binaries are available for x64 architectures, and arm-based Macs.
 
 ## Installation
 
-SDL2 is bundled along with the binaries so a separate installation is not necessary.
+SDL is bundled along with the binaries so a separate installation is not necessary.
 This package is self-contained.
 Just run:
 
@@ -26,14 +26,22 @@ npm install @kmamal/sdl
 (But if things go wrong do look over [here](#building-from-source))
 
 
-## Example
+## Hello world example
 
+```js
+const sdl = require('@kmamal/sdl')
+
+const window = sdl.video.createWindow({ title: "Hello, World!" })
+window.on('*', console.log)
+```
+
+## OpenGL example
 ```js
 const sdl = require('@kmamal/sdl')
 const createContext = require('@kmamal/gl')
 
 const window = sdl.video.createWindow({
-  title: "Hello, World!",
+  title: "OpenGL!",
   opengl: true,
 })
 
@@ -160,8 +168,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [Event: 'hatMotion'](#event-hatmotion)
     * [Event: 'close'](#joystick-instance-event-close)
     * [joystickInstance.device](#joystickinstancedevice)
-    * [joystickInstance.firmwareversion](#joystickinstancefirmwareversion)
-    * [joystickInstance.serialnumber](#joystickinstanceserialnumber)
+    * [joystickInstance.firmwareVersion](#joystickinstancefirmwareversion)
+    * [joystickInstance.serialNumber](#joystickinstanceserialnumber)
     * [joystickInstance.axes](#joystickinstanceaxes)
     * [joystickInstance.balls](#joystickinstanceballs)
     * [joystickInstance.buttons](#joystickinstancebuttons)
@@ -183,15 +191,15 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
   * [sdl.controller.devices](#sdlcontrollerdevices)
   * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
-  * [class controllerInstance](#class-controllerinstance)
+  * [class ControllerInstance](#class-controllerinstance)
     * [Event: 'axisMotion'](#controller-instance-event-axismotion)
     * [Event: 'buttonDown'](#controller-instance-event-buttondown)
     * [Event: 'buttonUp'](#controller-instance-event-buttonup)
     * [Event: 'remap'](#event-remap)
     * [Event: 'close'](#controller-instance-event-close)
     * [controllerInstance.device](#controllerinstancedevice)
-    * [controllerInstance.firmwareversion](#controllerinstancefirmwareversion)
-    * [controllerInstance.serialnumber](#controllerinstanceserialnumber)
+    * [controllerInstance.firmwareVersion](#controllerinstancefirmwareversion)
+    * [controllerInstance.serialNumber](#controllerinstanceserialnumber)
     * [controllerInstance.axes](#controllerinstanceaxes)
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
@@ -269,9 +277,9 @@ This event will be followed by a call to `process.exit()`.
 
 * `<object>`
   * `version: <object>`
-    * `compile: <object>` The SDL2 version the bindings were compiled against.
+    * `compile: <object>` The SDL version the bindings were compiled against.
       * `major, minor, patch: <semver>` The components of the version.
-    * `runtime: <object>` The SDL2 version of the dynamic library the is loaded.
+    * `runtime: <object>` The SDL version of the dynamic library the is loaded.
       * `major, minor, patch: <semver>` The components of the version.
   * `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'Mac OS X'`.
   * `drivers: <object>`
@@ -282,9 +290,9 @@ This event will be followed by a call to `process.exit()`.
       * `all: <string>[]` A list of all audio drivers.
       * `current: <string>` The audio driver that is currently selected.
 
-This object is filled with the information produced during the initialization of SDL2.
+This object is filled with the information produced during the initialization of SDL.
 All the values will remain constant throughout the execution of the program.
-If you want to initialize SDL2 with drivers other than the default ones, you can do so via its [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
+If you want to initialize SDL with drivers other than the default ones, you can do so via its [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
 
 Sample data for Ubuntu:
 
@@ -1282,7 +1290,7 @@ String values used to represent the type of a joystick device.
 
 String values used to represent the positions of a joystick hat
 
-| Value | Corresponding SDL2 enum |
+| Value | Corresponding SDL enum |
 | --- | --- | --- |
 | `'centered'` | `SDL_HAT_CENTERED` |
 | `'up'` | `SDL_HAT_UP` |
@@ -1546,7 +1554,7 @@ With a pure joystick instance it's impossible to know which axis or button corre
 
 Because controllers are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a controller device have the same id, then they refer to the same underlying physical device).
 For a joystick device to also be available as a controller device it needs a "mapping".
-A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name. See the sample output [`here`](#sdlcontrolerdevices) for an example.
+A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name. See the sample output [`here`](#sdlcontrollerdevices) for an example.
 SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on https://github.com/gabomdq/SDL_GameControllerDB.
 You can add them via:
 ```js
@@ -1559,29 +1567,29 @@ sdl.controller.addMappings(mappings)
 
 ### Event: 'deviceAdd'
 
-* `device: <object>`: An object from [`sdl.controler.devices`](#sdlcontrolerdevices) indicating the device that caused the event.
+* `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
 
-Fired when a new controler device becomes available.
-Check [`sdl.controler.devices`](#sdlcontrolerdevices) to get the new list of controler devices.
+Fired when a new controller device becomes available.
+Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
 
-<a id="controler-event-device-remove"></a>
+<a id="controller-event-device-remove"></a>
 
 ### Event: 'deviceRemove'
 
-* `device: <object>`: An object from [`sdl.controler.devices`](#sdlcontrolerdevices) indicating the device that caused the event.
+* `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
 
-Fired when an existing controler device is removed.
-Check [`sdl.controler.devices`](#sdlcontrolerdevices) to get the new list of controler devices.
+Fired when an existing controller device is removed.
+Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
 When this event is emitted, all instances that were opened from the removed device are closed automatically.
 
-### sdl.controler.addMappings(mappings)
+### sdl.controller.addMappings(mappings)
 
 * `mappings: <string>[]` An array of mappings to register.
 
 Registers new mappings for controllers.
 This can cause already opened controller instances to be [remapped](#event-remap).
 
-### sdl.controler.devices
+### sdl.controller.devices
 
 * `<object>[]`
   * `id: <number>` The unique id for the device.
@@ -1594,7 +1602,7 @@ This can cause already opened controller instances to be [remapped](#event-remap
   * `player: <number>` The player index for the device.
   * `mapping: <string>` The axis and button mapping for this device.
 
-A list of all the detected controler devices.
+A list of all the detected controller devices.
 Sample output:
 
 ```js
@@ -1613,19 +1621,19 @@ Sample output:
 ]
 ```
 
-### sdl.controler.openDevice(device[, options])
+### sdl.controller.openDevice(device[, options])
 
-* `device: <object>` An object from [`sdl.controler.devices`](#sdlcontrolerdevices) that should be opened.
-* Returns: [`<ControlerInstance>`](#class-controlerinstance) an object representing the opened controler device instance.
+* `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that should be opened.
+* Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
 
-Initializes an controler device and returns a corresponding instance.
+Initializes an controller device and returns a corresponding instance.
 
-## class ControlerInstance
+## class ControllerInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.controler.openDevice()`](#sdlcontroleropendevicedevice) are of this type.
+Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice) are of this type.
 
-<a id="controler-instance-event-axismotion"></a>
+<a id="controller-instance-event-axismotion"></a>
 
 ### Event: 'axisMotion'
 
@@ -1634,7 +1642,7 @@ Instead, objects returned by [`sdl.controler.openDevice()`](#sdlcontroleropendev
 
 Fired when one of the controller's axes moves.
 
-<a id="controler-instance-event-buttondown"></a>
+<a id="controller-instance-event-buttondown"></a>
 
 ### Event: 'buttonDown'
 
@@ -1642,7 +1650,7 @@ Fired when one of the controller's axes moves.
 
 Fired when one of the controller's buttons is pressed.
 
-<a id="controler-instance-event-buttonup"></a>
+<a id="controller-instance-event-buttonup"></a>
 
 ### Event: 'buttonUp'
 
@@ -1655,59 +1663,59 @@ Fired when one of the controller's buttons is released.
 Fired when a new mapping for this controller is applied (usually via [`sdl.controller.addMappings()`](#sdlcontrolleraddmappingsmappings)).
 This can cause all of the controller's axes and buttons to aquire new values.
 
-<a id="controler-instance-event-close"></a>
+<a id="controller-instance-event-close"></a>
 
 ### Event: 'close'
 
 Fired when the instance is about to close.
 Handle cleanup here.
 
-### controlerInstance.device
+### controllerInstance.device
 
 * `<object>`
 
-The [device](#sdlcontrolerdevices) from which this instance was opened.
+The [device](#sdlcontrollerdevices) from which this instance was opened.
 
-### controlerInstance.firmwareVersion
+### controllerInstance.firmwareVersion
 
 * `<number>`
 
 The controller's firmware version.
 
-### controlerInstance.serialNumber
+### controllerInstance.serialNumber
 
 * `<string>|<null>`
 
 The controller's serial number, or `null` if it's not available.
 
-### controlerInstance.axes
+### controllerInstance.axes
 
 * `<number>[]`
 
-An array of values, each corresponding to the position of one of the controler's axes.
+An array of values, each corresponding to the position of one of the controller's axes.
 The values are normalized from `-1` to `+1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
-### controlerInstance.buttons
+### controllerInstance.buttons
 
 * `<boolean>[]`
 
-An array of values, each corresponding to the state of one of the controler's buttons.
+An array of values, each corresponding to the state of one of the controller's buttons.
 The values will be `true` for buttons that are pressed and `false` otherwise.
 
-### controlerInstance.power
+### controllerInstance.power
 
 * [`<PowerLevel>`](#power-levels)
 
-The current power level of the controler device.
+The current power level of the controller device.
 
-### controlerInstance.hasLed
+### controllerInstance.hasLed
 
 * `<boolean>`
 
 Will be `true` if there is a LED light on the controller, whose color can be controlled.
 
-### controlerInstance.setLed(red, green, blue)
+### controllerInstance.setLed(red, green, blue)
 
 * `red: <number>` The red component of the led color, from `0` to `1`.
 * `green: <number>` The green component of the led color, from `0` to `1`.
@@ -1715,13 +1723,13 @@ Will be `true` if there is a LED light on the controller, whose color can be con
 
 Sets the color of the LED light on the controller.
 
-### controlerInstance.hasRumble
+### controllerInstance.hasRumble
 
 * `<boolean>`
 
 Will be `true` if the controller has rumble motors.
 
-### controlerInstance.rumble([low, [high, [duration]]])
+### controllerInstance.rumble([low, [high, [duration]]])
 
 * `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default `1`.
 * `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default `1`.
@@ -1730,18 +1738,18 @@ Will be `true` if the controller has rumble motors.
 Makes the controller rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
 
-### controlerInstance.stopRumble()
+### controllerInstance.stopRumble()
 
 Stops the controller rumbling.
 Equivalent to `controllerInstance.rumble(0, 0)`.
 
-### controlerInstance.hasRumbleTriggers
+### controllerInstance.hasRumbleTriggers
 
 * `<boolean>`
 
 Will be `true` if the controller has rumble motors on the triggers.
 
-### controlerInstance.rumbleTriggers([left, [right, [duration]]])
+### controllerInstance.rumbleTriggers([left, [right, [duration]]])
 
 * `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default `1`.
 * `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default `1`.
@@ -1750,19 +1758,19 @@ Will be `true` if the controller has rumble motors on the triggers.
 Makes the controller triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
 
-### controlerInstance.stopRumbleTriggers()
+### controllerInstance.stopRumbleTriggers()
 
 Stops the controller trigger rumbling.
 Equivalent to `controllerInstance.rumbleTriggers(0, 0)`.
 
-### controlerInstance.closed
+### controllerInstance.closed
 
 * `<boolean>`
 
 Will be `true` if the instance is closed.
 A closed instance object should not be used any further.
 
-### controlerInstance.close()
+### controllerInstance.close()
 
 Closes the instance.
 
@@ -2152,10 +2160,10 @@ A few prerequisites are necessary for that to work:
 
 First, make sure you have installed [node-gyp](https://github.com/nodejs/node-gyp#installation) as well as its dependencies.
 
-On Mac, you will also need to install `xquartz` so that SDL2 can find the X11 headers it needs.
+On Mac, you will also need to install `xquartz` so that SDL can find the X11 headers it needs.
 You can do that via `brew install xquartz`.
 
-You don't need to install any SDL2 libraries or headers.
+You don't need to install any SDL libraries or headers.
 These will be downloaded automatically through the [@kmamal/build-sdl](https://github.com/kmamal/build-sdl) package.
 If `@kmamal/build-sdl` has no prebuilt library for your platform, it will try to compile one on the spot.
 You will need to have `cmake` installed for that to work.
@@ -2165,11 +2173,11 @@ You will need to have `cmake` installed for that to work.
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package. There are some npm scripts in `package.json` that could be of use to you:
 * `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
 * `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
-* `npm run download-sdl` downloads the SDL2 headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
+* `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
 * `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
 * `NODE_SDL_FROM_SOURCE=1 npm install` runs the install script normally, but skips the inital attempt to download the binaries, and goes straight to building from source.
 
-The SDL2 headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
+The SDL headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
 
 The way I normally work is I run `npm run clean` to start fresh, then run `NODE_SDL_FROM_SOURCE=1 npm i` once to prepare everything, then as I make changes I run `npm run build` ro re-build the package.
 
