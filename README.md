@@ -1311,7 +1311,7 @@ String values used to represent the positions of a joystick hat
 String values used to represent the power level of a joystick device.
 
 | Value | Corresponding `SDL_JoystickPowerLevel` |
-| --- | --- | --- |
+| --- | --- |
 | `'unknown'` | `SDL_JOYSTICK_POWER_UNKNOWN` |
 | `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
 | `'low'` | `SDL_JOYSTICK_POWER_LOW` |
