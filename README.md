@@ -142,7 +142,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
 * [sdl.mouse](#sdlmouse)
   * [Mouse cursors](#mouse-cursors)
-  * [Enum: BUTTON](#enum-buttons)
+  * [Enum: BUTTON](#enum-button)
   * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
   * [sdl.mouse.position](#sdlmouseposition)
   * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
