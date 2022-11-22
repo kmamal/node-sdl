@@ -7,7 +7,7 @@
 
 SDL bindings for Node.js.
 Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, and clipboard manipulation.
-You can use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
+You can also use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, and arm-based Macs.
