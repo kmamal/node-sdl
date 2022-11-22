@@ -1551,8 +1551,8 @@ Closes the instance.
 
 ## sdl.controller
 
-An SDL controller is an abstraction over [`joysticks`](#sdljoystick) based on the xbox360 controller: They have a DPAD, two analog sticks, 4 buttons on the right (called A, B, X, Y), shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
-The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the X-Axis of the left Analog Stick, or `controllerInstance.buttons.b` is always the rightmost buttons of the 4 buttons on the right.
+An SDL controller is an abstraction over [`joysticks`](#sdljoystick) based on the xbox360 controller: They have a dpad, two analog sticks, 4 buttons on the right (called A, B, X, Y), shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
+The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the x-axis of the left analog stick, or `controllerInstance.buttons.b` is always the rightmost buttons of the 4 buttons on the right.
 This makes it easy to provide consistent input bindings, like "press B to jump, move around with the left analog stick".
 With a pure joystick instance it's impossible to know which axis or button corresponds to which physical axis/button on the device.
 
