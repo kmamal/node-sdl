@@ -23,53 +23,53 @@ const floatLimits = {
 
 const AudioFormatHelpers = {
 	s8: {
-		reader: Buffer.prototype.readInt8,
-		writer: Buffer.prototype.writeInt8,
+		readerName: 'readInt8',
+		writerName: 'writeInt8',
 		...signedLimits(8),
 	},
 	u8: {
-		reader: Buffer.prototype.readUInt8,
-		writer: Buffer.prototype.writeUInt8,
+		readerName: 'readUInt8',
+		writerName: 'writeUInt8',
 		...unsignedLimits(8),
 	},
 	s16lsb: {
-		reader: Buffer.prototype.readInt16LE,
-		writer: Buffer.prototype.writeInt16LE,
+		readerName: 'readInt16LE',
+		writerName: 'writeInt16LE',
 		...signedLimits(16),
 	},
 	s16msb: {
-		reader: Buffer.prototype.readInt16BE,
-		writer: Buffer.prototype.writeInt16BE,
+		readerName: 'readInt16BE',
+		writerName: 'writeInt16BE',
 		...signedLimits(16),
 	},
 	u16lsb: {
-		reader: Buffer.prototype.readUInt16LE,
-		writer: Buffer.prototype.writeUInt16LE,
+		readerName: 'readUInt16LE',
+		writerName: 'writeUInt16LE',
 		...unsignedLimits(16),
 	},
 	u16msb: {
-		reader: Buffer.prototype.readUInt16BE,
-		writer: Buffer.prototype.writeUInt16BE,
+		readerName: 'readUInt16BE',
+		writerName: 'writeUInt16BE',
 		...unsignedLimits(16),
 	},
 	s32lsb: {
-		reader: Buffer.prototype.readInt32LE,
-		writer: Buffer.prototype.writeInt32LE,
+		readerName: 'readInt32LE',
+		writerName: 'writeInt32LE',
 		...signedLimits(32),
 	},
 	s32msb: {
-		reader: Buffer.prototype.readInt32BE,
-		writer: Buffer.prototype.writeInt32BE,
+		readerName: 'readInt32BE',
+		writerName: 'writeInt32BE',
 		...signedLimits(32),
 	},
 	f32lsb: {
-		reader: Buffer.prototype.readFloatLE,
-		writer: Buffer.prototype.writeFloatLE,
+		readerName: 'readFloatLE',
+		writerName: 'writeFloatLE',
 		...floatLimits,
 	},
 	f32msb: {
-		reader: Buffer.prototype.readFloatBE,
-		writer: Buffer.prototype.writeFloatBE,
+		readerName: 'readFloatBE',
+		writerName: 'writeFloatBE',
 		...floatLimits,
 	},
 }
@@ -89,6 +89,11 @@ if (Os.endianness() === 'LE') {
 	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16msb
 	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32msb
 	AudioFormatHelpers.f32sys = AudioFormatHelpers.f32msb
+}
+
+for (const helper of Object.values(AudioFormatHelpers)) {
+	helper.reader = Buffer.prototype[helper.readerName]
+	helper.writer = Buffer.prototype[helper.writerName]
 }
 
 module.exports = { AudioFormatHelpers }

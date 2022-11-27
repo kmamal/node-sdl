@@ -223,7 +223,9 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
   * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
   * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
+  * [sdl.audio.readerName(format)](#sdlaudioreadernameformat)
   * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
+  * [sdl.audio.writerName(format)](#sdlaudiowriternameformat)
   * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioInstance](#class-audioinstance)
@@ -238,7 +240,9 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
     * [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
     * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
+    * [audioInstance.readerName](#audioinstancereadername)
     * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancewritesamplebuffer-value-offset)
+    * [audioInstance.writerName](#audioinstancewritername)
     * [audioInstance.buffered](#audioinstancebuffered)
     * [audioInstance.playing](#audioinstanceplaying)
     * [audioInstance.play([play])](#audioinstanceplayplay)
@@ -1914,6 +1918,15 @@ Helper function which maps each sample format to the sample value that correspon
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
+### sdl.audio.readerName(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<string>` The name of the read method.
+
+Helper function which returns the name of the appropriate `read*` method of `Buffer` based on the format argument.
+Most of the time you will want to use [sdl.audio.readSample](#sdlaudioreadsampleformat-buffer-offset) directly.
+The method name is only really useful for passing to worker threads.
+
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
 * `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
@@ -1924,6 +1937,15 @@ For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be eq
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+
+### sdl.audio.writerName(format)
+
+* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+* Returns: `<string>` The name of the write method.
+
+Helper function which returns the name of the appropriate `write*` method of `Buffer` based on the format argument.
+Most of the time you will want to use [sdl.audio.writeSample](#sdlaudiowritesampleformat-buffer-value-offset) directly.
+The method name is only really useful for passing to worker threads.
 
 ### sdl.audio.devices
 
@@ -2056,6 +2078,14 @@ The sample value that corresponds to silence, based on the format the instance w
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
+### audioInstance.readerName
+
+* `<string>`
+
+The name of the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
+Most of the time you will want to use [audioInstance.readSample](#audioinstancereadsamplebuffer-offset) directly.
+The method name is only really useful for passing to worker threads.
+
 ### audioInstance.writeSample(buffer, value[, offset])
 
 * `buffer: <Buffer>` The buffer to write the sample to.
@@ -2065,6 +2095,14 @@ For example, for an instance opened with the `'f32'` sample format, a call to `a
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+
+### audioInstance.writerName
+
+* `<string>`
+
+The name of the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
+Most of the time you will want to use [audioInstance.writeSample](#audioinstancewritesamplebuffer-value-offset) directly.
+The method name is only really useful for passing to worker threads.
 
 ### audioInstance.buffered
 

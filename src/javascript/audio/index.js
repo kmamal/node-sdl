@@ -17,7 +17,7 @@ const audio = new class extends EventsViaPoll {
 	}
 
 	openDevice (device, options = {}) {
-		return device.type === "recording"
+		return device.type === 'recording'
 			? new AudioRecordingInstance(device, options)
 			: new AudioPlaybackInstance(device, options)
 	}
@@ -31,8 +31,16 @@ const audio = new class extends EventsViaPoll {
 		return AudioFormatHelpers[format].reader.call(buffer, offset)
 	}
 
+	readerName (format) {
+		return AudioFormatHelpers[format].readerName
+	}
+
 	writeSample (format, buffer, value, offset) {
 		return AudioFormatHelpers[format].writer.call(buffer, value, offset)
+	}
+
+	writerName (format) {
+		return AudioFormatHelpers[format].writerName
 	}
 }()
 
