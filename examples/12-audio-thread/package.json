@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-sine-wave",
+  "name": "sdl-example-audio-thread",
   "main": "index.js",
   "type": "module",
   "dependencies": {
