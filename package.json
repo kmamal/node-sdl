@@ -50,5 +50,8 @@
     "owner": "kmamal",
     "repo": "build-sdl",
     "version": "2.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.10"
   }
 }

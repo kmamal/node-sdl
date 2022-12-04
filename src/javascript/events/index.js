@@ -164,7 +164,7 @@ const handleEvents = () => {
 				if (!window) { continue }
 
 				const { key } = event
-				event.key = mapping[key] ?? key?.length === 1 ? key : null
+				event.key = mapping[key] ?? (key?.length === 1 ? key : null)
 
 				if (Object.keys(event).length > 0) {
 					window.emit(Enums.eventTypeNames[type], event)
