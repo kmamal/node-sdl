@@ -289,14 +289,17 @@ This event will be followed by a call to `process.exit()`.
   * `drivers: <object>`
     * `video: <object>`
       * `all: <string>[]` A list of all video drivers.
-      * `current: <string>` The video driver that is currently selected.
+      * `current: <string>|<null>` The video driver that is currently selected.
     * `audio: <object>`
       * `all: <string>[]` A list of all audio drivers.
-      * `current: <string>` The audio driver that is currently selected.
+      * `current: <string>|<null>` The audio driver that is currently selected.
 
 This object is filled with the information produced during the initialization of SDL.
 All the values will remain constant throughout the execution of the program.
 If you want to initialize SDL with drivers other than the default ones, you can do so via its [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
+
+Note that the `current` video or audio driver can be `null`.
+This can happen on systems that don't have any compatible devices, such as on a CI pipeline.
 
 Sample data for Ubuntu:
 
