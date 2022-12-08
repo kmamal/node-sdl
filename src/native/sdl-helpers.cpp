@@ -698,13 +698,11 @@ initialize (Variant & object)
 	{
 		int subsystems = 0
 			| SDL_INIT_EVENTS
-			| SDL_INIT_VIDEO
 			| SDL_INIT_JOYSTICK
 			| SDL_INIT_GAMECONTROLLER
-			| SDL_INIT_HAPTIC
-			| SDL_INIT_AUDIO;
+			| SDL_INIT_HAPTIC;
 		if (SDL_Init(subsystems) != 0) {
-			RETURN_ERROR("SDL_Init(0) error: %s\n", SDL_GetError());
+			RETURN_ERROR("SDL_Init() error: %s\n", SDL_GetError());
 		}
 	}
 
@@ -774,12 +772,16 @@ initialize (Variant & object)
 
 	// Selected Video Driver
 	{
-		const char * driver_name = SDL_GetCurrentVideoDriver();
-		if(driver_name == nullptr) {
-			RETURN_ERROR("SDL_GetCurrentVideoDriver() error: %s\n", SDL_GetError());
-		}
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {
+			const char * driver_name = SDL_GetCurrentVideoDriver();
+			if(driver_name == nullptr) {
+				RETURN_ERROR("SDL_GetCurrentVideoDriver() error: %s\n", SDL_GetError());
+			}
 
-		SET_STRING(video, "current", driver_name);
+			SET_STRING(video, "current", driver_name);
+		} else {
+			SET_NULL(video, "current");
+		}
 	}
 
 	// Available Audio Drivers
@@ -809,13 +811,15 @@ initialize (Variant & object)
 	}
 
 	// Selected Audio Driver
-	{
+	if (SDL_InitSubSystem(SDL_INIT_AUDIO) == 0) {
 		const char * driver_name = SDL_GetCurrentAudioDriver();
 		if(driver_name == nullptr) {
 			RETURN_ERROR("SDL_GetCurrentAudioDriver() error: %s\n", SDL_GetError());
 		}
 
 		SET_STRING(audio, "current", driver_name);
+	} else {
+		SET_NULL(audio, "current");
 	}
 
 	SET_MAP(drivers, "video", video);
