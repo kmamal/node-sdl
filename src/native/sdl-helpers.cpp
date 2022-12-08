@@ -832,6 +832,11 @@ initialize (Variant & object)
 	keys = SDL_GetKeyboardState(&num_keys);
 	SDL_StartTextInput();
 
+
+#if defined(__MACOSX__)
+	reenableInertialScrolling();
+#endif
+
 	return nullptr;
 }
 

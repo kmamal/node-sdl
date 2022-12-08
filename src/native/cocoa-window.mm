@@ -7,3 +7,7 @@ extern "C" CALayer * getView(NSWindow * window) {
 	[view setWantsLayer:YES];
 	return view.layer;
 }
+
+extern "C" void reenableInertialScrolling() {
+	[[NSUserDefaults standardUserDefaults] setBool: YES forKey: @"AppleMomentumScrollSupported"];
+}
