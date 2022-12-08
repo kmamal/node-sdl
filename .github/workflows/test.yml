@@ -1,10 +1,10 @@
-name: Build and upload
+name: Test
 
 on: workflow_dispatch
 
 jobs:
   build:
-    name: test
+    name: Test
     runs-on: ubuntu-22.04
 
     steps:
