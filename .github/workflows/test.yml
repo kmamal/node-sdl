@@ -14,4 +14,4 @@ jobs:
         env:
           NODE_SDL_FROM_SOURCE: 1
 
-      - run: node -e 'const sdl = require(".")'
+      - run: node -e 'const sdl = require("."); console.log(sdl.info); sdl.video.createWindow()'
