@@ -12,4 +12,4 @@ jobs:
 
       - run: npm i
 
-      - run: node -e 'const sdl = require('.')'
+      - run: node -e 'const sdl = require(".")'
