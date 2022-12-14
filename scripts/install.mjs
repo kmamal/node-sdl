@@ -2,7 +2,7 @@
 if (!process.env.NODE_SDL_FROM_SOURCE) {
 	try {
 		await import('./download-release.mjs')
-		process.exit()
+		process.exit(0)
 	} catch (error) {}
 } else {
 	console.log("skip download and build from source")
