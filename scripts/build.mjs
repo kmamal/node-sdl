@@ -12,8 +12,8 @@ await Promise.all([
 }))
 
 console.log("build in", C.dir.build)
-process.env.SDL_INC = Path.join(C.dir.sdl, 'include')
-process.env.SDL_LIB = Path.join(C.dir.sdl, 'lib')
+const SDL_INC = Path.join(C.dir.sdl, 'include')
+const SDL_LIB = Path.join(C.dir.sdl, 'lib')
 
 let archFlag = ''
 if (process.env.CROSS_COMPILE_ARCH) {
@@ -21,7 +21,14 @@ if (process.env.CROSS_COMPILE_ARCH) {
 }
 
 process.chdir(C.dir.root)
-execSync(`npx node-gyp rebuild ${archFlag} -j max --verbose`, { stdio: 'inherit' })
+execSync(`npx node-gyp rebuild ${archFlag} -j max --verbose`, {
+	stdio: 'inherit',
+	env: {
+		...process.env,
+		SDL_INC,
+		SDL_LIB,
+	},
+})
 
 console.log("install to", C.dir.dist)
 await Fs.promises.rm(C.dir.dist, { recursive: true }).catch(() => {})
@@ -32,11 +39,11 @@ await Promise.all([
 		Path.join(C.dir.dist, 'sdl.node'),
 	),
 	(async () => {
-		const libs = await Fs.promises.readdir(process.env.SDL_LIB)
+		const libs = await Fs.promises.readdir(SDL_LIB)
 		await Promise.all(libs.map(async (name) => {
 			if (C.platform === 'win32' && name !== 'SDL2.dll') { return }
 			await Fs.promises.cp(
-				Path.join(process.env.SDL_LIB, name),
+				Path.join(SDL_LIB, name),
 				Path.join(C.dir.dist, name),
 				{ verbatimSymlinks: true },
 			)

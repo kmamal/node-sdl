@@ -23,7 +23,7 @@ jobs:
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
         run: npm run install-deps-mac
 
-      - run: npm run release
-        env:
+      - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}
+        run: npm run release
