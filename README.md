@@ -7,10 +7,13 @@
 
 SDL bindings for Node.js.
 Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, and clipboard manipulation.
-You can also use it together with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to get native WebGL drawing without having to use a browser.
 
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, and arm-based Macs.
+
+#### WebGL & WebGPU
+
+One goal of this project is to allow using WebGL and WebGPU without a browser. You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL. WebGPU is also working but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) to compute and render using WebGPU, but you can't yet render directly to windows; that will come in a future version.
 
 
 ## Installation
@@ -146,12 +149,12 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
   * [sdl.mouse.position](#sdlmouseposition)
   * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
-  * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursor)
+  * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursorcursor)
   * [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
   * [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
   * [sdl.mouse.hideCursor()](#sdlmousehidecursor)
   * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
-  * [sdl.mouse.uncapture()](#sdlmousecapture)
+  * [sdl.mouse.uncapture()](#sdlmouseuncapture)
 * [sdl.joystick](#sdljoystick)
   * [Joystick types](#joystick-types)
   * [Hat positions](#hat-positions)
@@ -159,7 +162,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'deviceAdd'](#joystick-event-device-add)
   * [Event: 'deviceRemove'](#joystick-event-device-remove)
   * [sdl.joystick.devices](#sdljoystickdevices)
-  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
+  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice-options)
   * [class JoystickInstance](#class-joystickinstance)
     * [Event: 'axisMotion'](#joystick-instance-event-axismotion)
     * [Event: 'ballMotion'](#event-ballmotion)
@@ -176,12 +179,12 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [joystickInstance.hats](#joystickinstancehats)
     * [joystickInstance.power](#joystickinstancepower)
     * [joystickInstance.hasLed](#joystickinstancehasled)
-    * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledredgreenblue)
+    * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
     * [joystickInstance.hasRumble](#joystickinstancehasrumble)
-    * [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelowhighduration)
+    * [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelow-high-duration)
     * [joystickInstance.stopRumble()](#joystickinstancestoprumble)
     * [joystickInstance.hasRumbleTriggers](#joystickinstancehasrumbletriggers)
-    * [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleftrightduration)
+    * [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleft-right-duration)
     * [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
     * [joystickInstance.closed](#joystickinstanceclosed)
     * [joystickInstance.close()](#joystickinstanceclose)
@@ -190,7 +193,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'deviceRemove'](#controller-event-device-remove)
   * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
   * [sdl.controller.devices](#sdlcontrollerdevices)
-  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
+  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice-options)
   * [class ControllerInstance](#class-controllerinstance)
     * [Event: 'axisMotion'](#controller-instance-event-axismotion)
     * [Event: 'buttonDown'](#controller-instance-event-buttondown)
@@ -204,12 +207,12 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
     * [controllerInstance.hasLed](#controllerinstancehasled)
-    * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledredgreenblue)
+    * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
     * [controllerInstance.hasRumble](#controllerinstancehasrumble)
-    * [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelowhighduration)
+    * [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelow-high-duration)
     * [controllerInstance.stopRumble()](#controllerinstancestoprumble)
     * [controllerInstance.hasRumbleTriggers](#controllerinstancehasrumbletriggers)
-    * [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleftrightduration)
+    * [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleft-right-duration)
     * [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
     * [controllerInstance.closed](#controllerinstanceclosed)
     * [controllerInstance.close()](#controllerinstanceclose)
@@ -231,7 +234,6 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [class AudioInstance](#class-audioinstance)
     * [Event: 'close'](#audio-instance-event-close)
     * [audioInstance.id](#audioinstanceid)
-    * [audioInstance.name](#audioinstancename)
     * [audioInstance.channels](#audioinstancechannels)
     * [audioInstance.frequency](#audioinstancefrequency)
     * [audioInstance.format](#audioinstanceformat)
@@ -636,7 +638,7 @@ Fired when the mouse wheel is scrolled.
 
 ### Event: 'dropBegin'
 
-When dropping a set of items onto a window, first the `'drop-begin'` event will be fired, then a number of `'drop-text'` and/or `'drop-file'` events will be fired corresponding to the contents of the drop, then finally the `'drop-complete'` event will be fired.
+When dropping a set of items onto a window, first the [`'dropBegin'`](#event-dropbegin) event will be fired, then a number of [`'dropText'`](#event-droptext) and/or [`'dropFile'`](#event-dropfile) events will be fired, corresponding to the contents of the drop, then finally the [`'dropComplete'`](#event-dropcomplete) event will be fired.
 
 ### Event: 'dropText'
 
@@ -1388,7 +1390,7 @@ Initializes a joystick device and returns a corresponding instance.
 ## class JoystickInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice) are of this type.
+Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice-options) are of this type.
 
 <a id="joystick-instance-event-axismotion"></a>
 
@@ -1576,6 +1578,8 @@ const mappings = text.split('\n')
 sdl.controller.addMappings(mappings)
 ```
 
+<a id="controller-event-device-add"></a>
+
 ### Event: 'deviceAdd'
 
 * `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
@@ -1642,7 +1646,7 @@ Initializes an controller device and returns a corresponding instance.
 ## class ControllerInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice) are of this type.
+Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice-options) are of this type.
 
 <a id="controller-instance-event-axismotion"></a>
 
