@@ -11,9 +11,9 @@ Provides window management, input events (keyboard, mouse, joystick, controller)
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, and arm-based Macs.
 
-#### WebGL & WebGPU
+#### Canvas, WebGL, and WebGPU
 
-One goal of this project is to allow using WebGL and WebGPU without a browser. You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL. WebGPU is also working but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) to compute and render using WebGPU, but you can't yet render directly to windows; that will come in a future version.
+One goal of this project is to allow using Canvas (the 2D rendering context API), WebGL and WebGPU without a browser. You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL. WebGPU is also working, but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) for WebGPU compute and render, but it can't yet render directly to windows; that will come in a future version. Right now you have to go through an intermediate buffer. Same with the Canvas API, where you can use the [`canvas`](https://www.npmjs.com/package/canvas) package to draw to a buffer and then draw that to a window.
 
 
 ## Installation
@@ -38,19 +38,36 @@ const window = sdl.video.createWindow({ title: "Hello, World!" })
 window.on('*', console.log)
 ```
 
+## Canvas example
+```js
+import sdl from '@kmamal/sdl'
+import canvas from 'canvas'
+
+const window = sdl.video.createWindow({ resizable: true })
+const { width, height } = window
+const canvas = canvas.createCanvas(width, height)
+const ctx = canvas.getContext('2d')
+
+// Clear screen to red
+ctx.fillStyle = 'red'
+ctx.fillRect(0, 0, width, height)
+const buffer = canvas.toBuffer('raw')
+window.render(width, height, width * 4, 'bgra32', buffer)
+```
+
 ## WebGL example
 ```js
 const sdl = require('@kmamal/sdl')
 const createContext = require('@kmamal/gl')
 
 const window = sdl.video.createWindow({
-  title: "WebGL!",
+  title: "WebGL",
   opengl: true,
 })
-
-// Clear screen to red
 const { width, height, native } = window
 const gl = createContext(width, height, { window: native })
+
+// Clear screen to red
 gl.clearColor(1, 0, 0, 1)
 gl.clear(gl.COLOR_BUFFER_BIT)
 gl.swap()
