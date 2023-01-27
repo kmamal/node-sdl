@@ -13,7 +13,11 @@ Prebuilt binaries are available for x64 architectures, and arm-based Macs.
 
 #### Canvas, WebGL, and WebGPU
 
-One goal of this project is to allow using Canvas (the 2D rendering context API), WebGL and WebGPU without a browser. You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL. WebGPU is also working, but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) for WebGPU compute and render, but it can't yet render directly to windows; that will come in a future version. Right now you have to go through an intermediate buffer. Same with the Canvas API, where you can use the [`canvas`](https://www.npmjs.com/package/canvas) package to draw to a buffer and then draw that to a window.
+One goal of this project is to allow using Canvas (the 2D rendering context API), WebGL, and WebGPU without a browser.
+You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL.
+WebGPU is also working, but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) for compute and render, but it can't yet render directly to windows; that will come in a future version.
+Right now you have to go through an intermediate buffer.
+Same with the Canvas API, where you can use the [canvas](https://www.npmjs.com/package/canvas) package to draw to a buffer and then draw that to a window.
 
 
 ## Installation
@@ -29,7 +33,9 @@ npm install @kmamal/sdl
 (But if things go wrong do look over [here](#building-from-source))
 
 
-## "Hello, World!" example
+## Examples
+
+### "Hello, World!"
 
 ```js
 const sdl = require('@kmamal/sdl')
@@ -38,12 +44,12 @@ const window = sdl.video.createWindow({ title: "Hello, World!" })
 window.on('*', console.log)
 ```
 
-## Canvas example
+### Canvas
 ```js
 import sdl from '@kmamal/sdl'
 import canvas from 'canvas'
 
-const window = sdl.video.createWindow({ resizable: true })
+const window = sdl.video.createWindow({ title: "Canvas" })
 const { width, height } = window
 const canvas = canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
@@ -55,15 +61,12 @@ const buffer = canvas.toBuffer('raw')
 window.render(width, height, width * 4, 'bgra32', buffer)
 ```
 
-## WebGL example
+### WebGL
 ```js
 const sdl = require('@kmamal/sdl')
 const createContext = require('@kmamal/gl')
 
-const window = sdl.video.createWindow({
-  title: "WebGL",
-  opengl: true,
-})
+const window = sdl.video.createWindow({title: "WebGL", opengl: true })
 const { width, height, native } = window
 const gl = createContext(width, height, { window: native })
 
@@ -73,7 +76,7 @@ gl.clear(gl.COLOR_BUFFER_BIT)
 gl.swap()
 ```
 
-There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples), covering several common use cases, including how to draw using Canvas and WebGL, as well as how to package the application for distribution.
+There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples).
 
 
 # API Reference
@@ -179,7 +182,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'deviceAdd'](#joystick-event-device-add)
   * [Event: 'deviceRemove'](#joystick-event-device-remove)
   * [sdl.joystick.devices](#sdljoystickdevices)
-  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice-options)
+  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
   * [class JoystickInstance](#class-joystickinstance)
     * [Event: 'axisMotion'](#joystick-instance-event-axismotion)
     * [Event: 'ballMotion'](#event-ballmotion)
@@ -210,7 +213,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'deviceRemove'](#controller-event-device-remove)
   * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
   * [sdl.controller.devices](#sdlcontrollerdevices)
-  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice-options)
+  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
   * [class ControllerInstance](#class-controllerinstance)
     * [Event: 'axisMotion'](#controller-instance-event-axismotion)
     * [Event: 'buttonDown'](#controller-instance-event-buttondown)
@@ -1397,7 +1400,7 @@ Sample output:
 ]
 ```
 
-### sdl.joystick.openDevice(device[, options])
+### sdl.joystick.openDevice(device)
 
 * `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that should be opened.
 * Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
@@ -1407,7 +1410,7 @@ Initializes a joystick device and returns a corresponding instance.
 ## class JoystickInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice-options) are of this type.
+Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice) are of this type.
 
 <a id="joystick-instance-event-axismotion"></a>
 
@@ -1584,7 +1587,8 @@ With a pure joystick instance it's impossible to know which axis or button corre
 
 Because controllers are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a controller device have the same id, then they refer to the same underlying physical device).
 For a joystick device to also be available as a controller device it needs a "mapping".
-A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name. See the sample output [`here`](#sdlcontrollerdevices) for an example.
+A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name.
+See the sample output [`here`](#sdlcontrollerdevices) for an example.
 SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on https://github.com/gabomdq/SDL_GameControllerDB.
 You can add them via:
 ```js
@@ -1653,7 +1657,7 @@ Sample output:
 ]
 ```
 
-### sdl.controller.openDevice(device[, options])
+### sdl.controller.openDevice(device)
 
 * `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that should be opened.
 * Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
@@ -1663,7 +1667,7 @@ Initializes an controller device and returns a corresponding instance.
 ## class ControllerInstance
 
 This class is not directly exposed by the API so you can't use it with the `new` operator.
-Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice-options) are of this type.
+Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice) are of this type.
 
 <a id="controller-instance-event-axismotion"></a>
 
@@ -2236,7 +2240,8 @@ You will need to have `cmake` installed for that to work.
 
 ---
 
-You could also have found your way to the "Building from source" section because you are trying to contribute to this package. There are some npm scripts in `package.json` that could be of use to you:
+You could also have found your way to the "Building from source" section because you are trying to contribute to this package.
+There are some npm scripts in `package.json` that could be of use to you:
 * `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
 * `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
 * `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
