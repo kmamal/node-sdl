@@ -122,7 +122,7 @@ class Window extends EventsViaPoll {
 
 		// This also keeps Node.js alive while windows are open
 		this.on('close', () => {
-			this.removeAllListeners()
+			process.nextTick(() => { this.removeAllListeners() })
 		})
 
 		// Manually emit an initial resize event for convenience

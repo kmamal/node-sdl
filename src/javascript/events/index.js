@@ -36,12 +36,16 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 			currDevice = currList[++currIndex]
 		} else if (cmp < 0) {
 			mainList.splice(mainIndex, 1)
-			emitter.emit('deviceRemove', { device: mainDevice })
+			const type = 'deviceRemove'
+			const event = { type, device: mainDevice }
+			emitter.emit(type, event)
 			mainDevice = mainList[mainIndex]
 		} else {
 			mainList.splice(mainIndex, 0, currDevice)
 			mainDevice = mainList[++mainIndex]
-			emitter.emit('deviceAdd', { device: currDevice })
+			const type = 'deviceAdd'
+			const event = { type, device: currDevice }
+			emitter.emit(type, event)
 			currDevice = currList[++currIndex]
 		}
 	}
@@ -49,12 +53,16 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 	if (mainIndex < mainList.length) {
 		while (mainIndex < mainList.length) {
 			[ mainDevice ] = mainList.splice(mainIndex, 1)
-			emitter.emit('deviceRemove', { device: mainDevice })
+			const type = 'deviceRemove'
+			const event = { type, device: mainDevice }
+			emitter.emit(type, event)
 		}
 	} else {
 		while (currIndex < currList.length) {
 			mainList.push(currDevice)
-			emitter.emit('deviceAdd', { device: currDevice })
+			const type = 'deviceAdd'
+			const event = { type, device: currDevice }
+			emitter.emit(type, event)
 			currDevice = currList[++currIndex]
 		}
 	}
@@ -67,7 +75,7 @@ const handleEvents = () => {
 		const { family, type } = event
 		if (family === undefined || type === undefined) { continue }
 		delete event.family
-		delete event.type
+		event.type = Enums.eventTypeNames[type]
 
 		switch (family) {
 			case Enums.eventFamily.app: {
@@ -140,25 +148,23 @@ const handleEvents = () => {
 					case Enums.eventType.close: {
 						let shouldPrevent = false
 						const prevent = () => { shouldPrevent = true }
-						window.emit('beforeClose', { prevent })
+						const type2 = 'beforeClose'
+						const event2 = { type: type2, prevent }
+						window.emit(type2, event2)
 						if (shouldPrevent) { continue }
 					} break
 
 					default: continue
 				}
 
-				if (Object.keys(event).length > 0) {
-					window.emit(Enums.eventTypeNames[type], event)
-				} else {
-					window.emit(Enums.eventTypeNames[type])
-				}
+				window.emit(event.type, event)
 
 				if (type === Enums.eventType.close) { window.destroy() }
 			} break
 
 			case Enums.eventFamily.keyboard: {
 				const { windowId } = event
-				delete event.window
+				delete event.windowId
 
 				const window = Globals.windows.all.get(windowId)
 				if (!window) { continue }
@@ -166,11 +172,7 @@ const handleEvents = () => {
 				const { key } = event
 				event.key = mapping[key] ?? (key?.length === 1 ? key : null)
 
-				if (Object.keys(event).length > 0) {
-					window.emit(Enums.eventTypeNames[type], event)
-				} else {
-					window.emit(Enums.eventTypeNames[type])
-				}
+				window.emit(event.type, event)
 			} break
 
 			case Enums.eventFamily.mouse:
@@ -182,11 +184,7 @@ const handleEvents = () => {
 				const window = Globals.windows.all.get(windowId)
 				if (!window) { continue }
 
-				if (Object.keys(event).length > 0) {
-					window.emit(Enums.eventTypeNames[type], event)
-				} else {
-					window.emit(Enums.eventTypeNames[type])
-				}
+				window.emit(event.type, event)
 			} break
 
 			case Enums.eventFamily.joystickDevice: {
@@ -249,7 +247,7 @@ const handleEvents = () => {
 					case Enums.eventType.axisMotion: {
 						for (const joystickInstance of collection) {
 							joystickInstance._axes[event.axis] = event.value
-							joystickInstance.emit('axisMotion', event)
+							joystickInstance.emit(event.type, event)
 						}
 					} break
 
@@ -258,20 +256,20 @@ const handleEvents = () => {
 							const ball = joystickInstance._balls[event.ball]
 							ball.x = event.x
 							ball.y = event.y
-							joystickInstance.emit('ballMotion', event)
+							joystickInstance.emit(event.type, event)
 						}
 					} break
 
 					case Enums.eventType.buttonDown: {
 						for (const joystickInstance of collection) {
 							joystickInstance._buttons[event.button] = true
-							joystickInstance.emit('buttonDown', event)
+							joystickInstance.emit(event.type, event)
 						}
 					} break
 					case Enums.eventType.buttonUp: {
 						for (const joystickInstance of collection) {
 							joystickInstance._buttons[event.button] = false
-							joystickInstance.emit('buttonUp', event)
+							joystickInstance.emit(event.type, event)
 						}
 					} break
 
@@ -279,7 +277,7 @@ const handleEvents = () => {
 						event.value = Enums.hatPositionNames[event.value]
 						for (const joystickInstance of collection) {
 							joystickInstance._hats[event.hat] = event.value
-							joystickInstance.emit('hatMotion', event)
+							joystickInstance.emit(event.type, event)
 						}
 					} break
 
@@ -299,7 +297,7 @@ const handleEvents = () => {
 						event.axis = Enums.controllerAxisNames[event.axis]
 						for (const controllerInstance of collection.values()) {
 							controllerInstance._axes[event.axis] = event.value
-							controllerInstance.emit('axisMotion', event)
+							controllerInstance.emit(event.type, event)
 						}
 					} break
 
@@ -307,7 +305,7 @@ const handleEvents = () => {
 						event.button = Enums.controllerButtonNames[event.button]
 						for (const controllerInstance of collection.values()) {
 							controllerInstance._axes[event.button] = true
-							controllerInstance.emit('buttonDown', event)
+							controllerInstance.emit(event.type, event)
 						}
 					} break
 
@@ -315,7 +313,7 @@ const handleEvents = () => {
 						event.button = Enums.controllerButtonNames[event.button]
 						for (const controllerInstance of collection.values()) {
 							controllerInstance._axes[event.button] = true
-							controllerInstance.emit('buttonUp', event)
+							controllerInstance.emit(event.type, event)
 						}
 					} break
 
@@ -327,7 +325,7 @@ const handleEvents = () => {
 						for (const controllerInstance of collection.values()) {
 							Object.assign(controllerInstance._axes, axes)
 							Object.assign(controllerInstance._buttons, buttons)
-							controllerInstance.emit('remap', event)
+							controllerInstance.emit(event.type, event)
 						}
 					} break
 
@@ -363,7 +361,7 @@ const handleEvents = () => {
 			} break
 
 			case Enums.eventFamily.clipboard: {
-				clipboardModule.emit(Enums.eventTypeNames[type])
+				clipboardModule.emit(event.type, event)
 			} break
 
 			default: continue

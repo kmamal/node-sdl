@@ -1,17 +1,18 @@
 
 export namespace Events {
 
-	interface BaseEvent {}
+	interface BaseEvent { readonly type: string }
 
 	type PreventCallback = () => void
 
 	namespace App {
 
 		interface BeforeQuit extends BaseEvent {
+			readonly type: 'beforeQuit'
 			readonly prevent: PreventCallback
 		}
 
-		// interface Quit extends BaseEvent {}
+		interface Quit extends BaseEvent { readonly type: 'quit' }
 
 	}
 
@@ -31,65 +32,75 @@ export namespace Events {
 			readonly numlock: number
 		}
 
+		interface KeyDownEvent extends KeyEvent {
+			readonly type: 'keyDown'
+			readonly repeat: number
+		}
+		interface KeyUpEvent extends KeyEvent { readonly type: 'keyUp' }
+
+		interface TextInput extends WindowEvent {
+			readonly type: 'textInput'
+			readonly text: string
+		}
+
 		interface MouseEvent extends WindowEvent {
 			readonly x: number
 			readonly y: number
 			readonly touch: boolean
 		}
 
+		interface MouseMoveEvent extends MouseEvent { readonly type: 'mouseMove' }
+
 		interface MouseButtonEvent extends MouseEvent {
 			readonly button: number
 		}
 
-		// interface Show extends WindowEvent {}
-		// interface Hide extends WindowEvent {}
-		// interface Expose extends WindowEvent {}
-		// interface Minimize extends WindowEvent {}
-		// interface Maximize extends WindowEvent {}
-		// interface Restore extends WindowEvent {}
-		interface Move extends WindowEvent {
-			readonly x: number,
-			readonly y: number
-		}
-		interface Resize extends WindowEvent {
-			readonly width: number,
-			readonly height: number
-		}
-		// interface Focus extends WindowEvent {}
-		// interface Blur extends WindowEvent {}
-		// interface Hover extends WindowEvent {}
-		// interface Leave extends WindowEvent {}
-		interface BeforeClose extends WindowEvent {
-			readonly prevent: PreventCallback
-		}
-		// interface Close extends WindowEvent {}
+		interface MouseButtonDownEvent extends MouseButtonEvent { readonly type: 'mouseButtonDown' }
+		interface MouseButtonUpEvent extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
 
-		interface KeyDown extends KeyEvent {
-			readonly repeat: number
-		}
-		interface KeyUp extends KeyEvent {}
-
-		interface TextInput extends WindowEvent {
-			readonly text: string
-		}
-
-		interface MouseButtonDown extends MouseButtonEvent {}
-		interface MouseButtonUp extends MouseButtonEvent {}
-		interface MouseMove extends MouseEvent {}
-		interface MouseWheel extends MouseEvent {
+		interface MouseWheelEvent extends MouseEvent {
+			readonly type: 'flipped'
 			readonly dx: number
 			readonly dy: number
 			readonly flipped: boolean
 		}
 
-		// interface DropBegin extends WindowEvent {}
+		interface Show extends WindowEvent { readonly type: 'show' }
+		interface Hide extends WindowEvent { readonly type: 'hide' }
+		interface Expose extends WindowEvent { readonly type: 'expose' }
+		interface Minimize extends WindowEvent { readonly type: 'minimize' }
+		interface Maximize extends WindowEvent { readonly type: 'maximize' }
+		interface Restore extends WindowEvent { readonly type: 'restore' }
+		interface Move extends WindowEvent {
+			readonly type: 'move'
+			readonly x: number,
+			readonly y: number
+		}
+		interface Resize extends WindowEvent {
+			readonly type: 'resize'
+			readonly width: number,
+			readonly height: number
+		}
+		interface Focus extends WindowEvent { readonly type: 'focus' }
+		interface Blur extends WindowEvent { readonly type: 'blur' }
+		interface Hover extends WindowEvent { readonly type: 'hover' }
+		interface Leave extends WindowEvent { readonly type: 'leave' }
+		interface BeforeClose extends WindowEvent {
+			readonly type: 'beforeClose'
+			readonly prevent: PreventCallback
+		}
+		interface Close extends WindowEvent { readonly type: 'close' }
+
+		interface DropBegin extends WindowEvent { readonly type: 'dropBegin' }
 		interface DropText extends WindowEvent {
+			readonly type: 'dropText'
 			readonly text: string
 		}
 		interface DropFile extends WindowEvent {
+			readonly type: 'dropFile'
 			readonly file: string
 		}
-		// interface DropComplete extends WindowEvent {}
+		interface DropComplete extends WindowEvent { readonly type: 'dropComplete' }
 
 	}
 
@@ -99,34 +110,37 @@ export namespace Events {
 			readonly device: Sdl.Joystick.Device
 		}
 
-		interface DeviceAdd extends DeviceEvent {}
-		interface DeviceRemove extends DeviceEvent {}
+		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
 
 		interface JoystickEvent extends BaseEvent {}
 
 		interface AxisMotion extends JoystickEvent {
-			axis: number,
-			value: number
+			readonly type: 'axisMotion'
+			readonly axis: number,
+			readonly value: number
 		}
 
 		interface BallMotion extends JoystickEvent {
-			ball: number,
-			x: number
-			y: number
+			readonly type: 'ballMotion'
+			readonly ball: number,
+			readonly x: number
+			readonly y: number
 		}
 
 		interface ButtonEvent extends JoystickEvent {
-			button: number
+			readonly button: number
 		}
-		interface ButtonDown extends ButtonEvent {}
-		interface ButtonUp extends ButtonEvent {}
+		interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
+		interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
 		interface HatMotion extends JoystickEvent {
-			hat: number,
-			value: Sdl.Joystick.HatPosition
+			readonly type: 'hatMotion'
+			readonly hat: number,
+			readonly value: Sdl.Joystick.HatPosition
 		}
 
-		// interface Close extends JoystickEvent {}
+		interface Close extends JoystickEvent { readonly type: 'close' }
 
 	}
 
@@ -136,25 +150,26 @@ export namespace Events {
 			readonly device: Sdl.Controller.Device
 		}
 
-		interface DeviceAdd extends DeviceEvent {}
-		interface DeviceRemove extends DeviceEvent {}
+		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
 
 		interface ControllerEvent extends BaseEvent {}
 
 		interface AxisMotion extends ControllerEvent {
-			axis: number,
-			value: number
+			readonly type: 'axisMotion'
+			readonly axis: number,
+			readonly value: number
 		}
 
 		interface ButtonEvent extends ControllerEvent {
-			button: number
+			readonly button: number
 		}
-		interface ButtonDown extends ButtonEvent {}
-		interface ButtonUp extends ButtonEvent {}
+		interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
+		interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
-		interface Remap extends ControllerEvent {}
+		interface Remap extends ControllerEvent { readonly type: 'remap' }
 
-		// interface Close extends ControllerEvent {}
+		interface Close extends ControllerEvent { readonly type: 'close' }
 
 	}
 
@@ -164,16 +179,17 @@ export namespace Events {
 			readonly device: Sdl.Audio.Device
 		}
 
-		interface DeviceAdd extends DeviceEvent {}
-		interface DeviceRemove extends DeviceEvent {}
+		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		// interface AudioEvent extends BaseEvent {}
-		// interface Close extends AudioEvent {}
+		interface AudioEvent extends BaseEvent {}
+
+		interface Close extends AudioEvent { readonly type: 'close' }
 	}
 
 	namespace Clipboard {
 
-		interface Update extends BaseEvent {}
+		interface Update extends BaseEvent { readonly type: 'update' }
 
 	}
 }
@@ -271,20 +287,20 @@ export namespace Sdl {
 		}
 
 		class Window {
-			on (event: 'show', listener: () => void): this
-			on (event: 'hide', listener: () => void): this
-			on (event: 'expose', listener: () => void): this
-			on (event: 'minimize', listener: () => void): this
-			on (event: 'maximize', listener: () => void): this
-			on (event: 'restore', listener: () => void): this
+			on (event: 'show', listener: (event: Events.Window.Show) => void): this
+			on (event: 'hide', listener: (event: Events.Window.Hide) => void): this
+			on (event: 'expose', listener: (event: Events.Window.Expose) => void): this
+			on (event: 'minimize', listener: (event: Events.Window.Minimize) => void): this
+			on (event: 'maximize', listener: (event: Events.Window.Maximize) => void): this
+			on (event: 'restore', listener: (event: Events.Window.Restore) => void): this
 			on (event: 'move', listener: (event: Events.Window.Move) => void): this
 			on (event: 'resize', listener: (event: Events.Window.Resize) => void): this
-			on (event: 'focus', listener: () => void): this
-			on (event: 'blur', listener: () => void): this
-			on (event: 'hover', listener: () => void): this
-			on (event: 'leave', listener: () => void): this
+			on (event: 'focus', listener: (event: Event.Window.Focus) => void): this
+			on (event: 'blur', listener: (event: Event.Window.Blur) => void): this
+			on (event: 'hover', listener: (event: Event.Window.Hover) => void): this
+			on (event: 'leave', listener: (event: Event.Window.Leave) => void): this
 			on (event: 'beforeClose', listener: (event: Events.Window.BeforeClose) => void): this
-			on (event: 'close', listener: () => void): this
+			on (event: 'close', listener: (event: Event.Window.Close) => void): this
 			on (event: 'keyDown', listener: (event: Events.Window.KeyDown) => void): this
 			on (event: 'keyUp', listener: (event: Events.Window.KeyUp) => void): this
 			on (event: 'textInput', listener: (event: Events.Window.TextInput) => void): this
@@ -292,10 +308,10 @@ export namespace Sdl {
 			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUp) => void): this
 			on (event: 'mouseMove', listener: (event: Events.Window.MouseMove) => void): this
 			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheel) => void): this
-			on (event: 'dropBegin', listener: () => void): this
+			on (event: 'dropBegin', listener: (event: Event.Window.DropBegin) => void): this
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
-			on (event: 'dropComplete', listener: () => void): this
+			on (event: 'dropComplete', listener: (event: Event.Window.DropComplete) => void): this
 
 			readonly id: number
 
@@ -729,7 +745,7 @@ export namespace Sdl {
 			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Joystick.ButtonUp) => void): this
 			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
-			on (event: 'close', listener: () => void): this
+			on (event: 'close', listener: (event: Events.Joystick.Close) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -787,7 +803,7 @@ export namespace Sdl {
 			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
-			on (event: 'close', listener: () => void): this
+			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -890,7 +906,7 @@ export namespace Sdl {
 		}
 
 		class AudioInstance {
-			on (event: 'close', listener: () => void): this
+			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 
 			readonly id: number
 			readonly device: Device
@@ -954,7 +970,7 @@ export namespace Sdl {
 	namespace Clipboard {
 
 		interface Module {
-			on (event: 'update', listener: () => void): this
+			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
 
 			readonly text: string
 			setText (text: string): void
@@ -964,7 +980,7 @@ export namespace Sdl {
 
 	interface Module {
 		on (event: 'beforeQuit', listener: (event: Events.App.BeforeQuit) => void): this
-		on (event: 'quit', listener: () => void): this
+		on (event: 'quit', listener: (event: Events.App.Quit) => void): this
 
 		readonly info: Info
 		readonly video: Video.Module
