@@ -1,5 +1,5 @@
-import Fs from 'node:fs'
-import { once } from 'node:events'
+import * as Fs from 'fs'
+import { once } from "events"
 import C from './util/common.js'
 import { fetch } from './util/fetch.js'
 import Tar from 'tar'

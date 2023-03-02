@@ -1,5 +1,5 @@
-import Fs from 'node:fs'
-import { once } from 'node:events'
+import * as Fs from 'fs'
+import { once } from "events"
 import C from './util/common.js'
 import { fetch } from './util/fetch.js'
 import Tar from 'tar'
@@ -10,7 +10,7 @@ console.log("fetch", url)
 const response = await fetch(url)
 
 console.log("unpack to", C.dir.sdl)
-await Fs.promises.rm(C.dir.sdl, { recursive: true }).catch(() => {})
+await Fs.promises.rm(C.dir.sdl, { recursive: true }).catch(() => { })
 await Fs.promises.mkdir(C.dir.sdl, { recursive: true })
 const tar = Tar.extract({ gzip: true, C: C.dir.sdl })
 response.stream().pipe(tar)

@@ -1,5 +1,5 @@
-import Fs from 'node:fs'
-import Path from 'node:path'
+import * as Fs from 'fs'
+import * as Path from 'path'
 import C from './util/common.js'
 import { fetch } from './util/fetch.js'
 import Tar from 'tar'

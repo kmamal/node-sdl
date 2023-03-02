@@ -1,6 +1,6 @@
-import Path from 'node:path'
-import { execSync } from 'node:child_process'
-import { fstat } from 'node:fs'
+import * as Path from 'path'
+import { execSync } from 'child_process'
+import { fstat } from 'fs'
 
 process.chdir(Path.resolve(__dirname, '../tests'))
 const files = await fstat.readdir('.')

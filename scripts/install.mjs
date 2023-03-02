@@ -1,4 +1,3 @@
-
 if (!process.env.NODE_SDL_FROM_SOURCE) {
 	try {
 		await import('./download-release.mjs')

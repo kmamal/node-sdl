@@ -2,6 +2,7 @@
   "version": "0.6.8",
   "name": "@kmamal/sdl",
   "description": "SDL bindings for Node.js",
+  "type": "module",
   "keywords": [
     "sdl",
     "sdl2",

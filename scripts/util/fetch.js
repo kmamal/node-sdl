@@ -1,4 +1,3 @@
-
 const _consume = async (stream) => {
 	const chunks = []
 	for await (const chunk of stream) {
@@ -7,7 +6,7 @@ const _consume = async (stream) => {
 	return Buffer.concat(chunks)
 }
 
-const fetch = async (_url, options = {}) => {
+export const fetch = async (_url, options = {}) => {
 	let url = _url
 	let {
 		maxRedirect = 5,
@@ -15,7 +14,7 @@ const fetch = async (_url, options = {}) => {
 	} = options
 
 	const { protocol } = new URL(url)
-	const lib = require(protocol.slice(0, -1))
+	const lib = await import(protocol.slice(0, -1))
 
 	const evalPromise = (resolve, reject) => {
 		const request = lib.request(url, options)
@@ -78,5 +77,3 @@ const fetch = async (_url, options = {}) => {
 		}
 	}
 }
-
-module.exports = { fetch }

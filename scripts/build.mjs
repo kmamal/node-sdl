@@ -1,6 +1,6 @@
-import Fs from 'node:fs'
-import Path from 'node:path'
-import { execSync } from 'node:child_process'
+import * as Fs from 'fs'
+import * as Path from 'path'
+import { execSync } from 'child_process'
 import C from './util/common.js'
 
 await Promise.all([
