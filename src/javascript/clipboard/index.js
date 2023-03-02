@@ -1,18 +1,14 @@
-// TODO: handle import issues here
+import * as Bindings from '../bindings'
+import { EventsViaPoll } from '../events/events-via-poll'
 
-const Bindings = require('../bindings').default
-const { EventsViaPoll } = require('../events/events-via-poll').default
+const validEvents = ['update']
 
-const validEvents = [ 'update' ]
+export class clipboard extends EventsViaPoll {
+	constructor() { super(validEvents) }
 
-const clipboard = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
-
-	get text () { return Bindings.clipboard_getText() ?? '' }
-	setText (text) {
+	get text() { return Bindings.clipboard_getText() ?? '' }
+	setText(text) {
 		if (typeof text !== 'string') { throw Object.assign(new Error("text must be a string"), { text }) }
 		Bindings.clipboard_setText(text)
 	}
-}()
-
-module.exports = { clipboard }
+}

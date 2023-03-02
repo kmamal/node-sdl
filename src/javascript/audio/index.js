@@ -1,14 +1,12 @@
-// TODO: handle import issues here
-
-const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll').default
-const { AudioPlaybackInstance } = require('./audio-playback-instance').default
-const { AudioRecordingInstance } = require('./audio-recording-instance')
-const { AudioFormatHelpers } = require('./format-helpers').default
+import Globals from '../globals'
+import { EventsViaPoll } from '../events/events-via-poll'
+import { AudioPlaybackInstance } from './audio-playback-instance'
+import { AudioRecordingInstance } from './audio-recording-instance'
+import { AudioFormatHelpers } from'./format-helpers'
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
-const audio = new class extends EventsViaPoll {
+export class audio extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
 	get devices () {
@@ -44,6 +42,4 @@ const audio = new class extends EventsViaPoll {
 	writerName (format) {
 		return AudioFormatHelpers[format].writerName
 	}
-}()
-
-module.exports = { audio }
+}

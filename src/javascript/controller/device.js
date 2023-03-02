@@ -1,4 +1,3 @@
-
 const make = (device) => {
 	delete device.type
 	delete device.isController

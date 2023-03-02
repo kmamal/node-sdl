@@ -1,4 +1,3 @@
-
 const make = (device) => {
 	const { isRecorder } = device
 	delete device.isRecorder

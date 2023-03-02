@@ -6,7 +6,7 @@ const activeEmitters = new Set()
 
 const commonEvents = [ 'newListener', 'removeListener', '*' ]
 
-class EventsViaPoll extends EventEmitter {
+export default class EventsViaPoll extends EventEmitter {
 	constructor (validEvents) {
 		super()
 
@@ -60,4 +60,3 @@ class EventsViaPoll extends EventEmitter {
 	}
 }
 
-export default { EventsViaPoll }

@@ -21,7 +21,7 @@ const floatLimits = {
 	maxSampleValue: 1,
 }
 
-const AudioFormatHelpers = {
+export default AudioFormatHelpers = {
 	s8: {
 		readerName: 'readInt8',
 		writerName: 'writeInt8',
@@ -95,5 +95,3 @@ for (const helper of Object.values(AudioFormatHelpers)) {
 	helper.reader = Buffer.prototype[helper.readerName]
 	helper.writer = Buffer.prototype[helper.writerName]
 }
-
-export default { AudioFormatHelpers }

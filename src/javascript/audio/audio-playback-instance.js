@@ -1,10 +1,8 @@
-// TODO: handle import issues here
-
 import Bindings from '../bindings'
 import { AudioInstance } from './audio-instance'
 
-class AudioPlaybackInstance extends AudioInstance {
-	enqueue (buffer, numBytes = buffer.length) {
+export default class AudioPlaybackInstance extends AudioInstance {
+	enqueue(buffer, numBytes = buffer.length) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
@@ -14,5 +12,3 @@ class AudioPlaybackInstance extends AudioInstance {
 		Bindings.audio_enqueue(this._id, buffer, numBytes)
 	}
 }
-
-export default { AudioPlaybackInstance }

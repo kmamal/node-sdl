@@ -1,7 +1,6 @@
-// TODO: handle import issues here
+import Globals from '../globals'
 
-const Globals = require('../globals')
-const { AudioPlaybackInstance } = require('./audio-playback-instance').default
+import { AudioPlaybackInstance } from './audio-playback-instance'
 
 let timeout
 
