@@ -1,5 +1,3 @@
-const { EventsViaPoll } = require('./events/events-via-poll')
+import { EventsViaPoll } from './events/events-via-poll'
 
-const sdl = new EventsViaPoll([ 'beforeQuit', 'quit' ])
-
-module.exports = { sdl }
+export default sdl = new EventsViaPoll(['beforeQuit', 'quit'])

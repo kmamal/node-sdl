@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
-const Enums = require('../enums')
+import Bindings from '../bindings'
+import Enums from '../enums'
 
 const mouse = {
 	get BUTTON () { return Enums.button },
@@ -70,4 +70,4 @@ const mouse = {
 	uncapture () { mouse.capture(false) },
 }
 
-module.exports = { mouse }
+export default { mouse }

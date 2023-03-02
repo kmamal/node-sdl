@@ -1,25 +1,21 @@
-
-module.exports = {
-	windows: {
-		all: new Map(),
-		focused: null,
-		hovered: null,
-	},
-	audioDevices: {
-		playback: [],
-		recording: [],
-	},
-	audioInstances: new Map(),
-	joystickDevices: [],
-	joystickInstances: {
-		all: new Set(),
-		byId: new Map(),
-	},
-	controllerDevices: [],
-	controllerInstances: {
-		all: new Set(),
-		byId: new Map(),
-	},
-
-	events: null, // Set later to { startPolling, stopPolling }
-}
+export const windows = {
+	all: new Map(),
+	focused: null,
+	hovered: null,
+};
+export const audioDevices = {
+	playback: [],
+	recording: [],
+};
+export const audioInstances = new Map();
+export const joystickDevices = [];
+export const joystickInstances = {
+	all: new Set(),
+	byId: new Map(),
+};
+export const controllerDevices = [];
+export const controllerInstances = {
+	all: new Set(),
+	byId: new Map(),
+};
+export const events = null;

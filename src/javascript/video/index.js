@@ -1,7 +1,7 @@
-const Bindings = require('../bindings')
-const Globals = require('../globals')
-const Enums = require('../enums')
-const { Window } = require('./window')
+import Bindings from '../bindings'
+import { windows as _windows } from '../globals'
+import Enums from '../enums'
+import { Window } from './window'
 
 const video = {
 	get displays () {
@@ -12,11 +12,11 @@ const video = {
 		return displays
 	},
 
-	get windows () { return [ ...Globals.windows.all.values() ] },
-	get focused () { return Globals.windows.focused },
-	get hovered () { return Globals.windows.hovered },
+	get windows () { return [ ..._windows.all.values() ] },
+	get focused () { return _windows.focused },
+	get hovered () { return _windows.hovered },
 
 	createWindow: (options) => new Window(options),
 }
 
-module.exports = { video }
+export default { video }

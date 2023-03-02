@@ -1,5 +1,7 @@
-const Bindings = require('../bindings')
-const { EventsViaPoll } = require('../events/events-via-poll')
+// TODO: handle import issues here
+
+const Bindings = require('../bindings').default
+const { EventsViaPoll } = require('../events/events-via-poll').default
 
 const validEvents = [ 'update' ]
 

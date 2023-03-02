@@ -1,8 +1,10 @@
-const Bindings = require('../bindings')
-const Enums = require('../enums')
+// TODO: handle import issues here
+
+const Bindings = require('../bindings').default
+const Enums = require('../enums').default
 const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll')
-const { AudioFormatHelpers } = require('./format-helpers')
+const { EventsViaPoll } = require('../events/events-via-poll').default
+const { AudioFormatHelpers } = require('./format-helpers').default
 
 const validEvents = [ 'close' ]
 

@@ -1,4 +1,4 @@
-const Bindings = require('../bindings')
+const Bindings = require('../bindings').default
 
 const mapping = {
 	'A': 'a',

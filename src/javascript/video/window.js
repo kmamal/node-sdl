@@ -1,8 +1,8 @@
-const Bindings = require('../bindings')
-const Globals = require('../globals')
-const Enums = require('../enums')
-const { EventsViaPoll } = require('../events/events-via-poll')
-const { maybeTriggerQuit } = require('../events/quit')
+import Bindings from '../bindings'
+import { windows } from '../globals'
+import Enums from '../enums'
+import { EventsViaPoll } from '../events/events-via-poll'
+import { maybeTriggerQuit } from '../events/quit'
 
 const validEvents = [
 	'show',
@@ -118,7 +118,7 @@ class Window extends EventsViaPoll {
 		this._maximized = false
 		this._destroyed = false
 
-		Globals.windows.all.set(this._id, this)
+		windows.all.set(this._id, this)
 
 		// This also keeps Node.js alive while windows are open
 		this.on('close', () => {
@@ -272,7 +272,7 @@ class Window extends EventsViaPoll {
 
 		Bindings.window_focus(this._id)
 		this._focused = true
-		Globals.windows.focused = this
+		windows.focused = this
 	}
 
 	get hovered () { return this._hovered }
@@ -321,16 +321,16 @@ class Window extends EventsViaPoll {
 	destroy () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
-		if (Globals.windows.focused === this) { Globals.windows.focused = null }
+		if (windows.hovered === this) { windows.hovered = null }
+		if (windows.focused === this) { windows.focused = null }
 
 		Bindings.window_destroy(this._id)
 		this._destroyed = true
 
-		Globals.windows.all.delete(this._id)
+		windows.all.delete(this._id)
 
 		maybeTriggerQuit()
 	}
 }
 
-module.exports = { Window }
+export default { Window }

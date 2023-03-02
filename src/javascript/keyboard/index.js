@@ -1,6 +1,6 @@
-const Bindings = require('../bindings')
-const Enums = require('../enums')
-const { mapping, reverseMapping } = require('./key-mapping')
+import Bindings from '../bindings'
+import Enums from '../enums'
+import { mapping, reverseMapping } from './key-mapping'
 
 const keyboard = {
 	get SCANCODE () { return Enums.scancode },
@@ -25,4 +25,4 @@ const keyboard = {
 	getState () { return Bindings.keyboard_getState() },
 }
 
-module.exports = { keyboard }
+export default { keyboard }

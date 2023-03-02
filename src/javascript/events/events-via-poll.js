@@ -1,5 +1,5 @@
-const { EventEmitter } = require('events')
-const Globals = require('../globals')
+import { EventEmitter } from 'events'
+import { events } from '../globals'
 
 let _ID = 0
 const activeEmitters = new Set()
@@ -27,7 +27,7 @@ class EventsViaPoll extends EventEmitter {
 			activeEmitters.delete(id)
 			if (activeEmitters.size !== 0) { return }
 
-			Globals.events.stopPolling()
+			events.stopPolling()
 		})
 
 		this.on('newListener', (type) => {
@@ -41,7 +41,7 @@ class EventsViaPoll extends EventEmitter {
 			activeEmitters.add(id)
 			if (activeEmitters.size !== 1) { return }
 
-			Globals.events.startPolling()
+			events.startPolling()
 		})
 	}
 
@@ -60,4 +60,4 @@ class EventsViaPoll extends EventEmitter {
 	}
 }
 
-module.exports = { EventsViaPoll }
+export default { EventsViaPoll }

@@ -1,4 +1,4 @@
-const Os = require('os')
+import { endianness } from 'os'
 
 const signedLimits = (bits) => ({
 	bytesPerSample: bits / 8,
@@ -79,7 +79,7 @@ AudioFormatHelpers.u16 = AudioFormatHelpers.u16lsb
 AudioFormatHelpers.s32 = AudioFormatHelpers.s32lsb
 AudioFormatHelpers.f32 = AudioFormatHelpers.f32lsb
 
-if (Os.endianness() === 'LE') {
+if (endianness() === 'LE') {
 	AudioFormatHelpers.s16sys = AudioFormatHelpers.s16lsb
 	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16lsb
 	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32lsb
@@ -96,4 +96,4 @@ for (const helper of Object.values(AudioFormatHelpers)) {
 	helper.writer = Buffer.prototype[helper.writerName]
 }
 
-module.exports = { AudioFormatHelpers }
+export default { AudioFormatHelpers }

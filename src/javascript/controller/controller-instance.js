@@ -1,7 +1,7 @@
-const Bindings = require('../bindings')
-const Enums = require('../enums')
+const Bindings = require('../bindings').default
+const Enums = require('../enums').default
 const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll')
+const { EventsViaPoll } = require('../events/events-via-poll').default
 
 const validEvents = [
 	'axisMotion',

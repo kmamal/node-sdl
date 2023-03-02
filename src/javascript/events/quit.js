@@ -1,9 +1,9 @@
-const Globals = require('../globals')
-const { sdl } = require('../sdl')
+import { windows } from '../globals'
+import { sdl } from '../sdl'
 
 
 const maybeTriggerQuit = () => {
-	if (Globals.windows.all.size > 0) { return }
+	if (windows.all.size > 0) { return }
 
 	let shouldPrevent = false
 	const prevent = () => { shouldPrevent = true }
@@ -20,4 +20,4 @@ const maybeTriggerQuit = () => {
 	process.exit()
 }
 
-module.exports = { maybeTriggerQuit }
+export default { maybeTriggerQuit }

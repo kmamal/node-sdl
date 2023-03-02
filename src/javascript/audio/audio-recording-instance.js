@@ -1,4 +1,4 @@
-const Bindings = require('../bindings')
+const Bindings = require('../bindings').default
 const { AudioInstance } = require('./audio-instance')
 
 class AudioRecordingInstance extends AudioInstance {

@@ -1,25 +1,25 @@
-const Bindings = require('../bindings')
+const Bindings = require('../bindings').default
 const Globals = require('../globals')
-const Enums = require('../enums')
-const { maybeTriggerQuit } = require('./quit')
+const Enums = require('../enums').default
+const { maybeTriggerQuit } = require('./quit').default
 const { mapping } = require('../keyboard/key-mapping')
-const { joystick: joystickModule } = require('../joystick')
+const { joystick: joystickModule } = require('../joystick').default
 const { controller: controllerModule } = require('../controller')
 const { audio: audioModule } = require('../audio')
 const { clipboard: clipboardModule } = require('../clipboard')
 const {
 	make: makeJoystickDevice,
 	compare: compareJoystickDevice,
-} = require('../joystick/device')
+} = require('../joystick/device').default
 const {
 	make: makeControllerDevice,
 	compare: compareControllerDevice,
 	filter: filterControllerDevice,
-} = require('../controller/device')
+} = require('../controller/device').default
 const {
 	make: makeAudioDevice,
 	compare: compareAudioDevice,
-} = require('../audio/device')
+} = require('../audio/device').default
 
 
 const reconcileDevices = (emitter, mainList, currList, compare) => {

@@ -1,5 +1,7 @@
-const Bindings = require('../bindings')
-const { AudioInstance } = require('./audio-instance')
+// TODO: handle import issues here
+
+import Bindings from '../bindings'
+import { AudioInstance } from './audio-instance'
 
 class AudioPlaybackInstance extends AudioInstance {
 	enqueue (buffer, numBytes = buffer.length) {
@@ -13,4 +15,4 @@ class AudioPlaybackInstance extends AudioInstance {
 	}
 }
 
-module.exports = { AudioPlaybackInstance }
+export default { AudioPlaybackInstance }

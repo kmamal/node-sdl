@@ -1,4 +1,4 @@
-const Enums = require('../enums')
+import Enums from '../enums'
 
 const make = (device) => {
 	const { type } = device
@@ -9,7 +9,7 @@ const make = (device) => {
 
 const compare = (a, b) => a.id - b.id
 
-module.exports = {
+export default {
 	make,
 	compare,
 }

@@ -1,6 +1,6 @@
-const Bindings = require('./bindings')
+import { getEnums } from './bindings'
 
-const enums = Bindings.getEnums()
+const enums = getEnums()
 
 for (const [ key, obj ] of Object.entries(enums)) {
 	const names = {}
@@ -10,4 +10,4 @@ for (const [ key, obj ] of Object.entries(enums)) {
 	enums[`${key}Names`] = names
 }
 
-module.exports = enums
+export default enums

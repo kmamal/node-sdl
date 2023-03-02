@@ -1,6 +1,6 @@
-const Bindings = require('../bindings')
+const Bindings = require('../bindings').default
 const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll')
+const { EventsViaPoll } = require('../events/events-via-poll').default
 const { ControllerInstance } = require('./controller-instance')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove', 'deviceRemap' ]

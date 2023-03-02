@@ -1,5 +1,7 @@
-const Path = require('path')
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const path = Path.resolve(__dirname, '../../dist/sdl.node')
+const path = resolve(__dirname, '../../dist/sdl.node')
 
-module.exports = require(path)
+export default require(path)

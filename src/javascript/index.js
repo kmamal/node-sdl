@@ -1,18 +1,20 @@
-const { isMainThread } = require('worker_threads')
-if (!isMainThread) { throw new Error('@kmamal/sdl can only be used in the main thread') }
+import { isMainThread } from 'worker_threads'
+if (!isMainThread) {
+  throw new Error('@kmamal/sdl can only be used in the main thread')
+}
 
-const Bindings = require('./bindings')
+import { initialize } from './bindings'
 
-const info = Bindings.initialize()
+const info = initialize()
 
-const { sdl } = require('./sdl')
-const { video } = require('./video')
-const { keyboard } = require('./keyboard')
-const { mouse } = require('./mouse')
-const { joystick } = require('./joystick')
-const { controller } = require('./controller')
-const { audio } = require('./audio')
-const { clipboard } = require('./clipboard')
+import { sdl } from './sdl'
+import { video } from './video'
+import { keyboard } from './keyboard'
+import { mouse } from './mouse'
+import { joystick } from './joystick'
+import { controller } from './controller'
+import { audio } from './audio'
+import { clipboard } from './clipboard'
 
 sdl.info = info
 sdl.video = video
@@ -23,8 +25,8 @@ sdl.controller = controller
 sdl.audio = audio
 sdl.clipboard = clipboard
 
-require('./events')
-require('./audio/prevent-exit')
-require('./cleanup')
+import './events'
+import './audio/prevent-exit'
+import './cleanup'
 
-module.exports = sdl
+export default sdl

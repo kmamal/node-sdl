@@ -1,8 +1,10 @@
+// TODO: handle import issues here
+
 const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll')
-const { AudioPlaybackInstance } = require('./audio-playback-instance')
+const { EventsViaPoll } = require('../events/events-via-poll').default
+const { AudioPlaybackInstance } = require('./audio-playback-instance').default
 const { AudioRecordingInstance } = require('./audio-recording-instance')
-const { AudioFormatHelpers } = require('./format-helpers')
+const { AudioFormatHelpers } = require('./format-helpers').default
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
