@@ -1,5 +1,5 @@
-import * as Bindings from '../bindings'
-import { EventsViaPoll } from '../events/events-via-poll'
+import * as Bindings from '../bindings.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
 
 const validEvents = ['update']
 

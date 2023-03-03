@@ -1,15 +1,13 @@
-import { joystickDevices } from '../globals'
-import { EventsViaPoll } from '../events/events-via-poll'
-import { JoystickInstance } from './joystick-instance'
+import { joystickDevices } from '../globals.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
+import { JoystickInstance } from './joystick-instance.js'
 
-const validEvents = [ 'deviceAdd', 'deviceRemove' ]
+const validEvents = ['deviceAdd', 'deviceRemove']
 
-const joystick = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+export class joystick extends EventsViaPoll {
+	constructor() { super(validEvents) }
 
-	get devices () { return joystickDevices }
+	get devices() { return joystickDevices }
 
-	openDevice (device) { return new JoystickInstance(device) }
-}()
-
-export default { joystick }
+	openDevice(device) { return new JoystickInstance(device) }
+}

@@ -1,7 +1,7 @@
-const Bindings = require('../bindings').default
-const Enums = require('../enums').default
-const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll').default
+import Bindings from '../bindings.js'
+import * as Globals from '../globals.js'
+import Enums from '../enums.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
 
 const validEvents = [
 	'axisMotion',
@@ -11,7 +11,7 @@ const validEvents = [
 	'close',
 ]
 
-class ControllerInstance extends EventsViaPoll {
+export class ControllerInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
@@ -112,4 +112,3 @@ class ControllerInstance extends EventsViaPoll {
 	}
 }
 
-module.exports = { ControllerInstance }

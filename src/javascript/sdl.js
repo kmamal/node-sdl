@@ -1,3 +1,3 @@
-import { EventsViaPoll } from './events/events-via-poll'
+import { EventsViaPoll } from './events/events-via-poll.js'
 
-export default sdl = new EventsViaPoll(['beforeQuit', 'quit'])
+export const sdl = new EventsViaPoll(['beforeQuit', 'quit'])

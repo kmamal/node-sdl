@@ -1,7 +1,7 @@
-import Bindings from '../bindings'
-import { windows as _windows } from '../globals'
-import Enums from '../enums'
-import { Window } from './window'
+import Bindings from '../bindings.js'
+import { windows as _windows } from '../globals.js'
+import Enums from '../enums.js'
+import { Window } from './window.js'
 
 const video = {
 	get displays () {

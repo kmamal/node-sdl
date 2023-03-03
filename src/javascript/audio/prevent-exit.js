@@ -1,6 +1,6 @@
-import Globals from '../globals'
+import * as Globals from '../globals.js'
 
-import { AudioPlaybackInstance } from './audio-playback-instance'
+import { AudioPlaybackInstance } from './audio-playback-instance.js'
 
 let timeout
 

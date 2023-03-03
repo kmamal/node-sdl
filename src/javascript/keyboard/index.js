@@ -1,6 +1,6 @@
-import Bindings from '../bindings'
-import Enums from '../enums'
-import { mapping, reverseMapping } from './key-mapping'
+import Bindings from '../bindings.js'
+import Enums from '../enums.js'
+import { mapping, reverseMapping } from './key-mapping.js'
 
 const keyboard = {
 	get SCANCODE () { return Enums.scancode },

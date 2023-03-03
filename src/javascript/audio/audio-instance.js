@@ -1,12 +1,12 @@
-import * as Bindings from '../bindings'
-import * as Enums from '../enums'
-import * as Globals from '../globals'
-import { EventsViaPoll } from '../events/events-via-poll'
-import { AudioFormatHelpers } from './format-helpers'
+import * as Bindings from '../bindings.js'
+import * as Enums from '../enums.js'
+import * as Globals from '../globals.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
+import { AudioFormatHelpers } from './format-helpers.js'
 
 const validEvents = [ 'close' ]
 
-class AudioInstance extends EventsViaPoll {
+export class AudioInstance extends EventsViaPoll {
 	constructor (device, options) {
 		super(validEvents)
 
@@ -123,5 +123,3 @@ class AudioInstance extends EventsViaPoll {
 		Globals.audioInstances.delete(this._id)
 	}
 }
-
-module.exports = { AudioInstance }

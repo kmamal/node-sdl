@@ -1,7 +1,7 @@
-const Bindings = require('../bindings').default
-const Enums = require('../enums').default
-const Globals = require('../globals')
-const { EventsViaPoll } = require('../events/events-via-poll').default
+import Bindings from '../bindings.js'
+import Enums from '../enums.js'
+import * as Globals from '../globals.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
 
 const validEvents = [
 	'axisMotion',
@@ -12,8 +12,8 @@ const validEvents = [
 	'close',
 ]
 
-class JoystickInstance extends EventsViaPoll {
-	constructor (device) {
+export class JoystickInstance extends EventsViaPoll {
+	constructor(device) {
 		super(validEvents)
 
 		const result = Bindings.joystick_open(device._index)
@@ -41,22 +41,22 @@ class JoystickInstance extends EventsViaPoll {
 		collection.add(this)
 	}
 
-	get device () { return this._device }
-	get firmwareVersion () { return this._firmwareVersion }
-	get serialNumber () { return this._serialNumber }
+	get device() { return this._device }
+	get firmwareVersion() { return this._firmwareVersion }
+	get serialNumber() { return this._serialNumber }
 
-	get axes () { return this._axes }
-	get balls () { return this._balls }
-	get buttons () { return this._buttons }
-	get hats () { return this._hats }
+	get axes() { return this._axes }
+	get balls() { return this._balls }
+	get buttons() { return this._buttons }
+	get hats() { return this._hats }
 
-	get power () {
+	get power() {
 		const power = Bindings.joystick_getPower(this._device.id)
 		return Enums.powerLevelNames[power]
 	}
 
-	get hasLed () { return this._hasLed }
-	setLed (red, green, blue) {
+	get hasLed() { return this._hasLed }
+	setLed(red, green, blue) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isFinite(red)) { throw Object.assign(new Error("red must be a number"), { red }) }
@@ -69,8 +69,8 @@ class JoystickInstance extends EventsViaPoll {
 		Bindings.joystick_rumble(this._device.id, red, green, blue)
 	}
 
-	get hasRumble () { return this._hasRumble }
-	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = 1e3) {
+	get hasRumble() { return this._hasRumble }
+	rumble(lowFreqRumble = 1, highFreqRumble = 1, duration = 1e3) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isFinite(lowFreqRumble)) { throw Object.assign(new Error("lowFreqRumble must be a number"), { lowFreqRumble }) }
@@ -82,10 +82,10 @@ class JoystickInstance extends EventsViaPoll {
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
 	}
 
-	stopRumble () { this.rumble(0, 0) }
+	stopRumble() { this.rumble(0, 0) }
 
-	get hasRumbleTriggers () { return this._hasRumbleTriggers }
-	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = 1e3) {
+	get hasRumbleTriggers() { return this._hasRumbleTriggers }
+	rumbleTriggers(leftRumble = 1, rightRumble = 1, duration = 1e3) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isFinite(leftRumble)) { throw Object.assign(new Error("leftRumble must be a number"), { leftRumble }) }
@@ -97,10 +97,10 @@ class JoystickInstance extends EventsViaPoll {
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 	}
 
-	stopRumbleTriggers () { this.rumbleTriggers(0, 0) }
+	stopRumbleTriggers() { this.rumbleTriggers(0, 0) }
 
-	get closed () { return this._closed }
-	close () {
+	get closed() { return this._closed }
+	close() {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		this.emit('close')
@@ -116,5 +116,3 @@ class JoystickInstance extends EventsViaPoll {
 		}
 	}
 }
-
-module.exports = { JoystickInstance }

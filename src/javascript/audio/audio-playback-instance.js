@@ -1,7 +1,7 @@
-import Bindings from '../bindings'
-import { AudioInstance } from './audio-instance'
+import Bindings from '../bindings.js'
+import { AudioInstance } from './audio-instance.js'
 
-export default class AudioPlaybackInstance extends AudioInstance {
+export class AudioPlaybackInstance extends AudioInstance {
 	enqueue(buffer, numBytes = buffer.length) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 

@@ -1,5 +1,5 @@
-import Bindings from '../bindings'
-import Enums from '../enums'
+import Bindings from '../bindings.js'
+import Enums from '../enums.js'
 
 const mouse = {
 	get BUTTON () { return Enums.button },

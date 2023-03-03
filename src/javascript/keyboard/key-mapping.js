@@ -1,6 +1,6 @@
-const Bindings = require('../bindings').default
+import Bindings from '../bindings.js'
 
-const mapping = {
+export const mapping = {
 	'A': 'a',
 	'AC Back': 'back',
 	'AC Bookmarks': 'bookmarks',
@@ -203,7 +203,7 @@ const mapping = {
 	'Z': 'z',
 }
 
-const reverseMapping = {}
+export const reverseMapping = {}
 
 for (const [ key, value ] of Object.entries(mapping)) {
 	const existing = reverseMapping[value]
@@ -212,9 +212,4 @@ for (const [ key, value ] of Object.entries(mapping)) {
 		Bindings.keyboard_getScancode(key),
 	)) : key
 	reverseMapping[value] = _key
-}
-
-module.exports = {
-	mapping,
-	reverseMapping,
 }

@@ -1,15 +1,10 @@
-import Enums from '../enums'
+import Enums from '../enums.js'
 
-const make = (device) => {
+export const make = (device) => {
 	const { type } = device
 	device.type = Enums.joystickTypeNames[type]
 	delete device.isController
 	delete device.mapping
 }
 
-const compare = (a, b) => a.id - b.id
-
-export default {
-	make,
-	compare,
-}
+export const compare = (a, b) => a.id - b.id

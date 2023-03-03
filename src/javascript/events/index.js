@@ -1,25 +1,25 @@
-const Bindings = require('../bindings').default
-const Globals = require('../globals')
-const Enums = require('../enums').default
-const { maybeTriggerQuit } = require('./quit').default
-const { mapping } = require('../keyboard/key-mapping')
-const { joystick: joystickModule } = require('../joystick').default
-const { controller: controllerModule } = require('../controller')
-const { audio: audioModule } = require('../audio')
-const { clipboard: clipboardModule } = require('../clipboard')
-const {
-	make: makeJoystickDevice,
-	compare: compareJoystickDevice,
-} = require('../joystick/device').default
-const {
-	make: makeControllerDevice,
-	compare: compareControllerDevice,
-	filter: filterControllerDevice,
-} = require('../controller/device').default
-const {
-	make: makeAudioDevice,
-	compare: compareAudioDevice,
-} = require('../audio/device').default
+import Bindings from '../bindings.js'
+import * as Globals from '../globals.js'
+import Enums from '../enums.js'
+import { maybeTriggerQuit } from './quit.js'
+import { mapping } from '../keyboard/key-mapping.js'
+import { joystick as joystickModule } from '../joystick/index.js'
+import { controller as controllerModule } from '../controller/index.js'
+import { audio as audioModule } from '../audio/index.js'
+import { clipboard as clipboardModule } from '../clipboard/index.js'
+import {
+	make as makeJoystickDevice,
+	compare as compareJoystickDevice,
+} from '../joystick/device.js'
+import {
+	make as makeControllerDevice,
+	compare as compareControllerDevice,
+	filter as filterControllerDevice,
+} from '../controller/device.js'
+import {
+	make as makeAudioDevice,
+	compare as compareAudioDevice,
+} from '../audio/device.js'
 
 
 const reconcileDevices = (emitter, mainList, currList, compare) => {
@@ -52,7 +52,7 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 
 	if (mainIndex < mainList.length) {
 		while (mainIndex < mainList.length) {
-			[ mainDevice ] = mainList.splice(mainIndex, 1)
+			[mainDevice] = mainList.splice(mainIndex, 1)
 			const type = 'deviceRemove'
 			const event = { type, device: mainDevice }
 			emitter.emit(type, event)

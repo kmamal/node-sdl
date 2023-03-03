@@ -1,8 +1,8 @@
-import { windows } from '../globals'
-import { sdl } from '../sdl'
+import { windows } from '../globals.js'
+import { sdl } from '../sdl.js'
 
 
-const maybeTriggerQuit = () => {
+export const maybeTriggerQuit = () => {
 	if (windows.all.size > 0) { return }
 
 	let shouldPrevent = false
@@ -19,5 +19,3 @@ const maybeTriggerQuit = () => {
 	sdl.emit(type2, event2)
 	process.exit()
 }
-
-export default { maybeTriggerQuit }

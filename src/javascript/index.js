@@ -3,18 +3,18 @@ if (!isMainThread) {
   throw new Error('@kmamal/sdl can only be used in the main thread')
 }
 
-import { initialize } from './bindings'
+import { initialize } from './bindings.js'
 
 const info = initialize()
 
-import { sdl } from './sdl'
-import { video } from './video'
-import { keyboard } from './keyboard'
-import { mouse } from './mouse'
-import { joystick } from './joystick'
-import { controller } from './controller'
-import { audio } from './audio'
-import { clipboard } from './clipboard'
+import { sdl } from './sdl.js'
+import { video } from './video/index.js'
+import { keyboard } from './keyboard/index.js'
+import { mouse } from './mouse/index.js'
+import { joystick } from './joystick/index.js'
+import { controller } from './controller/index.js'
+import { audio } from './audio/index.js'
+import { clipboard } from './clipboard/index.js'
 
 sdl.info = info
 sdl.video = video
@@ -25,8 +25,8 @@ sdl.controller = controller
 sdl.audio = audio
 sdl.clipboard = clipboard
 
-import './events'
-import './audio/prevent-exit'
-import './cleanup'
+import './events/index.js'
+import './audio/prevent-exit.js'
+import './cleanup.js'
 
 export default sdl

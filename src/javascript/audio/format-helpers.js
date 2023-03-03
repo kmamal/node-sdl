@@ -21,7 +21,7 @@ const floatLimits = {
 	maxSampleValue: 1,
 }
 
-export default AudioFormatHelpers = {
+export const AudioFormatHelpers = {
 	s8: {
 		readerName: 'readInt8',
 		writerName: 'writeInt8',

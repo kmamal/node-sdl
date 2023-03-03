@@ -1,7 +1,6 @@
-const Bindings = require('../bindings').default
-const { AudioInstance } = require('./audio-instance')
-
-class AudioRecordingInstance extends AudioInstance {
+import Bindings from '../bindings.js'
+import { AudioInstance } from './audio-instance.js'
+export class AudioRecordingInstance extends AudioInstance {
 	dequeue (buffer, numBytes = buffer.length) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
@@ -12,5 +11,3 @@ class AudioRecordingInstance extends AudioInstance {
 		return Bindings.audio_dequeue(this._id, buffer, numBytes)
 	}
 }
-
-module.exports = { AudioRecordingInstance }

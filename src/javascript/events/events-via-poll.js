@@ -1,12 +1,12 @@
 import { EventEmitter } from 'events'
-import { events } from '../globals'
+import { events } from '../globals.js'
 
 let _ID = 0
 const activeEmitters = new Set()
 
 const commonEvents = [ 'newListener', 'removeListener', '*' ]
 
-export default class EventsViaPoll extends EventEmitter {
+export class EventsViaPoll extends EventEmitter {
 	constructor (validEvents) {
 		super()
 

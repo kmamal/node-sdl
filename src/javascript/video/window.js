@@ -1,8 +1,8 @@
-import Bindings from '../bindings'
-import { windows } from '../globals'
-import Enums from '../enums'
-import { EventsViaPoll } from '../events/events-via-poll'
-import { maybeTriggerQuit } from '../events/quit'
+import Bindings from '../bindings.js'
+import { windows } from '../globals.js'
+import Enums from '../enums.js'
+import { EventsViaPoll } from '../events/events-via-poll.js'
+import { maybeTriggerQuit } from '../events/quit.js'
 
 const validEvents = [
 	'show',
@@ -32,7 +32,7 @@ const validEvents = [
 	'dropComplete',
 ]
 
-class Window extends EventsViaPoll {
+export class Window extends EventsViaPoll {
 	constructor (options = {}) {
 		super(validEvents)
 
@@ -332,5 +332,3 @@ class Window extends EventsViaPoll {
 		maybeTriggerQuit()
 	}
 }
-
-export default { Window }

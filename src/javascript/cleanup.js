@@ -1,5 +1,5 @@
-import { cleanup } from './bindings'
-import { events, windows, audioInstances, joystickInstances, controllerInstances } from './globals'
+// TODO: import { cleanup } from './bindings.js'
+import { events, windows, audioInstances, joystickInstances, controllerInstances } from './globals.js'
 
 process.on('exit', (code) => {
 	if (code !== 0) { return }
