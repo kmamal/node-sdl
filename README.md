@@ -38,7 +38,7 @@ npm install @kmamal/sdl
 ### "Hello, World!"
 
 ```js
-const sdl = require('@kmamal/sdl')
+import sdl from '@kmamal/sdl'
 
 const window = sdl.video.createWindow({ title: "Hello, World!" })
 window.on('*', console.log)
@@ -63,8 +63,8 @@ window.render(width, height, width * 4, 'bgra32', buffer)
 
 ### WebGL
 ```js
-const sdl = require('@kmamal/sdl')
-const createContext = require('@kmamal/gl')
+import sdl from '@kmamal/sdl'
+import createContext from '@kmamal/gl'
 
 const window = sdl.video.createWindow({title: "WebGL", opengl: true })
 const { width, height, native } = window
