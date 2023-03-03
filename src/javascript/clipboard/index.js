@@ -3,7 +3,7 @@ import { EventsViaPoll } from '../events/events-via-poll.js'
 
 const validEvents = ['update']
 
-export class clipboard extends EventsViaPoll {
+export class ClipboardEventsPoll extends EventsViaPoll {
 	constructor() { super(validEvents) }
 
 	get text() { return Bindings.clipboard_getText() ?? '' }
@@ -12,3 +12,4 @@ export class clipboard extends EventsViaPoll {
 		Bindings.clipboard_setText(text)
 	}
 }
+export const clipboard = new ClipboardEventsPoll()
