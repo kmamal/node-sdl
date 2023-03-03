@@ -18,4 +18,6 @@ export const controllerInstances = {
 	all: new Set(),
 	byId: new Map(),
 };
-export const events = null;
+export let events = {
+	
+};

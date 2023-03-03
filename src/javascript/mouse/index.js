@@ -1,7 +1,7 @@
 import Bindings from '../bindings.js'
 import Enums from '../enums.js'
 
-const mouse = {
+export const mouse = {
 	get BUTTON () { return Enums.button },
 
 	getButton (button) {
@@ -69,5 +69,3 @@ const mouse = {
 
 	uncapture () { mouse.capture(false) },
 }
-
-export default { mouse }

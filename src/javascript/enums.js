@@ -1,10 +1,6 @@
-import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const path = resolve(__dirname, '../../dist/sdl.node')
-console.log(path)
-// TODO:  import { getEnums } from './bindings.js'
-const enums = getEnums()
+import Bindings from './bindings.js'
+console.log(Bindings.getEnums)
+const enums = Bindings.getEnums()
 
 for (const [key, obj] of Object.entries(enums)) {
 	const names = {}

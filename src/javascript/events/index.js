@@ -380,7 +380,8 @@ const stopPolling = () => {
 	eventsInterval = null
 }
 
-Globals.events = {
+Object.assign(Globals.events, {
 	startPolling,
 	stopPolling,
-}
+})
+

@@ -1,4 +1,4 @@
-// TODO: import { cleanup } from './bindings.js'
+import Bindings from './bindings.js'
 import { events, windows, audioInstances, joystickInstances, controllerInstances } from './globals.js'
 
 process.on('exit', (code) => {
@@ -26,5 +26,5 @@ process.on('exit', (code) => {
 		controller.close()
 	}
 
-	cleanup()
+	Bindings.cleanup()
 })

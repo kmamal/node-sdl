@@ -3,7 +3,7 @@ import { windows as _windows } from '../globals.js'
 import Enums from '../enums.js'
 import { Window } from './window.js'
 
-const video = {
+export const video = {
 	get displays () {
 		const displays = Bindings.video_getDisplays()
 		for (const display of displays) {
@@ -18,5 +18,3 @@ const video = {
 
 	createWindow: (options) => new Window(options),
 }
-
-export default { video }

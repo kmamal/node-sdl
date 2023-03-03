@@ -2,7 +2,7 @@ import Bindings from '../bindings.js'
 import Enums from '../enums.js'
 import { mapping, reverseMapping } from './key-mapping.js'
 
-const keyboard = {
+export const keyboard = {
 	get SCANCODE () { return Enums.scancode },
 
 	getKey (scancode) {
@@ -24,5 +24,3 @@ const keyboard = {
 
 	getState () { return Bindings.keyboard_getState() },
 }
-
-export default { keyboard }

@@ -4,7 +4,7 @@ import { AudioPlaybackInstance } from './audio-playback-instance.js'
 
 let timeout
 
-const resetTimeout = () => {
+export const resetTimeout = () => {
 	if (timeout) {
 		clearTimeout(timeout)
 		timeout = null
@@ -32,4 +32,3 @@ process.on('beforeExit', (code) => {
 	}
 })
 
-module.exports = { resetTimeout }
