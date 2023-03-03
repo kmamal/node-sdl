@@ -5,7 +5,7 @@ import { ControllerInstance } from './controller-instance.js'
 
 const validEvents = ['deviceAdd', 'deviceRemove', 'deviceRemap']
 
-export class controller extends EventsViaPoll {
+export class ControllerEventsPoll extends EventsViaPoll {
 	constructor() { super(validEvents) }
 
 	get devices() { return Globals.controllerDevices }
@@ -21,3 +21,5 @@ export class controller extends EventsViaPoll {
 		Bindings.controller_addMappings(mappings)
 	}
 }
+
+export const controller = new ControllerEventsPoll()

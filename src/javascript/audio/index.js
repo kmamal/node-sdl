@@ -6,7 +6,7 @@ import { AudioFormatHelpers } from './format-helpers.js'
 
 const validEvents = ['deviceAdd', 'deviceRemove']
 
-export class audio extends EventsViaPoll {
+class AudioEventsPoll extends EventsViaPoll {
 	constructor() { super(validEvents) }
 
 	get devices() {
@@ -43,3 +43,5 @@ export class audio extends EventsViaPoll {
 		return AudioFormatHelpers[format].writerName
 	}
 }
+
+export const audio = new AudioEventsPoll();

@@ -4,10 +4,11 @@ import { JoystickInstance } from './joystick-instance.js'
 
 const validEvents = ['deviceAdd', 'deviceRemove']
 
-export class joystick extends EventsViaPoll {
+class JoystickEventsPoll extends EventsViaPoll {
 	constructor() { super(validEvents) }
 
 	get devices() { return joystickDevices }
 
 	openDevice(device) { return new JoystickInstance(device) }
 }
+export const joystick = new JoystickEventsPoll()

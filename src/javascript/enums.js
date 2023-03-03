@@ -1,5 +1,4 @@
 import Bindings from './bindings.js'
-console.log(Bindings.getEnums)
 const enums = Bindings.getEnums()
 
 for (const [key, obj] of Object.entries(enums)) {

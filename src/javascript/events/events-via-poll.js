@@ -4,10 +4,10 @@ import { events } from '../globals.js'
 let _ID = 0
 const activeEmitters = new Set()
 
-const commonEvents = [ 'newListener', 'removeListener', '*' ]
+const commonEvents = ['newListener', 'removeListener', '*']
 
 export class EventsViaPoll extends EventEmitter {
-	constructor (validEvents) {
+	constructor(validEvents) {
 		super()
 
 		this._validEvents = validEvents
@@ -45,7 +45,7 @@ export class EventsViaPoll extends EventEmitter {
 		})
 	}
 
-	emit (type, ...args) {
+	emit(type, ...args) {
 		const isCommon = commonEvents.includes(type)
 		const isValid = this._validEvents.includes(type)
 		if (!isCommon && !isValid) {
