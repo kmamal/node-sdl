@@ -2,7 +2,7 @@ const Fs = require('node:fs')
 const Path = require('node:path')
 
 const dir = {}
-dir.root = Path.resolve(__dirname, '../..')
+dir.root = Path.join(__dirname, '../..')
 dir.sdl = Path.join(dir.root, 'sdl')
 dir.build = Path.join(dir.root, 'build')
 dir.dist = Path.join(dir.root, 'dist')
