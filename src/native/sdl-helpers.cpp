@@ -1715,7 +1715,7 @@ window_render (
 		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d, %d) error: %s\n", window_id, texture_width, texture_height, texture_stride, texture_format, SDL_GetError());
 	}
 
-	if (SDL_BlitSurface(src_surface, NULL, dst_surface, NULL) != 0) {
+	if (SDL_BlitScaled(src_surface, NULL, dst_surface, NULL) != 0) {
 		RETURN_ERROR("SDL_BlitSurface(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
