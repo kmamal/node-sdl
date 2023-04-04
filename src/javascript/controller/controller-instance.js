@@ -50,6 +50,15 @@ class ControllerInstance extends EventsViaPoll {
 		return Enums.powerLevelNames[power]
 	}
 
+	setPlayer (player) {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		if (!Number.isFinite(player)) { throw Object.assign(new Error("player must be a number"), { player }) }
+		if (player < 0) { throw Object.assign(new Error("player must be non-negative"), { player }) }
+
+		Bindings.joystick_setPlayer(this._device.id, player)
+	}
+
 	get hasLed () { return this._hasLed }
 	setLed (red, green, blue) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
@@ -61,7 +70,7 @@ class ControllerInstance extends EventsViaPoll {
 		if (!Number.isFinite(blue)) { throw Object.assign(new Error("blue must be a number"), { blue }) }
 		if (blue < 0 || blue > 1) { throw Object.assign(new Error("blue must be between 0 and 1"), { blue }) }
 
-		Bindings.joystick_rumble(this._device.id, red, green, blue)
+		Bindings.joystick_setLed(this._device.id, red, green, blue)
 	}
 
 	get hasRumble () { return this._hasRumble }

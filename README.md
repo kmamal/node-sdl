@@ -198,6 +198,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [joystickInstance.buttons](#joystickinstancebuttons)
     * [joystickInstance.hats](#joystickinstancehats)
     * [joystickInstance.power](#joystickinstancepower)
+    * [joystickInstance.setPlayer(index)](#joystickinstancesetplayerindex)
     * [joystickInstance.hasLed](#joystickinstancehasled)
     * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
     * [joystickInstance.hasRumble](#joystickinstancehasrumble)
@@ -226,6 +227,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [controllerInstance.axes](#controllerinstanceaxes)
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
+    * [controllerInstance.setPlayer(index)](#controllerinstancesetplayerindex)
     * [controllerInstance.hasLed](#controllerinstancehasled)
     * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
     * [controllerInstance.hasRumble](#controllerinstancehasrumble)
@@ -1512,6 +1514,12 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 The current power level of the joystick device.
 
+### joystickInstance.setPlayer(index)
+
+* `index: <number>` The player index to assign to the joystick.
+
+Sets the player index of this joystick.
+
 ### joystickInstance.hasLed
 
 * `<boolean>`
@@ -1726,17 +1734,42 @@ The controller's serial number, or `null` if it's not available.
 
 ### controllerInstance.axes
 
-* `<number>[]`
+* `axes: <object>`
+  * `leftStickX: <number>` Left stick horizontal position
+  * `leftStickY: <number>` Left stick vertical position
+  * `rightStickX: <number>` Right stick horizontal position
+  * `rightStickY: <number>` Right stick vertical position
+  * `leftTrigger: <number>` Left trigger position
+  * `rightTrigger: <number>` Right trigger position
 
-An array of values, each corresponding to the position of one of the controller's axes.
+An object mapping each axis of the controller's axes to its position.
 The values are normalized from `-1` to `+1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
 ### controllerInstance.buttons
 
-* `<boolean>[]`
+* `buttons: <object>`
+  * `dpadLeft: <boolean>` D-Pad left pressed
+  * `dpadRight: <boolean>`  D-Pad right pressed
+  * `dpadUp: <boolean>`  D-Pad up pressed
+  * `dpadDown: <boolean>`  D-Pad down pressed
+  * `a: <boolean>` A button pressed
+  * `b: <boolean>` B button pressed
+  * `x: <boolean>` X button pressed
+  * `y: <boolean>` Y button pressed
+  * `guide: <boolean>` Middle button pressed
+  * `back: <boolean>` Back button pressed
+  * `start: <boolean>` Start button pressed
+  * `leftStick: <boolean>` Left stick pressed
+  * `rightStick: <boolean>` Right stick pressed
+  * `leftShoulder: <boolean>` Left shoulder button pressed
+  * `rightShoulder: <boolean>` Right shoulder button pressed
+  * `paddle1: <boolean>` Paddle 1 pressed
+  * `paddle2: <boolean>` Paddle 2 pressed
+  * `paddle3: <boolean>` Paddle 3 pressed
+  * `paddle4: <boolean>` Paddle 4 pressed
 
-An array of values, each corresponding to the state of one of the controller's buttons.
+An object mapping each of the controller's buttons to a boolean value.
 The values will be `true` for buttons that are pressed and `false` otherwise.
 
 ### controllerInstance.power
@@ -1744,6 +1777,12 @@ The values will be `true` for buttons that are pressed and `false` otherwise.
 * [`<PowerLevel>`](#power-levels)
 
 The current power level of the controller device.
+
+### controllerInstance.setPlayer(index)
+
+* `index: <number>` The player index to assign to the controller.
+
+Sets the player index of this controller.
 
 ### controllerInstance.hasLed
 
@@ -2250,6 +2289,6 @@ There are some npm scripts in `package.json` that could be of use to you:
 
 The SDL headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
 
-The way I normally work is I run `npm run clean` to start fresh, then run `NODE_SDL_FROM_SOURCE=1 npm i` once to prepare everything, then as I make changes I run `npm run build` ro re-build the package.
+The way I normally work is I run `npm run clean` to start fresh, then run `NODE_SDL_FROM_SOURCE=1 npm i` once to prepare everything, then as I make changes I run `npm run build` to re-build the package.
 
 Have fun!

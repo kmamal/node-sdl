@@ -758,6 +758,8 @@ export namespace Sdl {
 
 			readonly power: PowerLevel
 
+			setPlayer (index: number): void
+
 			readonly hasLed: boolean
 			setLed (red: number, green: number, blue: number): void
 
@@ -841,6 +843,8 @@ export namespace Sdl {
 			}
 
 			readonly power: Joystick.PowerLevel
+
+			setPlayer (index: number): void
 
 			readonly hasLed: boolean
 			setLed (red: number, green: number, blue: number): void
