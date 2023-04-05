@@ -37,8 +37,6 @@ update()
 const maxUnicode = 0x10FFFF
 
 while (!window.destroyed) {
-	await setTimeout(100)
-
 	const numChanges = Math.ceil(text.length / 100)
 
 	for (let i = 0; i < numChanges; i++) {
@@ -54,4 +52,7 @@ while (!window.destroyed) {
 	}
 
 	redraw()
+	await setTimeout(100)
 }
+
+sdl.clipboard.off('update', update)
