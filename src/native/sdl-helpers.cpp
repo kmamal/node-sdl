@@ -120,7 +120,6 @@ ErrorMessage::
 
 
 enum class EventFamily {
-	APP,
 	WINDOW,
 	KEYBOARD,
 	MOUSE,
@@ -138,7 +137,6 @@ enum_getEventFamilies (Variant & families)
 {
 	MAKE_MAP(families);
 
-	SET_NUM(families, "app", (int) EventFamily::APP);
 	SET_NUM(families, "window", (int) EventFamily::WINDOW);
 	SET_NUM(families, "keyboard", (int) EventFamily::KEYBOARD);
 	SET_NUM(families, "mouse", (int) EventFamily::MOUSE);
@@ -911,12 +909,6 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 	Variant value;
 	switch (event.type) {
-		case SDL_QUIT: {
-			SET_NUM(object, "family", (int) EventFamily::APP);
-			SET_NUM(object, "type", (int) EventType::QUIT);
-			break;
-		}
-
 		case SDL_WINDOWEVENT: {
 			SET_NUM(object, "family", (int) EventFamily::WINDOW);
 			SET_NUM(object, "windowId", event.window.windowID);

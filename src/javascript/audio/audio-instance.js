@@ -108,7 +108,6 @@ class AudioInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
 		Bindings.audio_clearQueue(this._id)
-		require('./prevent-exit').resetTimeout() // Avoid circular dependency
 	}
 
 	get closed () { return this._closed }

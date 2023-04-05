@@ -2,7 +2,6 @@ const Bindings = require('../bindings')
 const Globals = require('../globals')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { maybeTriggerQuit } = require('../events/quit')
 
 const validEvents = [
 	'show',
@@ -122,6 +121,14 @@ class Window extends EventsViaPoll {
 
 		// This also keeps Node.js alive while windows are open
 		this.on('close', () => {
+			if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
+			if (Globals.windows.focused === this) { Globals.windows.focused = null }
+
+			Bindings.window_destroy(this._id)
+			this._destroyed = true
+
+			Globals.windows.all.delete(this._id)
+
 			process.nextTick(() => { this.removeAllListeners() })
 		})
 
@@ -130,6 +137,7 @@ class Window extends EventsViaPoll {
 			this.emit('resize', {
 				width: this._width,
 				height: this._height,
+				type: 'resize',
 			})
 		})
 	}
@@ -321,15 +329,7 @@ class Window extends EventsViaPoll {
 	destroy () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
-		if (Globals.windows.focused === this) { Globals.windows.focused = null }
-
-		Bindings.window_destroy(this._id)
-		this._destroyed = true
-
-		Globals.windows.all.delete(this._id)
-
-		maybeTriggerQuit()
+		this.emit('close', { type: 'close' })
 	}
 }
 

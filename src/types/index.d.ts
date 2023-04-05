@@ -5,17 +5,6 @@ export namespace Events {
 
 	type PreventCallback = () => void
 
-	namespace App {
-
-		interface BeforeQuit extends BaseEvent {
-			readonly type: 'beforeQuit'
-			readonly prevent: PreventCallback
-		}
-
-		interface Quit extends BaseEvent { readonly type: 'quit' }
-
-	}
-
 	namespace Window {
 
 		interface WindowEvent extends BaseEvent {}
@@ -983,9 +972,6 @@ export namespace Sdl {
 	}
 
 	interface Module {
-		on (event: 'beforeQuit', listener: (event: Events.App.BeforeQuit) => void): this
-		on (event: 'quit', listener: (event: Events.App.Quit) => void): this
-
 		readonly info: Info
 		readonly video: Video.Module
 		readonly keyboard: Keyboard.Module

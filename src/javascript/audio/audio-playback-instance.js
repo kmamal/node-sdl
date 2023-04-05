@@ -1,5 +1,6 @@
 const Bindings = require('../bindings')
 const { AudioInstance } = require('./audio-instance')
+const { resetTimeout } = require('./prevent-exit')
 
 class AudioPlaybackInstance extends AudioInstance {
 	enqueue (buffer, numBytes = buffer.length) {
@@ -10,6 +11,11 @@ class AudioPlaybackInstance extends AudioInstance {
 		if (buffer.length < numBytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, numBytes }) }
 
 		Bindings.audio_enqueue(this._id, buffer, numBytes)
+	}
+
+	clearQueue () {
+		super.clearQueue()
+		resetTimeout()
 	}
 }
 

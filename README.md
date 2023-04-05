@@ -84,8 +84,6 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 ## Contents
 
 * [sdl](#sdl)
-  * [Event: 'beforeQuit'](#event-beforequit)
-  * [Event: 'quit'](#event-quit)
   * [sdl.info](#sdlinfo)
 * [sdl.video](#sdlvideo)
   * [Image data](#image-data)
@@ -286,20 +284,6 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 
 
 ## sdl
-
-### Event: 'beforeQuit'
-
-* `prevent: <function (void) => void>` Call this to prevent the application from closing.
-
-Fired to indicate that the user has requested the application to close (usually by closing the last window).
-If you need to display any confirmation dialogs you should call `event.prevent()` and handle termination manually.
-If `prevent` is not called, then this event will be followed by a [`'quit'`](#event-quit) event.
-
-### Event: 'quit'
-
-Indicates that the application is about to close.
-Handle any cleanup here.
-This event will be followed by a call to `process.exit()`.
 
 ### sdl.info
 
@@ -584,7 +568,6 @@ If `prevent` is not called, then this event will be followed by a [`'close'`](#e
 
 Indicates that the window is about to be destroyed.
 Handle any cleanup here.
-This event will be followed by a call to [`window.destroy()`](#windowdestroy).
 
 ### Event: 'keyDown'
 
@@ -1734,7 +1717,7 @@ The controller's serial number, or `null` if it's not available.
 
 ### controllerInstance.axes
 
-* `axes: <object>`
+* `<object>`
   * `leftStickX: <number>` Left stick horizontal position
   * `leftStickY: <number>` Left stick vertical position
   * `rightStickX: <number>` Right stick horizontal position
@@ -1748,7 +1731,7 @@ It may be necessary to impose certain tolerances on these values to account for 
 
 ### controllerInstance.buttons
 
-* `buttons: <object>`
+* `<object>`
   * `dpadLeft: <boolean>` D-Pad left pressed
   * `dpadRight: <boolean>`  D-Pad right pressed
   * `dpadUp: <boolean>`  D-Pad up pressed
@@ -1865,7 +1848,7 @@ The samples in a frame are arranged as follows:
 * For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
 * For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
 
-So for example, to fill a buffer with 3 seconds of a 440Hz sine wave, you could do:
+So for example, to play 3 seconds of a 440Hz sine wave, you could do:
 
 ```js
 const TWO_PI = 2 * Math.PI
@@ -1901,6 +1884,9 @@ for (let i = 0; i < numFrames; i++) {
     offset = playbackInstance.writeSample(buffer, sample, offset)
   }
 }
+
+playbackInstance.enqueue(buffer)
+playbackInstance.play()
 ```
 
 ### Sample formats

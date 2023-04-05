@@ -1,7 +1,6 @@
 const Bindings = require('../bindings')
 const Globals = require('../globals')
 const Enums = require('../enums')
-const { maybeTriggerQuit } = require('./quit')
 const { mapping } = require('../keyboard/key-mapping')
 const { joystick: joystickModule } = require('../joystick')
 const { controller: controllerModule } = require('../controller')
@@ -78,12 +77,6 @@ const handleEvents = () => {
 		event.type = Enums.eventTypeNames[type]
 
 		switch (family) {
-			case Enums.eventFamily.app: {
-				if (type === Enums.eventType.quit) {
-					maybeTriggerQuit()
-				}
-			} break
-
 			case Enums.eventFamily.window: {
 				const { windowId } = event
 				delete event.windowId
@@ -158,8 +151,6 @@ const handleEvents = () => {
 				}
 
 				window.emit(event.type, event)
-
-				if (type === Enums.eventType.close) { window.destroy() }
 			} break
 
 			case Enums.eventFamily.keyboard: {
