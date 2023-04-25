@@ -1376,9 +1376,14 @@ window_create (
 	bool * fullscreen,
 	bool * resizable,
 	bool * borderless,
+	bool * alwaysOnTop,
 	bool * accelerated,
 	bool * vsync,
 	bool opengl,
+	bool * skipTaskbar,
+	bool * popupMenu,
+	bool * tooltip,
+	bool * utility,
 	int * window_id, void ** native_pointer, int * native_pointer_size
 ) {
 	SDL_Window * window;
@@ -1404,7 +1409,12 @@ window_create (
 		| (*fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
 		| (*resizable ? SDL_WINDOW_RESIZABLE : 0)
 		| (*borderless ? SDL_WINDOW_BORDERLESS : 0)
-		| (opengl ? SDL_WINDOW_OPENGL : 0);
+		| (*alwaysOnTop ? SDL_WINDOW_ALWAYS_ON_TOP : 0)
+		| (opengl ? SDL_WINDOW_OPENGL : 0)
+		| (*skipTaskbar ? SDL_WINDOW_SKIP_TASKBAR : 0)
+		| (*popupMenu ? SDL_WINDOW_POPUP_MENU : 0)
+		| (*tooltip ? SDL_WINDOW_TOOLTIP : 0)
+		| (*utility ? SDL_WINDOW_UTILITY : 0);
 
 	window = SDL_CreateWindow(title, **x, **y, **width, **height, desired_flags);
 	if (window == nullptr) {
@@ -1417,6 +1427,11 @@ window_create (
 	*fullscreen = actual_flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 	*resizable = actual_flags & SDL_WINDOW_RESIZABLE;
 	*borderless = actual_flags & SDL_WINDOW_BORDERLESS;
+	*alwaysOnTop = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
+	*skipTaskbar = actual_flags & SDL_WINDOW_SKIP_TASKBAR;
+	*popupMenu = actual_flags & SDL_WINDOW_POPUP_MENU;
+	*tooltip = actual_flags & SDL_WINDOW_TOOLTIP;
+	*utility = actual_flags & SDL_WINDOW_UTILITY;
 
 	*window_id = SDL_GetWindowID(window);
 	if (*window_id == 0) {

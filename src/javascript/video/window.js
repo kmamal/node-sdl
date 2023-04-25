@@ -44,9 +44,14 @@ class Window extends EventsViaPoll {
 			fullscreen = false,
 			resizable = false,
 			borderless = false,
+			alwaysOnTop = false,
 			accelerated = true,
 			vsync = true,
 			opengl = false,
+			skipTaskbar = false,
+			popupMenu = false,
+			tooltip = false,
+			utility = false,
 		} = options
 
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
@@ -65,9 +70,14 @@ class Window extends EventsViaPoll {
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
 		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
+		if (typeof alwaysOnTop !== 'boolean') { throw Object.assign(new Error("alwaysOnTop must be a boolean"), { alwaysOnTop }) }
 		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
+		if (typeof skipTaskbar !== 'boolean') { throw Object.assign(new Error("skipTaskbar must be a boolean"), { skipTaskbar }) }
+		if (typeof popupMenu !== 'boolean') { throw Object.assign(new Error("popupMenu must be a boolean"), { popupMenu }) }
+		if (typeof tooltip !== 'boolean') { throw Object.assign(new Error("tooltip must be a boolean"), { tooltip }) }
+		if (typeof utility !== 'boolean') { throw Object.assign(new Error("utility must be a boolean"), { utility }) }
 		if (display && (Number.isFinite(x) || Number.isFinite(y))) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 
@@ -90,9 +100,14 @@ class Window extends EventsViaPoll {
 			fullscreen,
 			resizable,
 			borderless,
+			alwaysOnTop,
 			accelerated,
 			vsync,
 			opengl,
+			skipTaskbar,
+			popupMenu,
+			tooltip,
+			utility,
 		)
 
 		this._id = result.id
@@ -103,9 +118,14 @@ class Window extends EventsViaPoll {
 		this._fullscreen = result.fullscreen
 		this._resizable = result.resizable
 		this._borderless = result.borderless
+		this._alwaysOnTop = result.alwaysOnTop
 		this._accelerated = result.accelerated
 		this._vsync = result.vsync
 		this._native = result.native ?? null
+		this._skipTaskbar = result.skipTaskbar
+		this._popupMenu = result.popupMenu
+		this._tooltip = result.tooltip
+		this._utility = result.utility
 
 		this._title = title
 		this._visible = visible
@@ -221,6 +241,8 @@ class Window extends EventsViaPoll {
 		this._borderless = Bindings.window_setBorderless(this._id, borderless)
 	}
 
+	get alwaysOnTop () { return this._alwaysOnTop }
+
 	get accelerated () { return this._accelerated }
 	setAccelerated (accelerated) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
@@ -284,6 +306,11 @@ class Window extends EventsViaPoll {
 	}
 
 	get hovered () { return this._hovered }
+
+	get skipTaskbar () { return this._skipTaskbar }
+	get popupMenu () { return this._popupMenu }
+	get tooltip () { return this._tooltip }
+	get utility () { return this._utility }
 
 	render (width, height, stride, format, buffer) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }

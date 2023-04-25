@@ -328,6 +328,8 @@ export namespace Sdl {
 			readonly borderless: boolean
 			setBorderless (borderless: boolean): void
 
+			readonly alwaysOnTop: boolean
+
 			readonly accelerated: boolean
 			setAccelerated (accelerated: boolean): void
 
@@ -348,6 +350,11 @@ export namespace Sdl {
 			focus (): void
 
 			readonly hovered: boolean
+
+			readonly skipTaskbar: boolean
+			readonly popupMenu: boolean
+			readonly tooltip: boolean
+			readonly utility: boolean
 
 			render (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
 
@@ -375,9 +382,14 @@ export namespace Sdl {
 				fullscreen?: boolean
 				resizable?: boolean
 				borderless?: boolean
+				alwaysOnTop?: boolean
 				accelerated?: boolean
 				vsync?: boolean
 				opengl?: boolean
+				skipTaskbar?: boolean
+				popupMenu?: boolean
+				tooltip?: boolean
+				utility?: boolean
 			}): Window
 		}
 	}

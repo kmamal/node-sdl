@@ -47,11 +47,11 @@ window.on('*', console.log)
 ### Canvas
 ```js
 import sdl from '@kmamal/sdl'
-import canvas from 'canvas'
+import { createCanvas } from 'canvas'
 
 const window = sdl.video.createWindow({ title: "Canvas" })
 const { width, height } = window
-const canvas = canvas.createCanvas(width, height)
+const canvas = createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
 // Clear screen to red
@@ -482,9 +482,14 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   * `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   * `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
   * `borderless: <boolean>` Set to `true` to completely hide the window's borders and title bar. Default: `false`
+  * `alwaysOnTop: <boolean>` Set to `true` to always show this window above others. Default: `false`
   * `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
   * `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
   * `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
+  * `skipTaskbar: <boolean>` X11 only. Set to `true` to not add this window to the taskbar. Default: `false`
+  * `popupMenu: <boolean>` X11 only. Set to `true` to treat this window like a popup menu. Default: `false`
+  * `tooltip: <boolean>` X11 only. Set to `true` to treat this window like a tooltip. Default: `false`
+  * `utility: <boolean>` X11 only. Set to `true` to treat this window like a utility window. Default: `false`
 * Returns: [`<Window>`](#class-window) an object representing the new window.
 
 Creates a new window.
@@ -773,6 +778,13 @@ A borderless window has no borders or title bar.
 
 Changes the window's borderless property.
 
+### window.alwaysOnTop
+
+* `<boolean>`
+
+Will be `true` if the window was created with `alwaysOnTop: true`.
+Such a window will always be shown above other windows.
+
 ### window.accelerated
 
 * `<boolean>`
@@ -853,6 +865,38 @@ Gives the window the keyboard focus.
 * `<boolean>`
 
 Will be `true` if the mouse is over the window.
+
+### window.skipTaskbar
+
+* `<boolean>`
+
+X11 only.
+Will be `true` if the window was created with `skipTaskbar: true`.
+Such a window will not be added to the taskbar.
+
+### window.popupMenu
+
+* `<boolean>`
+
+X11 only.
+Will be `true` if the window was created with `popupMenu: true`.
+Such a window will always be treated as a popup menu.
+
+### window.tooltip
+
+* `<boolean>`
+
+X11 only.
+Will be `true` if the window was created with `tooltip: true`.
+Such a window will always be treated as a tooltip.
+
+### window.utility
+
+* `<boolean>`
+
+X11 only.
+Will be `true` if the window was created with `utility: true`.
+Such a window will always be treated as a utility window.
 
 ### window.render(width, height, stride, format, buffer)
 

@@ -60,9 +60,14 @@ ErrorMessage * window_create (
 	bool * fullscreen,
 	bool * resizable,
 	bool * borderless,
+	bool * alwaysOnTop,
 	bool * accelerated,
 	bool * vsync,
 	bool opengl,
+	bool * skipTaskbar,
+	bool * popupMenu,
+	bool * tooltip,
+	bool * utility,
 	int * window_id, void ** native_pointer, int * native_pointer_size
 );
 ErrorMessage * window_setTitle (int window_id, const char * title);

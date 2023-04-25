@@ -303,7 +303,7 @@ window_create(napi_env env, napi_callback_info info)
 	int * height = nullptr;
 	void * native_pointer = nullptr;
 
-	napi_value argv[13];
+	napi_value argv[18];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
@@ -341,21 +341,30 @@ window_create(napi_env env, napi_callback_info info)
 		CALL_NAPI(napi_get_value_int32, argv[5], y);
 	}
 
-	bool visible, fullscreen, resizable, borderless, accelerated, vsync, opengl;
+	bool visible, fullscreen, resizable, borderless, alwaysOnTop,
+		accelerated, vsync, opengl,
+		skipTaskbar, popupMenu, tooltip, utility;
 	CALL_NAPI(napi_get_value_bool, argv[6], &visible);
 	CALL_NAPI(napi_get_value_bool, argv[7], &fullscreen);
 	CALL_NAPI(napi_get_value_bool, argv[8], &resizable);
 	CALL_NAPI(napi_get_value_bool, argv[9], &borderless);
-	CALL_NAPI(napi_get_value_bool, argv[10], &accelerated);
-	CALL_NAPI(napi_get_value_bool, argv[11], &vsync);
-	CALL_NAPI(napi_get_value_bool, argv[12], &opengl);
+	CALL_NAPI(napi_get_value_bool, argv[10], &alwaysOnTop);
+	CALL_NAPI(napi_get_value_bool, argv[11], &accelerated);
+	CALL_NAPI(napi_get_value_bool, argv[12], &vsync);
+	CALL_NAPI(napi_get_value_bool, argv[13], &opengl);
+	CALL_NAPI(napi_get_value_bool, argv[14], &skipTaskbar);
+	CALL_NAPI(napi_get_value_bool, argv[15], &popupMenu);
+	CALL_NAPI(napi_get_value_bool, argv[16], &tooltip);
+	CALL_NAPI(napi_get_value_bool, argv[17], &utility);
 
 	int window_id;
 	int native_pointer_size;
 	CALL_SDL_HELPER(window_create,
 		title, display,
 		&x, &y, &width, &height,
-		visible, &fullscreen, &resizable, &borderless, &accelerated, &vsync, opengl,
+		visible, &fullscreen, &resizable, &borderless, &alwaysOnTop,
+		&accelerated, &vsync, opengl,
+		&skipTaskbar, &popupMenu, &tooltip, &utility,
 		&window_id, &native_pointer, &native_pointer_size
 	);
 
@@ -397,6 +406,11 @@ window_create(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_create_string_latin1, "borderless", 10, &key);
 	CALL_NAPI(napi_set_property, result, key, value);
 
+	CALL_NAPI(napi_create_int32, alwaysOnTop, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "alwaysOnTop", 11, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
 	CALL_NAPI(napi_create_int32, accelerated, &value);
 	CALL_NAPI(napi_coerce_to_bool, value, &value);
 	CALL_NAPI(napi_create_string_latin1, "accelerated", 11, &key);
@@ -405,6 +419,26 @@ window_create(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_create_int32, vsync, &value);
 	CALL_NAPI(napi_coerce_to_bool, value, &value);
 	CALL_NAPI(napi_create_string_latin1, "vsync", 5, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, skipTaskbar, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "skipTaskbar", 11, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, popupMenu, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "popupMenu", 9, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, tooltip, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "tooltip", 7, &key);
+	CALL_NAPI(napi_set_property, result, key, value);
+
+	CALL_NAPI(napi_create_int32, utility, &value);
+	CALL_NAPI(napi_coerce_to_bool, value, &value);
+	CALL_NAPI(napi_create_string_latin1, "utility", 7, &key);
 	CALL_NAPI(napi_set_property, result, key, value);
 
 	if (native_pointer) {
