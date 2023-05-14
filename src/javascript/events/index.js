@@ -100,6 +100,9 @@ const handleEvents = () => {
 					case Enums.eventType.hide: {
 						window._visible = false
 					} break
+					case Enums.eventType.expose: {
+						// Nothing
+					} break
 
 					case Enums.eventType.minimize: {
 						window._visible = false

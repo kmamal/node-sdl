@@ -522,7 +522,7 @@ Fired when a window becomes hidden.
 
 ### Event: 'expose'
 
-Fired when a window becomes exposed.
+Fired when a window becomes exposed and should be redrawn.
 
 ### Event: 'minimize'
 
