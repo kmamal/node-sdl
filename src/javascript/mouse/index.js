@@ -29,7 +29,7 @@ const mouse = {
 	setCursor (cursor) {
 		const _cursor = Enums.cursor[cursor]
 		if (typeof cursor !== 'string') { throw Object.assign(new Error("cursor must be a string"), { cursor }) }
-		if (!_cursor) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
+		if (!Number.isFinite(_cursor)) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
 
 		Bindings.mouse_setCursor(_cursor)
 	},
