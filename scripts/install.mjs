@@ -10,5 +10,11 @@ if (!process.env.NODE_SDL_FROM_SOURCE) {
 	console.log("skip download and build from source")
 }
 
-await import('./download-sdl.mjs')
+try {
+	await import('./download-sdl.mjs')
+} catch (error) {
+	console.log("failed to download sdl")
+	await import('./build-sdl.mjs')
+}
+
 await import('./build.mjs')
