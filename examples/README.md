@@ -60,11 +60,17 @@ This is like example #7, but this time with audio files. Again we are going to u
 
 You can only use `@kmamal/sdl` from the main thread of your Node.js program, but you might still want to offload computationally expensive tasks to worker threads. This example shows how an audio rendering thread might be implemented.
 
-## [13. Clipboard mutator](https://github.com/kmamal/node-sdl/tree/master/examples/13-clipboard-mutator)
+## [13. Changing audio driver dynamically](https://github.com/kmamal/node-sdl/tree/master/examples/13-audio-driver)
+Once SDL has been initialized (which happens automatically when you import `@kmamal/sdl`) you can no longer change the audio or video driver.
+Your only option is to restart the process, passing different values to the `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` environment variables.
+This example shows how you could implement an audio player, that can change audio drivers without closing it's main window.
+It does this by keeping the audio playback in a child process, separate from the main window.
+
+## [14. Clipboard mutator](https://github.com/kmamal/node-sdl/tree/master/examples/14-clipboard-mutator)
 
 Applies random changes to whatever text has been copied to the clipboard.
 
-## [14. Packaging for distribution](https://github.com/kmamal/node-sdl/tree/master/examples/14-packaging)
+## [15. Packaging for distribution](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging)
 
 Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/packager`](https://github.com/kmamal/packager#readme) here, but other packagers should work as well. There's also a [github workflow file](https://github.com/kmamal/node-sdl/tree/master/examples/12-packaging/.github/workflows/build.yml) that builds and bundles the project for all supported platforms.
 

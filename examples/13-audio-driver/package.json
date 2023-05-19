@@ -1,0 +1,11 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-audio-driver",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "canvas": "*",
+    "ffmpeg-static": "*"
+  }
+}
