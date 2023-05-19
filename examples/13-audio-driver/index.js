@@ -3,10 +3,9 @@ import Canvas from 'canvas'
 import { fork } from 'node:child_process'
 import { once } from 'node:events'
 
-let currentState = 'stopped'
-
 const audioDrivers = sdl.info.drivers.audio.all
 let currentAudioDriver = sdl.info.drivers.audio.current
+let currentState = 'stopped'
 let currentTime = 0
 
 let audioProcess
@@ -82,7 +81,10 @@ ctx.textBaseline = 'middle'
 const redraw = () => {
 	ctx.clearRect(0, 0, width, height)
 
-	ctx.fillText(`State: ${currentState}`, width / 2, 15)
+	const time = Math.round(currentTime / 1e3)
+	const minutes = Math.floor(time / 60).toString().padStart(2, '0')
+	const seconds = (time % 60).toString().padStart(2, '0')
+	ctx.fillText(`State: ${currentState} ${minutes}:${seconds}`, width / 2, 15)
 
 	ctx.fillText(`Using: ${currentAudioDriver}`, width / 2, 75)
 

@@ -23,13 +23,13 @@ const play = (time = 0) => {
 		format: 'f32lsb',
 	})
 
-	const skippedFrames = Math.round(frequency * time)
+	const skippedFrames = Math.round(frequency * time / 1e3)
 	const skippedSamples = skippedFrames * channels
 	const skippedBytes = skippedSamples * audioInstance.bytesPerSample
 	audioInstance.enqueue(audioBuffer.slice(skippedBytes))
 	audioInstance.play()
 
-	startTime = Date.now() - Math.round(time * 1e3)
+	startTime = Date.now() - time
 	interval = setInterval(() => {
 		if (audioInstance.queued === 0) {
 			process.send({ type: 'end' })
@@ -37,7 +37,7 @@ const play = (time = 0) => {
 			return
 		}
 
-		process.send({ type: 'time', time: (Date.now() - startTime) / 1e3 })
+		process.send({ type: 'time', time: Date.now() - startTime })
 	}, 100)
 }
 
