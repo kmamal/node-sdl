@@ -34,7 +34,7 @@
     "type": "git",
     "url": "git://github.com/kmamal/node-sdl.git"
   },
-  "main": "src/javascript/index.js",
+  "exports": "./src/javascript/index.js",
   "types": "src/types/index.d.ts",
   "gypfile": true,
   "scripts": {
@@ -45,8 +45,7 @@
     "build": "cd scripts && node build.mjs",
     "upload-release": "cd scripts && node upload-release.mjs",
     "release": "cd scripts && node release.mjs",
-    "clean": "cd scripts && node clean.mjs",
-    "install-deps-mac": "./scripts/install-deps-mac.sh"
+    "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
     "tar": "^6.1.13"
