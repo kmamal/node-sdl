@@ -48,7 +48,7 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
-    "tar": "^6.1.13"
+    "tar": "^6.1.15"
   },
   "sdl": {
     "owner": "kmamal",
@@ -56,6 +56,6 @@
     "version": "2.26.4"
   },
   "devDependencies": {
-    "@types/node": "^18.15.11"
+    "@types/node": "^20.2.3"
   }
 }
