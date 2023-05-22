@@ -9,7 +9,7 @@ SDL bindings for Node.js.
 Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, and clipboard manipulation.
 
 It should work on Linux, Mac, and Windows.
-Prebuilt binaries are available for x64 architectures (Linux, Mac, and Windows), arm-based Macs, and Raspberry Pi.
+Prebuilt binaries are available for x64 architectures, arm-based Macs, and Raspberry Pi.
 
 #### Canvas, WebGL, and WebGPU
 
