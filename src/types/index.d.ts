@@ -284,23 +284,23 @@ export namespace Sdl {
 			on (event: 'restore', listener: (event: Events.Window.Restore) => void): this
 			on (event: 'move', listener: (event: Events.Window.Move) => void): this
 			on (event: 'resize', listener: (event: Events.Window.Resize) => void): this
-			on (event: 'focus', listener: (event: Event.Window.Focus) => void): this
-			on (event: 'blur', listener: (event: Event.Window.Blur) => void): this
-			on (event: 'hover', listener: (event: Event.Window.Hover) => void): this
-			on (event: 'leave', listener: (event: Event.Window.Leave) => void): this
+			on (event: 'focus', listener: (event: Events.Window.Focus) => void): this
+			on (event: 'blur', listener: (event: Events.Window.Blur) => void): this
+			on (event: 'hover', listener: (event: Events.Window.Hover) => void): this
+			on (event: 'leave', listener: (event: Events.Window.Leave) => void): this
 			on (event: 'beforeClose', listener: (event: Events.Window.BeforeClose) => void): this
-			on (event: 'close', listener: (event: Event.Window.Close) => void): this
-			on (event: 'keyDown', listener: (event: Events.Window.KeyDown) => void): this
-			on (event: 'keyUp', listener: (event: Events.Window.KeyUp) => void): this
+			on (event: 'close', listener: (event: Events.Window.Close) => void): this
+			on (event: 'keyDown', listener: (event: Events.Window.KeyDownEvent) => void): this
+			on (event: 'keyUp', listener: (event: Events.Window.KeyUpEvent) => void): this
 			on (event: 'textInput', listener: (event: Events.Window.TextInput) => void): this
-			on (event: 'mouseButtonDown', listener: (event: Events.Window.MouseButtonDown) => void): this
-			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUp) => void): this
-			on (event: 'mouseMove', listener: (event: Events.Window.MouseMove) => void): this
-			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheel) => void): this
-			on (event: 'dropBegin', listener: (event: Event.Window.DropBegin) => void): this
+			on (event: 'mouseButtonDown', listener: (event: Events.Window.MouseButtonDownEvent) => void): this
+			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUpEvent) => void): this
+			on (event: 'mouseMove', listener: (event: Events.Window.MouseMoveEvent) => void): this
+			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheelEvent) => void): this
+			on (event: 'dropBegin', listener: (event: Events.Window.DropBegin) => void): this
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
-			on (event: 'dropComplete', listener: (event: Event.Window.DropComplete) => void): this
+			on (event: 'dropComplete', listener: (event: Events.Window.DropComplete) => void): this
 
 			readonly id: number
 
@@ -995,5 +995,5 @@ export namespace Sdl {
 	}
 }
 
-const sdl: Sdl.Module
-export = sdl
+declare const sdl: Sdl.Module
+export default sdl
