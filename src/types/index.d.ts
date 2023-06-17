@@ -301,6 +301,7 @@ export namespace Sdl {
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
 			on (event: 'dropComplete', listener: (event: Events.Window.DropComplete) => void): this
+			on (event: '*', listener: (event: Events.BaseEvent) => void): this
 
 			readonly id: number
 
