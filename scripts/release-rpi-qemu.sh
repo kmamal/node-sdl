@@ -14,7 +14,8 @@ mkdir -p "$DIR"
 cd "$DIR"
 echo "Working in $DIR"
 
-sudo apt install xz-utils qemu-system-arm expect -y
+sudo apt-get update
+sudo apt-get install -y xz-utils qemu-system-arm expect
 
 wget "https://downloads.raspberrypi.org/$OS/images/$OS-$DATE/$IMAGE.xz"
 unxz "$IMAGE.xz"
