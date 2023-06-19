@@ -14,7 +14,7 @@ for (const controllerDevice of Globals.controllerDevices) {
 }
 
 
-const validEvents = [ 'deviceAdd', 'deviceRemove', 'deviceRemap' ]
+const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 const controller = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }

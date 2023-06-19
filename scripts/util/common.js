@@ -1,5 +1,5 @@
-const Fs = require('node:fs')
-const Path = require('node:path')
+const Fs = require('fs')
+const Path = require('path')
 
 const dir = {}
 dir.root = Path.join(__dirname, '../..')

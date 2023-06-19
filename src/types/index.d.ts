@@ -21,11 +21,11 @@ export namespace Events {
 			readonly numlock: number
 		}
 
-		interface KeyDownEvent extends KeyEvent {
+		interface KeyDown extends KeyEvent {
 			readonly type: 'keyDown'
 			readonly repeat: number
 		}
-		interface KeyUpEvent extends KeyEvent { readonly type: 'keyUp' }
+		interface KeyUp extends KeyEvent { readonly type: 'keyUp' }
 
 		interface TextInput extends WindowEvent {
 			readonly type: 'textInput'
@@ -38,16 +38,16 @@ export namespace Events {
 			readonly touch: boolean
 		}
 
-		interface MouseMoveEvent extends MouseEvent { readonly type: 'mouseMove' }
+		interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
 
 		interface MouseButtonEvent extends MouseEvent {
 			readonly button: number
 		}
 
-		interface MouseButtonDownEvent extends MouseButtonEvent { readonly type: 'mouseButtonDown' }
-		interface MouseButtonUpEvent extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
+		interface MouseButtonDown extends MouseButtonEvent { readonly type: 'mouseButtonDown' }
+		interface MouseButtonUp extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
 
-		interface MouseWheelEvent extends MouseEvent {
+		interface MouseWheel extends MouseEvent {
 			readonly type: 'flipped'
 			readonly dx: number
 			readonly dy: number
@@ -91,16 +91,35 @@ export namespace Events {
 		}
 		interface DropComplete extends WindowEvent { readonly type: 'dropComplete' }
 
+		type Any
+			= KeyDown
+			| KeyUp
+			| TextInput
+			| MouseMove
+			| MouseButtonDown
+			| MouseButtonUp
+			| MouseWheel
+			| Show
+			| Hide
+			| Expose
+			| Minimize
+			| Maximize
+			| Restore
+			| Move
+			| Resize
+			| Focus
+			| Blur
+			| Hover
+			| Leave
+			| BeforeClose
+			| Close
+			| DropBegin
+			| DropText
+			| DropFile
+			| DropComplete
 	}
 
 	namespace Joystick {
-
-		interface DeviceEvent extends BaseEvent {
-			readonly device: Sdl.Joystick.Device
-		}
-
-		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
 
 		interface JoystickEvent extends BaseEvent {}
 
@@ -131,16 +150,30 @@ export namespace Events {
 
 		interface Close extends JoystickEvent { readonly type: 'close' }
 
+		type Any
+			= AxisMotion
+			| BallMotion
+			| ButtonDown
+			| ButtonUp
+			| HatMotion
+			| Close
+
+	}
+
+	namespace JoystickDevice {
+
+		interface DeviceEvent extends BaseEvent {
+			readonly device: Sdl.Joystick.Device
+		}
+
+		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
+
+		type Any = Add | Remove
+
 	}
 
 	namespace Controller {
-
-		interface DeviceEvent extends BaseEvent {
-			readonly device: Sdl.Controller.Device
-		}
-
-		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
 
 		interface ControllerEvent extends BaseEvent {}
 
@@ -160,25 +193,56 @@ export namespace Events {
 
 		interface Close extends ControllerEvent { readonly type: 'close' }
 
+		type Any
+			= AxisMotion
+			| ButtonDown
+			| ButtonUp
+			| Remap
+			| Close
+
+	}
+
+	namespace ControllerDevice {
+
+		interface DeviceEvent extends BaseEvent {
+			readonly device: Sdl.Controller.Device
+		}
+
+		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
+
+		type Any = Add | Remove
+
 	}
 
 	namespace Audio {
+
+		interface AudioEvent extends BaseEvent {}
+
+		interface Close extends AudioEvent { readonly type: 'close' }
+
+		type Any = Close
+
+	}
+
+	namespace AudioDevice {
 
 		interface DeviceEvent extends BaseEvent {
 			readonly device: Sdl.Audio.Device
 		}
 
-		interface DeviceAdd extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface DeviceRemove extends DeviceEvent { readonly type: 'deviceRemove' }
+		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		interface AudioEvent extends BaseEvent {}
+		type Any = Add | Remove
 
-		interface Close extends AudioEvent { readonly type: 'close' }
 	}
 
 	namespace Clipboard {
 
 		interface Update extends BaseEvent { readonly type: 'update' }
+
+		type Any = Update
 
 	}
 }
@@ -215,42 +279,42 @@ export namespace Sdl {
 	namespace Video {
 
 		type Format
-		= 'rgb332'
-		| 'rgb444'
-		| 'rgb555'
-		| 'bgr555'
-		| 'argb4444'
-		| 'rgba4444'
-		| 'abgr4444'
-		| 'bgra4444'
-		| 'argb1555'
-		| 'rgba5551'
-		| 'abgr1555'
-		| 'bgra5551'
-		| 'rgb565'
-		| 'bgr565'
-		| 'rgb24'
-		| 'bgr24'
-		| 'rgb888'
-		| 'rgbx8888'
-		| 'bgr888'
-		| 'bgrx8888'
-		| 'argb8888'
-		| 'rgba8888'
-		| 'abgr8888'
-		| 'bgra8888'
-		| 'argb2101010'
-		| 'rgba32'
-		| 'argb32'
-		| 'bgra32'
-		| 'abgr32'
-		| 'yv12'
-		| 'iyuv'
-		| 'yuy2'
-		| 'uyvy'
-		| 'yvyu'
-		| 'nv12'
-		| 'nv21'
+			= 'rgb332'
+			| 'rgb444'
+			| 'rgb555'
+			| 'bgr555'
+			| 'argb4444'
+			| 'rgba4444'
+			| 'abgr4444'
+			| 'bgra4444'
+			| 'argb1555'
+			| 'rgba5551'
+			| 'abgr1555'
+			| 'bgra5551'
+			| 'rgb565'
+			| 'bgr565'
+			| 'rgb24'
+			| 'bgr24'
+			| 'rgb888'
+			| 'rgbx8888'
+			| 'bgr888'
+			| 'bgrx8888'
+			| 'argb8888'
+			| 'rgba8888'
+			| 'abgr8888'
+			| 'bgra8888'
+			| 'argb2101010'
+			| 'rgba32'
+			| 'argb32'
+			| 'bgra32'
+			| 'abgr32'
+			| 'yv12'
+			| 'iyuv'
+			| 'yuy2'
+			| 'uyvy'
+			| 'yvyu'
+			| 'nv12'
+			| 'nv21'
 
 		interface Display {
 			readonly name: string
@@ -290,18 +354,18 @@ export namespace Sdl {
 			on (event: 'leave', listener: (event: Events.Window.Leave) => void): this
 			on (event: 'beforeClose', listener: (event: Events.Window.BeforeClose) => void): this
 			on (event: 'close', listener: (event: Events.Window.Close) => void): this
-			on (event: 'keyDown', listener: (event: Events.Window.KeyDownEvent) => void): this
-			on (event: 'keyUp', listener: (event: Events.Window.KeyUpEvent) => void): this
+			on (event: 'keyDown', listener: (event: Events.Window.KeyDown) => void): this
+			on (event: 'keyUp', listener: (event: Events.Window.KeyUp) => void): this
 			on (event: 'textInput', listener: (event: Events.Window.TextInput) => void): this
-			on (event: 'mouseButtonDown', listener: (event: Events.Window.MouseButtonDownEvent) => void): this
-			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUpEvent) => void): this
-			on (event: 'mouseMove', listener: (event: Events.Window.MouseMoveEvent) => void): this
-			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheelEvent) => void): this
+			on (event: 'mouseButtonDown', listener: (event: Events.Window.MouseButtonDown) => void): this
+			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUp) => void): this
+			on (event: 'mouseMove', listener: (event: Events.Window.MouseMove) => void): this
+			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheel) => void): this
 			on (event: 'dropBegin', listener: (event: Events.Window.DropBegin) => void): this
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
 			on (event: 'dropComplete', listener: (event: Events.Window.DropComplete) => void): this
-			on (event: '*', listener: (event: Events.BaseEvent) => void): this
+			on (event: '*', listener: (event: Events.Window.Any) => void): this
 
 			readonly id: number
 
@@ -400,248 +464,248 @@ export namespace Sdl {
 		type Scancode = number
 
 		type ScancodeNames
-		= 'A'
-		| 'B'
-		| 'C'
-		| 'D'
-		| 'E'
-		| 'F'
-		| 'G'
-		| 'H'
-		| 'I'
-		| 'J'
-		| 'K'
-		| 'L'
-		| 'M'
-		| 'N'
-		| 'O'
-		| 'P'
-		| 'Q'
-		| 'R'
-		| 'S'
-		| 'T'
-		| 'U'
-		| 'V'
-		| 'W'
-		| 'X'
-		| 'Y'
-		| 'Z'
-		| '1'
-		| '2'
-		| '3'
-		| '4'
-		| '5'
-		| '6'
-		| '7'
-		| '8'
-		| '9'
-		| '0'
-		| 'RETURN'
-		| 'ESCAPE'
-		| 'BACKSPACE'
-		| 'TAB'
-		| 'SPACE'
-		| 'MINUS'
-		| 'EQUALS'
-		| 'LEFTBRACKET'
-		| 'RIGHTBRACKET'
-		| 'BACKSLASH'
-		| 'NONUSHASH'
-		| 'SEMICOLON'
-		| 'APOSTROPHE'
-		| 'GRAVE'
-		| 'COMMA'
-		| 'PERIOD'
-		| 'SLASH'
-		| 'CAPSLOCK'
-		| 'F1'
-		| 'F2'
-		| 'F3'
-		| 'F4'
-		| 'F5'
-		| 'F6'
-		| 'F7'
-		| 'F8'
-		| 'F9'
-		| 'F10'
-		| 'F11'
-		| 'F12'
-		| 'PRINTSCREEN'
-		| 'SCROLLLOCK'
-		| 'PAUSE'
-		| 'INSERT'
-		| 'HOME'
-		| 'PAGEUP'
-		| 'DELETE'
-		| 'END'
-		| 'PAGEDOWN'
-		| 'RIGHT'
-		| 'LEFT'
-		| 'DOWN'
-		| 'UP'
-		| 'NUMLOCKCLEAR'
-		| 'KP_DIVIDE'
-		| 'KP_MULTIPLY'
-		| 'KP_MINUS'
-		| 'KP_PLUS'
-		| 'KP_ENTER'
-		| 'KP_1'
-		| 'KP_2'
-		| 'KP_3'
-		| 'KP_4'
-		| 'KP_5'
-		| 'KP_6'
-		| 'KP_7'
-		| 'KP_8'
-		| 'KP_9'
-		| 'KP_0'
-		| 'KP_PERIOD'
-		| 'NONUSBACKSLASH'
-		| 'APPLICATION'
-		| 'POWER'
-		| 'KP_EQUALS'
-		| 'F13'
-		| 'F14'
-		| 'F15'
-		| 'F16'
-		| 'F17'
-		| 'F18'
-		| 'F19'
-		| 'F20'
-		| 'F21'
-		| 'F22'
-		| 'F23'
-		| 'F24'
-		| 'EXECUTE'
-		| 'HELP'
-		| 'MENU'
-		| 'SELECT'
-		| 'STOP'
-		| 'AGAIN'
-		| 'UNDO'
-		| 'CUT'
-		| 'COPY'
-		| 'PASTE'
-		| 'FIND'
-		| 'MUTE'
-		| 'VOLUMEUP'
-		| 'VOLUMEDOWN'
-		| 'KP_COMMA'
-		| 'KP_EQUALSAS400'
-		| 'INTERNATIONAL1'
-		| 'INTERNATIONAL2'
-		| 'INTERNATIONAL3'
-		| 'INTERNATIONAL4'
-		| 'INTERNATIONAL5'
-		| 'INTERNATIONAL6'
-		| 'INTERNATIONAL7'
-		| 'INTERNATIONAL8'
-		| 'INTERNATIONAL9'
-		| 'LANG1'
-		| 'LANG2'
-		| 'LANG3'
-		| 'LANG4'
-		| 'LANG5'
-		| 'LANG6'
-		| 'LANG7'
-		| 'LANG8'
-		| 'LANG9'
-		| 'ALTERASE'
-		| 'SYSREQ'
-		| 'CANCEL'
-		| 'CLEAR'
-		| 'PRIOR'
-		| 'RETURN2'
-		| 'SEPARATOR'
-		| 'OUT'
-		| 'OPER'
-		| 'CLEARAGAIN'
-		| 'CRSEL'
-		| 'EXSEL'
-		| 'KP_00'
-		| 'KP_000'
-		| 'THOUSANDSSEPARATOR'
-		| 'DECIMALSEPARATOR'
-		| 'CURRENCYUNIT'
-		| 'CURRENCYSUBUNIT'
-		| 'KP_LEFTPAREN'
-		| 'KP_RIGHTPAREN'
-		| 'KP_LEFTBRACE'
-		| 'KP_RIGHTBRACE'
-		| 'KP_TAB'
-		| 'KP_BACKSPACE'
-		| 'KP_A'
-		| 'KP_B'
-		| 'KP_C'
-		| 'KP_D'
-		| 'KP_E'
-		| 'KP_F'
-		| 'KP_XOR'
-		| 'KP_POWER'
-		| 'KP_PERCENT'
-		| 'KP_LESS'
-		| 'KP_GREATER'
-		| 'KP_AMPERSAND'
-		| 'KP_DBLAMPERSAND'
-		| 'KP_VERTICALBAR'
-		| 'KP_DBLVERTICALBAR'
-		| 'KP_COLON'
-		| 'KP_HASH'
-		| 'KP_SPACE'
-		| 'KP_AT'
-		| 'KP_EXCLAM'
-		| 'KP_MEMSTORE'
-		| 'KP_MEMRECALL'
-		| 'KP_MEMCLEAR'
-		| 'KP_MEMADD'
-		| 'KP_MEMSUBTRACT'
-		| 'KP_MEMMULTIPLY'
-		| 'KP_MEMDIVIDE'
-		| 'KP_PLUSMINUS'
-		| 'KP_CLEAR'
-		| 'KP_CLEARENTRY'
-		| 'KP_BINARY'
-		| 'KP_OCTAL'
-		| 'KP_DECIMAL'
-		| 'KP_HEXADECIMAL'
-		| 'LCTRL'
-		| 'LSHIFT'
-		| 'LALT'
-		| 'LGUI'
-		| 'RCTRL'
-		| 'RSHIFT'
-		| 'RALT'
-		| 'RGUI'
-		| 'MODE'
-		| 'AUDIONEXT'
-		| 'AUDIOPREV'
-		| 'AUDIOSTOP'
-		| 'AUDIOPLAY'
-		| 'AUDIOMUTE'
-		| 'MEDIASELECT'
-		| 'WWW'
-		| 'MAIL'
-		| 'CALCULATOR'
-		| 'COMPUTER'
-		| 'AC_SEARCH'
-		| 'AC_HOME'
-		| 'AC_BACK'
-		| 'AC_FORWARD'
-		| 'AC_STOP'
-		| 'AC_REFRESH'
-		| 'AC_BOOKMARKS'
-		| 'BRIGHTNESSDOWN'
-		| 'BRIGHTNESSUP'
-		| 'DISPLAYSWITCH'
-		| 'KBDILLUMTOGGLE'
-		| 'KBDILLUMDOWN'
-		| 'KBDILLUMUP'
-		| 'EJECT'
-		| 'SLEEP'
-		| 'APP1'
-		| 'APP2'
-		| 'AUDIOREWIND'
-		| 'AUDIOFASTFORWARD'
+			= 'A'
+			| 'B'
+			| 'C'
+			| 'D'
+			| 'E'
+			| 'F'
+			| 'G'
+			| 'H'
+			| 'I'
+			| 'J'
+			| 'K'
+			| 'L'
+			| 'M'
+			| 'N'
+			| 'O'
+			| 'P'
+			| 'Q'
+			| 'R'
+			| 'S'
+			| 'T'
+			| 'U'
+			| 'V'
+			| 'W'
+			| 'X'
+			| 'Y'
+			| 'Z'
+			| '1'
+			| '2'
+			| '3'
+			| '4'
+			| '5'
+			| '6'
+			| '7'
+			| '8'
+			| '9'
+			| '0'
+			| 'RETURN'
+			| 'ESCAPE'
+			| 'BACKSPACE'
+			| 'TAB'
+			| 'SPACE'
+			| 'MINUS'
+			| 'EQUALS'
+			| 'LEFTBRACKET'
+			| 'RIGHTBRACKET'
+			| 'BACKSLASH'
+			| 'NONUSHASH'
+			| 'SEMICOLON'
+			| 'APOSTROPHE'
+			| 'GRAVE'
+			| 'COMMA'
+			| 'PERIOD'
+			| 'SLASH'
+			| 'CAPSLOCK'
+			| 'F1'
+			| 'F2'
+			| 'F3'
+			| 'F4'
+			| 'F5'
+			| 'F6'
+			| 'F7'
+			| 'F8'
+			| 'F9'
+			| 'F10'
+			| 'F11'
+			| 'F12'
+			| 'PRINTSCREEN'
+			| 'SCROLLLOCK'
+			| 'PAUSE'
+			| 'INSERT'
+			| 'HOME'
+			| 'PAGEUP'
+			| 'DELETE'
+			| 'END'
+			| 'PAGEDOWN'
+			| 'RIGHT'
+			| 'LEFT'
+			| 'DOWN'
+			| 'UP'
+			| 'NUMLOCKCLEAR'
+			| 'KP_DIVIDE'
+			| 'KP_MULTIPLY'
+			| 'KP_MINUS'
+			| 'KP_PLUS'
+			| 'KP_ENTER'
+			| 'KP_1'
+			| 'KP_2'
+			| 'KP_3'
+			| 'KP_4'
+			| 'KP_5'
+			| 'KP_6'
+			| 'KP_7'
+			| 'KP_8'
+			| 'KP_9'
+			| 'KP_0'
+			| 'KP_PERIOD'
+			| 'NONUSBACKSLASH'
+			| 'APPLICATION'
+			| 'POWER'
+			| 'KP_EQUALS'
+			| 'F13'
+			| 'F14'
+			| 'F15'
+			| 'F16'
+			| 'F17'
+			| 'F18'
+			| 'F19'
+			| 'F20'
+			| 'F21'
+			| 'F22'
+			| 'F23'
+			| 'F24'
+			| 'EXECUTE'
+			| 'HELP'
+			| 'MENU'
+			| 'SELECT'
+			| 'STOP'
+			| 'AGAIN'
+			| 'UNDO'
+			| 'CUT'
+			| 'COPY'
+			| 'PASTE'
+			| 'FIND'
+			| 'MUTE'
+			| 'VOLUMEUP'
+			| 'VOLUMEDOWN'
+			| 'KP_COMMA'
+			| 'KP_EQUALSAS400'
+			| 'INTERNATIONAL1'
+			| 'INTERNATIONAL2'
+			| 'INTERNATIONAL3'
+			| 'INTERNATIONAL4'
+			| 'INTERNATIONAL5'
+			| 'INTERNATIONAL6'
+			| 'INTERNATIONAL7'
+			| 'INTERNATIONAL8'
+			| 'INTERNATIONAL9'
+			| 'LANG1'
+			| 'LANG2'
+			| 'LANG3'
+			| 'LANG4'
+			| 'LANG5'
+			| 'LANG6'
+			| 'LANG7'
+			| 'LANG8'
+			| 'LANG9'
+			| 'ALTERASE'
+			| 'SYSREQ'
+			| 'CANCEL'
+			| 'CLEAR'
+			| 'PRIOR'
+			| 'RETURN2'
+			| 'SEPARATOR'
+			| 'OUT'
+			| 'OPER'
+			| 'CLEARAGAIN'
+			| 'CRSEL'
+			| 'EXSEL'
+			| 'KP_00'
+			| 'KP_000'
+			| 'THOUSANDSSEPARATOR'
+			| 'DECIMALSEPARATOR'
+			| 'CURRENCYUNIT'
+			| 'CURRENCYSUBUNIT'
+			| 'KP_LEFTPAREN'
+			| 'KP_RIGHTPAREN'
+			| 'KP_LEFTBRACE'
+			| 'KP_RIGHTBRACE'
+			| 'KP_TAB'
+			| 'KP_BACKSPACE'
+			| 'KP_A'
+			| 'KP_B'
+			| 'KP_C'
+			| 'KP_D'
+			| 'KP_E'
+			| 'KP_F'
+			| 'KP_XOR'
+			| 'KP_POWER'
+			| 'KP_PERCENT'
+			| 'KP_LESS'
+			| 'KP_GREATER'
+			| 'KP_AMPERSAND'
+			| 'KP_DBLAMPERSAND'
+			| 'KP_VERTICALBAR'
+			| 'KP_DBLVERTICALBAR'
+			| 'KP_COLON'
+			| 'KP_HASH'
+			| 'KP_SPACE'
+			| 'KP_AT'
+			| 'KP_EXCLAM'
+			| 'KP_MEMSTORE'
+			| 'KP_MEMRECALL'
+			| 'KP_MEMCLEAR'
+			| 'KP_MEMADD'
+			| 'KP_MEMSUBTRACT'
+			| 'KP_MEMMULTIPLY'
+			| 'KP_MEMDIVIDE'
+			| 'KP_PLUSMINUS'
+			| 'KP_CLEAR'
+			| 'KP_CLEARENTRY'
+			| 'KP_BINARY'
+			| 'KP_OCTAL'
+			| 'KP_DECIMAL'
+			| 'KP_HEXADECIMAL'
+			| 'LCTRL'
+			| 'LSHIFT'
+			| 'LALT'
+			| 'LGUI'
+			| 'RCTRL'
+			| 'RSHIFT'
+			| 'RALT'
+			| 'RGUI'
+			| 'MODE'
+			| 'AUDIONEXT'
+			| 'AUDIOPREV'
+			| 'AUDIOSTOP'
+			| 'AUDIOPLAY'
+			| 'AUDIOMUTE'
+			| 'MEDIASELECT'
+			| 'WWW'
+			| 'MAIL'
+			| 'CALCULATOR'
+			| 'COMPUTER'
+			| 'AC_SEARCH'
+			| 'AC_HOME'
+			| 'AC_BACK'
+			| 'AC_FORWARD'
+			| 'AC_STOP'
+			| 'AC_REFRESH'
+			| 'AC_BOOKMARKS'
+			| 'BRIGHTNESSDOWN'
+			| 'BRIGHTNESSUP'
+			| 'DISPLAYSWITCH'
+			| 'KBDILLUMTOGGLE'
+			| 'KBDILLUMDOWN'
+			| 'KBDILLUMUP'
+			| 'EJECT'
+			| 'SLEEP'
+			| 'APP1'
+			| 'APP2'
+			| 'AUDIOREWIND'
+			| 'AUDIOFASTFORWARD'
 
 		type Key = string
 
@@ -661,23 +725,23 @@ export namespace Sdl {
 		type Button = number
 
 		type ButtonNames
-		= 'LEFT'
-		| 'MIDDLE'
-		| 'RIGHT'
+			= 'LEFT'
+			| 'MIDDLE'
+			| 'RIGHT'
 
 		type Cursor
-		= 'arrow'
-		| 'ibeam'
-		| 'wait'
-		| 'crosshair'
-		| 'waitarrow'
-		| 'sizenwse'
-		| 'sizenesw'
-		| 'sizewe'
-		| 'sizens'
-		| 'sizeall'
-		| 'no'
-		| 'hand'
+			= 'arrow'
+			| 'ibeam'
+			| 'wait'
+			| 'crosshair'
+			| 'waitarrow'
+			| 'sizenwse'
+			| 'sizenesw'
+			| 'sizewe'
+			| 'sizens'
+			| 'sizeall'
+			| 'no'
+			| 'hand'
 
 		interface Module {
 			readonly BUTTON: { [name in ButtonNames]: number }
@@ -710,24 +774,24 @@ export namespace Sdl {
 		}
 
 		type HatPosition
-		= 'centered'
-		| 'up'
-		| 'right'
-		| 'down'
-		| 'left'
-		| 'rightup'
-		| 'rightdown'
-		| 'leftup'
-		| 'leftdown'
+			= 'centered'
+			| 'up'
+			| 'right'
+			| 'down'
+			| 'left'
+			| 'rightup'
+			| 'rightdown'
+			| 'leftup'
+			| 'leftdown'
 
 		type PowerLevel
-		= 'unknown'
-		| 'empty'
-		| 'low'
-		| 'medium'
-		| 'full'
-		| 'wired'
-		| 'max'
+			= 'unknown'
+			| 'empty'
+			| 'low'
+			| 'medium'
+			| 'full'
+			| 'wired'
+			| 'max'
 
 		interface Device {
 			readonly id: number
@@ -748,6 +812,7 @@ export namespace Sdl {
 			on (event: 'buttonUp', listener: (event: Events.Joystick.ButtonUp) => void): this
 			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
 			on (event: 'close', listener: (event: Events.Joystick.Close) => void): this
+			on (event: '*', listener: (event: Events.Joystick.Any) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -778,8 +843,9 @@ export namespace Sdl {
 		}
 
 		interface Module {
-			on (event: 'deviceAdd', listener: (event: Events.Joystick.DeviceAdd) => void): this
-			on (event: 'deviceRemove', listener: (event: Events.Joystick.DeviceRemove) => void): this
+			on (event: 'deviceAdd', listener: (event: Events.JoystickDevice.Add) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.JoystickDevice.Remove) => void): this
+			on (event: '*', listener: (event: Events.JoystickDevice.Any) => void): this
 
 			readonly devices: Device[]
 
@@ -808,6 +874,7 @@ export namespace Sdl {
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
 			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
+			on (event: '*', listener: (event: Events.Controller.Any) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -864,8 +931,9 @@ export namespace Sdl {
 		}
 
 		interface Module {
-			on (event: 'deviceAdd', listener: (event: Events.Controller.DeviceAdd) => void): this
-			on (event: 'deviceRemove', listener: (event: Events.Controller.DeviceRemove) => void): this
+			on (event: 'deviceAdd', listener: (event: Events.ControllerDevice.Add) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.ControllerDevice.Remove) => void): this
+			on (event: '*', listener: (event: Events.ControllerDevice.Any) => void): this
 
 			addMappings (mappings: string[]): void
 
@@ -879,24 +947,24 @@ export namespace Sdl {
 	namespace Audio {
 
 		type Format
-		= 's8'
-		| 'u8'
-		| 's16lsb'
-		| 's16msb'
-		| 's16sys'
-		| 's16'
-		| 'u16lsb'
-		| 'u16msb'
-		| 'u16sys'
-		| 'u16'
-		| 's32lsb'
-		| 's32msb'
-		| 's32sys'
-		| 's32'
-		| 'f32lsb'
-		| 'f32msb'
-		| 'f32sys'
-		| 'f32'
+			= 's8'
+			| 'u8'
+			| 's16lsb'
+			| 's16msb'
+			| 's16sys'
+			| 's16'
+			| 'u16lsb'
+			| 'u16msb'
+			| 'u16sys'
+			| 'u16'
+			| 's32lsb'
+			| 's32msb'
+			| 's32sys'
+			| 's32'
+			| 'f32lsb'
+			| 'f32msb'
+			| 'f32sys'
+			| 'f32'
 
 		interface Device {
 			readonly type: "recording"|"playback"
@@ -913,6 +981,7 @@ export namespace Sdl {
 
 		class AudioInstance {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
+			on (event: '*', listener: (event: Events.Audio.Any) => void): this
 
 			readonly id: number
 			readonly device: Device
@@ -956,8 +1025,9 @@ export namespace Sdl {
 		}
 
 		interface Module {
-			on (event: 'deviceAdd', listener: (event: Events.Audio.DeviceAdd) => void): this
-			on (event: 'deviceRemove', listener: (event: Events.Audio.DeviceRemove) => void): this
+			on (event: 'deviceAdd', listener: (event: Events.AudioDevice.Add) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.AudioDevice.Remove) => void): this
+			on (event: '*', listener: (event: Events.AudioDevice.Any) => void): this
 
 			readonly devices: Device[]
 
@@ -977,6 +1047,7 @@ export namespace Sdl {
 
 		interface Module {
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
+			on (event: '*', listener: (event: Events.Clipboard.Any) => void): this
 
 			readonly text: string
 			setText (text: string): void
@@ -997,4 +1068,4 @@ export namespace Sdl {
 }
 
 declare const sdl: Sdl.Module
-export default sdl
+export = sdl
