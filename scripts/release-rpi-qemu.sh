@@ -7,6 +7,7 @@ OS="raspios_lite_arm64"
 DATE="2023-05-03"
 IMAGE="$DATE-raspios-bullseye-arm64-lite.img"
 MOUNT="/mnt/raspbian"
+LOOP="/dev/loop4"
 
 DIR="/tmp/node-sdl-rpi-qemu"
 rm -rf "$DIR" || true
@@ -14,8 +15,6 @@ mkdir -p "$DIR"
 cd "$DIR"
 echo "Working in $DIR"
 
-
-sudo losetup --list --all
 
 sudo apt-get update
 sudo apt-get install -y xz-utils qemu-system-arm expect
@@ -61,10 +60,10 @@ expect -f - <<- EOF
 	expect eof
 EOF
 
-sudo losetup -P /dev/loop0 "$IMAGE"
-sudo e2fsck -fa /dev/loop0p2 || true
-sudo resize2fs /dev/loop0p2
-sudo losetup -d /dev/loop0
+sudo losetup -P $LOOP "$IMAGE"
+sudo e2fsck -fa $LOOPp2 || true
+sudo resize2fs $LOOPp2
+sudo losetup -d $LOOP
 
 sudo mount -o loop,offset=4194304 "$IMAGE" "$MOUNT"
 
