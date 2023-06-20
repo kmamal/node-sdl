@@ -19,42 +19,43 @@ echo "Working in $DIR"
 sudo apt-get update
 sudo apt-get install -y xz-utils qemu-system-arm expect
 
-wget "https://downloads.raspberrypi.org/$OS/images/$OS-$DATE/$IMAGE.xz"
+wget --progress=dot:giga "https://downloads.raspberrypi.org/$OS/images/$OS-$DATE/$IMAGE.xz"
 unxz "$IMAGE.xz"
 
 qemu-img resize "$IMAGE" 4G
 
 expect -f - <<- EOF
 	set timeout -1
+	# exp_internal 1
 
-	spawn fdisk "$IMAGE"
+	spawn fdisk --color=never {$IMAGE}
 
-	expect "Command (m for help): "
-	send "d\n"
+	expect -exact {Command (m for help): }
+	send [string cat {d} "\r"]
 
-	expect "Partition number (1,2, default 2): "
-	send "\n"
+	expect -exact {Partition number (1,2, default 2): }
+	send [string cat {} "\r"]
 
-	expect "Command (m for help): "
-	send "n\n"
+	expect -exact {Command (m for help): }
+	send [string cat {n} "\r"]
 
-	expect "Select (default p): "
-	send "\n"
+	expect -exact {Select (default p): }
+	send [string cat {} "\r"]
 
-	expect "Partition number (2-4, default 2): "
-	send "\n"
+	expect -exact {Partition number (2-4, default 2): }
+	send [string cat {} "\r"]
 
-	expect "First sector (2048-8388607, default 2048): "
-	send "532480\n"
+	expect -exact {First sector (2048-8388607, default 2048): }
+	send [string cat {532480} "\r"]
 
-	expect "(532480-8388607, default 8388607): "
-	send "\n"
+	expect -exact {(532480-8388607, default 8388607): }
+	send [string cat {} "\r"]
 
-	expect "Do you want to remove the signature*"
-	send "N\n"
+	expect -exact {Do you want to remove the signature?}
+	send [string cat {N} "\r"]
 
-	expect "Command (m for help): "
-	send "w\n"
+	expect -exact {Command (m for help): }
+	send [string cat {w} "\r"]
 
 	expect eof
 EOF
@@ -71,7 +72,7 @@ printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZH
 
 expect -f - <<- EOF
 	set timeout -1
-	exp_internal 1
+	# exp_internal 1
 
 	spawn qemu-system-aarch64 \
 		-machine raspi3b \
@@ -84,23 +85,23 @@ expect -f - <<- EOF
 		-device usb-net,netdev=net0 \
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
-	expect "login: "
-	send "pi\n"
+	expect -exact {login: }
+	send [string cat {pi} "\r"]
 
-	expect "Password: "
-	send "raspberry\n"
+	expect -exact {Password: }
+	send [string cat {raspberry} "\r"]
 
-	expect "pi@raspberrypi*"
-	send "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs\n"
+	expect -exact {pi@raspberrypi}
+	send [string cat {curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs} "\r"]
 
-	expect "pi@raspberrypi*"
-	send "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\n"
+	expect -exact {pi@raspberrypi}
+	send [string cat {wget --progress=dot https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master} "\r"]
 
-	expect "pi@raspberrypi*"
-	send {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\n}
+	expect -exact {pi@raspberrypi}
+	send [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release} "\r"]
 
-	expect "pi@raspberrypi*"
-	send "sudo shutdown -h now\n"
+	expect -exact {pi@raspberrypi}
+	send [string cat {sudo shutdown -h now} "\r"]
 
 	expect eof
 EOF
