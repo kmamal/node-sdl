@@ -85,7 +85,7 @@ expect -f - <<- EOF
 		-device usb-net,netdev=net0 \
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
-	expect -exact {login: }
+	expect -exact {raspberrypi login: }
 	send [string cat {pi} "\n"]
 
 	expect -exact {Password: }
