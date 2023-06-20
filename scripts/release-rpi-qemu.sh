@@ -29,40 +29,31 @@ expect -f - <<- EOF
 	spawn fdisk "$IMAGE"
 
 	expect "Command (m for help): "
-	sleep 1
-	send -- "d\r"
+	send "d\n"
 
 	expect "Partition number (1,2, default 2): "
-	sleep 1
-	send -- "\r"
+	send "\n"
 
 	expect "Command (m for help): "
-	sleep 1
-	send -- "n\r"
+	send "n\n"
 
 	expect "Select (default p): "
-	sleep 1
-	send -- "\r"
+	send "\n"
 
 	expect "Partition number (2-4, default 2): "
-	sleep 1
-	send -- "\r"
+	send "\n"
 
 	expect "First sector (2048-8388607, default 2048): "
-	sleep 1
-	send -- "532480\r"
+	send "532480\n"
 
-	expect "Last sector, +/-sectors or +/-size{K,M,G,T,P} (532480-8388607, default 8388607): "
-	sleep 1
-	send -- "\r"
+	expect "(532480-8388607, default 8388607): "
+	send "\n"
 
 	expect "Do you want to remove the signature*"
-	sleep 1
-	send -- "N\r"
+	send "N\n"
 
 	expect "Command (m for help): "
-	sleep 1
-	send -- "w\r"
+	send "w\n"
 
 	expect eof
 EOF
@@ -92,28 +83,22 @@ expect -f - <<- EOF
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
 	expect "login: "
-	sleep 1
-	send -- "pi\r"
+	send "pi\n"
 
 	expect "Password: "
-	sleep 1
-	send -- "raspberry\r"
+	send "raspberry\n"
 
 	expect "pi@raspberrypi*"
-	sleep 1
-	send -- "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs\r"
+	send "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs\n"
 
 	expect "pi@raspberrypi*"
-	sleep 1
-	send -- "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\r"
+	send "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\n"
 
 	expect "pi@raspberrypi*"
-	sleep 1
-	send -- "./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\r"
+	send "./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\n"
 
 	expect "pi@raspberrypi*"
- 	sleep 1
-	send -- "sudo shutdown -h now\r"
+	send "sudo shutdown -h now\n"
 
 	expect eof
 EOF
