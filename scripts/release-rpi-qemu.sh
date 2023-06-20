@@ -65,7 +65,7 @@ sudo e2fsck -fa "${LOOP}p2" || true
 sudo resize2fs "${LOOP}p2"
 sudo losetup -d "${LOOP}"
 
-mkdir -p "$MOUNT"
+sudo mkdir -p "$MOUNT"
 sudo mount -o loop,offset=4194304 "$IMAGE" "$MOUNT"
 
 printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0' | sudo tee "$MOUNT/userconf" > /dev/null
