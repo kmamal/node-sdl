@@ -14,6 +14,9 @@ mkdir -p "$DIR"
 cd "$DIR"
 echo "Working in $DIR"
 
+
+sudo losetup --list --all
+
 sudo apt-get update
 sudo apt-get install -y xz-utils qemu-system-arm expect
 
@@ -24,7 +27,7 @@ qemu-img resize "$IMAGE" 4G
 
 expect -f - <<- EOF
 	set timeout -1
-	exp_internal 1
+	# exp_internal 1
 
 	spawn fdisk "$IMAGE"
 
