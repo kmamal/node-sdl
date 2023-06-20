@@ -27,31 +27,31 @@ expect -f - <<- EOF
 	spawn fdisk "$IMAGE"
 
 	expect "Command (m for help): "
-	send "d\n"
+	send -- "d\r"
 
 	expect "Partition number (1,2, default 2): "
-	send "\n"
+	send -- "\r"
 
 	expect "Command (m for help): "
-	send "n\n"
+	send -- "n\r"
 
 	expect "Select (default p): "
-	send "\n"
+	send -- "\r"
 
 	expect "Partition number (2-4, default 2): "
-	send "\n"
+	send -- "\r"
 
 	expect "First sector (2048-8388607, default 2048): "
-	send "532480\n"
+	send -- "532480\r"
 
 	expect "Last sector, +/-sectors or +/-size{K,M,G,T,P} (532480-8388607, default 8388607): "
-	send "\n"
+	send -- "\r"
 
 	expect "Do you want to remove the signature*"
-	send "N\n"
+	send -- "N\r"
 
 	expect "Command (m for help): "
-	send "w\n"
+	send -- "w\r"
 
 	expect eof
 EOF
@@ -80,22 +80,22 @@ expect -f - <<- EOF
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
 	expect "login: "
-	send "pi\n"
+	send -- "pi\r"
 
 	expect "Password: "
-	send "raspberry\n"
+	send -- "raspberry\r"
 
 	expect "pi@raspberrypi*"
-	send "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs\n"
+	send -- "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs\r"
 
 	expect "pi@raspberrypi*"
-	send "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\n"
+	send -- "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\r"
 
 	expect "pi@raspberrypi*"
-	send "./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\n"
+	send -- "./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\r"
 
 	expect "pi@raspberrypi*"
- 	send "sudo shutdown -h now\n"
+ 	send -- "sudo shutdown -h now\r"
 
 	expect eof
 EOF
