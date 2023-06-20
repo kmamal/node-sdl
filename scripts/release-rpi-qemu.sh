@@ -97,7 +97,7 @@ expect -f - <<- EOF
 	send "wget https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master\n"
 
 	expect "pi@raspberrypi*"
-	send "./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\n"
+	send {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release\n}
 
 	expect "pi@raspberrypi*"
 	send "sudo shutdown -h now\n"
