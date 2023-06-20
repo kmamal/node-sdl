@@ -60,10 +60,10 @@ expect -f - <<- EOF
 	expect eof
 EOF
 
-sudo losetup -P $LOOP "$IMAGE"
-sudo e2fsck -fa $LOOPp2 || true
-sudo resize2fs $LOOPp2
-sudo losetup -d $LOOP
+sudo losetup -P "${LOOP}" "$IMAGE"
+sudo e2fsck -fa "${LOOP}p2" || true
+sudo resize2fs "${LOOP}p2"
+sudo losetup -d "${LOOP}"
 
 sudo mount -o loop,offset=4194304 "$IMAGE" "$MOUNT"
 
