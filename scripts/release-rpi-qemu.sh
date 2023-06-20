@@ -26,7 +26,6 @@ qemu-img resize "$IMAGE" 4G
 
 expect -f - <<- EOF
 	set timeout -1
-	# exp_internal 1
 
 	spawn fdisk "$IMAGE"
 
@@ -72,6 +71,7 @@ printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZH
 
 expect -f - <<- EOF
 	set timeout -1
+	exp_internal 1
 
 	spawn qemu-system-aarch64 \
 		-machine raspi3b \
