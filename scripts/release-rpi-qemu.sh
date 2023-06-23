@@ -31,31 +31,31 @@ expect -f - <<- EOF
 	spawn fdisk {$IMAGE}
 
 	expect -exact {Command (m for help): }
-	send -- [string cat {d} "\r"]
+	send -- [string cat {d} "\n"]
 
 	expect -exact {Partition number (1,2, default 2): }
-	send -- [string cat {} "\r"]
+	send -- [string cat {} "\n"]
 
 	expect -exact {Command (m for help): }
-	send -- [string cat {n} "\r"]
+	send -- [string cat {n} "\n"]
 
 	expect -exact {Select (default p): }
-	send -- [string cat {} "\r"]
+	send -- [string cat {} "\n"]
 
 	expect -exact {Partition number (2-4, default 2): }
-	send -- [string cat {} "\r"]
+	send -- [string cat {} "\n"]
 
 	expect -exact {First sector (2048-8388607, default 2048): }
-	send -- [string cat {532480} "\r"]
+	send -- [string cat {532480} "\n"]
 
 	expect -exact {(532480-8388607, default 8388607): }
-	send -- [string cat {} "\r"]
+	send -- [string cat {} "\n"]
 
 	expect -exact {Do you want to remove the signature?}
-	send -- [string cat {N} "\r"]
+	send -- [string cat {N} "\n"]
 
 	expect -exact {Command (m for help): }
-	send -- [string cat {w} "\r"]
+	send -- [string cat {w} "\n"]
 
 	expect eof
 EOF
@@ -86,22 +86,22 @@ expect -f - <<- EOF
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
 	expect -exact {raspberrypi login: }
-	send -- [string cat {pi} "\r"]
+	send -- [string cat {pi} "\n"]
 
 	expect -exact {Password: }
-	send -- [string cat {raspberry} "\r"]
+	send -- [string cat {raspberry} "\n"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs} "\r"]
+	send -- [string cat {curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs} "\n"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {wget --progress=dot https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master} "\r"]
+	send -- [string cat {wget --progress=dot https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master} "\n"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release} "\r"]
+	send -- [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release} "\n"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {sudo shutdown -h now} "\r"]
+	send -- [string cat {sudo shutdown -h now} "\n"]
 
 	expect eof
 EOF
