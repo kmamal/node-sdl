@@ -21,7 +21,7 @@ if (process.env.CROSS_COMPILE_ARCH) {
 }
 
 process.chdir(C.dir.root)
-execSync(`npx node-gyp rebuild ${archFlag} -j max --verbose`, {
+execSync(`npx -y node-gyp rebuild ${archFlag} -j max --verbose`, {
 	stdio: 'inherit',
 	env: {
 		...process.env,
