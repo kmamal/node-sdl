@@ -2111,7 +2111,9 @@ joystick_rumble (
 		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
 	}
 
-	SDL_JoystickRumble(joystick, low_freq_rumble * 0xFFFF, high_freq_rumble * 0xFFFF, duration);
+	if (SDL_JoystickRumble(joystick, low_freq_rumble * 0xFFFF, high_freq_rumble * 0xFFFF, duration) == -1) {
+		RETURN_ERROR("SDL_JoystickRumble(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
 
 	return nullptr;
 }
@@ -2124,7 +2126,9 @@ joystick_setLed (int joystick_id, double red, double green, double blue)
 		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
 	}
 
-	SDL_JoystickSetLED(joystick, red * 0xFF, green * 0xFF, blue * 0xFF);
+	if (SDL_JoystickSetLED(joystick, red * 0xFF, green * 0xFF, blue * 0xFF) == -1) {
+		RETURN_ERROR("SDL_JoystickSetLED(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
 
 	return nullptr;
 }
@@ -2154,7 +2158,9 @@ joystick_rumbleTriggers (
 		RETURN_ERROR("SDL_JoystickFromInstanceID(%d) error: %s\n", joystick_id, SDL_GetError());
 	}
 
-	SDL_JoystickRumbleTriggers(joystick, left_rumble * 0xFFFF, right_rumble * 0xFFFF, duration);
+	if (SDL_JoystickRumbleTriggers(joystick, left_rumble * 0xFFFF, right_rumble * 0xFFFF, duration) == -1) {
+		RETURN_ERROR("SDL_JoystickRumbleTriggers(%d) error: %s\n", joystick_id, SDL_GetError());
+	}
 
 	return nullptr;
 }

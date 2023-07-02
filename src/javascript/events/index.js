@@ -186,15 +186,17 @@ const handleEvents = () => {
 					const { joystickId } = event
 					delete event.joystickId
 
-					{
+					closeJoysticks: {
 						const collection = Globals.joystickInstances.byId.get(joystickId)
+						if (!collection) { break closeJoysticks }
 						for (const joystickInstance of collection.values()) {
 							joystickInstance.close()
 						}
 					}
 
-					{
+					closeControllers: {
 						const collection = Globals.controllerInstances.byId.get(joystickId)
+						if (!collection) { break closeControllers }
 						for (const controllerInstance of collection.values()) {
 							controllerInstance.close()
 						}
