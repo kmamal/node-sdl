@@ -690,6 +690,12 @@ enum_getControllerButtons (Variant & buttons)
 ErrorMessage *
 initialize (Variant & object)
 {
+	// Hints
+	{
+		SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
+		SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
+	}
+
 	MAKE_MAP(object);
 
 	// Init
@@ -702,11 +708,6 @@ initialize (Variant & object)
 		if (SDL_Init(subsystems) != 0) {
 			RETURN_ERROR("SDL_Init() error: %s\n", SDL_GetError());
 		}
-	}
-
-	// Hints
-	{
-		SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
 	}
 
 	// Version
