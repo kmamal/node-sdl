@@ -68,7 +68,7 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 }
 
 
-const handleEvents = () => {
+const poll = () => {
 	let event
 	while ((event = Bindings.events_poll())) {
 		const { family, type } = event
@@ -368,7 +368,7 @@ const handleEvents = () => {
 let eventsInterval = null
 
 const startPolling = () => {
-	eventsInterval = setInterval(handleEvents, 0)
+	eventsInterval = setInterval(poll, 0)
 }
 
 const stopPolling = () => {
@@ -379,4 +379,5 @@ const stopPolling = () => {
 Globals.events = {
 	startPolling,
 	stopPolling,
+	poll,
 }

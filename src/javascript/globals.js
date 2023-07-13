@@ -21,5 +21,5 @@ module.exports = {
 		byId: new Map(),
 	},
 
-	events: null, // Set later to { startPolling, stopPolling }
+	events: null, // Set later to { startPolling, stopPolling, poll }
 }

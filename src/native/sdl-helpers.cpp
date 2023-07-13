@@ -693,7 +693,6 @@ initialize (Variant & object)
 	// Hints
 	{
 		SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
-		SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
 	}
 
 	MAKE_MAP(object);

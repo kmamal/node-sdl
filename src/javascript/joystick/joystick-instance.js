@@ -30,6 +30,8 @@ class JoystickInstance extends EventsViaPoll {
 
 		this._device = device
 
+		this._rumbleTimeout = null
+		this._rumbleTriggersTimeout = null
 		this._closed = false
 
 		Globals.joystickInstances.all.add(this)
@@ -88,10 +90,18 @@ class JoystickInstance extends EventsViaPoll {
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
 		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
 
+		Globals.events.poll()
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
+		clearTimeout(this._rumbleTimeout)
+		this._rumbleTimeout = setTimeout(() => { this.stopRumble() }, duration)
 	}
 
-	stopRumble () { this.rumble(0, 0) }
+	stopRumble () {
+		clearTimeout(this._rumbleTimeout)
+		this._rumbleTimeout = null
+		Bindings.joystick_rumble(this._device.id, 0, 0, 0)
+		Globals.events.poll()
+	}
 
 	get hasRumbleTriggers () { return this._hasRumbleTriggers }
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = 1e3) {
@@ -103,10 +113,18 @@ class JoystickInstance extends EventsViaPoll {
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
 		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
 
+		Globals.events.poll()
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
+		clearTimeout(this._rumbleTriggersTimeout)
+		this._rumbleTriggersTimeout = setTimeout(() => { this.stopRumble() }, duration)
 	}
 
-	stopRumbleTriggers () { this.rumbleTriggers(0, 0) }
+	stopRumbleTriggers () {
+		clearTimeout(this._rumbleTriggersTimeout)
+		this._rumbleTriggersTimeout = null
+		Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0)
+		Globals.events.poll()
+	}
 
 	get closed () { return this._closed }
 	close () {
