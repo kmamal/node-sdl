@@ -1,9 +1,9 @@
-.github
-.eslintrc.js
-tests
-examples
-sdl
-build
-dist
-publish
+/.github/
+/.eslintrc.js
+/tests/
+/examples/
+/sdl/
+/build/
+/dist/
+/publish/
 NOTES.txt
