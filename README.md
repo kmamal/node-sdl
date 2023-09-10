@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SDL bindings for Node.js.
-Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, and clipboard manipulation.
+Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, clipboard manipulation, and battery status.
 
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, arm-based Macs, and Raspberry Pi.
@@ -291,6 +291,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Event: 'update'](#event-update)
   * [sdl.clipboard.text](#sdlclipboardtext)
   * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
+* [sdl.power](#sdlpower)
+  * [sdl.power.info](#sdlpowerinfo)
 
 
 ## sdl
@@ -2348,6 +2350,18 @@ The current text value on the clipboard.
 * `text: <string>` The new value to save on the clipboard.
 
 Changes the text contents of the clipboard.
+
+
+## sdl.power
+
+### sdl.power.info
+
+* `<object>`
+  * `state: <string>` One of `'unknown'`, `'noBattery'`, `'battery'`, `'charging'`, `'changed'`.
+  * `seconds: <number | null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
+  * `percent: <number | null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
+
+The curent power state of the device.
 
 
 ## Building from source

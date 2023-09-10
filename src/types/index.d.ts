@@ -1080,6 +1080,27 @@ export namespace Sdl {
 
 	}
 
+	namespace Power {
+
+		type PowerState
+			= 'unknown'
+			| 'noBattery'
+			| 'battery'
+			| 'charging'
+			| 'charged'
+
+		interface PowerInfo {
+			state: PowerState
+			seconds: number | null
+			percent: number | null
+		}
+
+		interface Module {
+			readonly info: PowerInfo
+		}
+
+	}
+
 	interface Module {
 		readonly info: Info
 		readonly video: Video.Module
@@ -1089,7 +1110,9 @@ export namespace Sdl {
 		readonly controller: Controller.Module
 		readonly audio: Audio.Module
 		readonly clipboard: Clipboard.Module
+		readonly power: Power.Module
 	}
+
 }
 
 declare const sdl: Sdl.Module

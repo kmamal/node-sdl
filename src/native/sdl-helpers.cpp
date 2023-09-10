@@ -694,6 +694,21 @@ enum_getControllerButtons (Variant & buttons)
 	return nullptr;
 }
 
+ErrorMessage *
+enum_getPowerStates (Variant & states)
+{
+	MAKE_MAP(states);
+
+	SET_NUM(states, "unknown", SDL_POWERSTATE_UNKNOWN);
+	SET_NUM(states, "noBattery", SDL_POWERSTATE_NO_BATTERY);
+	SET_NUM(states, "battery", SDL_POWERSTATE_ON_BATTERY);
+	SET_NUM(states, "charging", SDL_POWERSTATE_CHARGING);
+	SET_NUM(states, "charged", SDL_POWERSTATE_CHARGED);
+
+	return nullptr;
+}
+
+
 
 ErrorMessage *
 initialize (Variant & object)
@@ -2429,6 +2444,22 @@ clipboard_setText (const char * text)
 	if (SDL_SetClipboardText(text) != 0) {
 		RETURN_ERROR("SDL_SetClipboardText() error: %s\n", SDL_GetError());
 	}
+
+	return nullptr;
+}
+
+
+ErrorMessage *
+power_getInfo (Variant & info)
+{
+	int seconds, percent;
+	SDL_PowerState state = SDL_GetPowerInfo(&seconds, &percent);
+
+	MAKE_MAP(info);
+
+	SET_NUM(info, "state", (int) state);
+	SET_NUM(info, "seconds", seconds);
+	SET_NUM(info, "percent", percent);
 
 	return nullptr;
 }

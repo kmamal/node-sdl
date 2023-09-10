@@ -44,6 +44,7 @@ ErrorMessage * enum_getPowerLevels (Variant & object);
 ErrorMessage * enum_getJoystickTypes (Variant & object);
 ErrorMessage * enum_getControllerAxes (Variant & object);
 ErrorMessage * enum_getControllerButtons (Variant & object);
+ErrorMessage * enum_getPowerStates (Variant & object);
 
 ErrorMessage * initialize (Variant & object);
 ErrorMessage * cleanup ();
@@ -165,6 +166,8 @@ ErrorMessage * audio_dequeue (int audio_id, void * dst, int size, int * num);
 
 ErrorMessage * clipboard_getText (const char ** text);
 ErrorMessage * clipboard_setText (const char * text);
+
+ErrorMessage * power_getInfo (Variant & info);
 
 } // namespace
 

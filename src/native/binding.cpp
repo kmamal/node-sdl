@@ -221,6 +221,15 @@ getEnums(napi_env env, napi_callback_info info)
 		CALL_NAPI(napi_set_property, result, key, value);
 	}
 
+	{
+		SdlHelpers::Variant power_states;
+		CALL_SDL_HELPER(enum_getPowerStates, power_states);
+
+		CALL_NAPI(fromVariant, power_states, &value);
+		CALL_NAPI(napi_create_string_latin1, "powerState", 10, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
 	cleanup:
 	return result;
 }
@@ -1470,6 +1479,21 @@ clipboard_setText(napi_env env, napi_callback_info info)
 
 
 napi_value
+power_getInfo(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	SdlHelpers::Variant power;
+	CALL_SDL_HELPER(power_getInfo, power);
+
+	CALL_NAPI(fromVariant, power, &result);
+
+	cleanup:
+	return result;
+}
+
+
+napi_value
 cleanup(napi_env env, napi_callback_info info)
 {
 	CALL_SDL_HELPER(cleanup);
@@ -1536,10 +1560,11 @@ init (napi_env env, napi_value exports)
 		{ "audio_clearQueue", NULL, audio_clearQueue, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "clipboard_getText", NULL, clipboard_getText, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "clipboard_setText", NULL, clipboard_setText, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "power_getInfo", NULL, power_getInfo, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 54, desc);
+	CALL_NAPI(napi_define_properties, exports, 55, desc);
 
 	cleanup:
 	return exports;

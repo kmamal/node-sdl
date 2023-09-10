@@ -12,6 +12,7 @@ const { joystick } = require('./joystick')
 const { controller } = require('./controller')
 const { audio } = require('./audio')
 const { clipboard } = require('./clipboard')
+const { power } = require('./power')
 
 require('./events')
 require('./cleanup')
@@ -25,4 +26,5 @@ module.exports = {
 	controller,
 	audio,
 	clipboard,
+	power,
 }

@@ -27,6 +27,8 @@
     "microphone",
     "mic",
     "clipboard",
+    "power",
+    "battery",
     "game"
   ],
   "license": "MIT",
