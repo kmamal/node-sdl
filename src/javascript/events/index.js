@@ -92,6 +92,8 @@ const poll = () => {
 					case Enums.eventType.resize: {
 						window._width = event.width
 						window._height = event.height
+						window._pixelWidth = event.pixelWidth
+						window._pixelHeight = event.pixelHeight
 					} break
 
 					case Enums.eventType.show: {

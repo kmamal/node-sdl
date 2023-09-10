@@ -67,8 +67,10 @@ export namespace Events {
 		}
 		interface Resize extends WindowEvent {
 			readonly type: 'resize'
-			readonly width: number,
+			readonly width: number
 			readonly height: number
+			readonly pixelWidth: number
+			readonly pixelHeight: number
 		}
 		interface Focus extends WindowEvent { readonly type: 'focus' }
 		interface Blur extends WindowEvent { readonly type: 'blur' }
@@ -379,6 +381,9 @@ export namespace Sdl {
 			readonly width: number
 			readonly height: number
 			setSize (width: number, height: number): void
+
+			readonly pixelWidth: number
+			readonly pixelHeight: number
 
 			readonly visible: boolean
 			show (show?: boolean): void
