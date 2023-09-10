@@ -56,6 +56,7 @@ ErrorMessage * video_getDisplays (Variant & list);
 ErrorMessage * window_create (
 	const char * title, int display,
 	int ** x, int ** y, int ** width, int ** height,
+	int * pixel_width, int * pixel_height,
 	bool visible,
 	bool * fullscreen,
 	bool * resizable,
@@ -72,7 +73,10 @@ ErrorMessage * window_create (
 );
 ErrorMessage * window_setTitle (int window_id, const char * title);
 ErrorMessage * window_setPosition (int window_id, int x, int y);
-ErrorMessage * window_setSize (int window_id, int width, int height);
+ErrorMessage * window_setSize (
+	int window_id, int width, int height,
+	int * pixel_width, int * pixel_height
+);
 ErrorMessage * window_setFullscreen (int window_id, bool * fullscreen);
 ErrorMessage * window_setResizable (int window_id, bool * resizable);
 ErrorMessage * window_setBorderless (int window_id, bool * borderless);

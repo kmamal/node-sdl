@@ -6,7 +6,7 @@ const window = sdl.video.createWindow({
 	opengl: true,
 })
 
-const { width, height, native } = window
+const { pixelWidth: width, pixelHeight: height, native } = window
 const gl = createContext(width, height, { window: native })
 const ext = gl.getExtension('STACKGL_resize_drawingbuffer')
 
@@ -72,7 +72,7 @@ gl.useProgram(program)
 gl.clearColor(1, 0, 0, 1)
 
 window.on('resize', () => {
-	const { width: w, height: h } = window
+	const { pixelWidth: w, pixelHeight: h } = window
 	ext.resize(w, h)
 	gl.viewport(0, 0, w, h)
 	gl.swap()

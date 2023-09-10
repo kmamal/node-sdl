@@ -3,7 +3,7 @@ import sdl from '@kmamal/sdl'
 const window = sdl.video.createWindow({ resizable: true })
 
 window.on('resize', () => {
-	const { width, height } = window
+	const { pixelWidth: width, pixelHeight: height } = window
 	const stride = width * 4
 	const buffer = Buffer.alloc(stride * height)
 

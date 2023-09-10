@@ -4,7 +4,7 @@ import Canvas from 'canvas'
 const window = sdl.video.createWindow({ resizable: true })
 
 window.on('resize', () => {
-	const { width, height } = window
+	const { pixelWidth: width, pixelHeight: height } = window
 	const canvas = Canvas.createCanvas(width, height)
 	const ctx = canvas.getContext('2d')
 

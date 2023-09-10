@@ -7,7 +7,7 @@ const window = sdl.video.createWindow({
 	opengl: true,
 })
 
-const { width, height, native } = window
+const { pixelWidth: width, pixelHeight: height, native } = window
 const gl = createContext(width, height, { window: native })
 const ext = gl.getExtension('STACKGL_resize_drawingbuffer')
 const regl = createRegl({ gl })
@@ -43,7 +43,7 @@ const drawTriangle = regl({
 })
 
 window.on('resize', () => {
-	const { width: w, height: h } = window
+	const { pixelWidth: w, pixelHeight: h } = window
 	ext.resize(w, h)
 	regl.poll()
 	gl.swap()

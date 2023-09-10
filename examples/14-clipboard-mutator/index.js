@@ -3,7 +3,7 @@ import Canvas from 'canvas'
 import { setTimeout } from 'timers/promises'
 
 const window = sdl.video.createWindow()
-const { width, height } = window
+const { pixelWidth: width, pixelHeight: height } = window
 const stride = width * 4
 const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')

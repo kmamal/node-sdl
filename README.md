@@ -2,7 +2,6 @@
 
 [![Package](https://img.shields.io/npm/v/%2540kmamal%252Fsdl)](https://www.npmjs.com/package/@kmamal/sdl)
 [![Dependencies](https://img.shields.io/librariesio/release/npm/@kmamal/sdl)](https://libraries.io/npm/@kmamal%2Fsdl)
-[![Count](https://badgen.net/bundlephobia/dependency-count/@kmamal/sdl)](https://bundlephobia.com/package/@kmamal/sdl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SDL bindings for Node.js.
@@ -50,7 +49,7 @@ import sdl from '@kmamal/sdl'
 import { createCanvas } from 'canvas'
 
 const window = sdl.video.createWindow({ title: "Canvas" })
-const { width, height } = window
+const { pixelWidth: width, pixelHeight: height } = window
 const canvas = createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
@@ -67,7 +66,7 @@ import sdl from '@kmamal/sdl'
 import createContext from '@kmamal/gl'
 
 const window = sdl.video.createWindow({title: "WebGL", opengl: true })
-const { width, height, native } = window
+const { pixelWidth: width, pixelHeight: height, native } = window
 const gl = createContext(width, height, { window: native })
 
 // Clear screen to red
@@ -88,6 +87,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 * [sdl.video](#sdlvideo)
   * [Image data](#image-data)
   * [Pixel formats](#pixel-formats)
+  * [High-DPI](#highdpi)
   * [sdl.video.displays](#sdlvideodisplays)
   * [sdl.video.windows](#sdlvideowindows)
   * [sdl.video.focused](#sdlvideofocused)
@@ -127,6 +127,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.setPosition(x, y)](#windowsetpositionx-y)
     * [window.width](#windowwidth)
     * [window.height](#windowheight)
+    * [window.pixelWidth](#windowpixelwidth)
+    * [window.pixelHeight](#windowpixelheight)
     * [window.setSize(width, height)](#windowsetsizewidth-height)
     * [window.visible](#windowvisible)
     * [window.show([show])](#windowshowshow)
@@ -356,7 +358,7 @@ All three of these functions accept the image as a series of arguments:
 So for example, to fill the window with a red+green gradient you could do:
 
 ```js
-const { width, height } = window
+const { pixelWidth: width, pixelHeight: height } = window
 const stride = width * 4
 const buffer = Buffer.alloc(stride * height)
 
@@ -415,6 +417,16 @@ String values used to represent how the pixels of an image are stored in a Buffe
 | `'yvyu'` | `SDL_PIXELFORMAT_YVYU` | packed mode: Y0+V0+Y1+U0 (1 plane) |
 | `'nv12'` | `SDL_PIXELFORMAT_NV12` | planar mode: Y + U/V interleaved (2 planes) |
 | `'nv21'` | `SDL_PIXELFORMAT_NV21` | planar mode: Y + V/U interleaved (2 planes) |
+
+
+### High-DPI
+
+On a high-dpi display, windows have more pixels that their `width` and `height` would indicate.
+On such systems `width` and `height` (and all other measurements such as `x` and `y`) are in "points".
+Points are abstract and don't have to correspond to pixels.
+If you need to know a window's width and height in pixels, you should use the `pixelWidth` and `pixelHeight` properties.
+You should be doing this always, since you don't know beforehand if your program will be running on a high-dpi system.
+
 
 ### sdl.video.displays
 
@@ -547,6 +559,8 @@ Fired when the window changes position.
 
 * `width: <number>` The window's new width.
 * `height: <number>` The window's new height.
+* `pixelWidth: <number>` The window's new width in pixels. See [high-dpi](#high-dpi).
+* `pixelHeight: <number>` The window's new height in pixels. See [high-dpi](#high-dpi).
 
 Fired when the window changes size.
 
@@ -719,6 +733,18 @@ The window's width.
 * `<number>`
 
 The window's height.
+
+### window.pixelWidth
+
+* `<number>`
+
+The window's width in pixels. This will be larger than `width` on [high-dpi](#high-dpi) displays.
+
+### window.pixelHeight
+
+* `<number>`
+
+The window's height in pixels. This will be larger than `height` on [high-dpi](#high-dpi) displays.
 
 ### window.setSize(width, height)
 

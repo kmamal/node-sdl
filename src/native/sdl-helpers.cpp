@@ -840,6 +840,87 @@ initialize (Variant & object)
 
 
 ErrorMessage *
+_windowGetPixelSize(SDL_Window * window, int * pixel_width, int * pixel_height)
+{
+	SDL_Renderer * renderer = SDL_GetRenderer(window);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_GetRenderer() error: %s\n", SDL_GetError());
+	}
+
+	if (SDL_GetRendererOutputSize(renderer, pixel_width, pixel_height) != 0) {
+		RETURN_ERROR("SDL_GetRendererOutputSize() error: %s\n", SDL_GetError());
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+_windowUpdateTexture(
+	SDL_Window * window,
+	SDL_Renderer * renderer,
+	int pixel_width, int pixel_height,
+	SDL_Texture ** texture_dst
+) {
+	int window_id = SDL_GetWindowID(window);
+
+	int format = SDL_GetWindowPixelFormat(window);
+	SDL_Texture * texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, pixel_width, pixel_height);
+	if (texture == nullptr) {
+		RETURN_ERROR("SDL_CreateTexture(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE)) {
+		RETURN_ERROR("SDL_SetTextureBlendMode(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Texture * old_texture = (SDL_Texture *) SDL_SetWindowData(window, "texture", texture);
+	if (old_texture != nullptr) { SDL_DestroyTexture(old_texture); }
+
+	if (texture_dst != nullptr) { *texture_dst = texture; }
+
+	return nullptr;
+}
+
+ErrorMessage *
+_windowUpdateRenderer(
+	SDL_Window * window,
+	bool * accelerated,
+	bool * vsync
+) {
+	int window_id = SDL_GetWindowID(window);
+
+	SDL_Renderer * old_renderer = SDL_GetRenderer(window);
+	if (old_renderer != nullptr) { SDL_DestroyRenderer(old_renderer); }
+
+	int renderer_flags = 0
+		| (*accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
+		| (*accelerated && *vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
+
+	SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+	if (renderer == nullptr) {
+		RETURN_ERROR("SDL_CreateRenderer(%d, %d) error: %s\n", window_id, renderer_flags, SDL_GetError());
+	}
+
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+
+	*accelerated = info.flags & SDL_RENDERER_ACCELERATED;
+	*vsync = info.flags & SDL_RENDERER_PRESENTVSYNC;
+
+	ErrorMessage * error;
+
+	int pixel_width, pixel_height;
+	error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
+	if (error != nullptr) { return error; }
+
+	error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, nullptr);
+	if (error != nullptr) { return error; }
+
+	return nullptr;
+}
+
+
+ErrorMessage *
 _controllerGetState (SDL_GameController * controller, Variant & object)
 {
 	{
@@ -924,9 +1005,20 @@ packageEvent (const SDL_Event & event, Variant & object)
 					break;
 				}
 				case SDL_WINDOWEVENT_SIZE_CHANGED: {
+					SDL_Window * window = SDL_GetWindowFromID(event.window.windowID);
+					if (window == nullptr) {
+						RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
+					}
+
+					int pixel_width, pixel_height;
+					ErrorMessage * error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
+					if (error != nullptr) { return error; }
+
 					SET_NUM(object, "type", (int) EventType::RESIZE);
 					SET_NUM(object, "width", event.window.data1);
 					SET_NUM(object, "height", event.window.data2);
+					SET_NUM(object, "pixelWidth", pixel_width);
+					SET_NUM(object, "pixelHeight", pixel_height);
 					break;
 				}
 				case SDL_WINDOWEVENT_MINIMIZED: { SET_NUM(object, "type", (int) EventType::MINIMIZE); break; }
@@ -1203,7 +1295,8 @@ events_poll (Variant & object)
 
 	if (!got_event) { return nullptr; }
 
-	packageEvent(event, object);
+	ErrorMessage * error = packageEvent(event, object);
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -1218,7 +1311,8 @@ events_wait (int timeout, Variant & object)
 
 	if (!got_event) { return nullptr; }
 
-	packageEvent(event, object);
+	ErrorMessage * error = packageEvent(event, object);
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -1307,87 +1401,26 @@ video_getDisplays(Variant & list)
 	return nullptr;
 }
 
-ErrorMessage *
-_windowUpdateTexture(
-	SDL_Window * window,
-	SDL_Renderer * renderer,
-	int width, int height,
-	SDL_Texture ** texture_dst
-) {
-	int window_id = SDL_GetWindowID(window);
-
-	int format = SDL_GetWindowPixelFormat(window);
-	SDL_Texture * texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
-	if (texture == nullptr) {
-		RETURN_ERROR("SDL_CreateTexture(%d) error: %s\n", window_id, SDL_GetError());
-	}
-
-	if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE)) {
-		RETURN_ERROR("SDL_SetTextureBlendMode(%d) error: %s\n", window_id, SDL_GetError());
-	}
-
-	SDL_Texture * old_texture = (SDL_Texture *) SDL_SetWindowData(window, "texture", texture);
-	if (old_texture != nullptr) { SDL_DestroyTexture(old_texture); }
-
-	if (texture_dst != nullptr) { *texture_dst = texture; }
-
-	return nullptr;
-}
-
-ErrorMessage *
-_windowUpdateRenderer(
-	SDL_Window * window,
-	bool * accelerated,
-	bool * vsync
-) {
-	int window_id = SDL_GetWindowID(window);
-
-	SDL_Renderer * old_renderer = SDL_GetRenderer(window);
-	if (old_renderer != nullptr) { SDL_DestroyRenderer(old_renderer); }
-
-	int renderer_flags = 0
-		| (*accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
-		| (*accelerated && *vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
-
-	SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, renderer_flags);
-	if (renderer == nullptr) {
-		RETURN_ERROR("SDL_CreateRenderer(%d, %d) error: %s\n", window_id, renderer_flags, SDL_GetError());
-	}
-
-	SDL_RendererInfo info;
-	SDL_GetRendererInfo(renderer, &info);
-
-	*accelerated = info.flags & SDL_RENDERER_ACCELERATED;
-	*vsync = info.flags & SDL_RENDERER_PRESENTVSYNC;
-
-	int width, height;
-	SDL_GetWindowSize(window, &width, &height);
-	ErrorMessage * error = _windowUpdateTexture(window, renderer, width, height, nullptr);
-	if (error != nullptr) { return error; }
-
-	return nullptr;
-}
 
 ErrorMessage *
 window_create (
 	const char * title, int display,
 	int ** x, int ** y, int ** width, int ** height,
+	int * pixel_width, int * pixel_height,
 	bool visible,
 	bool * fullscreen,
 	bool * resizable,
 	bool * borderless,
-	bool * alwaysOnTop,
+	bool * always_on_top,
 	bool * accelerated,
 	bool * vsync,
 	bool opengl,
-	bool * skipTaskbar,
-	bool * popupMenu,
+	bool * skip_taskbar,
+	bool * popup_menu,
 	bool * tooltip,
 	bool * utility,
 	int * window_id, void ** native_pointer, int * native_pointer_size
 ) {
-	SDL_Window * window;
-
 	if (*x == nullptr) {
 		*x = (int *) malloc(sizeof(int));
 		**x = SDL_WINDOWPOS_CENTERED_DISPLAY(display);
@@ -1405,18 +1438,18 @@ window_create (
 		**height = 480;
 	}
 	int desired_flags = 0
-		| SDL_WINDOW_HIDDEN
+		| SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI
 		| (*fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
 		| (*resizable ? SDL_WINDOW_RESIZABLE : 0)
 		| (*borderless ? SDL_WINDOW_BORDERLESS : 0)
-		| (*alwaysOnTop ? SDL_WINDOW_ALWAYS_ON_TOP : 0)
+		| (*always_on_top ? SDL_WINDOW_ALWAYS_ON_TOP : 0)
 		| (opengl ? SDL_WINDOW_OPENGL : 0)
-		| (*skipTaskbar ? SDL_WINDOW_SKIP_TASKBAR : 0)
-		| (*popupMenu ? SDL_WINDOW_POPUP_MENU : 0)
+		| (*skip_taskbar ? SDL_WINDOW_SKIP_TASKBAR : 0)
+		| (*popup_menu ? SDL_WINDOW_POPUP_MENU : 0)
 		| (*tooltip ? SDL_WINDOW_TOOLTIP : 0)
 		| (*utility ? SDL_WINDOW_UTILITY : 0);
 
-	window = SDL_CreateWindow(title, **x, **y, **width, **height, desired_flags);
+	SDL_Window * window = SDL_CreateWindow(title, **x, **y, **width, **height, desired_flags);
 	if (window == nullptr) {
 		RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
 	}
@@ -1427,9 +1460,9 @@ window_create (
 	*fullscreen = actual_flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 	*resizable = actual_flags & SDL_WINDOW_RESIZABLE;
 	*borderless = actual_flags & SDL_WINDOW_BORDERLESS;
-	*alwaysOnTop = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
-	*skipTaskbar = actual_flags & SDL_WINDOW_SKIP_TASKBAR;
-	*popupMenu = actual_flags & SDL_WINDOW_POPUP_MENU;
+	*always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
+	*skip_taskbar = actual_flags & SDL_WINDOW_SKIP_TASKBAR;
+	*popup_menu = actual_flags & SDL_WINDOW_POPUP_MENU;
 	*tooltip = actual_flags & SDL_WINDOW_TOOLTIP;
 	*utility = actual_flags & SDL_WINDOW_UTILITY;
 
@@ -1453,7 +1486,12 @@ window_create (
 		*native_pointer_size = size;
 	}
 
-	ErrorMessage * error = _windowUpdateRenderer(window, accelerated, vsync);
+	ErrorMessage * error;
+
+	error = _windowUpdateRenderer(window, accelerated, vsync);
+	if (error != nullptr) { return error; }
+
+	error = _windowGetPixelSize(window, pixel_width, pixel_height);
 	if (error != nullptr) { return error; }
 
 	if (visible) { SDL_ShowWindow(window); }
@@ -1488,7 +1526,7 @@ window_setPosition (int window_id, int x, int y)
 }
 
 ErrorMessage *
-window_setSize (int window_id, int width, int height)
+window_setSize (int window_id, int width, int height, int * pixel_width, int * pixel_height)
 {
 	SDL_Window * window = SDL_GetWindowFromID(window_id);
 	if (window == nullptr) {
@@ -1496,6 +1534,9 @@ window_setSize (int window_id, int width, int height)
 	}
 
 	SDL_SetWindowSize(window, width, height);
+
+	ErrorMessage * error = _windowGetPixelSize(window, pixel_width, pixel_height);
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -1694,14 +1735,15 @@ window_render (
 		RETURN_ERROR("SDL_QueryTexture(%d) error: %s\n", window_id, SDL_GetError());
 	}
 
-	int window_width, window_height;
-	SDL_GetWindowSize(window, &window_width, &window_height);
+	int pixel_width, pixel_height;
+	ErrorMessage * error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
+	if (error != nullptr) { return error; }
 
-	if (window_width != texture_width || window_height != texture_height) {
-		ErrorMessage * error = _windowUpdateTexture(window, renderer, window_width, window_height, &texture);
+	if (pixel_width != texture_width || pixel_height != texture_height) {
+		ErrorMessage * error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, &texture);
 		if (error != nullptr) { return error; }
-		texture_width = window_width;
-		texture_height = window_height;
+		texture_width = pixel_width;
+		texture_height = pixel_height;
 	}
 
 	SDL_Surface * src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);

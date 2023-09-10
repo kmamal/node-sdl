@@ -68,13 +68,18 @@ const width = 230
 const height = 90 + audioDrivers.length * 30 + 10
 
 const window = sdl.video.createWindow({ width, height })
-const canvas = Canvas.createCanvas(width, height)
+const { pixelWidth, pixelHeight } = window
+const canvas = Canvas.createCanvas(pixelWidth, pixelHeight)
 const ctx = canvas.getContext('2d')
+
+const scaleX = pixelWidth / width
+const scaleY = pixelHeight / height
+ctx.scale(scaleX, scaleY)
 
 ctx.font = '15px monospace'
 ctx.fillStyle = 'white'
 ctx.strokeStyle = 'white'
-ctx.lineWidth = 2
+ctx.lineWidth = 2 * Math.min(scaleX, scaleY)
 ctx.textAlign = 'center'
 ctx.textBaseline = 'middle'
 

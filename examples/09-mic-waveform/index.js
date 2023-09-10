@@ -3,7 +3,7 @@ import Canvas from 'canvas'
 import { setTimeout } from 'timers/promises'
 
 const window = sdl.video.createWindow()
-const { width, height } = window
+const { pixelWidth: width, pixelHeight: height } = window
 const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
@@ -56,15 +56,15 @@ while (!window.destroyed) {
 		{
 			let min = 0
 			let max = 0
-			let last_x = -1
+			let lastX = -1
 			for (let i = 0; i < numSamples; i++) {
 				const x = Math.floor((i / numSamples) * width * supersampling)
 
-				if (x > last_x) {
+				if (x > lastX) {
 					const y = (min - zeroSampleValue) / amplitude
 					const h = (max - min) / amplitude
-					ctx.fillRect(last_x / supersampling, y, 1, h)
-					last_x = x
+					ctx.fillRect(lastX / supersampling, y, 1, h)
+					lastX = x
 					min = Infinity
 					max = -Infinity
 				}

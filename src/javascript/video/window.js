@@ -115,6 +115,8 @@ class Window extends EventsViaPoll {
 		this._y = result.y
 		this._width = result.width
 		this._height = result.height
+		this._pixelWidth = result.pixelWidth
+		this._pixelHeight = result.pixelHeight
 		this._fullscreen = result.fullscreen
 		this._resizable = result.resizable
 		this._borderless = result.borderless
@@ -157,6 +159,8 @@ class Window extends EventsViaPoll {
 			this.emit('resize', {
 				width: this._width,
 				height: this._height,
+				pixelWidth: this._pixelWidth,
+				pixelHeight: this._pixelHeight,
 				type: 'resize',
 			})
 		})
@@ -197,10 +201,15 @@ class Window extends EventsViaPoll {
 		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
 
-		Bindings.window_setSize(this._id, width, height)
+		const { pixelWidth, pixelHeight } = Bindings.window_setSize(this._id, width, height)
 		this._width = width
 		this._height = height
+		this._pixelWidth = pixelWidth
+		this._pixelHeight = pixelHeight
 	}
+
+	get pixelWidth () { return this._pixelWidth }
+	get pixelHeight () { return this._pixelHeight }
 
 	get visible () { return this._visible }
 	show (show = true) {
