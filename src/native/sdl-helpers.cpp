@@ -120,6 +120,7 @@ ErrorMessage::
 
 
 enum class EventFamily {
+	DISPLAY,
 	WINDOW,
 	KEYBOARD,
 	MOUSE,
@@ -137,6 +138,7 @@ enum_getEventFamilies (Variant & families)
 {
 	MAKE_MAP(families);
 
+	SET_NUM(families, "display", (int) EventFamily::DISPLAY);
 	SET_NUM(families, "window", (int) EventFamily::WINDOW);
 	SET_NUM(families, "keyboard", (int) EventFamily::KEYBOARD);
 	SET_NUM(families, "mouse", (int) EventFamily::MOUSE);
@@ -154,6 +156,9 @@ enum_getEventFamilies (Variant & families)
 
 enum class EventType {
 	QUIT,
+	DISPLAY_ADD,
+	DISPLAY_REMOVE,
+	DISPLAY_ORIENT,
 	SHOW,
 	HIDE,
 	EXPOSE,
@@ -195,6 +200,9 @@ enum_getEventTypes (Variant & types)
 	MAKE_MAP(types);
 
 	SET_NUM(types, "quit", (int) EventType::QUIT);
+	SET_NUM(types, "displayAdd", (int) EventType::DISPLAY_ADD);
+	SET_NUM(types, "displayRemove", (int) EventType::DISPLAY_REMOVE);
+	SET_NUM(types, "displayOrient", (int) EventType::DISPLAY_ORIENT);
 	SET_NUM(types, "show", (int) EventType::SHOW);
 	SET_NUM(types, "hide", (int) EventType::HIDE);
 	SET_NUM(types, "expose", (int) EventType::EXPOSE);
@@ -990,6 +998,18 @@ packageEvent (const SDL_Event & event, Variant & object)
 
 	Variant value;
 	switch (event.type) {
+		case SDL_DISPLAYEVENT: {
+			SET_NUM(object, "family", (int) EventFamily::DISPLAY);
+			SET_NUM(object, "displayIndex", event.display.display);
+
+			switch (event.display.event) {
+				case SDL_DISPLAYEVENT_CONNECTED: { SET_NUM(object, "type", (int) EventType::DISPLAY_ADD); break; }
+				case SDL_DISPLAYEVENT_DISCONNECTED: { SET_NUM(object, "type", (int) EventType::DISPLAY_REMOVE); break; }
+				case SDL_DISPLAYEVENT_ORIENTATION: { SET_NUM(object, "type", (int) EventType::DISPLAY_ORIENT); break; }
+			}
+			break;
+		}
+
 		case SDL_WINDOWEVENT: {
 			SET_NUM(object, "family", (int) EventFamily::WINDOW);
 			SET_NUM(object, "windowId", event.window.windowID);

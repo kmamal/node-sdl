@@ -5,6 +5,20 @@ export namespace Events {
 
 	type PreventCallback = () => void
 
+	namespace Display {
+
+		interface DisplayEvent extends BaseEvent {
+			readonly display: Sdl.Video.Display
+		}
+
+		interface Add extends DisplayEvent { readonly type: 'deviceAdd' }
+		interface Remove extends DisplayEvent { readonly type: 'deviceRemove' }
+		interface Orient extends DisplayEvent { readonly type: 'deviceOrient' }
+
+		type Any = Add | Remove | Orient
+
+	}
+
 	namespace Window {
 
 		interface WindowEvent extends BaseEvent {}
@@ -119,6 +133,7 @@ export namespace Events {
 			| DropText
 			| DropFile
 			| DropComplete
+
 	}
 
 	namespace Joystick {
@@ -435,6 +450,11 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
+			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
+			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
+			on (event: '*', listener: (event: Events.Display.Any) => void): this
+
 			readonly displays: Display[]
 
 			readonly windows: Window[]

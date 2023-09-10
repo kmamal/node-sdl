@@ -88,6 +88,9 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Image data](#image-data)
   * [Pixel formats](#pixel-formats)
   * [High-DPI](#highdpi)
+  * [Event: 'displayAdd'](#event-displayadd)
+  * [Event: 'displayRemove'](#event-displayremove)
+  * [Event: 'displayOrient'](#event-displayorient)
   * [sdl.video.displays](#sdlvideodisplays)
   * [sdl.video.windows](#sdlvideowindows)
   * [sdl.video.focused](#sdlvideofocused)
@@ -184,8 +187,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [Joystick types](#joystick-types)
   * [Hat positions](#hat-positions)
   * [Power levels](#power-levels)
-  * [Event: 'deviceAdd'](#joystick-event-device-add)
-  * [Event: 'deviceRemove'](#joystick-event-device-remove)
+  * [Event: 'deviceAdd'](#joystick-event-deviceadd)
+  * [Event: 'deviceRemove'](#joystick-event-deviceremove)
   * [sdl.joystick.devices](#sdljoystickdevices)
   * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
   * [class JoystickInstance](#class-joystickinstance)
@@ -215,8 +218,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [joystickInstance.closed](#joystickinstanceclosed)
     * [joystickInstance.close()](#joystickinstanceclose)
 * [sdl.controller](#sdlcontroller)
-  * [Event: 'deviceAdd'](#controller-event-device-add)
-  * [Event: 'deviceRemove'](#controller-event-device-remove)
+  * [Event: 'deviceAdd'](#controller-event-deviceadd)
+  * [Event: 'deviceRemove'](#controller-event-deviceremove)
   * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
   * [sdl.controller.devices](#sdlcontrollerdevices)
   * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
@@ -246,8 +249,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
 * [sdl.audio](#sdlaudio)
   * [Audio data](#audio-data)
   * [Sample formats](#sample-formats)
-  * [Event: 'deviceAdd'](#audio-event-device-add)
-  * [Event: 'deviceRemove'](#audio-event-device-remove)
+  * [Event: 'deviceAdd'](#audio-event-deviceadd)
+  * [Event: 'deviceRemove'](#audio-event-deviceremove)
   * [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
   * [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
   * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
@@ -426,6 +429,30 @@ On such systems `width` and `height` (and all other measurements such as `x` and
 Points are abstract and don't have to correspond to pixels.
 If you need to know a window's width and height in pixels, you should use the `pixelWidth` and `pixelHeight` properties.
 You should be doing this always, since you don't know beforehand if your program will be running on a high-dpi system.
+
+
+### Event: 'displayAdd'
+
+* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+
+Fired when a display is added to the system.
+Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
+
+
+### Event: 'displayRemove'
+
+* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+
+Fired when a display is removed from the system.
+Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
+
+
+### Event: 'displayOrient'
+
+* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+
+Fired when a display changes orientation.
+Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
 
 ### sdl.video.displays
@@ -1409,7 +1436,7 @@ String values used to represent the power level of a joystick device.
 | `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
 | `'max'` | `SDL_JOYSTICK_POWER_MAX` |
 
-<a id="joystick-event-device-add"></a>
+<a id="joystick-event-deviceadd"></a>
 
 ### Event: 'deviceAdd'
 
@@ -1418,7 +1445,7 @@ String values used to represent the power level of a joystick device.
 Fired when a new joystick device becomes available.
 Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
 
-<a id="joystick-event-device-remove"></a>
+<a id="joystick-event-deviceremove"></a>
 
 ### Event: 'deviceRemove'
 
@@ -1665,7 +1692,7 @@ const mappings = text.split('\n')
 sdl.controller.addMappings(mappings)
 ```
 
-<a id="controller-event-device-add"></a>
+<a id="controller-event-deviceadd"></a>
 
 ### Event: 'deviceAdd'
 
@@ -1674,7 +1701,7 @@ sdl.controller.addMappings(mappings)
 Fired when a new controller device becomes available.
 Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
 
-<a id="controller-event-device-remove"></a>
+<a id="controller-event-deviceremove"></a>
 
 ### Event: 'deviceRemove'
 
@@ -1989,7 +2016,7 @@ String values used to represent how audio samples are stored in a Buffer.
 | `'f32sys'` | `AUDIO_F32SYS` | 32-bit floating point samples in native byte order |
 | `'f32'` | `AUDIO_F32` | alias for `'f32lsb'` |
 
-<a id="audio-event-device-add"></a>
+<a id="audio-event-deviceadd"></a>
 
 ### Event: 'deviceAdd'
 
@@ -1998,7 +2025,7 @@ String values used to represent how audio samples are stored in a Buffer.
 Fired when a new audio device becomes available.
 Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
 
-<a id="audio-event-device-remove"></a>
+<a id="audio-event-deviceremove"></a>
 
 ### Event: 'deviceRemove'
 

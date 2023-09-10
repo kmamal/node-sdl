@@ -4,7 +4,7 @@ const { make: makeJoystickDevice } = require('./device')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { JoystickInstance } = require('./joystick-instance')
 
-Globals.joystickDevices = Bindings.joystick_getDevices(false)
+Globals.joystickDevices = Bindings.joystick_getDevices()
 for (const joystickDevice of Globals.joystickDevices) {
 	makeJoystickDevice(joystickDevice)
 }

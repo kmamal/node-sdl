@@ -1,5 +1,6 @@
 
 module.exports = {
+	displays: [],
 	windows: {
 		all: new Map(),
 		focused: null,

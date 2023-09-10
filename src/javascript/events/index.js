@@ -1,6 +1,7 @@
 const Bindings = require('../bindings')
 const Globals = require('../globals')
 const Enums = require('../enums')
+const { video: videoModule } = require('../video')
 const { mapping } = require('../keyboard/key-mapping')
 const { joystick: joystickModule } = require('../joystick')
 const { controller: controllerModule } = require('../controller')
@@ -77,6 +78,24 @@ const poll = () => {
 		event.type = Enums.eventTypeNames[type]
 
 		switch (family) {
+			case Enums.eventFamily.display: {
+				const { displayIndex } = event
+				delete event.displayIndex
+
+				const oldDisplays = Globals.displays
+				Globals.displays = Bindings.video_getDisplays()
+				for (const display of Globals.displays) {
+					display.format = Enums.pixelFormatNames[display.format]
+				}
+				const newDisplays = Globals.displays
+
+				event.display = event.type === Enums.eventType.displayRemove
+					? oldDisplays[displayIndex]
+					: newDisplays[displayIndex]
+
+				videoModule.emit(event.type, event)
+			} break
+
 			case Enums.eventFamily.window: {
 				const { windowId } = event
 				delete event.windowId

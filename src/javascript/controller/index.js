@@ -7,7 +7,7 @@ const {
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { ControllerInstance } = require('./controller-instance')
 
-Globals.controllerDevices = Bindings.joystick_getDevices(false)
+Globals.controllerDevices = Bindings.joystick_getDevices()
 	.filter(filterControllerDevice)
 for (const controllerDevice of Globals.controllerDevices) {
 	makeControllerDevice(controllerDevice)
