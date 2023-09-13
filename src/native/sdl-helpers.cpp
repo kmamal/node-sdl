@@ -129,6 +129,7 @@ enum class EventFamily {
 	JOYSTICK_DEVICE,
 	JOYSTICK,
 	CONTROLLER,
+	SENSOR,
 	AUDIO_DEVICE,
 	CLIPBOARD,
 };
@@ -695,6 +696,22 @@ enum_getControllerButtons (Variant & buttons)
 }
 
 ErrorMessage *
+enum_getSensorTypes (Variant & types)
+{
+	MAKE_MAP(types);
+
+	SET_NUM(types, "unknown", SDL_SENSOR_UNKNOWN);
+	SET_NUM(types, "accelerometer", SDL_SENSOR_ACCEL);
+	SET_NUM(types, "gyroscope", SDL_SENSOR_GYRO);
+	SET_NUM(types, "accelerometerLeft", SDL_SENSOR_ACCEL_L);
+	SET_NUM(types, "gyroscopeLeft", SDL_SENSOR_GYRO_L);
+	SET_NUM(types, "accelerometerRight", SDL_SENSOR_ACCEL_R);
+	SET_NUM(types, "gyroscopeRight", SDL_SENSOR_GYRO_R);
+
+	return nullptr;
+}
+
+ErrorMessage *
 enum_getPowerStates (Variant & states)
 {
 	MAKE_MAP(states);
@@ -726,7 +743,8 @@ initialize (Variant & object)
 			| SDL_INIT_EVENTS
 			| SDL_INIT_JOYSTICK
 			| SDL_INIT_GAMECONTROLLER
-			| SDL_INIT_HAPTIC;
+			| SDL_INIT_HAPTIC
+			| SDL_INIT_SENSOR;
 		if (SDL_Init(subsystems) != 0) {
 			RETURN_ERROR("SDL_Init() error: %s\n", SDL_GetError());
 		}
@@ -1260,6 +1278,13 @@ packageEvent (const SDL_Event & event, Variant & object)
 				: EventType::BUTTON_UP));
 			SET_NUM(object, "controllerId", event.cbutton.which);
 			SET_NUM(object, "button", event.cbutton.button);
+			break;
+		}
+
+		case SDL_SENSORUPDATE: {
+			SET_NUM(object, "family", (int) EventFamily::SENSOR);
+			SET_NUM(object, "type", (int) EventType::UPDATE);
+			SET_NUM(object, "sensorId", event.sensor.which);
 			break;
 		}
 
@@ -2307,6 +2332,89 @@ controller_addMappings (char ** mappings, int length)
 	}
 	return nullptr;
 }
+
+
+ErrorMessage *
+sensor_getDevices (Variant & list)
+{
+	int num_devices = SDL_NumSensors();
+	if (num_devices < 0) {
+		RETURN_ERROR("SDL_NumSensors() error: %s\n", SDL_GetError());
+	}
+
+	MAKE_LIST(list);
+
+	for (int i = 0; i < num_devices; i++) {
+		Variant device;
+		MAKE_MAP(device);
+
+		SET_NUM(device, "_index", i);
+
+		int id = SDL_SensorGetDeviceInstanceID(i);
+		SET_NUM(device, "id", id);
+
+		int type = SDL_SensorGetDeviceType(i);
+		SET_NUM(device, "type", type);
+
+		const char * name = SDL_SensorGetDeviceName(i);
+		if (name == nullptr) {
+			RETURN_ERROR("SDL_SensorGetDeviceName(%d) error: %s\n", i, SDL_GetError());
+		}
+		SET_STRING(device, "name", name);
+
+		APPEND(list, device);
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+sensor_open (int index)
+{
+	SDL_Sensor * sensor = SDL_SensorOpen(index);
+	if (sensor == nullptr) {
+		RETURN_ERROR("SDL_SensorOpen(%d) error: %s\n", index, SDL_GetError());
+	}
+
+	return nullptr;
+}
+
+ErrorMessage *
+sensor_close (int sensor_id)
+{
+	SDL_Sensor * sensor = SDL_SensorFromInstanceID(sensor_id);
+	if (sensor == nullptr) {
+		RETURN_ERROR("SDL_SensorFromInstanceID(%d) error: %s\n", sensor_id, SDL_GetError());
+	}
+
+	SDL_SensorClose(sensor);
+
+	return nullptr;
+}
+
+ErrorMessage *
+sensor_getData (int sensor_id, Variant & object)
+{
+	SDL_Sensor * sensor = SDL_SensorFromInstanceID(sensor_id);
+	if (sensor == nullptr) {
+		RETURN_ERROR("SDL_SensorFromInstanceID(%d) error: %s\n", sensor_id, SDL_GetError());
+	}
+
+	Uint64 timestamp;
+	float data[3];
+	if (SDL_SensorGetDataWithTimestamp(sensor, &timestamp, data, 3) == -1) {
+		RETURN_ERROR("SDL_SensorGetDataWithTimestamp(%d) error: %s\n", sensor_id, SDL_GetError());
+	}
+
+	MAKE_MAP(object);
+	SET_NUM(object, "timestamp", timestamp);
+	SET_NUM(object, "x", data[0]);
+	SET_NUM(object, "y", data[1]);
+	SET_NUM(object, "z", data[2]);
+
+	return nullptr;
+}
+
 
 
 ErrorMessage *

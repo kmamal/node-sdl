@@ -6,11 +6,6 @@ module.exports = {
 		focused: null,
 		hovered: null,
 	},
-	audioDevices: {
-		playback: [],
-		recording: [],
-	},
-	audioInstances: new Map(),
 	joystickDevices: [],
 	joystickInstances: {
 		all: new Set(),
@@ -21,6 +16,15 @@ module.exports = {
 		all: new Set(),
 		byId: new Map(),
 	},
+	sensorInstances: {
+		all: new Set(),
+		byId: new Map(),
+	},
+	audioDevices: {
+		playback: [],
+		recording: [],
+	},
+	audioInstances: new Map(),
 
 	events: null, // Set later to { startPolling, stopPolling, poll }
 }

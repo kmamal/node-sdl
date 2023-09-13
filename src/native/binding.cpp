@@ -222,6 +222,15 @@ getEnums(napi_env env, napi_callback_info info)
 	}
 
 	{
+		SdlHelpers::Variant sensor_types;
+		CALL_SDL_HELPER(enum_getSensorTypes, sensor_types);
+
+		CALL_NAPI(fromVariant, sensor_types, &value);
+		CALL_NAPI(napi_create_string_latin1, "sensorType", 10, &key);
+		CALL_NAPI(napi_set_property, result, key, value);
+	}
+
+	{
 		SdlHelpers::Variant power_states;
 		CALL_SDL_HELPER(enum_getPowerStates, power_states);
 
@@ -1261,6 +1270,79 @@ controller_addMappings(napi_env env, napi_callback_info info)
 
 
 napi_value
+sensor_getDevices(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	SdlHelpers::Variant devices;
+	CALL_SDL_HELPER(sensor_getDevices, devices);
+
+	CALL_NAPI(fromVariant, devices, &result);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+sensor_open(napi_env env, napi_callback_info info)
+{
+	SdlHelpers::Variant object;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int index;
+	CALL_NAPI(napi_get_value_int32, argv[0], &index);
+
+	CALL_SDL_HELPER(sensor_open, index);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
+sensor_getData(napi_env env, napi_callback_info info)
+{
+	napi_value result = nullptr;
+
+	SdlHelpers::Variant object;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int sensor_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &sensor_id);
+
+	CALL_SDL_HELPER(sensor_getData, sensor_id, object);
+
+	CALL_NAPI(fromVariant, object, &result);
+
+	cleanup:
+	return result;
+}
+
+napi_value
+sensor_close(napi_env env, napi_callback_info info)
+{
+	SdlHelpers::Variant object;
+
+	napi_value argv[1];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int sensor_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &sensor_id);
+
+	CALL_SDL_HELPER(sensor_close, sensor_id);
+
+	cleanup:
+	return nullptr;
+}
+
+
+napi_value
 audio_getDevices(napi_env env, napi_callback_info info)
 {
 	napi_value result = nullptr;
@@ -1550,6 +1632,10 @@ init (napi_env env, napi_value exports)
 		{ "controller_open", NULL, controller_open, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "controller_close", NULL, controller_close, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "controller_addMappings", NULL, controller_addMappings, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "sensor_getDevices", NULL, sensor_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "sensor_open", NULL, sensor_open, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "sensor_getData", NULL, sensor_getData, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "sensor_close", NULL, sensor_close, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_getDevices", NULL, audio_getDevices, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_openDevice", NULL, audio_openDevice, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "audio_close", NULL, audio_close, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1564,7 +1650,7 @@ init (napi_env env, napi_value exports)
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 55, desc);
+	CALL_NAPI(napi_define_properties, exports, 59, desc);
 
 	cleanup:
 	return exports;

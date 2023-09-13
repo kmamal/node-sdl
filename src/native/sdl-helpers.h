@@ -44,6 +44,7 @@ ErrorMessage * enum_getPowerLevels (Variant & object);
 ErrorMessage * enum_getJoystickTypes (Variant & object);
 ErrorMessage * enum_getControllerAxes (Variant & object);
 ErrorMessage * enum_getControllerButtons (Variant & object);
+ErrorMessage * enum_getSensorTypes (Variant & object);
 ErrorMessage * enum_getPowerStates (Variant & object);
 
 ErrorMessage * initialize (Variant & object);
@@ -150,6 +151,11 @@ ErrorMessage * joystick_rumbleTriggers (
 ErrorMessage * controller_open (int index, Variant & object);
 ErrorMessage * controller_close (int controller_id);
 ErrorMessage * controller_addMappings (char ** mappings, int length);
+
+ErrorMessage * sensor_getDevices (Variant & list);
+ErrorMessage * sensor_open (int index);
+ErrorMessage * sensor_close (int sensor_id);
+ErrorMessage * sensor_getData (int sensor_id, Variant & object);
 
 ErrorMessage * audio_getDevices (bool capture, Variant & list);
 ErrorMessage * audio_openDevice (

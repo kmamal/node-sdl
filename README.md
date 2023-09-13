@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SDL bindings for Node.js.
-Provides window management, input events (keyboard, mouse, joystick, controller), audio playback and recording, clipboard manipulation, and battery status.
+Provides window management, input events (keyboard, mouse, joysticks, controllers, sensors), audio playback and recording, clipboard manipulation, and battery status.
 
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, arm-based Macs, and Raspberry Pi.
@@ -246,6 +246,16 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
     * [controllerInstance.closed](#controllerinstanceclosed)
     * [controllerInstance.close()](#controllerinstanceclose)
+* [sdl.sensor](#sdlsensor)
+  * [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandardgravity)
+  * [sdl.sensor.devices](#sdlsensordevices)
+  * [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
+  * [class SensorInstance](#class-sensorinstance)
+    * [Event: 'update'](#sensor-instance-event-update)
+    * [sensorInstance.device](#sensorinstancedevice)
+    * [sensorInstance.data](#sensorinstancedata)
+    * [sensorInstance.closed](#sensorinstanceclosed)
+    * [sensorInstance.close()](#sensorinstanceclose)
 * [sdl.audio](#sdlaudio)
   * [Audio data](#audio-data)
   * [Sample formats](#sample-formats)
@@ -1936,6 +1946,95 @@ A closed instance object should not be used any further.
 
 Closes the instance.
 
+
+## sdl.sensor
+
+### sdl.sensor.STANDARD_GRAVITY
+
+* `<number>`
+
+The readings from accelerometers will include the force of gravity, so a device at rest will have an value of `STANDARD_GRAVITY` away from the center of the earth.
+Use this constant to correct for that if your application requires it.
+
+### sdl.sensor.devices
+
+* `<object>[]`
+  * `id: <number>` The unique id of the device.
+  * `name: <string>` The name of the device.
+  * `type: <string>` Will be either `'accelerometer'`, `'gyroscope'`, or `'unknown'`.
+  * `side: <string | null>` Some sensors (such as those on the Joy-Con controller) have a `'left'` or `'right'` side, otherwise this value will be `null`.
+
+A list of all the detected sensor devices.
+Sample output:
+
+// TODO
+
+### sdl.sensor.openDevice(device)
+
+* `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) that should be opened.
+* Returns: [`<SensorInstance>`](#class-sensorinstance) an object representing the opened sensor device instance.
+
+Initializes a sensor device and returns a corresponding instance.
+
+## class SensorInstance
+
+This class is not directly exposed by the API so you can't use it with the `new` operator.
+Instead, objects returned by [`sdl.sensor.openDevice()`](#sdlsensoropendevicedevice) are of this type.
+
+<a id="sensor-instance-event-update"></a>
+
+### Event: 'update'
+
+Fired when the sensor's data changes.
+Get the new data by accessing [`sensorInstance.data`](#sensorInstancedata)
+
+<a id="sensor-instance-event-close"></a>
+
+### Event: 'close'
+
+Fired when the instance is about to close.
+Handle cleanup here.
+
+### sensorInstance.device
+
+* `<object>`
+
+The [device](#sdlsensordevices) from which this instance was opened.
+
+### sensorInstance.data
+
+* `<object>`
+  * `timestamp: <number | null>` The time this measurement was taken **in microseconds**, or `null` if that's not available.
+  * `x: <number>` X axis value.
+  * `y: <number>` Y axis value.
+  * `z: <number>` Z axis value.
+
+An object reporting the latest measurement from the sensor.
+
+For accelerometers, the values correspond to the current acceleration in meters per second squared.
+This measurement includes the force of gravity, so a device at rest will have an value of [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity) away from the center of the earth.
+
+For gyroscopes, the values correspond to the current rate of rotation in radians per second.
+The rotation is positive in the counter-clockwise direction.
+That is, an observer looking from a positive location on one of the axes would see positive rotation on that axis when it appeared to be rotating counter-clockwise.
+
+For phones held in portrait mode and game controllers held in front of you, the axes are defined as follows:
+* -X ... +X : left ... right
+* -Y ... +Y : bottom ... top
+* -Z ... +Z : farther ... closer
+
+### sensorInstance.closed
+
+* `<boolean>`
+
+Will be `true` if the instance is closed.
+A closed instance object should not be used any further.
+
+### sensorInstance.close()
+
+Closes the instance.
+
+
 ## sdl.audio
 
 ### Audio data
@@ -2357,11 +2456,11 @@ Changes the text contents of the clipboard.
 ### sdl.power.info
 
 * `<object>`
-  * `state: <string>` One of `'unknown'`, `'noBattery'`, `'battery'`, `'charging'`, `'changed'`.
+  * `state: <string>` One of `'unknown'`, `'noBattery'`, `'battery'`, `'charging'`, `'charged'`.
   * `seconds: <number | null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
   * `percent: <number | null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
 
-The curent power state of the device.
+The curent power information of the device.
 
 
 ## Building from source

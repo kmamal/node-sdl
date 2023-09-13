@@ -219,6 +219,22 @@ export namespace Events {
 
 	}
 
+	namespace Sensor {
+
+		interface SensorEvent extends BaseEvent {}
+
+		interface Update extends SensorEvent {
+			readonly type: 'update'
+		}
+
+		interface Close extends SensorEvent { readonly type: 'close' }
+
+		type Any
+			= Update
+			| Close
+
+	}
+
 	namespace ControllerDevice {
 
 		interface DeviceEvent extends BaseEvent {
@@ -965,6 +981,54 @@ export namespace Sdl {
 			readonly devices: Device[]
 
 			openDevice (device: Device): ControllerInstance
+		}
+
+	}
+
+	namespace Sensor {
+
+		type Type
+			= 'unknown'
+			| 'accelerometer'
+			| 'gyroscope'
+
+		type Side
+			= 'left'
+			| 'right'
+
+		interface Device {
+			readonly id: number
+			readonly name: string
+			readonly type: Type
+			readonly side: Side | null
+		}
+
+		interface Data {
+			timestamp: number | null,
+			x: number,
+			y: number,
+			z: number,
+		}
+
+		class SensorInstance {
+			on (event: 'update', listener: (event: Events.Sensor.Update) => void): this
+			on (event: 'close', listener: (event: Events.Sensor.Close) => void): this
+			on (event: '*', listener: (event: Events.Sensor.Any) => void): this
+
+			readonly device: Device
+
+			readonly data: Data
+
+			readonly closed: boolean
+			close (): void
+		}
+
+		interface Module {
+			STANDARD_GRAVITY: 9.80665,
+
+			readonly devices: Device[]
+
+			openDevice (device: Device): SensorInstance
 		}
 
 	}

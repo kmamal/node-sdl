@@ -350,6 +350,26 @@ const poll = () => {
 				}
 			} break
 
+			case Enums.eventFamily.sensor: {
+				const { sensorId } = event
+				delete event.sensorId
+
+				const collection = Globals.sensorInstances.byId.get(sensorId)
+				if (!collection) { continue }
+
+				switch (type) {
+					case Enums.eventType.update: {
+						for (const sensorInstance of collection.values()) {
+							sensorInstance.emit(event.type, event)
+						}
+					} break
+
+					default: continue
+				}
+
+				//
+			} break
+
 			case Enums.eventFamily.audioDevice: {
 				const { isRecorder } = event
 				delete event.isRecorder
