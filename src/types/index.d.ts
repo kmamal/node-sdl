@@ -1172,6 +1172,7 @@ export namespace Sdl {
 		readonly mouse: Mouse.Module
 		readonly joystick: Joystick.Module
 		readonly controller: Controller.Module
+		readonly sensor: Sensor.Module
 		readonly audio: Audio.Module
 		readonly clipboard: Clipboard.Module
 		readonly power: Power.Module

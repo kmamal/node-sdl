@@ -366,8 +366,6 @@ const poll = () => {
 
 					default: continue
 				}
-
-				//
 			} break
 
 			case Enums.eventFamily.audioDevice: {
