@@ -1541,7 +1541,7 @@ window_create (
 			#if defined(__LINUX__)
 				*pointer = info.info.x11.window;
 			#elif defined(__WIN32__)
-				*pointer = info.info.x11.window;
+				*pointer = info.info.win.window;
 			#elif defined(__MACOSX__)
 				*pointer = getCocoaGlView(info.info.cocoa.window);
 			#endif
