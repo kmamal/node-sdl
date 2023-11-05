@@ -2,7 +2,7 @@
 
 #include "cocoa-window.h"
 
-extern "C" CALayer * getView(NSWindow * window) {
+extern "C" CALayer * getCocoaView(NSWindow * window) {
 	NSView * view = window.contentView;
 	[view setWantsLayer:YES];
 	return view.layer;

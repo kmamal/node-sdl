@@ -48,6 +48,7 @@ class Window extends EventsViaPoll {
 			accelerated = true,
 			vsync = true,
 			opengl = false,
+			webgpu = false,
 			skipTaskbar = false,
 			popupMenu = false,
 			tooltip = false,
@@ -74,12 +75,14 @@ class Window extends EventsViaPoll {
 		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
+		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
 		if (typeof skipTaskbar !== 'boolean') { throw Object.assign(new Error("skipTaskbar must be a boolean"), { skipTaskbar }) }
 		if (typeof popupMenu !== 'boolean') { throw Object.assign(new Error("popupMenu must be a boolean"), { popupMenu }) }
 		if (typeof tooltip !== 'boolean') { throw Object.assign(new Error("tooltip must be a boolean"), { tooltip }) }
 		if (typeof utility !== 'boolean') { throw Object.assign(new Error("utility must be a boolean"), { utility }) }
 		if (display && (Number.isFinite(x) || Number.isFinite(y))) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
+		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 
 		let displayIndex = 0
 		if (display) {
@@ -104,6 +107,7 @@ class Window extends EventsViaPoll {
 			accelerated,
 			vsync,
 			opengl,
+			webgpu,
 			skipTaskbar,
 			popupMenu,
 			tooltip,
@@ -132,6 +136,7 @@ class Window extends EventsViaPoll {
 		this._title = title
 		this._visible = visible
 		this._opengl = opengl
+		this._webgpu = webgpu
 
 		this._focused = false
 		this._hovered = false
@@ -256,6 +261,9 @@ class Window extends EventsViaPoll {
 	setAccelerated (accelerated) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
+		if (this._opengl) { throw new Error("can't call setAccelerated in opengl mode") }
+		if (this._webgpu) { throw new Error("can't call setAccelerated in webgpu mode") }
+
 		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
 
 		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
@@ -265,12 +273,16 @@ class Window extends EventsViaPoll {
 	setVsync (vsync) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
+		if (this._opengl) { throw new Error("can't call setVsync in opengl mode") }
+		if (this._webgpu) { throw new Error("can't call setVsync in webgpu mode") }
+
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 
 		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
 	}
 
 	get opengl () { return this._opengl }
+	get webgpu () { return this._webgpu }
 	get native () { return this._native }
 
 	get minimized () { return this._minimized }
@@ -325,6 +337,7 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
+		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
 		const _format = Enums.pixelFormat[format] ?? null
 

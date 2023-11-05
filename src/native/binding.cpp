@@ -321,7 +321,7 @@ window_create(napi_env env, napi_callback_info info)
 	int * height = nullptr;
 	void * native_pointer = nullptr;
 
-	napi_value argv[18];
+	napi_value argv[19];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
@@ -360,7 +360,7 @@ window_create(napi_env env, napi_callback_info info)
 	}
 
 	bool visible, fullscreen, resizable, borderless, always_on_top,
-		accelerated, vsync, opengl,
+		accelerated, vsync, opengl, webgpu,
 		skip_taskbar, popup_menu, tooltip, utility;
 	CALL_NAPI(napi_get_value_bool, argv[6], &visible);
 	CALL_NAPI(napi_get_value_bool, argv[7], &fullscreen);
@@ -370,21 +370,22 @@ window_create(napi_env env, napi_callback_info info)
 	CALL_NAPI(napi_get_value_bool, argv[11], &accelerated);
 	CALL_NAPI(napi_get_value_bool, argv[12], &vsync);
 	CALL_NAPI(napi_get_value_bool, argv[13], &opengl);
-	CALL_NAPI(napi_get_value_bool, argv[14], &skip_taskbar);
-	CALL_NAPI(napi_get_value_bool, argv[15], &popup_menu);
-	CALL_NAPI(napi_get_value_bool, argv[16], &tooltip);
-	CALL_NAPI(napi_get_value_bool, argv[17], &utility);
+	CALL_NAPI(napi_get_value_bool, argv[14], &webgpu);
+	CALL_NAPI(napi_get_value_bool, argv[15], &skip_taskbar);
+	CALL_NAPI(napi_get_value_bool, argv[16], &popup_menu);
+	CALL_NAPI(napi_get_value_bool, argv[17], &tooltip);
+	CALL_NAPI(napi_get_value_bool, argv[18], &utility);
 
-	int pixel_width, pixel_height, window_id, native_pointer_size;
+	int pixel_width, pixel_height, window_id, native_size;
 
 	CALL_SDL_HELPER(window_create,
 		title, display,
 		&x, &y, &width, &height,
 		&pixel_width, &pixel_height,
 		visible, &fullscreen, &resizable, &borderless, &always_on_top,
-		&accelerated, &vsync, opengl,
+		&accelerated, &vsync, opengl, webgpu,
 		&skip_taskbar, &popup_menu, &tooltip, &utility,
-		&window_id, &native_pointer, &native_pointer_size
+		&window_id, &native_pointer, &native_size
 	);
 
 	napi_value key, value;
@@ -470,7 +471,7 @@ window_create(napi_env env, napi_callback_info info)
 
 	if (native_pointer) {
 		CALL_NAPI(napi_create_external_buffer,
-			native_pointer_size, native_pointer, freePointer, native_pointer,
+			native_size, native_pointer, freePointer, native_pointer,
 		&value);
 		CALL_NAPI(napi_create_string_latin1, "native", 6, &key);
 		CALL_NAPI(napi_set_property, result, key, value);

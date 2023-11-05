@@ -12,11 +12,11 @@ Prebuilt binaries are available for x64 architectures, arm-based Macs, and Raspb
 
 #### Canvas, WebGL, and WebGPU
 
-One goal of this project is to allow using Canvas (the 2D rendering context API), WebGL, and WebGPU without a browser.
-You can already use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) to draw on windows using WebGL.
-WebGPU is also working, but it's not been fully integrated: you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme) for compute and render, but it can't yet render directly to windows; that will come in a future version.
-Right now you have to go through an intermediate buffer.
-Same with the Canvas API, where you can use the [canvas](https://www.npmjs.com/package/canvas) package to draw to a buffer and then draw that to a window.
+One goal of this project is to allow using Canvas, WebGL, and WebGPU without a browser.
+You can use the [canvas](https://www.npmjs.com/package/canvas) package to render using the canvas API.
+For WebGL you can use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and for WebGPU you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme).
+Both WebGL and WebGPU support rendering directly to the window (without any intermediate buffer copying).
+Canvas still uses an intermediate buffer, but that might change in the future.
 
 
 ## Installation
@@ -65,7 +65,7 @@ window.render(width, height, width * 4, 'bgra32', buffer)
 import sdl from '@kmamal/sdl'
 import createContext from '@kmamal/gl'
 
-const window = sdl.video.createWindow({title: "WebGL", opengl: true })
+const window = sdl.video.createWindow({ title: "WebGL", opengl: true })
 const { pixelWidth: width, pixelHeight: height, native } = window
 const gl = createContext(width, height, { window: native })
 
@@ -73,6 +73,38 @@ const gl = createContext(width, height, { window: native })
 gl.clearColor(1, 0, 0, 1)
 gl.clear(gl.COLOR_BUFFER_BIT)
 gl.swap()
+```
+
+### WebGPU
+```js
+import sdl from '@kmamal/sdl'
+import gpu from '@kmamal/gpu'
+
+const window = sdl.video.createWindow({ title: "WebGPU", webgpu: true })
+
+const instance = gpu.create([])
+const adapter = await instance.requestAdapter()
+const device = await adapter.requestDevice()
+
+const renderer = gpu.renderGPUDeviceToWindow({ device, window })
+
+// Clear screen to red
+const commandEncoder = device.createCommandEncoder()
+const renderPass = commandEncoder.beginRenderPass({
+	colorAttachments: [
+		{
+			view: renderer.getCurrentTextureView(),
+			clearValue: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 },
+			loadOp: 'clear',
+			storeOp: 'store',
+		},
+	],
+})
+renderPass.end()
+device.queue.submit([ commandEncoder.finish() ])
+
+renderer.swap()
+
 ```
 
 There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples).
@@ -148,6 +180,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.vsync](#windowvsync)
     * [window.setVsync(vsync)](#windowsetvsyncvsync)
     * [window.opengl](#windowopengl)
+    * [window.webgpu](#windowwebgpu)
     * [window.native](#windownative)
     * [window.maximized](#windowmaximized)
     * [window.maximize()](#windowmaximize)
@@ -542,6 +575,7 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   * `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
   * `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
   * `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
+  * `webgpu: <boolean>` Set to `true` to create an WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
   * `skipTaskbar: <boolean>` X11 only. Set to `true` to not add this window to the taskbar. Default: `false`
   * `popupMenu: <boolean>` X11 only. Set to `true` to treat this window like a popup menu. Default: `false`
   * `tooltip: <boolean>` X11 only. Set to `true` to treat this window like a tooltip. Default: `false`
@@ -553,9 +587,11 @@ Creates a new window.
 The following restrictions apply:
 * If you specify the `display` option, you can't also specify the `x` or `y` options, and vice-versa.
 * The `resizable` and `borderless` options are mutually exclusive.
+* The `opengl` and `webgpu` options are mutually exclusive.
 * The `vsync` option only applies to windows that are also `accelerated`.
+* The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
 
-If you set the `opengl` option, then you can only render to the window with OpenGL calls.
+If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
 Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 ## class Window
@@ -867,6 +903,8 @@ Will be `true` if the window is using hardware accelerated rendering.
 
 Changes the window's accelerated property.
 
+If you have set the `opengl` or `webgpu` options, then calls to this function will fail.
+
 ### window.vsync
 
 * `<boolean>`
@@ -881,6 +919,8 @@ Note that vsync can only be used if that window is also [`accelerated`](#windowa
 
 Changes the window's vsync property.
 
+If you have set the `opengl` or `webgpu` options, then calls to this function will fail.
+
 ### window.opengl
 
 * `<boolean>`
@@ -889,12 +929,20 @@ Will be `true` if the window was created in OpenGl mode.
 In OpenGL mode, you can only render to the window with OpenGL calls.
 Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
+### window.webgpu
+
+* `<boolean>`
+
+Will be `true` if the window was created in WebGPU mode.
+In WebGPU mode, you can only render to the window with WebGPU calls.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+
 ### window.native
 
 * `<any>`
 
 Holds a copy of the native (platform-specific) representation of the window.
-Only used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme).
+Only used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme).
 
 ### window.maximized
 
@@ -974,6 +1022,9 @@ Such a window will always be treated as a utility window.
 
 Displays an image in the window.
 The provided image will be stretched over the entire window.
+
+If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 ### window.setIcon(width, height, stride, format, buffer)
 

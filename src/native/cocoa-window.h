@@ -3,6 +3,6 @@
 class CALayer;
 #endif
 
-extern "C" CALayer * getView(NSWindow *);
+extern "C" CALayer * getCocoaView(NSWindow *);
 
 extern "C" void reenableInertialScrolling();

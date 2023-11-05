@@ -67,11 +67,12 @@ ErrorMessage * window_create (
 	bool * accelerated,
 	bool * vsync,
 	bool opengl,
+	bool webgpu,
 	bool * skipTaskbar,
 	bool * popupMenu,
 	bool * tooltip,
 	bool * utility,
-	int * window_id, void ** native_pointer, int * native_pointer_size
+	int * window_id, void ** native_pointer, int * native_size
 );
 ErrorMessage * window_setTitle (int window_id, const char * title);
 ErrorMessage * window_setPosition (int window_id, int x, int y);

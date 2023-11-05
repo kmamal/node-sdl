@@ -437,6 +437,8 @@ export namespace Sdl {
 			readonly vsync: boolean
 			setVsync (vsync: boolean): void
 
+			readonly opengl: boolean
+			readonly webgpu: boolean
 			readonly native: unknown
 
 			readonly maximized: boolean
@@ -492,6 +494,7 @@ export namespace Sdl {
 				accelerated?: boolean
 				vsync?: boolean
 				opengl?: boolean
+				webgpu?: boolean
 				skipTaskbar?: boolean
 				popupMenu?: boolean
 				tooltip?: boolean

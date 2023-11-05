@@ -11,18 +11,28 @@
 
 
 #if defined(__LINUX__)
-	#define __WINDOW_TYPE__ Window
-	#define GET_WINDOW(x) x.info.x11.window
+	#define GL_NativeWindow Window
+	struct GPU_NativeData {
+		Display *display;
+		Window window;
+	};
+	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
 #elif defined(__WIN32__)
-	#define __WINDOW_TYPE__ HWND
-	#define GET_WINDOW(x) x.info.win.window
+	#define GL_NativeWindow HWND
+	struct GPU_NativeData {
+		HWND hwnd;
+		HINSTANCE hinstance;
+	};
+	#define GPU_WINDOW_FLAG 0
 #elif defined(__MACOSX__)
 	#include "cocoa-window.h"
-	#define __WINDOW_TYPE__ CALayer *
-	#define GET_WINDOW(x) getView(x.info.cocoa.window)
+	#define GL_NativeWindow CALayer *
+	struct GPU_NativeData {
+		CALayer *layer;
+	};
+	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
+	#define GET_WINDOW(x) getCocoaView(x.info.cocoa.window)
 #endif
-
-typedef __WINDOW_TYPE__ NativeWindow;
 
 
 #define RETURN_ERROR(...) do { \
@@ -881,21 +891,6 @@ initialize (Variant & object)
 
 
 ErrorMessage *
-_windowGetPixelSize(SDL_Window * window, int * pixel_width, int * pixel_height)
-{
-	SDL_Renderer * renderer = SDL_GetRenderer(window);
-	if (renderer == nullptr) {
-		RETURN_ERROR("SDL_GetRenderer() error: %s\n", SDL_GetError());
-	}
-
-	if (SDL_GetRendererOutputSize(renderer, pixel_width, pixel_height) != 0) {
-		RETURN_ERROR("SDL_GetRendererOutputSize() error: %s\n", SDL_GetError());
-	}
-
-	return nullptr;
-}
-
-ErrorMessage *
 _windowUpdateTexture(
 	SDL_Window * window,
 	SDL_Renderer * renderer,
@@ -951,8 +946,7 @@ _windowUpdateRenderer(
 	ErrorMessage * error;
 
 	int pixel_width, pixel_height;
-	error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
-	if (error != nullptr) { return error; }
+	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 	error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, nullptr);
 	if (error != nullptr) { return error; }
@@ -1064,8 +1058,7 @@ packageEvent (const SDL_Event & event, Variant & object)
 					}
 
 					int pixel_width, pixel_height;
-					ErrorMessage * error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
-					if (error != nullptr) { return error; }
+					SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 					SET_NUM(object, "type", (int) EventType::RESIZE);
 					SET_NUM(object, "width", event.window.data1);
@@ -1475,11 +1468,12 @@ window_create (
 	bool * accelerated,
 	bool * vsync,
 	bool opengl,
+	bool webgpu,
 	bool * skip_taskbar,
 	bool * popup_menu,
 	bool * tooltip,
 	bool * utility,
-	int * window_id, void ** native_pointer, int * native_pointer_size
+	int * window_id, void ** native_pointer, int * native_size
 ) {
 	if (*x == nullptr) {
 		*x = (int *) malloc(sizeof(int));
@@ -1504,17 +1498,22 @@ window_create (
 		| (*borderless ? SDL_WINDOW_BORDERLESS : 0)
 		| (*always_on_top ? SDL_WINDOW_ALWAYS_ON_TOP : 0)
 		| (opengl ? SDL_WINDOW_OPENGL : 0)
+		| (webgpu ? GPU_WINDOW_FLAG : 0)
 		| (*skip_taskbar ? SDL_WINDOW_SKIP_TASKBAR : 0)
 		| (*popup_menu ? SDL_WINDOW_POPUP_MENU : 0)
 		| (*tooltip ? SDL_WINDOW_TOOLTIP : 0)
-		| (*utility ? SDL_WINDOW_UTILITY : 0);
+		| (*utility ? SDL_WINDOW_UTILITY : 0)
+		;
 
 	SDL_Window * window = SDL_CreateWindow(title, **x, **y, **width, **height, desired_flags);
 	if (window == nullptr) {
 		RETURN_ERROR("SDL_CreateWindow() error: %s\n", SDL_GetError());
 	}
 
-	SDL_GetWindowPosition(window, *x, *y);
+	*window_id = SDL_GetWindowID(window);
+	if (*window_id == 0) {
+		RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
+	}
 
 	int actual_flags = SDL_GetWindowFlags(window);
 	*fullscreen = actual_flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -1526,12 +1525,10 @@ window_create (
 	*tooltip = actual_flags & SDL_WINDOW_TOOLTIP;
 	*utility = actual_flags & SDL_WINDOW_UTILITY;
 
-	*window_id = SDL_GetWindowID(window);
-	if (*window_id == 0) {
-		RETURN_ERROR("SDL_GetWindowID() error: %s\n", SDL_GetError());
-	}
+	SDL_GetWindowPosition(window, *x, *y);
+	SDL_GetWindowSizeInPixels(window, pixel_width, pixel_height);
 
-	if (opengl) {
+	if (opengl || webgpu) {
 		SDL_SysWMinfo info;
 		SDL_VERSION(&(info.version));
 		bool got_info = SDL_GetWindowWMInfo(window, &info);
@@ -1539,20 +1536,41 @@ window_create (
 			RETURN_ERROR("SDL_GetWindowWMInfo(%d) error: %s\n", *window_id, SDL_GetError());
 		}
 
-		int size = sizeof(NativeWindow);
-		NativeWindow * pointer = (NativeWindow *) malloc(size);
-		*pointer = GET_WINDOW(info);
-		*native_pointer = pointer;
-		*native_pointer_size = size;
+		if (opengl) {
+			int size = sizeof(GL_NativeWindow);
+			GL_NativeWindow *pointer = (GL_NativeWindow *) malloc(size);
+			#if defined(__LINUX__)
+				*pointer = info.info.x11.window;
+			#elif defined(__WIN32__)
+				*pointer = info.info.x11.window;
+			#elif defined(__MACOSX__)
+				*pointer = getCocoaView(info.info.cocoa.window);
+			#endif
+
+			*native_pointer = pointer;
+			*native_size = size;
+		} else if (webgpu) {
+			int size = sizeof(GPU_NativeData);
+			GPU_NativeData *pointer = (GPU_NativeData *) malloc(size);
+
+			#if defined(__LINUX__)
+				pointer->display = info.info.x11.display;
+				pointer->window = info.info.x11.window;
+			#elif defined(__WIN32__)
+				pointer->hwnd = info.info.win.window;
+				pointer->hinstance = info.info.win.hinstance;
+			#elif defined(__MACOSX__)
+				pointer->layer = getCocoaView(info.info.cocoa.window);
+			#endif
+
+			*native_pointer = pointer;
+			*native_size = size;
+		}
 	}
-
-	ErrorMessage * error;
-
-	error = _windowUpdateRenderer(window, accelerated, vsync);
-	if (error != nullptr) { return error; }
-
-	error = _windowGetPixelSize(window, pixel_width, pixel_height);
-	if (error != nullptr) { return error; }
+	else {
+		ErrorMessage * error = _windowUpdateRenderer(window, accelerated, vsync);
+		if (error != nullptr) { return error; }
+	}
 
 	if (visible) { SDL_ShowWindow(window); }
 
@@ -1595,8 +1613,7 @@ window_setSize (int window_id, int width, int height, int * pixel_width, int * p
 
 	SDL_SetWindowSize(window, width, height);
 
-	ErrorMessage * error = _windowGetPixelSize(window, pixel_width, pixel_height);
-	if (error != nullptr) { return error; }
+	SDL_GetWindowSizeInPixels(window, pixel_width, pixel_height);
 
 	return nullptr;
 }
@@ -1796,8 +1813,7 @@ window_render (
 	}
 
 	int pixel_width, pixel_height;
-	ErrorMessage * error = _windowGetPixelSize(window, &pixel_width, &pixel_height);
-	if (error != nullptr) { return error; }
+	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 	if (pixel_width != texture_width || pixel_height != texture_height) {
 		ErrorMessage * error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, &texture);
@@ -1851,14 +1867,13 @@ window_destroy (int window_id)
 	}
 
 	SDL_Renderer * renderer = SDL_GetRenderer(window);
-	if (renderer == nullptr) {
-		RETURN_ERROR("SDL_GetRenderer(%d) error: %s\n", window_id, SDL_GetError());
+	if (renderer != nullptr) {
+		SDL_Texture * texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
+
+		SDL_DestroyTexture(texture);
+		SDL_DestroyRenderer(renderer);
 	}
 
-	SDL_Texture * texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
-
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
 	return nullptr;
