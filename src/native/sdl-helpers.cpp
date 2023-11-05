@@ -31,7 +31,6 @@
 		CALayer *layer;
 	};
 	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
-	#define GET_WINDOW(x) getCocoaView(x.info.cocoa.window)
 #endif
 
 
@@ -1544,7 +1543,7 @@ window_create (
 			#elif defined(__WIN32__)
 				*pointer = info.info.x11.window;
 			#elif defined(__MACOSX__)
-				*pointer = getCocoaView(info.info.cocoa.window);
+				*pointer = getCocoaGlView(info.info.cocoa.window);
 			#endif
 
 			*native_pointer = pointer;
@@ -1560,7 +1559,7 @@ window_create (
 				pointer->hwnd = info.info.win.window;
 				pointer->hinstance = info.info.win.hinstance;
 			#elif defined(__MACOSX__)
-				pointer->layer = getCocoaView(info.info.cocoa.window);
+				pointer->layer = getCocoaGpuView(info.info.cocoa.window);
 			#endif
 
 			*native_pointer = pointer;
