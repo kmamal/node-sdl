@@ -13,8 +13,8 @@ extern "C" CALayer * getCocoaGpuView(NSWindow * window) {
 	NSView * view = window.contentView;
 	[view setWantsLayer:YES];
 	[view setLayer:[CAMetalLayer layer]];
-	[[view layer] setContentsScale:[nsWindow backingScaleFactor]];
-	return [view layer];
+	[[view layer] setContentsScale:[window backingScaleFactor]];
+	return view.layer;
 }
 
 extern "C" void reenableInertialScrolling() {
