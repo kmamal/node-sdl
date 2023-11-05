@@ -1,11 +1,12 @@
 #include <Cocoa/Cocoa.h>
+#import <QuartzCore/CAMetalLayer.h>
 
 #include "cocoa-window.h"
 
 extern "C" CALayer * getCocoaGlView(NSWindow * window) {
 	NSView * view = window.contentView;
 	[view setWantsLayer:YES];
-	[[view layer] setContentsScale:[nsWindow backingScaleFactor]];
+	[[view layer] setContentsScale:[window backingScaleFactor]];
 	return view.layer;
 }
 
