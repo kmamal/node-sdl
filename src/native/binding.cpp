@@ -769,6 +769,33 @@ window_restore(napi_env env, napi_callback_info info)
 }
 
 napi_value
+window_render(napi_env env, napi_callback_info info)
+{
+	napi_value argv[6];
+	size_t argc = sizeof(argv) / sizeof(napi_value);
+	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
+
+	int window_id;
+	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
+
+	int w, h, stride;
+	CALL_NAPI(napi_get_value_int32, argv[1], &w);
+	CALL_NAPI(napi_get_value_int32, argv[2], &h);
+	CALL_NAPI(napi_get_value_int32, argv[3], &stride);
+
+	unsigned int format;
+	CALL_NAPI(napi_get_value_uint32, argv[4], &format);
+
+	void * pixels;
+	CALL_NAPI(napi_get_buffer_info, argv[5], &pixels, nullptr);
+
+	CALL_SDL_HELPER(window_render, window_id, w, h, stride, format, pixels);
+
+	cleanup:
+	return nullptr;
+}
+
+napi_value
 window_setIcon(napi_env env, napi_callback_info info)
 {
 	napi_value argv[6];
@@ -796,27 +823,19 @@ window_setIcon(napi_env env, napi_callback_info info)
 }
 
 napi_value
-window_render(napi_env env, napi_callback_info info)
+window_flash(napi_env env, napi_callback_info info)
 {
-	napi_value argv[6];
+	napi_value argv[2];
 	size_t argc = sizeof(argv) / sizeof(napi_value);
 	CALL_NAPI(napi_get_cb_info, info, &argc, argv, nullptr, nullptr);
 
 	int window_id;
 	CALL_NAPI(napi_get_value_int32, argv[0], &window_id);
 
-	int w, h, stride;
-	CALL_NAPI(napi_get_value_int32, argv[1], &w);
-	CALL_NAPI(napi_get_value_int32, argv[2], &h);
-	CALL_NAPI(napi_get_value_int32, argv[3], &stride);
+	int type;
+	CALL_NAPI(napi_get_value_int32, argv[1], &type);
 
-	unsigned int format;
-	CALL_NAPI(napi_get_value_uint32, argv[4], &format);
-
-	void * pixels;
-	CALL_NAPI(napi_get_buffer_info, argv[5], &pixels, nullptr);
-
-	CALL_SDL_HELPER(window_render, window_id, w, h, stride, format, pixels);
+	CALL_SDL_HELPER(window_flash, window_id, type);
 
 	cleanup:
 	return nullptr;
@@ -1609,8 +1628,9 @@ init (napi_env env, napi_value exports)
 		{ "window_maximize", NULL, window_maximize, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_minimize", NULL, window_minimize, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_restore", NULL, window_restore, NULL, NULL, NULL, napi_enumerable, NULL },
-		{ "window_setIcon", NULL, window_setIcon, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_render", NULL, window_render, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_setIcon", NULL, window_setIcon, NULL, NULL, NULL, napi_enumerable, NULL },
+		{ "window_flash", NULL, window_flash, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "window_destroy", NULL, window_destroy, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getKey", NULL, keyboard_getKey, NULL, NULL, NULL, napi_enumerable, NULL },
 		{ "keyboard_getScancode", NULL, keyboard_getScancode, NULL, NULL, NULL, napi_enumerable, NULL },
@@ -1651,7 +1671,7 @@ init (napi_env env, napi_value exports)
 		{ "cleanup", NULL, cleanup, NULL, NULL, NULL, napi_enumerable, NULL }
 	};
 
-	CALL_NAPI(napi_define_properties, exports, 59, desc);
+	CALL_NAPI(napi_define_properties, exports, 60, desc);
 
 	cleanup:
 	return exports;

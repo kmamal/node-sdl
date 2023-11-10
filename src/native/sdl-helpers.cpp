@@ -1760,30 +1760,6 @@ window_restore (int window_id)
 }
 
 ErrorMessage *
-window_setIcon (
-	int window_id,
-	int w, int h, int stride,
-	unsigned int format,
-	void * pixels
-) {
-	SDL_Window * window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
-	}
-
-	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
-	if (surface == nullptr) {
-		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
-	}
-
-	SDL_SetWindowIcon(window, surface);
-
-	SDL_FreeSurface(surface);
-
-	return nullptr;
-}
-
-ErrorMessage *
 window_render (
 	int window_id,
 	int w, int h, int stride,
@@ -1853,6 +1829,52 @@ window_render (
 
 	SDL_FreeSurface(src_surface);
 	SDL_FreeSurface(dst_surface);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_setIcon (
+	int window_id,
+	int w, int h, int stride,
+	unsigned int format,
+	void * pixels
+) {
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+	if (surface == nullptr) {
+		RETURN_ERROR("SDL_CreateRGBSurfaceWithFormatFrom(%d, %d, %d, %d) error: %s\n", window_id, w, h, format, SDL_GetError());
+	}
+
+	SDL_SetWindowIcon(window, surface);
+
+	SDL_FreeSurface(surface);
+
+	return nullptr;
+}
+
+ErrorMessage *
+window_flash (int window_id, int type)
+{
+	SDL_Window * window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		RETURN_ERROR("SDL_GetWindowFromID(%d) error: %s\n", window_id, SDL_GetError());
+	}
+
+	SDL_FlashOperation op;
+	switch (type) {
+		case 2: op = SDL_FLASH_UNTIL_FOCUSED; break;
+		case 1: op = SDL_FLASH_BRIEFLY; break;
+		default: op = SDL_FLASH_CANCEL; break;
+	}
+
+	if (SDL_FlashWindow(window, op) != 0) {
+		RETURN_ERROR("SDL_FlashWindow(%d, %d) error: %s\n", window_id, type, SDL_GetError());
+	}
 
 	return nullptr;
 }

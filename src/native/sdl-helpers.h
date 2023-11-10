@@ -94,18 +94,19 @@ ErrorMessage * window_hide (int window_id);
 ErrorMessage * window_maximize (int window_id);
 ErrorMessage * window_minimize (int window_id);
 ErrorMessage * window_restore (int window_id);
-ErrorMessage * window_setIcon (
-	int window_id,
-	int w, int h, int stride,
-	unsigned int format,
-	void * pixels
-);
 ErrorMessage * window_render (
 	int window_id,
 	int w, int h, int stride,
 	unsigned int format,
 	void * pixels
 );
+ErrorMessage * window_setIcon (
+	int window_id,
+	int w, int h, int stride,
+	unsigned int format,
+	void * pixels
+);
+ErrorMessage * window_flash (int window_id, int type);
 ErrorMessage * window_destroy (int window_id);
 
 ErrorMessage * keyboard_getKey (int scancode, const char ** key);

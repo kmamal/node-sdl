@@ -463,6 +463,9 @@ export namespace Sdl {
 
 			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
 
+			flash (untilFocused: boolean): void
+			stopFlashing (): void
+
 			readonly destroyed: boolean
 			destroy (): void
 		}

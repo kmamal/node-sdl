@@ -196,6 +196,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [window.utility](#windowutility)
     * [window.render(width, height, stride, format, buffer)](#windowrenderwidth-height-stride-format-buffer)
     * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
+    * [window.flash(untilFocused)](#windowflashuntilfocused)
+    * [window.stopFlashing()](#windowstopflashing)
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
 * [sdl.keyboard](#sdlkeyboard)
@@ -836,8 +838,7 @@ Will be `true` if the window is visible.
 
 ### window.show([show])
 
-* `show: <boolean>` Set to `true` to make the window visible, `false` to hide it.
-Default: `true`
+* `show: <boolean>` Set to `true` to make the window visible, `false` to hide it. Default: `true`
 
 Shows or hides the window.
 
@@ -1031,6 +1032,17 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display as the icon of the window.
 
 Set's the window's icon, usually displayed in the title bar and the taskbar.
+
+### window.flash(untilFocused)
+
+* `untilFocused: <boolean>` Whether to keep flashing the window until the user focuses it. Default: `false`
+
+Flash the window briefly to get attention.
+If `untilFocused` is set, the window will flash until the user focuses it.
+
+### window.stopFlashing()
+
+Stop the window from flashing.
 
 ### window.destroyed
 
@@ -1429,8 +1441,7 @@ The hotspot represents the pixel that is considered to be under the mouse.
 
 ### sdl.mouse.showCursor([show])
 
-* `show: <boolean>` If `true` then the mouse cursor will be visible.
-Default `true`.
+* `show: <boolean>` If `true` then the mouse cursor will be visible. Default: `true`
 
 Changes the visibility of the mouse cursor.
 
@@ -1440,8 +1451,7 @@ Equivalent to [`sdl.mouse.showCursor(false)`](#sdlmouseshowcursorshow).
 
 ### sdl.mouse.capture([capture])
 
-* `capture: <boolean>` If `true` the mouse will be captured by the current window.
-Default `true`.
+* `capture: <boolean>` If `true` the mouse will be captured by the current window. Default: `true`
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
 
@@ -1690,9 +1700,9 @@ Will be `true` if the joystick has rumble motors.
 
 ### joystickInstance.rumble([low, [high, [duration]]])
 
-* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default `1`.
-* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default `1`.
-* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the joystick rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -1710,9 +1720,9 @@ Will be `true` if the joystick has rumble motors on the triggers.
 
 ### joystickInstance.rumbleTriggers([left, [right, [duration]]])
 
-* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default `1`.
-* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default `1`.
-* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the joystick triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -1954,9 +1964,9 @@ Will be `true` if the controller has rumble motors.
 
 ### controllerInstance.rumble([low, [high, [duration]]])
 
-* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default `1`.
-* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default `1`.
-* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the controller rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -1974,9 +1984,9 @@ Will be `true` if the controller has rumble motors on the triggers.
 
 ### controllerInstance.rumbleTriggers([left, [right, [duration]]])
 
-* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default `1`.
-* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default `1`.
-* `duration: <number>` The duration of the rumble, in ms. Default `1e3`.
+* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the controller triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -2283,10 +2293,10 @@ const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
   * `type: <string>`: Should be either `'playback'` or `'recording'`.
   * `name: <string>|<null>`: The name of the device. Optional.
 * `options: <object>`
-  * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default `1`.
-  * `frequency: <number>`: The sampling frequency in frames per second. Default `48e3`.
-  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default `'f32'`.
-  * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default `4096`.
+  * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
+  * `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
+  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
+  * `buffered: <number>`: Number of frames that will be buffered by the driver. Must be a power of `2`. Default: `4096`
 * Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
 
 Initializes an audio device for playback/recording and returns a corresponding instance.

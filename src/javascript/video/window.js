@@ -374,6 +374,20 @@ class Window extends EventsViaPoll {
 		Bindings.window_setIcon(this._id, width, height, stride, _format, buffer)
 	}
 
+	flash (untilFocused = false) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (typeof untilFocused !== 'boolean') { throw Object.assign(new Error("untilFocused must be a boolean"), { untilFocused }) }
+
+		Bindings.window_flash(this._id, untilFocused ? 2 : 1)
+	}
+
+	stopFlashing () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		Bindings.window_flash(this._id, 0)
+	}
+
 	get destroyed () { return this._destroyed }
 	destroy () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
