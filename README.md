@@ -91,14 +91,14 @@ const renderer = gpu.renderGPUDeviceToWindow({ device, window })
 // Clear screen to red
 const commandEncoder = device.createCommandEncoder()
 const renderPass = commandEncoder.beginRenderPass({
-	colorAttachments: [
-		{
-			view: renderer.getCurrentTextureView(),
-			clearValue: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 },
-			loadOp: 'clear',
-			storeOp: 'store',
-		},
-	],
+  colorAttachments: [
+    {
+      view: renderer.getCurrentTextureView(),
+      clearValue: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 },
+      loadOp: 'clear',
+      storeOp: 'store',
+    },
+  ],
 })
 renderPass.end()
 device.queue.submit([ commandEncoder.finish() ])
