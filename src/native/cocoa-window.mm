@@ -17,7 +17,7 @@ extern "C" CALayer * getCocoaGpuView(NSWindow * window) {
 		NSView * view = [window contentView];
 		[view setWantsLayer:YES];
 		[view setLayer:[CAMetalLayer layer]];
-		[[view layer] setContentsScale:[window backingScaleFactor]];
+		// [[view layer] setContentsScale:[window backingScaleFactor]];
 		return [view layer];
 	}
 }
