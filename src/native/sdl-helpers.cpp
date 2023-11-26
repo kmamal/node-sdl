@@ -1561,7 +1561,7 @@ window_create (
 
 				SDL_MetalView metal_view = SDL_Metal_CreateView(window);
 				SDL_SetWindowData(window, "metal_view", metal_view);
-				pointer->layer = SDL_Metal_GetLayer(metal_view);
+				pointer->layer = (CALayer *) SDL_Metal_GetLayer(metal_view);
 			#endif
 
 			*native_pointer = pointer;
