@@ -30,8 +30,7 @@
 	struct GPU_NativeData {
 		CALayer *layer;
 	};
-	// #define GPU_WINDOW_FLAG SDL_WINDOW_METAL
-	#define GPU_WINDOW_FLAG 0
+	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
 #endif
 
 
@@ -1565,7 +1564,6 @@ window_create (
 				// pointer->layer = (CALayer *) SDL_Metal_GetLayer(metal_view);
 			#endif
 
-			printf("%p %d %p\n", pointer, size, pointer->layer);
 			*native_pointer = pointer;
 			*native_size = size;
 		}
