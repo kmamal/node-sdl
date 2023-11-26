@@ -30,7 +30,8 @@
 	struct GPU_NativeData {
 		CALayer *layer;
 	};
-	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
+	// #define GPU_WINDOW_FLAG SDL_WINDOW_METAL
+	#define GPU_WINDOW_FLAG 0
 #endif
 
 
@@ -1557,11 +1558,11 @@ window_create (
 				pointer->hwnd = info.info.win.window;
 				pointer->hinstance = info.info.win.hinstance;
 			#elif defined(__MACOSX__)
-				// pointer->layer = getCocoaGpuView(info.info.cocoa.window);
+				pointer->layer = getCocoaGpuView(info.info.cocoa.window);
 
-				SDL_MetalView metal_view = SDL_Metal_CreateView(window);
-				SDL_SetWindowData(window, "metal_view", metal_view);
-				pointer->layer = (CALayer *) SDL_Metal_GetLayer(metal_view);
+				// SDL_MetalView metal_view = SDL_Metal_CreateView(window);
+				// SDL_SetWindowData(window, "metal_view", metal_view);
+				// pointer->layer = (CALayer *) SDL_Metal_GetLayer(metal_view);
 			#endif
 
 			*native_pointer = pointer;
@@ -1897,10 +1898,10 @@ window_destroy (int window_id)
 		SDL_DestroyRenderer(renderer);
 	}
 
-	#if defined(__MACOSX__)
-		SDL_MetalView metal_view = (SDL_MetalView) SDL_SetWindowData(window, "metal_view", nullptr);
-		if (metal_view != nullptr) { SDL_Metal_DestroyView(metal_view); }
-	#endif
+	// #if defined(__MACOSX__)
+	// 	SDL_MetalView metal_view = (SDL_MetalView) SDL_SetWindowData(window, "metal_view", nullptr);
+	// 	if (metal_view != nullptr) { SDL_Metal_DestroyView(metal_view); }
+	// #endif
 
 	SDL_DestroyWindow(window);
 
