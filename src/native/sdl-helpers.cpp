@@ -942,12 +942,10 @@ _windowUpdateRenderer(
 	*accelerated = info.flags & SDL_RENDERER_ACCELERATED;
 	*vsync = info.flags & SDL_RENDERER_PRESENTVSYNC;
 
-	ErrorMessage * error;
-
 	int pixel_width, pixel_height;
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-	error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, nullptr);
+	ErrorMessage * error = _windowUpdateTexture(window, renderer, pixel_width, pixel_height, nullptr);
 	if (error != nullptr) { return error; }
 
 	return nullptr;
@@ -1543,7 +1541,10 @@ window_create (
 			#elif defined(__WIN32__)
 				*pointer = info.info.win.window;
 			#elif defined(__MACOSX__)
-				*pointer = getCocoaGlView(info.info.cocoa.window);
+				SDL_MetalView *metal_view = SDL_Metal_CreateView(window);
+				SDL_SetWindowData(window, "metal_view", &metal_view);
+				*pointer = SDL_Metal_GetLayer(metal_view);
+				// *pointer = getCocoaGlView(info.info.cocoa.window);
 			#endif
 
 			*native_pointer = pointer;
@@ -1894,6 +1895,11 @@ window_destroy (int window_id)
 		SDL_DestroyTexture(texture);
 		SDL_DestroyRenderer(renderer);
 	}
+
+	#if defined(__MACOSX__)
+		SDL_MetalView *metal_view = (SDL_MetalView*) SDL_SetWindowData(window, "metal_view", nullptr);
+		if (metal_view != nullptr) { SDL_Metal_DestroyView(*metal_view); }
+	#endif
 
 	SDL_DestroyWindow(window);
 
@@ -2340,7 +2346,7 @@ controller_open (int index, Variant & object)
 	}
 
 	ErrorMessage * error = _controllerGetState(controller, object);
-	if (error) { return error; }
+	if (error != nullptr) { return error; }
 
 	return nullptr;
 }
@@ -2363,7 +2369,7 @@ controller_addMappings (char ** mappings, int length)
 {
 	for (int i = 0; i < length; i++) {
 		if (SDL_GameControllerAddMapping(mappings[i]) == -1) {
-			RETURN_ERROR("SDL_GameControllerAddMapping(%s) error: %s\n", mappings[i], error);
+			RETURN_ERROR("SDL_GameControllerAddMapping(%s) error: %s\n", mappings[i], SDL_GetError());
 		}
 	}
 	return nullptr;
