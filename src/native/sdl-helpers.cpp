@@ -1565,6 +1565,7 @@ window_create (
 				// pointer->layer = (CALayer *) SDL_Metal_GetLayer(metal_view);
 			#endif
 
+			printf("%p %d %p\n", pointer, size, pointer->layer);
 			*native_pointer = pointer;
 			*native_size = size;
 		}
