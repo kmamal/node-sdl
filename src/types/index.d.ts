@@ -3,23 +3,23 @@ export namespace Events {
 
 	interface BaseEvent { readonly type: string }
 
-	type PreventCallback = () => void
+	export type PreventCallback = () => void
 
-	namespace Display {
+	export namespace Display {
 
 		interface DisplayEvent extends BaseEvent {
 			readonly display: Sdl.Video.Display
 		}
 
-		interface Add extends DisplayEvent { readonly type: 'deviceAdd' }
-		interface Remove extends DisplayEvent { readonly type: 'deviceRemove' }
-		interface Orient extends DisplayEvent { readonly type: 'deviceOrient' }
+		export interface Add extends DisplayEvent { readonly type: 'deviceAdd' }
+		export interface Remove extends DisplayEvent { readonly type: 'deviceRemove' }
+		export interface Orient extends DisplayEvent { readonly type: 'deviceOrient' }
 
-		type Any = Add | Remove | Orient
+		export type Any = Add | Remove | Orient
 
 	}
 
-	namespace Window {
+	export namespace Window {
 
 		interface WindowEvent extends BaseEvent {}
 
@@ -35,13 +35,13 @@ export namespace Events {
 			readonly numlock: number
 		}
 
-		interface KeyDown extends KeyEvent {
+		export interface KeyDown extends KeyEvent {
 			readonly type: 'keyDown'
 			readonly repeat: number
 		}
-		interface KeyUp extends KeyEvent { readonly type: 'keyUp' }
+		export interface KeyUp extends KeyEvent { readonly type: 'keyUp' }
 
-		interface TextInput extends WindowEvent {
+		export interface TextInput extends WindowEvent {
 			readonly type: 'textInput'
 			readonly text: string
 		}
@@ -52,62 +52,62 @@ export namespace Events {
 			readonly touch: boolean
 		}
 
-		interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
+		export interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
 
 		interface MouseButtonEvent extends MouseEvent {
 			readonly button: number
 		}
 
-		interface MouseButtonDown extends MouseButtonEvent { readonly type: 'mouseButtonDown' }
-		interface MouseButtonUp extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
+		export interface MouseButtonDown extends MouseButtonEvent { readonly type: 'mouseButtonDown' }
+		export interface MouseButtonUp extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
 
-		interface MouseWheel extends MouseEvent {
+		export interface MouseWheel extends MouseEvent {
 			readonly type: 'flipped'
 			readonly dx: number
 			readonly dy: number
 			readonly flipped: boolean
 		}
 
-		interface Show extends WindowEvent { readonly type: 'show' }
-		interface Hide extends WindowEvent { readonly type: 'hide' }
-		interface Expose extends WindowEvent { readonly type: 'expose' }
-		interface Minimize extends WindowEvent { readonly type: 'minimize' }
-		interface Maximize extends WindowEvent { readonly type: 'maximize' }
-		interface Restore extends WindowEvent { readonly type: 'restore' }
-		interface Move extends WindowEvent {
+		export interface Show extends WindowEvent { readonly type: 'show' }
+		export interface Hide extends WindowEvent { readonly type: 'hide' }
+		export interface Expose extends WindowEvent { readonly type: 'expose' }
+		export interface Minimize extends WindowEvent { readonly type: 'minimize' }
+		export interface Maximize extends WindowEvent { readonly type: 'maximize' }
+		export interface Restore extends WindowEvent { readonly type: 'restore' }
+		export interface Move extends WindowEvent {
 			readonly type: 'move'
 			readonly x: number,
 			readonly y: number
 		}
-		interface Resize extends WindowEvent {
+		export interface Resize extends WindowEvent {
 			readonly type: 'resize'
 			readonly width: number
 			readonly height: number
 			readonly pixelWidth: number
 			readonly pixelHeight: number
 		}
-		interface Focus extends WindowEvent { readonly type: 'focus' }
-		interface Blur extends WindowEvent { readonly type: 'blur' }
-		interface Hover extends WindowEvent { readonly type: 'hover' }
-		interface Leave extends WindowEvent { readonly type: 'leave' }
-		interface BeforeClose extends WindowEvent {
+		export interface Focus extends WindowEvent { readonly type: 'focus' }
+		export interface Blur extends WindowEvent { readonly type: 'blur' }
+		export interface Hover extends WindowEvent { readonly type: 'hover' }
+		export interface Leave extends WindowEvent { readonly type: 'leave' }
+		export interface BeforeClose extends WindowEvent {
 			readonly type: 'beforeClose'
 			readonly prevent: PreventCallback
 		}
-		interface Close extends WindowEvent { readonly type: 'close' }
+		export interface Close extends WindowEvent { readonly type: 'close' }
 
-		interface DropBegin extends WindowEvent { readonly type: 'dropBegin' }
-		interface DropText extends WindowEvent {
+		export interface DropBegin extends WindowEvent { readonly type: 'dropBegin' }
+		export interface DropText extends WindowEvent {
 			readonly type: 'dropText'
 			readonly text: string
 		}
-		interface DropFile extends WindowEvent {
+		export interface DropFile extends WindowEvent {
 			readonly type: 'dropFile'
 			readonly file: string
 		}
-		interface DropComplete extends WindowEvent { readonly type: 'dropComplete' }
+		export interface DropComplete extends WindowEvent { readonly type: 'dropComplete' }
 
-		type Any
+		export type Any
 			= KeyDown
 			| KeyUp
 			| TextInput
@@ -136,17 +136,17 @@ export namespace Events {
 
 	}
 
-	namespace Joystick {
+	export namespace Joystick {
 
 		interface JoystickEvent extends BaseEvent {}
 
-		interface AxisMotion extends JoystickEvent {
+		export interface AxisMotion extends JoystickEvent {
 			readonly type: 'axisMotion'
 			readonly axis: number,
 			readonly value: number
 		}
 
-		interface BallMotion extends JoystickEvent {
+		export interface BallMotion extends JoystickEvent {
 			readonly type: 'ballMotion'
 			readonly ball: number,
 			readonly x: number
@@ -156,18 +156,19 @@ export namespace Events {
 		interface ButtonEvent extends JoystickEvent {
 			readonly button: number
 		}
-		interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
-		interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
-		interface HatMotion extends JoystickEvent {
+		export interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
+		export interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
+
+		export interface HatMotion extends JoystickEvent {
 			readonly type: 'hatMotion'
 			readonly hat: number,
 			readonly value: Sdl.Joystick.HatPosition
 		}
 
-		interface Close extends JoystickEvent { readonly type: 'close' }
+		export interface Close extends JoystickEvent { readonly type: 'close' }
 
-		type Any
+		export type Any
 			= AxisMotion
 			| BallMotion
 			| ButtonDown
@@ -177,24 +178,24 @@ export namespace Events {
 
 	}
 
-	namespace JoystickDevice {
+	export namespace JoystickDevice {
 
 		interface DeviceEvent extends BaseEvent {
 			readonly device: Sdl.Joystick.Device
 		}
 
-		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
+		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		type Any = Add | Remove
+		export type Any = Add | Remove
 
 	}
 
-	namespace Controller {
+	export namespace Controller {
 
 		interface ControllerEvent extends BaseEvent {}
 
-		interface AxisMotion extends ControllerEvent {
+		export interface AxisMotion extends ControllerEvent {
 			readonly type: 'axisMotion'
 			readonly axis: number,
 			readonly value: number
@@ -203,14 +204,15 @@ export namespace Events {
 		interface ButtonEvent extends ControllerEvent {
 			readonly button: number
 		}
-		interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
-		interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
-		interface Remap extends ControllerEvent { readonly type: 'remap' }
+		export interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
+		export interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
-		interface Close extends ControllerEvent { readonly type: 'close' }
+		export interface Remap extends ControllerEvent { readonly type: 'remap' }
 
-		type Any
+		export interface Close extends ControllerEvent { readonly type: 'close' }
+
+		export type Any
 			= AxisMotion
 			| ButtonDown
 			| ButtonUp
@@ -219,71 +221,71 @@ export namespace Events {
 
 	}
 
-	namespace Sensor {
+	export namespace Sensor {
 
 		interface SensorEvent extends BaseEvent {}
 
-		interface Update extends SensorEvent {
+		export interface Update extends SensorEvent {
 			readonly type: 'update'
 		}
 
-		interface Close extends SensorEvent { readonly type: 'close' }
+		export interface Close extends SensorEvent { readonly type: 'close' }
 
-		type Any
+		export type Any
 			= Update
 			| Close
 
 	}
 
-	namespace ControllerDevice {
+	export namespace ControllerDevice {
 
 		interface DeviceEvent extends BaseEvent {
 			readonly device: Sdl.Controller.Device
 		}
 
-		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
+		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		type Any = Add | Remove
+		export type Any = Add | Remove
 
 	}
 
-	namespace Audio {
+	export namespace Audio {
 
 		interface AudioEvent extends BaseEvent {}
 
-		interface Close extends AudioEvent { readonly type: 'close' }
+		export interface Close extends AudioEvent { readonly type: 'close' }
 
-		type Any = Close
+		export type Any = Close
 
 	}
 
-	namespace AudioDevice {
+	export namespace AudioDevice {
 
 		interface DeviceEvent extends BaseEvent {
 			readonly device: Sdl.Audio.Device
 		}
 
-		interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
-		interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
+		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
+		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		type Any = Add | Remove
+		export type Any = Add | Remove
+
+	}
+
+	export namespace Clipboard {
+
+		export interface Update extends BaseEvent { readonly type: 'update' }
+
+		export type Any = Update
 
 	}
 
-	namespace Clipboard {
-
-		interface Update extends BaseEvent { readonly type: 'update' }
-
-		type Any = Update
-
-	}
 }
-
 
 export namespace Sdl {
 
-	interface Info {
+	export interface Info {
 		readonly version: {
 			readonly compile: {
 				readonly major: number
@@ -309,9 +311,9 @@ export namespace Sdl {
 		}
 	}
 
-	namespace Video {
+	export namespace Video {
 
-		type Format
+		export type Format
 			= 'rgb332'
 			| 'rgb444'
 			| 'rgb555'
@@ -349,7 +351,7 @@ export namespace Sdl {
 			| 'nv12'
 			| 'nv21'
 
-		interface Display {
+		export interface Display {
 			readonly name: string
 			readonly format: Format
 			readonly frequency: number
@@ -372,7 +374,7 @@ export namespace Sdl {
 			}
 		}
 
-		class Window {
+		export class Window {
 			on (event: 'show', listener: (event: Events.Window.Show) => void): this
 			on (event: 'hide', listener: (event: Events.Window.Hide) => void): this
 			on (event: 'expose', listener: (event: Events.Window.Expose) => void): this
@@ -506,11 +508,11 @@ export namespace Sdl {
 		}
 	}
 
-	namespace Keyboard {
+	export namespace Keyboard {
 
-		type Scancode = number
+		export type Scancode = number
 
-		type ScancodeNames
+		export type ScancodeNames
 			= 'A'
 			| 'B'
 			| 'C'
@@ -754,7 +756,7 @@ export namespace Sdl {
 			| 'AUDIOREWIND'
 			| 'AUDIOFASTFORWARD'
 
-		type Key = string
+		export type Key = string
 
 		interface Module {
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
@@ -767,16 +769,16 @@ export namespace Sdl {
 
 	}
 
-	namespace Mouse {
+	export namespace Mouse {
 
-		type Button = number
+		export type Button = number
 
-		type ButtonNames
+		export type ButtonNames
 			= 'LEFT'
 			| 'MIDDLE'
 			| 'RIGHT'
 
-		type Cursor
+		export type Cursor
 			= 'arrow'
 			| 'ibeam'
 			| 'wait'
@@ -802,7 +804,7 @@ export namespace Sdl {
 			setPosition (x: number, y: number): void
 
 			setCursor (cursor: Cursor): void
-			setCursorImage (width: number, height: number, stride: number, format: Sdl.Video.Format, buffer: Buffer): void
+			setCursorImage (width: number, height: number, stride: number, format: Video.Format, buffer: Buffer): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void
@@ -813,14 +815,14 @@ export namespace Sdl {
 
 	}
 
-	namespace Joystick {
+	export namespace Joystick {
 
-		interface BallPosition {
+		export interface BallPosition {
 			x: number
 			y: number
 		}
 
-		type HatPosition
+		export type HatPosition
 			= 'centered'
 			| 'up'
 			| 'right'
@@ -831,7 +833,7 @@ export namespace Sdl {
 			| 'leftup'
 			| 'leftdown'
 
-		type PowerLevel
+		export type PowerLevel
 			= 'unknown'
 			| 'empty'
 			| 'low'
@@ -840,7 +842,7 @@ export namespace Sdl {
 			| 'wired'
 			| 'max'
 
-		interface Device {
+		export interface Device {
 			readonly id: number
 			readonly type: string
 			readonly name: string
@@ -852,7 +854,7 @@ export namespace Sdl {
 			readonly player: number
 		}
 
-		class JoystickInstance {
+		export class JoystickInstance {
 			on (event: 'axisMotion', listener: (event: Events.Joystick.AxisMotion) => void): this
 			on (event: 'ballMotion', listener: (event: Events.Joystick.BallMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
@@ -901,9 +903,9 @@ export namespace Sdl {
 
 	}
 
-	namespace Controller {
+	export namespace Controller {
 
-		interface Device {
+		export interface Device {
 			readonly id: number
 			readonly name: string
 			readonly path: string
@@ -915,7 +917,7 @@ export namespace Sdl {
 			readonly mapping: string
 		}
 
-		class ControllerInstance {
+		export class ControllerInstance {
 			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
@@ -991,32 +993,32 @@ export namespace Sdl {
 
 	}
 
-	namespace Sensor {
+	export namespace Sensor {
 
-		type Type
+		export type Type
 			= 'unknown'
 			| 'accelerometer'
 			| 'gyroscope'
 
-		type Side
+		export type Side
 			= 'left'
 			| 'right'
 
-		interface Device {
+		export interface Device {
 			readonly id: number
 			readonly name: string
 			readonly type: Type
 			readonly side: Side | null
 		}
 
-		interface Data {
+		export interface Data {
 			timestamp: number | null,
 			x: number,
 			y: number,
 			z: number,
 		}
 
-		class SensorInstance {
+		export class SensorInstance {
 			on (event: 'update', listener: (event: Events.Sensor.Update) => void): this
 			on (event: 'close', listener: (event: Events.Sensor.Close) => void): this
 			on (event: '*', listener: (event: Events.Sensor.Any) => void): this
@@ -1039,9 +1041,9 @@ export namespace Sdl {
 
 	}
 
-	namespace Audio {
+	export namespace Audio {
 
-		type Format
+		export type Format
 			= 's8'
 			| 'u8'
 			| 's16lsb'
@@ -1061,20 +1063,20 @@ export namespace Sdl {
 			| 'f32sys'
 			| 'f32'
 
-		interface Device {
+		export interface Device {
 			readonly type: "recording"|"playback"
 			readonly name?: string
 		}
 
-		interface PlaybackDevice extends Device {
+		export interface PlaybackDevice extends Device {
 			readonly type: "playback"
 		}
 
-		interface RecordingDevice extends Device {
+		export interface RecordingDevice extends Device {
 			readonly type: "recording"
 		}
 
-		class AudioInstance {
+		export class AudioInstance {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 			on (event: '*', listener: (event: Events.Audio.Any) => void): this
 
@@ -1104,15 +1106,15 @@ export namespace Sdl {
 			close (): void
 		}
 
-		class AudioPlaybackInstance extends AudioInstance {
+		export class AudioPlaybackInstance extends AudioInstance {
 			enqueue (buffer: Buffer, bytes?: number): void
 		}
 
-		class AudioRecordingInstance extends AudioInstance {
+		export class AudioRecordingInstance extends AudioInstance {
 			dequeue (buffer: Buffer, bytes?: number): number
 		}
 
-		interface AudioOptions {
+		export interface AudioOptions {
 			channels?: 1 | 2 | 4 | 6
 			frequency?: number
 			format?: Format
@@ -1138,7 +1140,7 @@ export namespace Sdl {
 		}
 	}
 
-	namespace Clipboard {
+	export namespace Clipboard {
 
 		interface Module {
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
@@ -1150,16 +1152,16 @@ export namespace Sdl {
 
 	}
 
-	namespace Power {
+	export namespace Power {
 
-		type PowerState
+		export type PowerState
 			= 'unknown'
 			| 'noBattery'
 			| 'battery'
 			| 'charging'
 			| 'charged'
 
-		interface PowerInfo {
+		export interface PowerInfo {
 			state: PowerState
 			seconds: number | null
 			percent: number | null
@@ -1170,6 +1172,7 @@ export namespace Sdl {
 		}
 
 	}
+
 }
 
 export const info: Sdl.Info
