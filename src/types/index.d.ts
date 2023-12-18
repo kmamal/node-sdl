@@ -1170,21 +1170,15 @@ export namespace Sdl {
 		}
 
 	}
-
-	interface Module {
-		readonly info: Info
-		readonly video: Video.Module
-		readonly keyboard: Keyboard.Module
-		readonly mouse: Mouse.Module
-		readonly joystick: Joystick.Module
-		readonly controller: Controller.Module
-		readonly sensor: Sensor.Module
-		readonly audio: Audio.Module
-		readonly clipboard: Clipboard.Module
-		readonly power: Power.Module
-	}
-
 }
 
-declare const sdl: Sdl.Module
-export = sdl
+export const info: Sdl.Info
+export const video: Sdl.Video.Module
+export const keyboard: Sdl.Keyboard.Module
+export const mouse: Sdl.Mouse.Module
+export const joystick: Sdl.Joystick.Module
+export const controller: Sdl.Controller.Module
+export const sensor: Sdl.Sensor.Module
+export const audio: Sdl.Audio.Module
+export const clipboard: Sdl.Clipboard.Module
+export const power: Sdl.Power.Module
