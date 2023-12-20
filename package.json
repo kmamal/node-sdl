@@ -37,8 +37,13 @@
     "url": "git://github.com/kmamal/node-sdl.git"
   },
   "main": "./src/javascript/index.js",
-  "exports": "./src/javascript/index.js",
   "types": "./src/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "default": "./src/javascript/index.js"
+    }
+  },
   "gypfile": true,
   "scripts": {
     "test": "cd scripts && node test.mjs",
