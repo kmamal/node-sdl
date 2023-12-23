@@ -925,7 +925,10 @@ _windowUpdateRenderer(
 	int window_id = SDL_GetWindowID(window);
 
 	SDL_Renderer * old_renderer = SDL_GetRenderer(window);
-	if (old_renderer != nullptr) { SDL_DestroyRenderer(old_renderer); }
+	if (old_renderer != nullptr) {
+		SDL_DestroyRenderer(old_renderer);
+		SDL_SetWindowData(window, "texture", nullptr);
+	}
 
 	int renderer_flags = 0
 		| (*accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
