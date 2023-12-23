@@ -1889,12 +1889,7 @@ window_destroy (int window_id)
 	}
 
 	SDL_Renderer * renderer = SDL_GetRenderer(window);
-	if (renderer != nullptr) {
-		SDL_Texture * texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
-
-		SDL_DestroyTexture(texture);
-		SDL_DestroyRenderer(renderer);
-	}
+	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 
 	SDL_DestroyWindow(window);
 
