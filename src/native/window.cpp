@@ -1,5 +1,4 @@
 #include "window.h"
-#include "cocoa-window.h"
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <string>

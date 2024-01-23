@@ -1,10 +1,14 @@
 #include "global.h"
 #include "events.h"
 #include "keyboard.h"
-#include "cocoa-window.h"
 #include <SDL.h>
 #include <string>
 #include <sstream>
+
+#if defined(__MACOSX__)
+	#include "cocoa-window.h"
+#endif
+
 
 SDL_threadID mainThreadId;
 

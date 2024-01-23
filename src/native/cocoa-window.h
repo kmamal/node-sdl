@@ -2,9 +2,12 @@
 #define _COCOA_WINDOW_H_
 
 
+#include <Cocoa/Cocoa.h>
+
 #ifndef __OBJC__
 class CALayer;
 #endif
+
 
 extern "C" CALayer *getCocoaGlView(NSWindow *);
 

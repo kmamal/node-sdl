@@ -37,7 +37,7 @@
 			['OS == "mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'cflags': [ '-D_THREAD_SAFE' ],
-				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ], },
+				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
 				'include_dirs': [
 					'$(SDL_INC)',
 					'/opt/X11/include',
