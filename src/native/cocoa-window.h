@@ -3,8 +3,12 @@
 
 
 #ifndef __OBJC__
-class CALayer;
-class NSWindow;
+	class CALayer;
+
+	#ifndef NSWindow
+		class NSWindow;
+	#endif
+
 #endif
 
 
