@@ -1,6 +1,7 @@
 #include "global.h"
 #include "events.h"
 #include "keyboard.h"
+#include "cocoa-window.h"
 #include <SDL.h>
 #include <string>
 #include <sstream>
