@@ -6,7 +6,7 @@
 #include <sstream>
 
 #if defined(__MACOSX__)
-	#include "cocoa-window.h"
+	#include "cocoa-global.h"
 #endif
 
 

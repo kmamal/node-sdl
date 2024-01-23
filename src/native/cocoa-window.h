@@ -4,19 +4,12 @@
 
 #ifndef __OBJC__
 	class CALayer;
-
-	#ifndef NSWindow
-		class NSWindow;
-	#endif
-
 #endif
 
 
 extern "C" CALayer *getCocoaGlView(NSWindow *);
 
 extern "C" CALayer *getCocoaGpuView(NSWindow *);
-
-extern "C" void reenableInertialScrolling();
 
 
 #endif // _COCOA_WINDOW_H_

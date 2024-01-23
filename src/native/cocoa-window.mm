@@ -1,7 +1,8 @@
 #include <Cocoa/Cocoa.h>
-#import <QuartzCore/CAMetalLayer.h>
+#include <QuartzCore/CAMetalLayer.h>
 
 #include "cocoa-window.h"
+
 
 extern "C" CALayer *getCocoaGlView(NSWindow *window) {
 	@autoreleasepool {
@@ -20,8 +21,4 @@ extern "C" CALayer *getCocoaGpuView(NSWindow *window) {
 		[[view layer] setContentsScale:[window backingScaleFactor]];
 		return [view layer];
 	}
-}
-
-extern "C" void reenableInertialScrolling() {
-	[[NSUserDefaults standardUserDefaults] setBool: YES forKey: @"AppleMomentumScrollSupported"];
 }

@@ -35,7 +35,10 @@
 				},
 			}],
 			['OS == "mac"', {
-				'sources': [ 'src/native/cocoa-window.mm' ],
+				'sources': [
+					'src/native/cocoa-global.mm',
+					'src/native/cocoa-window.mm',
+				],
 				'cflags': [ '-D_THREAD_SAFE' ],
 				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
 				'include_dirs': [
