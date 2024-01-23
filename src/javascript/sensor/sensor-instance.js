@@ -28,11 +28,7 @@ class SensorInstance extends EventsViaPoll {
 
 	get device () { return this._device }
 
-	get data () {
-		const data = Bindings.sensor_getData(this._device.id)
-		if (data.timestamp === 0) { data.timestamp = null }
-		return data
-	}
+	get data () { return Bindings.sensor_getData(this._device.id) }
 
 	get closed () { return this._closed }
 	close () {

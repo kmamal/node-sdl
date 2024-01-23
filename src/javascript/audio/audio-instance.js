@@ -19,8 +19,6 @@ class AudioInstance extends EventsViaPoll {
 			buffered = 4096,
 		} = options
 
-		const _format = Enums.audioFormat[format] ?? null
-
 		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("name must be a string"), { name }) }
 		if (typeof type !== 'string') { throw Object.assign(new Error("type must be a string"), { type }) }
 		if (type !== 'playback' && type !== 'recording') { throw Object.assign(new Error("type must be either 'playback' or 'recording'"), { type }) }
@@ -29,11 +27,13 @@ class AudioInstance extends EventsViaPoll {
 		if (!Number.isFinite(frequency)) { throw Object.assign(new Error("frequency must be a number"), { frequency }) }
 		if (frequency <= 0) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		if (_format === null) { throw Object.assign(new Error("invalid format"), { format }) }
 		if (!Number.isFinite(buffered)) { throw Object.assign(new Error("buffered must be a number"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 
-		this._id = Bindings.audio_openDevice(name ?? '', type === 'recording', frequency, _format, channels, buffered)
+		const _format = Enums.audioFormat[format]
+		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+
+		this._id = Bindings.audio_open(name ?? null, type === 'recording', frequency, _format, channels, buffered)
 
 		this._device = device
 		this._name = name
@@ -42,7 +42,7 @@ class AudioInstance extends EventsViaPoll {
 		this._format = format
 		this._frequency = frequency
 
-		this._playing = true
+		this._playing = false
 		this._closed = false
 
 		const helper = AudioFormatHelpers[this._format]
@@ -90,8 +90,10 @@ class AudioInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
 		if (typeof play !== 'boolean') { throw Object.assign(new Error("play must be a boolean"), { play }) }
-		this._playing = play
+
 		Bindings.audio_play(this._id, play)
+
+		this._playing = play
 	}
 
 	pause () {
@@ -119,6 +121,7 @@ class AudioInstance extends EventsViaPoll {
 		this._closed = true
 
 		Bindings.audio_close(this._id)
+
 		Globals.audioInstances.delete(this._id)
 	}
 }

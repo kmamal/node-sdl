@@ -54,6 +54,7 @@ class JoystickInstance extends EventsViaPoll {
 
 	get power () {
 		const power = Bindings.joystick_getPower(this._device.id)
+		if (power === null) { return null }
 		return Enums.powerLevelNames[power]
 	}
 
@@ -64,6 +65,12 @@ class JoystickInstance extends EventsViaPoll {
 		if (player < 0) { throw Object.assign(new Error("player must be non-negative"), { player }) }
 
 		Bindings.joystick_setPlayer(this._device.id, player)
+	}
+
+	resetPlayer () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		Bindings.joystick_setPlayer(this._device.id, -1)
 	}
 
 	get hasLed () { return this._hasLed }

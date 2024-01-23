@@ -1,6 +1,6 @@
 const Bindings = require('./bindings')
 
-const enums = Bindings.getEnums()
+const enums = Bindings.enums_get()
 
 for (const [ key, obj ] of Object.entries(enums)) {
 	const names = {}

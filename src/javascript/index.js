@@ -3,7 +3,7 @@ if (!isMainThread) { throw new Error('@kmamal/sdl can only be used in the main t
 
 const Bindings = require('./bindings')
 
-const info = Bindings.initialize()
+const info = Bindings.global_initialize()
 
 const { video } = require('./video')
 const { keyboard } = require('./keyboard')

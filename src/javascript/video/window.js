@@ -95,10 +95,10 @@ class Window extends EventsViaPoll {
 		const result = Bindings.window_create(
 			title,
 			displayIndex,
-			width,
-			height,
 			x,
 			y,
+			width,
+			height,
 			visible,
 			fullscreen,
 			resizable,
@@ -127,7 +127,7 @@ class Window extends EventsViaPoll {
 		this._alwaysOnTop = result.alwaysOnTop
 		this._accelerated = result.accelerated
 		this._vsync = result.vsync
-		this._native = result.native ?? null
+		this._native = result.native
 		this._skipTaskbar = result.skipTaskbar
 		this._popupMenu = result.popupMenu
 		this._tooltip = result.tooltip
@@ -138,8 +138,6 @@ class Window extends EventsViaPoll {
 		this._opengl = opengl
 		this._webgpu = webgpu
 
-		this._focused = false
-		this._hovered = false
 		this._minimized = false
 		this._maximized = false
 		this._destroyed = false
@@ -266,7 +264,9 @@ class Window extends EventsViaPoll {
 
 		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
 
-		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
+		const result = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
+		this._accelerated = result.accelerated
+		this._vsync = result.vsync
 	}
 
 	get vsync () { return this._vsync }
@@ -278,7 +278,9 @@ class Window extends EventsViaPoll {
 
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 
-		[ this._accelerated, this._vsync ] = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
+		const result = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
+		this._accelerated = result.accelerated
+		this._vsync = result.vsync
 	}
 
 	get opengl () { return this._opengl }
@@ -317,16 +319,15 @@ class Window extends EventsViaPoll {
 		this._fullscreen = false
 	}
 
-	get focused () { return this._focused }
+	get focused () { return Globals.windows.focused === this }
 	focus () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		Bindings.window_focus(this._id)
-		this._focused = true
 		Globals.windows.focused = this
 	}
 
-	get hovered () { return this._hovered }
+	get hovered () { return Globals.windows.hovered === this }
 
 	get skipTaskbar () { return this._skipTaskbar }
 	get popupMenu () { return this._popupMenu }
@@ -339,8 +340,6 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
-		const _format = Enums.pixelFormat[format] ?? null
-
 		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
@@ -348,9 +347,11 @@ class Window extends EventsViaPoll {
 		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
 		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		if (_format === null) { throw Object.assign(new Error("invalid format"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+
+		const _format = Enums.pixelFormat[format]
+		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		Bindings.window_render(this._id, width, height, stride, _format, buffer)
 	}
@@ -358,8 +359,6 @@ class Window extends EventsViaPoll {
 	setIcon (width, height, stride, format, buffer) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		const _format = Enums.pixelFormat[format] ?? null
-
 		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
@@ -367,9 +366,11 @@ class Window extends EventsViaPoll {
 		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
 		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		if (_format === null) { throw Object.assign(new Error("invalid format"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+
+		const _format = Enums.pixelFormat[format]
+		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		Bindings.window_setIcon(this._id, width, height, stride, _format, buffer)
 	}

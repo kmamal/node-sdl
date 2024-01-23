@@ -206,12 +206,20 @@ const mapping = {
 const reverseMapping = {}
 
 for (const [ key, value ] of Object.entries(mapping)) {
-	const existing = reverseMapping[value]
-	const _key = existing ? Bindings.keyboard_getKey(Math.min(
-		Bindings.keyboard_getScancode(existing),
-		Bindings.keyboard_getScancode(key),
-	)) : key
-	reverseMapping[value] = _key
+	maybeSkip: {
+		const existing = reverseMapping[value]
+		if (existing === undefined) { break maybeSkip }
+
+		const keyScancode = Bindings.keyboard_getScancode(key)
+		if (keyScancode === 0) { continue }
+
+		const existingScancode = Bindings.keyboard_getScancode(existing)
+		if (existingScancode === 0) { break maybeSkip }
+
+		if (existingScancode < keyScancode) { continue }
+	}
+
+	reverseMapping[value] = key
 }
 
 module.exports = {

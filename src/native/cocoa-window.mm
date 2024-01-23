@@ -3,18 +3,18 @@
 
 #include "cocoa-window.h"
 
-extern "C" CALayer * getCocoaGlView(NSWindow * window) {
+extern "C" CALayer *getCocoaGlView(NSWindow *window) {
 	@autoreleasepool {
-		NSView * view = [window contentView];
+		NSView *view = [window contentView];
 		[view setWantsLayer:YES];
 		[[view layer] setContentsScale:[window backingScaleFactor]];
 		return [view layer];
 	}
 }
 
-extern "C" CALayer * getCocoaGpuView(NSWindow * window) {
+extern "C" CALayer *getCocoaGpuView(NSWindow *window) {
 	@autoreleasepool {
-		NSView * view = [window contentView];
+		NSView *view = [window contentView];
 		[view setWantsLayer:YES];
 		[view setLayer:[CAMetalLayer layer]];
 		[[view layer] setContentsScale:[window backingScaleFactor]];

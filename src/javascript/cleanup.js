@@ -26,5 +26,5 @@ process.on('exit', (code) => {
 		controller.close()
 	}
 
-	Bindings.cleanup()
+	Bindings.global_cleanup()
 })

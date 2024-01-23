@@ -761,8 +761,8 @@ export namespace Sdl {
 		interface Module {
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
 
-			getKey (scancode: Scancode): Key
-			getScancode (key: Key): Scancode
+			getKey (scancode: Scancode): Key | null
+			getScancode (key: Key): Scancode | null
 
 			getState (): boolean[]
 		}
@@ -804,10 +804,12 @@ export namespace Sdl {
 			setPosition (x: number, y: number): void
 
 			setCursor (cursor: Cursor): void
+			resetCursor (): void
 			setCursorImage (width: number, height: number, stride: number, format: Video.Format, buffer: Buffer): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void
+			redrawCursor (): void
 
 			capture (): void
 			uncapture (): void
@@ -834,8 +836,7 @@ export namespace Sdl {
 			| 'leftdown'
 
 		export type PowerLevel
-			= 'unknown'
-			| 'empty'
+			= 'empty'
 			| 'low'
 			| 'medium'
 			| 'full'
@@ -875,6 +876,7 @@ export namespace Sdl {
 			readonly power: PowerLevel
 
 			setPlayer (index: number): void
+			resetPlayer (): void
 
 			readonly hasLed: boolean
 			setLed (red: number, green: number, blue: number): void
@@ -963,6 +965,7 @@ export namespace Sdl {
 			readonly power: Joystick.PowerLevel
 
 			setPlayer (index: number): void
+			resetPlayer (): void
 
 			readonly hasLed: boolean
 			setLed (red: number, green: number, blue: number): void

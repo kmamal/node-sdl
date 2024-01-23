@@ -2,10 +2,28 @@
 	'targets': [{
 		'target_name': 'sdl',
 		'sources': [
-			'src/native/binding.cpp',
-			'src/native/sdl-helpers.cpp',
+			'src/native/module.cpp',
+			'src/native/enums.cpp',
+			'src/native/global.cpp',
+			'src/native/events.cpp',
+			'src/native/video.cpp',
+			'src/native/window.cpp',
+			'src/native/keyboard.cpp',
+			'src/native/mouse.cpp',
+			'src/native/joystick.cpp',
+			'src/native/controller.cpp',
+			'src/native/sensor.cpp',
+			'src/native/audio.cpp',
+			'src/native/clipboard.cpp',
+			'src/native/power.cpp',
 		],
-		'defines': [ 'NAPI_VERSION=<(napi_build_version)' ],
+		'dependencies': [
+			"<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
+		],
+		'defines': [
+			'NAPI_VERSION=<(napi_build_version)',
+			'NODE_ADDON_API_DISABLE_DEPRECATED',
+		],
 		'conditions': [
 			['OS == "linux"', {
 				'cflags': [ '-D_REENTRANT' ],
@@ -19,7 +37,7 @@
 			['OS == "mac"', {
 				'sources': [ 'src/native/cocoa-window.mm' ],
 				'cflags': [ '-D_THREAD_SAFE' ],
-				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ] },
+				'xcode_settings': { 'OTHER_CFLAGS': [ '-std=c++17' ], },
 				'include_dirs': [
 					'$(SDL_INC)',
 					'/opt/X11/include',
@@ -30,7 +48,6 @@
 				},
 			}],
 			['OS == "win"', {
-				'sources': [ 'src/native/asprintf.c' ],
 				'cflags': [ '-D_REENTRANT' ],
 				'msvs_settings': {
 					'VCCLCompilerTool': {

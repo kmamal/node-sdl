@@ -213,9 +213,11 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.mouse.position](#sdlmouseposition)
   * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
   * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursorcursor)
+  * [sdl.mouse.resetCursor()](#sdlmouseresetcursor)
   * [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
   * [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
   * [sdl.mouse.hideCursor()](#sdlmousehidecursor)
+  * [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
   * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   * [sdl.mouse.uncapture()](#sdlmouseuncapture)
 * [sdl.joystick](#sdljoystick)
@@ -242,6 +244,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [joystickInstance.hats](#joystickinstancehats)
     * [joystickInstance.power](#joystickinstancepower)
     * [joystickInstance.setPlayer(index)](#joystickinstancesetplayerindex)
+    * [joystickInstance.resetPlayer()](#joystickinstanceresetplayer)
     * [joystickInstance.hasLed](#joystickinstancehasled)
     * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
     * [joystickInstance.hasRumble](#joystickinstancehasrumble)
@@ -271,6 +274,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
     * [controllerInstance.setPlayer(index)](#controllerinstancesetplayerindex)
+    * [controllerInstance.resetPlayer()](#controllerinstanceresetplayer)
     * [controllerInstance.hasLed](#controllerinstancehasled)
     * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
     * [controllerInstance.hasRumble](#controllerinstancehasrumble)
@@ -282,7 +286,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
     * [controllerInstance.closed](#controllerinstanceclosed)
     * [controllerInstance.close()](#controllerinstanceclose)
 * [sdl.sensor](#sdlsensor)
-  * [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandardgravity)
+  * [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandard_gravity)
   * [sdl.sensor.devices](#sdlsensordevices)
   * [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
   * [class SensorInstance](#class-sensorinstance)
@@ -1092,7 +1096,6 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
 
   | Value | Corresponding `SDL_Scancode` | Comment |
   | --- | --- | --- |
-  | `sdl.keyboard.SCANCODE.UNKNOWN` | `SDL_SCANCODE_UNKNOWN` | value `0` |
   | `sdl.keyboard.SCANCODE.A` | `SDL_SCANCODE_A` | |
   | `sdl.keyboard.SCANCODE.B` | `SDL_SCANCODE_B` | |
   | `sdl.keyboard.SCANCODE.C` | `SDL_SCANCODE_C` | |
@@ -1353,13 +1356,15 @@ All others are represented by one of these values:
 * Returns: [`<Key>`](#virtual-keys)`|<null>`
 
 Maps a scancode to the corresponding key based on the current keyboard mapping.
+Retuns `null` if the scancode does not currespond to a key in the current mapping.
 
 ### sdl.keyboard.getScancode(key)
 
 * `key: `[`<Key>`](#virtual-keys)
-* Returns: [`<Scancode>`](#enum-scancode)
+* Returns: [`<Scancode>`](#enum-scancode)`|<null>`
 
 Maps a key to the corresponding scancode based on the current keyboard mapping.
+Retuns `null` if the key does not currespond to a scancode in the current mapping.
 If multiple physical keys produce the same virtual key, then only the first one will be returned.
 
 ### sdl.keyboard.getState()
@@ -1430,6 +1435,10 @@ Moves the mouse to the specified position.
 
 Changes the icon that is displayed for the mouse cursor.
 
+### sdl.mouse.resetCursor()
+
+Switched back to the default cursor.
+
 ### sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)
 
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to use as a cursor.
@@ -1447,7 +1456,11 @@ Changes the visibility of the mouse cursor.
 
 ### sdl.mouse.hideCursor()
 
-Equivalent to [`sdl.mouse.showCursor(false)`](#sdlmouseshowcursorshow).
+Equivalent to [`sdl.mouse.showCursor
+
+### sdl.mouse.redrawCursor()
+
+Forces a cursor redraw.
 
 ### sdl.mouse.capture([capture])
 
@@ -1468,7 +1481,6 @@ String values used to represent the type of a joystick device.
 
 | Value | Corresponding `SDL_JoystickType` |
 | --- | --- |
-| `'unknown'` | `SDL_JOYSTICK_TYPE_UNKNOWN` |
 | `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
 | `'wheel'` | `SDL_JOYSTICK_TYPE_WHEEL` |
 | `'arcadestick'` | `SDL_JOYSTICK_TYPE_ARCADE_STICK` |
@@ -1501,7 +1513,6 @@ String values used to represent the power level of a joystick device.
 
 | Value | Corresponding `SDL_JoystickPowerLevel` |
 | --- | --- |
-| `'unknown'` | `SDL_JOYSTICK_POWER_UNKNOWN` |
 | `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
 | `'low'` | `SDL_JOYSTICK_POWER_LOW` |
 | `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
@@ -1627,9 +1638,9 @@ The [device](#sdljoystickdevices) from which this instance was opened.
 
 ### joystickInstance.firmwareVersion
 
-* `<number>`
+* `<number>|<null>`
 
-The joystick's firmware version.
+The joystick's firmware version, or `null` if it's not available..
 
 ### joystickInstance.serialNumber
 
@@ -1668,15 +1679,19 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 ### joystickInstance.power
 
-* [`<PowerLevel>`](#power-levels)
+* [`<PowerLevel>`](#power-levels)`|<null>`
 
-The current power level of the joystick device.
+The current power level of the joystick device, or `null` if it is unknown;
 
 ### joystickInstance.setPlayer(index)
 
 * `index: <number>` The player index to assign to the joystick.
 
 Sets the player index of this joystick.
+
+### joystickInstance.resetPlayer()
+
+Clears player assignment and player led.
 
 ### joystickInstance.hasLed
 
@@ -1942,6 +1957,10 @@ The current power level of the controller device.
 
 Sets the player index of this controller.
 
+### controllerInstance.resetPlayer()
+
+Clears player assignment and player led.
+
 ### controllerInstance.hasLed
 
 * `<boolean>`
@@ -2014,7 +2033,7 @@ Closes the instance.
 
 * `<number>`
 
-The readings from accelerometers will include the force of gravity, so a device at rest will have an value of `STANDARD_GRAVITY` away from the center of the earth.
+The readings from accelerometers will include the force of gravity, so a device at rest will have a value of `STANDARD_GRAVITY` away from the center of the earth.
 Use this constant to correct for that if your application requires it.
 
 ### sdl.sensor.devices
@@ -2023,7 +2042,7 @@ Use this constant to correct for that if your application requires it.
   * `id: <number>` The unique id of the device.
   * `name: <string>` The name of the device.
   * `type: <string>` Will be either `'accelerometer'`, `'gyroscope'`, or `'unknown'`.
-  * `side: <string | null>` Some sensors (such as those on the Joy-Con controller) have a `'left'` or `'right'` side, otherwise this value will be `null`.
+  * `side: <string>|<null>` Some sensors (such as those on the Joy-Con controller) have a `'left'` or `'right'` side, otherwise this value will be `null`.
 
 A list of all the detected sensor devices.
 Sample output:
@@ -2065,7 +2084,7 @@ The [device](#sdlsensordevices) from which this instance was opened.
 ### sensorInstance.data
 
 * `<object>`
-  * `timestamp: <number | null>` The time this measurement was taken **in microseconds**, or `null` if that's not available.
+  * `timestamp: <number>|<null>` The time this measurement was taken **in microseconds**, or `null` if that's not available.
   * `x: <number>` X axis value.
   * `y: <number>` Y axis value.
   * `z: <number>` Z axis value.
@@ -2518,8 +2537,8 @@ Changes the text contents of the clipboard.
 
 * `<object>`
   * `state: <string>` One of `'unknown'`, `'noBattery'`, `'battery'`, `'charging'`, `'charged'`.
-  * `seconds: <number | null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
-  * `percent: <number | null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
+  * `seconds: <number>|<null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
+  * `percent: <number>|<null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
 
 The curent power information of the device.
 
