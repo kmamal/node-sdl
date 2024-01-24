@@ -20,7 +20,7 @@ int filterEvents(void*, SDL_Event *event) {
 	int window_event_type = event->window.event;
 	if (true
 		&& window_event_type != SDL_WINDOWEVENT_MOVED
-		&& window_event_type != SDL_WINDOWEVENT_RESIZED
+		&& window_event_type != SDL_WINDOWEVENT_SIZE_CHANGED
 	) { return 1; }
 
 	events::dispatchEvent(*event);
