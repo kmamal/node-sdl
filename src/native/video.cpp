@@ -2,6 +2,11 @@
 #include <SDL.h>
 #include <string>
 #include <sstream>
+#include <map>
+
+
+std::map<SDL_PixelFormatEnum, std::string> video::formats;
+
 
 Napi::Value
 video::getDisplays(const Napi::CallbackInfo &info)
@@ -77,7 +82,7 @@ video::getDisplays(const Napi::CallbackInfo &info)
 
 		Napi::Object display = Napi::Object::New(env);
 		display.Set("name", Napi::String::New(env, name));
-		display.Set("format", Napi::Number::New(env, mode.format));
+		display.Set("format", video::formats[(SDL_PixelFormatEnum) mode.format]);
 		display.Set("frequency", Napi::Number::New(env, mode.refresh_rate));
 		display.Set("geometry", geometry);
 		display.Set("usable", usable);

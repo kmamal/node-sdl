@@ -3,8 +3,13 @@
 
 #include <napi.h>
 #include <SDL.h>
+#include <map>
+#include <string>
 
 namespace controller {
+
+	extern std::map<SDL_GameControllerAxis, std::string> axes;
+	extern std::map<SDL_GameControllerButton, std::string> buttons;
 
 	void getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst);
 

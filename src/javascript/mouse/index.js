@@ -2,7 +2,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 
 const mouse = {
-	get BUTTON () { return Enums.button },
+	get BUTTON () { return Enums.mouseButtons },
 
 	getButton (button) {
 		if (!Number.isFinite(button)) { throw Object.assign(new Error("button must be a number"), { button }) }
@@ -23,7 +23,7 @@ const mouse = {
 	setCursor (cursor) {
 		if (typeof cursor !== 'string') { throw Object.assign(new Error("cursor must be a string"), { cursor }) }
 
-		const _cursor = Enums.cursor[cursor]
+		const _cursor = Enums.cursors[cursor]
 		if (_cursor === undefined) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
 
 		Bindings.mouse_setCursor(_cursor)

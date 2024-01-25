@@ -1,5 +1,4 @@
 const Bindings = require('../bindings')
-const Enums = require('../enums')
 const Globals = require('../globals')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
@@ -26,7 +25,7 @@ class JoystickInstance extends EventsViaPoll {
 		this._axes = result.axes
 		this._balls = result.balls
 		this._buttons = result.buttons
-		this._hats = result.hats.map((x) => Enums.hatPositionNames[x])
+		this._hats = result.hats
 
 		this._device = device
 
@@ -52,11 +51,7 @@ class JoystickInstance extends EventsViaPoll {
 	get buttons () { return this._buttons }
 	get hats () { return this._hats }
 
-	get power () {
-		const power = Bindings.joystick_getPower(this._device.id)
-		if (power === null) { return null }
-		return Enums.powerLevelNames[power]
-	}
+	get power () { return Bindings.joystick_getPower(this._device.id) }
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }

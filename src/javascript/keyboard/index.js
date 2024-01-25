@@ -3,7 +3,7 @@ const Enums = require('../enums')
 const { mapping, reverseMapping } = require('./key-mapping')
 
 const keyboard = {
-	get SCANCODE () { return Enums.scancode },
+	get SCANCODE () { return Enums.scancodes },
 
 	getKey (scancode) {
 		if (!Number.isFinite(scancode)) { throw Object.assign(new Error("scancode must be a number"), { scancode }) }
@@ -19,7 +19,7 @@ const keyboard = {
 		const _key = reverseMapping[key] ?? (key.length === 1 ? key : null)
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
 
-		return Bindings.keyboard_getScancode(_key) || null
+		return Bindings.keyboard_getScancode(_key)
 	},
 
 	getState () { return Bindings.keyboard_getState() },

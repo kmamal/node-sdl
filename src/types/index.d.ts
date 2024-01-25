@@ -142,13 +142,13 @@ export namespace Events {
 
 		export interface AxisMotion extends JoystickEvent {
 			readonly type: 'axisMotion'
-			readonly axis: number,
+			readonly axis: number
 			readonly value: number
 		}
 
 		export interface BallMotion extends JoystickEvent {
 			readonly type: 'ballMotion'
-			readonly ball: number,
+			readonly ball: number
 			readonly x: number
 			readonly y: number
 		}
@@ -162,7 +162,7 @@ export namespace Events {
 
 		export interface HatMotion extends JoystickEvent {
 			readonly type: 'hatMotion'
-			readonly hat: number,
+			readonly hat: number
 			readonly value: Sdl.Joystick.HatPosition
 		}
 
@@ -197,12 +197,12 @@ export namespace Events {
 
 		export interface AxisMotion extends ControllerEvent {
 			readonly type: 'axisMotion'
-			readonly axis: number,
+			readonly axis: Sdl.Controller.Axis
 			readonly value: number
 		}
 
 		interface ButtonEvent extends ControllerEvent {
-			readonly button: number
+			readonly button: Sdl.Controller.Button
 		}
 
 		export interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
@@ -824,6 +824,17 @@ export namespace Sdl {
 			y: number
 		}
 
+		export type JoystickType
+			= 'gamecontroller'
+			| 'wheel'
+			| 'arcadestick'
+			| 'flightstick'
+			| 'dancepad'
+			| 'guitar'
+			| 'drumkit'
+			| 'arcadepad'
+			| 'throttle'
+
 		export type HatPosition
 			= 'centered'
 			| 'up'
@@ -845,14 +856,14 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly id: number
-			readonly type: string
+			readonly type: JoystickType
 			readonly name: string
 			readonly path: string
 			readonly guid: string
-			readonly vendor: number
-			readonly product: number
-			readonly version: number
-			readonly player: number
+			readonly vendor: number | null
+			readonly product: number | null
+			readonly version: number | null
+			readonly player: number | null
 		}
 
 		export class JoystickInstance {
@@ -873,7 +884,7 @@ export namespace Sdl {
 			readonly hats: HatPosition[]
 			readonly buttons: boolean[]
 
-			readonly power: PowerLevel
+			readonly power: PowerLevel | null
 
 			setPlayer (index: number): void
 			resetPlayer (): void
@@ -919,6 +930,35 @@ export namespace Sdl {
 			readonly mapping: string
 		}
 
+		export type Axis
+			= 'leftStickX'
+			| 'leftStickY'
+			| 'rightStickX'
+			| 'rightStickY'
+			| 'leftTrigger'
+			| 'rightTrigger'
+
+		export type Button
+			= 'dpadLeft'
+			| 'dpadRight'
+			| 'dpadUp'
+			| 'dpadDown'
+			| 'a'
+			| 'b'
+			| 'x'
+			| 'y'
+			| 'guide'
+			| 'back'
+			| 'start'
+			| 'leftStick'
+			| 'rightStick'
+			| 'leftShoulder'
+			| 'rightShoulder'
+			| 'paddle1'
+			| 'paddle2'
+			| 'paddle3'
+			| 'paddle4'
+
 		export class ControllerInstance {
 			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
@@ -932,34 +972,34 @@ export namespace Sdl {
 			readonly serialNumber: string
 
 			readonly axes: {
-				readonly leftStickX: number,
-				readonly leftStickY: number,
-				readonly rightStickX: number,
-				readonly rightStickY: number,
-				readonly leftTrigger: number,
-				readonly rightTrigger: number,
+				readonly leftStickX: number
+				readonly leftStickY: number
+				readonly rightStickX: number
+				readonly rightStickY: number
+				readonly leftTrigger: number
+				readonly rightTrigger: number
 			}
 
 			readonly buttons: {
-				readonly dpadLeft: boolean,
-				readonly dpadRight: boolean,
-				readonly dpadUp: boolean,
-				readonly dpadDown: boolean,
-				readonly a: boolean,
-				readonly b: boolean,
-				readonly x: boolean,
-				readonly y: boolean,
-				readonly guide: boolean,
-				readonly back: boolean,
-				readonly start: boolean,
-				readonly leftStick: boolean,
-				readonly rightStick: boolean,
-				readonly leftShoulder: boolean,
-				readonly rightShoulder: boolean,
-				readonly paddle1: boolean,
-				readonly paddle2: boolean,
-				readonly paddle3: boolean,
-				readonly paddle4: boolean,
+				readonly dpadLeft: boolean
+				readonly dpadRight: boolean
+				readonly dpadUp: boolean
+				readonly dpadDown: boolean
+				readonly a: boolean
+				readonly b: boolean
+				readonly x: boolean
+				readonly y: boolean
+				readonly guide: boolean
+				readonly back: boolean
+				readonly start: boolean
+				readonly leftStick: boolean
+				readonly rightStick: boolean
+				readonly leftShoulder: boolean
+				readonly rightShoulder: boolean
+				readonly paddle1: boolean
+				readonly paddle2: boolean
+				readonly paddle3: boolean
+				readonly paddle4: boolean
 			}
 
 			readonly power: Joystick.PowerLevel
@@ -1010,15 +1050,15 @@ export namespace Sdl {
 		export interface Device {
 			readonly id: number
 			readonly name: string
-			readonly type: Type
+			readonly type: Type | null
 			readonly side: Side | null
 		}
 
 		export interface Data {
-			timestamp: number | null,
-			x: number,
-			y: number,
-			z: number,
+			readonly timestamp: number | null
+			readonly x: number
+			readonly y: number
+			readonly z: number
 		}
 
 		export class SensorInstance {
@@ -1035,7 +1075,7 @@ export namespace Sdl {
 		}
 
 		interface Module {
-			STANDARD_GRAVITY: 9.80665,
+			readonly STANDARD_GRAVITY: 9.80665
 
 			readonly devices: Device[]
 
@@ -1158,14 +1198,13 @@ export namespace Sdl {
 	export namespace Power {
 
 		export type PowerState
-			= 'unknown'
-			| 'noBattery'
+			= 'noBattery'
 			| 'battery'
 			| 'charging'
 			| 'charged'
 
 		export interface PowerInfo {
-			state: PowerState
+			state: PowerState | null
 			seconds: number | null
 			percent: number | null
 		}

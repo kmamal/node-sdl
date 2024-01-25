@@ -2,8 +2,14 @@
 #include "joystick.h"
 #include "global.h"
 #include <SDL.h>
+#include <map>
 #include <string>
 #include <sstream>
+
+
+std::map<SDL_GameControllerAxis, std::string> controller::axes;
+std::map<SDL_GameControllerButton, std::string> controller::buttons;
+
 
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)

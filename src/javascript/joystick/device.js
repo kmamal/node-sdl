@@ -1,8 +1,5 @@
-const Enums = require('../enums')
 
 const make = (device) => {
-	const { type } = device
-	device.type = Enums.joystickTypeNames[type]
 	delete device.isController
 	delete device.mapping
 }

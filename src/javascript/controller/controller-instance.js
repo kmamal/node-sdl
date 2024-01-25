@@ -47,10 +47,7 @@ class ControllerInstance extends EventsViaPoll {
 	get axes () { return this._axes }
 	get buttons () { return this._buttons }
 
-	get power () {
-		const power = Bindings.joystick_getPower(this._device.id)
-		return Enums.powerLevelNames[power]
-	}
+	get power () { return Bindings.joystick_getPower(this._device.id) }
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }

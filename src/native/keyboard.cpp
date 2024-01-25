@@ -28,14 +28,10 @@ keyboard::getScancode(const Napi::CallbackInfo &info)
 	std::string keyname = info[0].As<Napi::String>().Utf8Value();
 
 	SDL_Keycode keycode = SDL_GetKeyFromName(keyname.c_str());
-	if (keycode == SDLK_UNKNOWN) {
-		std::ostringstream message;
-		message << "SDL_GetKeyFromName(" << keyname << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (keycode == SDLK_UNKNOWN) { return env.Null(); }
 
 	int scancode = SDL_GetScancodeFromKey(keycode);
+	if (scancode == 0) { return env.Null(); }
 
 	return Napi::Number::New(env, scancode);
 }

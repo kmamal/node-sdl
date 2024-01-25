@@ -2,8 +2,15 @@
 #define _JOYSTICK_H_
 
 #include <napi.h>
+#include <SDL.h>
+#include <map>
+#include <string>
 
 namespace joystick {
+
+	extern std::map<SDL_JoystickType, std::string> joystick_types;
+	extern std::map<Uint8, std::string> hat_positions;
+	extern std::map<SDL_JoystickPowerLevel, std::string> power_levels;
 
 	double mapAxis (int value);
 	Napi::Array _getDevices (Napi::Env &env);

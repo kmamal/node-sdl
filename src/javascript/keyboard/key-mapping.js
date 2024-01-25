@@ -211,10 +211,10 @@ for (const [ key, value ] of Object.entries(mapping)) {
 		if (existing === undefined) { break maybeSkip }
 
 		const keyScancode = Bindings.keyboard_getScancode(key)
-		if (keyScancode === 0) { continue }
+		if (keyScancode === null) { continue }
 
 		const existingScancode = Bindings.keyboard_getScancode(existing)
-		if (existingScancode === 0) { break maybeSkip }
+		if (existingScancode === null) { break maybeSkip }
 
 		if (existingScancode < keyScancode) { continue }
 	}

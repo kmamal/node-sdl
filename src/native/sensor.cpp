@@ -1,7 +1,13 @@
 #include "sensor.h"
 #include <SDL.h>
+#include <map>
 #include <string>
 #include <sstream>
+
+
+std::map<SDL_SensorType, std::string> sensor::types;
+std::map<SDL_SensorType, std::string> sensor::sides;
+
 
 Napi::Value
 sensor::getDevices (const Napi::CallbackInfo &info)
@@ -27,7 +33,7 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		int type = SDL_SensorGetDeviceType(i);
+		SDL_SensorType type = SDL_SensorGetDeviceType(i);
 		// This function can only error if the index is invalid.
 
 		const char *name = SDL_SensorGetDeviceName(i);
@@ -36,8 +42,9 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 		Napi::Object device = Napi::Object::New(env);
 		device.Set("_index", Napi::Number::New(env, i));
 		device.Set("id", Napi::Number::New(env, id));
-		device.Set("type", Napi::Number::New(env, type));
 		device.Set("name", Napi::String::New(env, name));
+		device.Set("type", type == SDL_SENSOR_UNKNOWN ? env.Null() : Napi::String::New(env, sensor::types[type]));
+		device.Set("side", type == SDL_SENSOR_UNKNOWN || type == SDL_SENSOR_ACCEL || type == SDL_SENSOR_GYRO ? env.Null() : Napi::String::New(env, sensor::sides[type]));
 
 		devices.Set(i, device);
 	}

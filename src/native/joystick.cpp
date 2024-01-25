@@ -3,6 +3,12 @@
 #include <SDL.h>
 #include <string>
 #include <sstream>
+#include <map>
+
+
+std::map<Uint8, std::string> joystick::hat_positions;
+std::map<SDL_JoystickType, std::string> joystick::joystick_types;
+std::map<SDL_JoystickPowerLevel, std::string> joystick::power_levels;
 
 
 double
@@ -33,7 +39,7 @@ joystick::_getDevices (Napi::Env &env)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		int type = SDL_JoystickGetDeviceType(i);
+		SDL_JoystickType type = SDL_JoystickGetDeviceType(i);
 		// This function can only error if the index is invalid.
 
 		const char *name = SDL_JoystickNameForIndex(i);
@@ -89,7 +95,7 @@ joystick::_getDevices (Napi::Env &env)
 		Napi::Object device = Napi::Object::New(env);
 		device.Set("_index", Napi::Number::New(env, i));
 		device.Set("id", Napi::Number::New(env, id));
-		device.Set("type", Napi::Number::New(env, type));
+		device.Set("type", joystick::joystick_types[type]);
 		device.Set("name", Napi::String::New(env, name));
 		device.Set("path", Napi::String::New(env, path));
 		device.Set("guid", Napi::String::New(env, guid_string));
@@ -222,8 +228,8 @@ joystick::open (const Napi::CallbackInfo &info)
 	Napi::Array hats = Napi::Array::New(env, num_hats);
 
 	for (int i = 0; i < num_hats; i++) {
-		int position = SDL_JoystickGetHat(joystick, i);
-		hats.Set(i, Napi::Number::New(env, position));
+		int hat_position = SDL_JoystickGetHat(joystick, i);
+		hats.Set(i, joystick::hat_positions[hat_position]);
 	}
 
 	Napi::Object result = Napi::Object::New(env);
@@ -256,10 +262,10 @@ joystick::getPower (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_JoystickPowerLevel power = SDL_JoystickCurrentPowerLevel(joystick);
-	if (power == SDL_JOYSTICK_POWER_UNKNOWN) { return env.Null(); }
+	SDL_JoystickPowerLevel power_level = SDL_JoystickCurrentPowerLevel(joystick);
+	if (power_level == SDL_JOYSTICK_POWER_UNKNOWN) { return env.Null(); }
 
-	return Napi::Number::New(env, power);
+	return Napi::String::New(env, joystick::power_levels[power_level]);
 }
 
 Napi::Value

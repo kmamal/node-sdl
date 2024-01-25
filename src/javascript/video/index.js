@@ -1,14 +1,9 @@
 const Bindings = require('../bindings')
 const Globals = require('../globals')
-const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
 
 Globals.displays = Bindings.video_getDisplays()
-for (const display of Globals.displays) {
-	display.format = Enums.pixelFormatNames[display.format]
-}
-
 
 const validEvents = [ 'displayAdd', 'displayRemove', 'displayOrient' ]
 

@@ -118,8 +118,8 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.info](#sdlinfo)
 * [sdl.video](#sdlvideo)
   * [Image data](#image-data)
+  * [High-DPI](#high-dpi)
   * [Pixel formats](#pixel-formats)
-  * [High-DPI](#highdpi)
   * [Event: 'displayAdd'](#event-displayadd)
   * [Event: 'displayRemove'](#event-displayremove)
   * [Event: 'displayOrient'](#event-displayorient)
@@ -207,7 +207,6 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
   * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
 * [sdl.mouse](#sdlmouse)
-  * [Mouse cursors](#mouse-cursors)
   * [Enum: BUTTON](#enum-button)
   * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
   * [sdl.mouse.position](#sdlmouseposition)
@@ -221,9 +220,7 @@ There are more examples [in the `examples/` folder](https://github.com/kmamal/no
   * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   * [sdl.mouse.uncapture()](#sdlmouseuncapture)
 * [sdl.joystick](#sdljoystick)
-  * [Joystick types](#joystick-types)
   * [Hat positions](#hat-positions)
-  * [Power levels](#power-levels)
   * [Event: 'deviceAdd'](#joystick-event-deviceadd)
   * [Event: 'deviceRemove'](#joystick-event-deviceremove)
   * [sdl.joystick.devices](#sdljoystickdevices)
@@ -429,6 +426,14 @@ for (let i = 0; i < height; i++) {
 window.render(width, height, stride, 'rgba32', buffer)
 ```
 
+### High-DPI
+
+On a high-dpi display, windows have more pixels that their `width` and `height` would indicate.
+On such systems `width` and `height` (and all other measurements such as `x` and `y`) are in "points".
+Points are abstract and don't have to correspond to pixels.
+If you need to know a window's width and height in pixels, you should use the `pixelWidth` and `pixelHeight` properties.
+You should be doing this always, since you don't know beforehand if your program will be running on a high-dpi system.
+
 ### Pixel formats
 
 String values used to represent how the pixels of an image are stored in a Buffer.
@@ -473,15 +478,6 @@ String values used to represent how the pixels of an image are stored in a Buffe
 | `'nv21'` | `SDL_PIXELFORMAT_NV21` | planar mode: Y + V/U interleaved (2 planes) |
 
 
-### High-DPI
-
-On a high-dpi display, windows have more pixels that their `width` and `height` would indicate.
-On such systems `width` and `height` (and all other measurements such as `x` and `y`) are in "points".
-Points are abstract and don't have to correspond to pixels.
-If you need to know a window's width and height in pixels, you should use the `pixelWidth` and `pixelHeight` properties.
-You should be doing this always, since you don't know beforehand if your program will be running on a high-dpi system.
-
-
 ### Event: 'displayAdd'
 
 * `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
@@ -489,14 +485,12 @@ You should be doing this always, since you don't know beforehand if your program
 Fired when a display is added to the system.
 Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
-
 ### Event: 'displayRemove'
 
 * `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 
 Fired when a display is removed from the system.
 Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
-
 
 ### Event: 'displayOrient'
 
@@ -1085,6 +1079,16 @@ Trying to handle text input by manually translating key presses to text is not a
 It's better to let the OS handle all the text logic, and get the final text by handling the rasulting ([`'textInput'`](#event-textinput)) events.
 
 
+### Virtual keys
+
+String values used to represent virtual keys in the context of the current keyboard mapping.
+Note that some keys do not correspond to any virtual key.
+A Key can be either one of the values below __or__ any unicode character.
+Keys that produce characters are represented by that character.
+All others are represented by one of these values:
+
+`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'space'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
+
 ### Enum: SCANCODE
 
 Used to represent physical keys on the keyboard.
@@ -1340,16 +1344,6 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
   | `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD` | `SDL_SCANCODE_AUDIOFASTFORWARD` | |
 </details>
 
-### Virtual keys
-
-String values used to represent virtual keys in the context of the current keyboard mapping.
-Note that some keys do not correspond to any virtual key.
-A Key can be either one of the values below __or__ any unicode character.
-Keys that produce characters are represented by that character.
-All others are represented by one of these values:
-
-`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'space'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
-
 ### sdl.keyboard.getKey(scancode)
 
 * `scancode: `[`<Scancode>`](#enum-scancode)
@@ -1376,25 +1370,6 @@ The values will be `true` for keys that are pressed and `false` otherwise.
 
 
 ## sdl.mouse
-
-### Mouse cursors
-
-String values used to represent the types of cursors available on most systems.
-
-| Value | Corresponding `SDL_SystemCursor` | Description |
-| --- | --- | --- |
-| `'arrow'` | `SDL_SYSTEM_CURSOR_ARROW` | arrow |
-| `'ibeam'` | `SDL_SYSTEM_CURSOR_IBEAM` | i-beam |
-| `'wait'` | `SDL_SYSTEM_CURSOR_WAIT` | wait |
-| `'crosshair'` | `SDL_SYSTEM_CURSOR_CROSSHAIR` | crosshair |
-| `'waitarrow'` | `SDL_SYSTEM_CURSOR_WAITARROW` | small wait cursor (or wait if not available) |
-| `'sizenwse'` | `SDL_SYSTEM_CURSOR_SIZENWSE` | double arrow pointing northwest and southeast |
-| `'sizenesw'` | `SDL_SYSTEM_CURSOR_SIZENESW` | double arrow pointing northeast and southwest |
-| `'sizewe'` | `SDL_SYSTEM_CURSOR_SIZEWE` | double arrow pointing west and east |
-| `'sizens'` | `SDL_SYSTEM_CURSOR_SIZENS` | double arrow pointing north and south |
-| `'sizeall'` | `SDL_SYSTEM_CURSOR_SIZEALL` | four pointed arrow pointing north, south, east, and west |
-| `'no'` | `SDL_SYSTEM_CURSOR_NO` | slashed circle or crossbones |
-| `'hand'` | `SDL_SYSTEM_CURSOR_HAND` | hand |
 
 ### Enum: BUTTON
 
@@ -1431,9 +1406,26 @@ Moves the mouse to the specified position.
 
 ### sdl.mouse.setCursor(cursor)
 
-* `cursor: `[`<MouseCursor>`](#mouse-cursors) The icon to use for the cursor.
+* `cursor: <MouseCursor>` The icon to use for the cursor.
 
 Changes the icon that is displayed for the mouse cursor.
+
+Possible values for `cursor` are:
+
+| Value | Corresponding `SDL_SystemCursor` | Description |
+| --- | --- | --- |
+| `'arrow'` | `SDL_SYSTEM_CURSOR_ARROW` | arrow |
+| `'ibeam'` | `SDL_SYSTEM_CURSOR_IBEAM` | i-beam |
+| `'wait'` | `SDL_SYSTEM_CURSOR_WAIT` | wait |
+| `'crosshair'` | `SDL_SYSTEM_CURSOR_CROSSHAIR` | crosshair |
+| `'waitarrow'` | `SDL_SYSTEM_CURSOR_WAITARROW` | small wait cursor (or wait if not available) |
+| `'sizenwse'` | `SDL_SYSTEM_CURSOR_SIZENWSE` | double arrow pointing northwest and southeast |
+| `'sizenesw'` | `SDL_SYSTEM_CURSOR_SIZENESW` | double arrow pointing northeast and southwest |
+| `'sizewe'` | `SDL_SYSTEM_CURSOR_SIZEWE` | double arrow pointing west and east |
+| `'sizens'` | `SDL_SYSTEM_CURSOR_SIZENS` | double arrow pointing north and south |
+| `'sizeall'` | `SDL_SYSTEM_CURSOR_SIZEALL` | four pointed arrow pointing north, south, east, and west |
+| `'no'` | `SDL_SYSTEM_CURSOR_NO` | slashed circle or crossbones |
+| `'hand'` | `SDL_SYSTEM_CURSOR_HAND` | hand |
 
 ### sdl.mouse.resetCursor()
 
@@ -1475,27 +1467,11 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 ## sdl.joystick
 
-### Joystick types
-
-String values used to represent the type of a joystick device.
-
-| Value | Corresponding `SDL_JoystickType` |
-| --- | --- |
-| `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
-| `'wheel'` | `SDL_JOYSTICK_TYPE_WHEEL` |
-| `'arcadestick'` | `SDL_JOYSTICK_TYPE_ARCADE_STICK` |
-| `'flightstick'` | `SDL_JOYSTICK_TYPE_FLIGHT_STICK` |
-| `'dancepad'` | `SDL_JOYSTICK_TYPE_DANCE_PAD` |
-| `'guitar'` | `SDL_JOYSTICK_TYPE_GUITAR` |
-| `'drumkit'` | `SDL_JOYSTICK_TYPE_DRUM_KIT` |
-| `'arcadepad'` | `SDL_JOYSTICK_TYPE_ARCADE_PAD` |
-| `'throttle'` | `SDL_JOYSTICK_TYPE_THROTTLE` |
-
 ### Hat positions
 
 String values used to represent the positions of a joystick hat
 
-| Value | Corresponding SDL enum |
+| Value | Corresponding `SDL_HAT_*` |
 | --- | --- |
 | `'centered'` | `SDL_HAT_CENTERED` |
 | `'up'` | `SDL_HAT_UP` |
@@ -1506,19 +1482,6 @@ String values used to represent the positions of a joystick hat
 | `'rightdown'` | `SDL_HAT_RIGHTDOWN` |
 | `'leftup'` | `SDL_HAT_LEFTUP` |
 | `'leftdown'` | `SDL_HAT_LEFTDOWN` |
-
-### Power levels
-
-String values used to represent the power level of a joystick device.
-
-| Value | Corresponding `SDL_JoystickPowerLevel` |
-| --- | --- |
-| `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
-| `'low'` | `SDL_JOYSTICK_POWER_LOW` |
-| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
-| `'full'` | `SDL_JOYSTICK_POWER_FULL` |
-| `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
-| `'max'` | `SDL_JOYSTICK_POWER_MAX` |
 
 <a id="joystick-event-deviceadd"></a>
 
@@ -1543,16 +1506,31 @@ When this event is emitted, all instances that were opened from the removed devi
 
 * `<object>[]`
   * `id: <number>` The unique id for the device.
-  * `type:`[`<JoystickType>`](#joystick-types) The type of the device.
+  * `type: <JoystickType>` The type of the device.
   * `name: <string>` The name of the device.
   * `path: <string>` The implementation dependent path of the device.
   * `guid: <string>` The GUID of the device.
-  * `vendor: <number>` The USB vendor ID of the device.
-  * `product: <number>` The USB product ID of the device.
-  * `version: <number>` The USB product version of the device.
-  * `player: <number>` The player index for the device.
+  * `vendor: <number>|<null>` The USB vendor ID of the device. Will be `null` if it can't be determined.
+  * `product: <number>|<null>` The USB product ID of the device. Will be `null` if it can't be determined.
+  * `version: <number>|<null>` The USB product version of the device. Will be `null` if it can't be determined.
+  * `player: <number>|<null>` The player index for the device. Will be `null` if it can't be determined.
 
 A list of all the detected joystick devices.
+
+Possible values for `type` are:
+
+| Value | Corresponding `SDL_JoystickType` |
+| --- | --- |
+| `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
+| `'wheel'` | `SDL_JOYSTICK_TYPE_WHEEL` |
+| `'arcadestick'` | `SDL_JOYSTICK_TYPE_ARCADE_STICK` |
+| `'flightstick'` | `SDL_JOYSTICK_TYPE_FLIGHT_STICK` |
+| `'dancepad'` | `SDL_JOYSTICK_TYPE_DANCE_PAD` |
+| `'guitar'` | `SDL_JOYSTICK_TYPE_GUITAR` |
+| `'drumkit'` | `SDL_JOYSTICK_TYPE_DRUM_KIT` |
+| `'arcadepad'` | `SDL_JOYSTICK_TYPE_ARCADE_PAD` |
+| `'throttle'` | `SDL_JOYSTICK_TYPE_THROTTLE` |
+
 Sample output:
 
 ```js
@@ -1679,9 +1657,20 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 ### joystickInstance.power
 
-* [`<PowerLevel>`](#power-levels)`|<null>`
+* `<PowerLevel>|<null>`
 
-The current power level of the joystick device, or `null` if it is unknown;
+The current power level of the joystick device, or `null` if it is unknown.
+
+Possible values are:
+
+| Value | Corresponding `SDL_JoystickPowerLevel` |
+| --- | --- |
+| `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
+| `'low'` | `SDL_JOYSTICK_POWER_LOW` |
+| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
+| `'full'` | `SDL_JOYSTICK_POWER_FULL` |
+| `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
+| `'max'` | `SDL_JOYSTICK_POWER_MAX` |
 
 ### joystickInstance.setPlayer(index)
 
@@ -1813,10 +1802,10 @@ This can cause already opened controller instances to be [remapped](#event-remap
   * `name: <string>` The name of the device.
   * `path: <string>` The implementation dependent path of the device.
   * `guid: <string>` The GUID of the device.
-  * `vendor: <number>` The USB vendor ID of the device.
-  * `product: <number>` The USB product ID of the device.
-  * `version: <number>` The USB product version of the device.
-  * `player: <number>` The player index for the device.
+  * `vendor: <number>|<null>` The USB vendor ID of the device. Will be `null` if it can't be determined.
+  * `product: <number>|<null>` The USB product ID of the device. Will be `null` if it can't be determined.
+  * `version: <number>|<null>` The USB product version of the device. Will be `null` if it can't be determined.
+  * `player: <number>|<null>` The player index for the device. Will be `null` if it can't be determined.
   * `mapping: <string>` The axis and button mapping for this device.
 
 A list of all the detected controller devices.
@@ -1854,7 +1843,7 @@ Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropend
 
 ### Event: 'axisMotion'
 
-* `axis: <string>` The name of the axis that moved.
+* `axis:`[`<Axis>`](#controllerinstanceaxes) The axis that moved.
 * `value: <number>` The new axis position.
 
 Fired when one of the controller's axes moves.
@@ -1863,7 +1852,7 @@ Fired when one of the controller's axes moves.
 
 ### Event: 'buttonDown'
 
-* `button: <string>` The name of the button that was pressed.
+* `button:`[`<Button>`](#controllerinstancebuttons) The button that was pressed.
 
 Fired when one of the controller's buttons is pressed.
 
@@ -2041,7 +2030,7 @@ Use this constant to correct for that if your application requires it.
 * `<object>[]`
   * `id: <number>` The unique id of the device.
   * `name: <string>` The name of the device.
-  * `type: <string>` Will be either `'accelerometer'`, `'gyroscope'`, or `'unknown'`.
+  * `type: <string>|<null>` Either `'accelerometer'`, `'gyroscope'`. Will be `null` if it can't be determined.
   * `side: <string>|<null>` Some sensors (such as those on the Joy-Con controller) have a `'left'` or `'right'` side, otherwise this value will be `null`.
 
 A list of all the detected sensor devices.
@@ -2536,7 +2525,7 @@ Changes the text contents of the clipboard.
 ### sdl.power.info
 
 * `<object>`
-  * `state: <string>` One of `'unknown'`, `'noBattery'`, `'battery'`, `'charging'`, `'charged'`.
+  * `state: <string>|null` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Will be `null` if it can't be determinded.
   * `seconds: <number>|<null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
   * `percent: <number>|<null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
 

@@ -6,58 +6,6 @@ enums::get(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	Napi::Object event_families = Napi::Object::New(env);
-	event_families.Set("display", Napi::Number::New(env, (int) EventFamily::DISPLAY));
-	event_families.Set("window", Napi::Number::New(env, (int) EventFamily::WINDOW));
-	event_families.Set("keyboard", Napi::Number::New(env, (int) EventFamily::KEYBOARD));
-	event_families.Set("mouse", Napi::Number::New(env, (int) EventFamily::MOUSE));
-	event_families.Set("text", Napi::Number::New(env, (int) EventFamily::TEXT));
-	event_families.Set("drop", Napi::Number::New(env, (int) EventFamily::DROP));
-	event_families.Set("joystickDevice", Napi::Number::New(env, (int) EventFamily::JOYSTICK_DEVICE));
-	event_families.Set("joystick", Napi::Number::New(env, (int) EventFamily::JOYSTICK));
-	event_families.Set("controller", Napi::Number::New(env, (int) EventFamily::CONTROLLER));
-	event_families.Set("audioDevice", Napi::Number::New(env, (int) EventFamily::AUDIO_DEVICE));
-	event_families.Set("clipboard", Napi::Number::New(env, (int) EventFamily::CLIPBOARD));
-
-	Napi::Object event_types = Napi::Object::New(env);
-	event_types.Set("quit", Napi::Number::New(env, (int) EventType::QUIT));
-	event_types.Set("displayAdd", Napi::Number::New(env, (int) EventType::DISPLAY_ADD));
-	event_types.Set("displayRemove", Napi::Number::New(env, (int) EventType::DISPLAY_REMOVE));
-	event_types.Set("displayOrient", Napi::Number::New(env, (int) EventType::DISPLAY_ORIENT));
-	event_types.Set("show", Napi::Number::New(env, (int) EventType::SHOW));
-	event_types.Set("hide", Napi::Number::New(env, (int) EventType::HIDE));
-	event_types.Set("expose", Napi::Number::New(env, (int) EventType::EXPOSE));
-	event_types.Set("move", Napi::Number::New(env, (int) EventType::MOVE));
-	event_types.Set("resize", Napi::Number::New(env, (int) EventType::RESIZE));
-	event_types.Set("minimize", Napi::Number::New(env, (int) EventType::MINIMIZE));
-	event_types.Set("maximize", Napi::Number::New(env, (int) EventType::MAXIMIZE));
-	event_types.Set("restore", Napi::Number::New(env, (int) EventType::RESTORE));
-	event_types.Set("focus", Napi::Number::New(env, (int) EventType::FOCUS));
-	event_types.Set("blur", Napi::Number::New(env, (int) EventType::BLUR));
-	event_types.Set("hover", Napi::Number::New(env, (int) EventType::HOVER));
-	event_types.Set("leave", Napi::Number::New(env, (int) EventType::LEAVE));
-	event_types.Set("close", Napi::Number::New(env, (int) EventType::CLOSE));
-	event_types.Set("dropBegin", Napi::Number::New(env, (int) EventType::DROP_BEGIN));
-	event_types.Set("dropComplete", Napi::Number::New(env, (int) EventType::DROP_COMPLETE));
-	event_types.Set("dropFile", Napi::Number::New(env, (int) EventType::DROP_FILE));
-	event_types.Set("dropText", Napi::Number::New(env, (int) EventType::DROP_TEXT));
-	event_types.Set("keyDown", Napi::Number::New(env, (int) EventType::KEY_DOWN));
-	event_types.Set("keyUp", Napi::Number::New(env, (int) EventType::KEY_UP));
-	event_types.Set("textInput", Napi::Number::New(env, (int) EventType::TEXT_INPUT));
-	event_types.Set("mouseMove", Napi::Number::New(env, (int) EventType::MOUSE_MOVE));
-	event_types.Set("mouseButtonDown", Napi::Number::New(env, (int) EventType::MOUSE_BUTTON_DOWN));
-	event_types.Set("mouseButtonUp", Napi::Number::New(env, (int) EventType::MOUSE_BUTTON_UP));
-	event_types.Set("mouseWheel", Napi::Number::New(env, (int) EventType::MOUSE_WHEEL));
-	event_types.Set("deviceAdd", Napi::Number::New(env, (int) EventType::DEVICE_ADD));
-	event_types.Set("deviceRemove", Napi::Number::New(env, (int) EventType::DEVICE_REMOVE));
-	event_types.Set("axisMotion", Napi::Number::New(env, (int) EventType::AXIS_MOTION));
-	event_types.Set("ballMotion", Napi::Number::New(env, (int) EventType::BALL_MOTION));
-	event_types.Set("buttonDown", Napi::Number::New(env, (int) EventType::BUTTON_DOWN));
-	event_types.Set("buttonUp", Napi::Number::New(env, (int) EventType::BUTTON_UP));
-	event_types.Set("hatMotion", Napi::Number::New(env, (int) EventType::HAT_MOTION));
-	event_types.Set("remap", Napi::Number::New(env, (int) EventType::REMAP));
-	event_types.Set("update", Napi::Number::New(env, (int) EventType::UPDATE));
-
 	Napi::Object pixel_formats = Napi::Object::New(env);
 	pixel_formats.Set("rgb332", Napi::Number::New(env, SDL_PIXELFORMAT_RGB332));
 	pixel_formats.Set("rgb444", Napi::Number::New(env, SDL_PIXELFORMAT_RGB444));
@@ -380,98 +328,12 @@ enums::get(const Napi::CallbackInfo &info)
 	cursors.Set("no", Napi::Number::New(env, SDL_SYSTEM_CURSOR_NO));
 	cursors.Set("hand", Napi::Number::New(env, SDL_SYSTEM_CURSOR_HAND));
 
-	Napi::Object hat_positions = Napi::Object::New(env);
-	hat_positions.Set("centered", Napi::Number::New(env, SDL_HAT_CENTERED));
-	hat_positions.Set("up", Napi::Number::New(env, SDL_HAT_UP));
-	hat_positions.Set("right", Napi::Number::New(env, SDL_HAT_RIGHT));
-	hat_positions.Set("down", Napi::Number::New(env, SDL_HAT_DOWN));
-	hat_positions.Set("left", Napi::Number::New(env, SDL_HAT_LEFT));
-	hat_positions.Set("rightup", Napi::Number::New(env, SDL_HAT_RIGHTUP));
-	hat_positions.Set("rightdown", Napi::Number::New(env, SDL_HAT_RIGHTDOWN));
-	hat_positions.Set("leftup", Napi::Number::New(env, SDL_HAT_LEFTUP));
-	hat_positions.Set("leftdown", Napi::Number::New(env, SDL_HAT_LEFTDOWN));
-
-	Napi::Object power_levels = Napi::Object::New(env);
-	// power_levels.Set("unknown", Napi::Number::New(env, SDL_JOYSTICK_POWER_UNKNOWN)); // js will use null here
-	power_levels.Set("empty", Napi::Number::New(env, SDL_JOYSTICK_POWER_EMPTY));
-	power_levels.Set("low", Napi::Number::New(env, SDL_JOYSTICK_POWER_LOW));
-	power_levels.Set("medium", Napi::Number::New(env, SDL_JOYSTICK_POWER_MEDIUM));
-	power_levels.Set("full", Napi::Number::New(env, SDL_JOYSTICK_POWER_FULL));
-	power_levels.Set("wired", Napi::Number::New(env, SDL_JOYSTICK_POWER_WIRED));
-	power_levels.Set("max", Napi::Number::New(env, SDL_JOYSTICK_POWER_MAX));
-
-	Napi::Object joystick_types = Napi::Object::New(env);
-	// joystick_types.Set("unknown", Napi::Number::New(env, SDL_JOYSTICK_TYPE_UNKNOWN)); // This is an error case
-	joystick_types.Set("gamecontroller", Napi::Number::New(env, SDL_JOYSTICK_TYPE_GAMECONTROLLER));
-	joystick_types.Set("wheel", Napi::Number::New(env, SDL_JOYSTICK_TYPE_WHEEL));
-	joystick_types.Set("arcadestick", Napi::Number::New(env, SDL_JOYSTICK_TYPE_ARCADE_STICK));
-	joystick_types.Set("flightstick", Napi::Number::New(env, SDL_JOYSTICK_TYPE_FLIGHT_STICK));
-	joystick_types.Set("dancepad", Napi::Number::New(env, SDL_JOYSTICK_TYPE_DANCE_PAD));
-	joystick_types.Set("guitar", Napi::Number::New(env, SDL_JOYSTICK_TYPE_GUITAR));
-	joystick_types.Set("drumkit", Napi::Number::New(env, SDL_JOYSTICK_TYPE_DRUM_KIT));
-	joystick_types.Set("arcadepad", Napi::Number::New(env, SDL_JOYSTICK_TYPE_ARCADE_PAD));
-	joystick_types.Set("throttle", Napi::Number::New(env, SDL_JOYSTICK_TYPE_THROTTLE));
-
-	Napi::Object controller_axes = Napi::Object::New(env);
-	controller_axes.Set("leftStickX", Napi::Number::New(env, SDL_CONTROLLER_AXIS_LEFTX));
-	controller_axes.Set("leftStickY", Napi::Number::New(env, SDL_CONTROLLER_AXIS_LEFTY));
-	controller_axes.Set("rightStickX", Napi::Number::New(env, SDL_CONTROLLER_AXIS_RIGHTX));
-	controller_axes.Set("rightStickY", Napi::Number::New(env, SDL_CONTROLLER_AXIS_RIGHTY));
-	controller_axes.Set("leftTrigger", Napi::Number::New(env, SDL_CONTROLLER_AXIS_TRIGGERLEFT));
-	controller_axes.Set("rightTrigger", Napi::Number::New(env, SDL_CONTROLLER_AXIS_TRIGGERRIGHT));
-
-	Napi::Object controller_buttons = Napi::Object::New(env);
-	controller_buttons.Set("dpadLeft", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-	controller_buttons.Set("dpadRight", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
-	controller_buttons.Set("dpadUp", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_DPAD_UP));
-	controller_buttons.Set("dpadDown", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-	controller_buttons.Set("a", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_A));
-	controller_buttons.Set("b", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_B));
-	controller_buttons.Set("x", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_X));
-	controller_buttons.Set("y", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_Y));
-	controller_buttons.Set("guide", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_GUIDE));
-	controller_buttons.Set("back", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_BACK));
-	controller_buttons.Set("start", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_START));
-	controller_buttons.Set("leftStick", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_LEFTSTICK));
-	controller_buttons.Set("rightStick", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_RIGHTSTICK));
-	controller_buttons.Set("leftShoulder", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-	controller_buttons.Set("rightShoulder", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-	controller_buttons.Set("paddle1", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_PADDLE1));
-	controller_buttons.Set("paddle2", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_PADDLE2));
-	controller_buttons.Set("paddle3", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_PADDLE3));
-	controller_buttons.Set("paddle4", Napi::Number::New(env, SDL_CONTROLLER_BUTTON_PADDLE4));
-
-	Napi::Object sensor_types = Napi::Object::New(env);
-	sensor_types.Set("unknown", Napi::Number::New(env, SDL_SENSOR_UNKNOWN));
-	sensor_types.Set("accelerometer", Napi::Number::New(env, SDL_SENSOR_ACCEL));
-	sensor_types.Set("gyroscope", Napi::Number::New(env, SDL_SENSOR_GYRO));
-	sensor_types.Set("accelerometerLeft", Napi::Number::New(env, SDL_SENSOR_ACCEL_L));
-	sensor_types.Set("gyroscopeLeft", Napi::Number::New(env, SDL_SENSOR_GYRO_L));
-	sensor_types.Set("accelerometerRight", Napi::Number::New(env, SDL_SENSOR_ACCEL_R));
-	sensor_types.Set("gyroscopeRight", Napi::Number::New(env, SDL_SENSOR_GYRO_R));
-
-	Napi::Object power_states = Napi::Object::New(env);
-	power_states.Set("unknown", Napi::Number::New(env, SDL_POWERSTATE_UNKNOWN));
-	power_states.Set("noBattery", Napi::Number::New(env, SDL_POWERSTATE_NO_BATTERY));
-	power_states.Set("battery", Napi::Number::New(env, SDL_POWERSTATE_ON_BATTERY));
-	power_states.Set("charging", Napi::Number::New(env, SDL_POWERSTATE_CHARGING));
-	power_states.Set("charged", Napi::Number::New(env, SDL_POWERSTATE_CHARGED));
-
 	Napi::Object all = Napi::Object::New(env);
-	all.Set("eventFamily", event_families);
-	all.Set("eventType", event_types);
 	all.Set("pixelFormat", pixel_formats);
 	all.Set("audioFormat", audio_formats);
-	all.Set("scancode", scancodes);
-	all.Set("button", mouse_buttons);
-	all.Set("cursor", cursors);
-	all.Set("hatPosition", hat_positions);
-	all.Set("powerLevel", power_levels);
-	all.Set("joystickType", joystick_types);
-	all.Set("controllerAxis", controller_axes);
-	all.Set("controllerButton", controller_buttons);
-	all.Set("sensorType", sensor_types);
-	all.Set("powerState", power_states);
+	all.Set("scancodes", scancodes);
+	all.Set("mouseButtons", mouse_buttons);
+	all.Set("cursors", cursors);
 
 	return all;
 }

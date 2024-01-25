@@ -8,6 +8,58 @@
 #include <string>
 #include <sstream>
 
+
+std::string events::families::DISPLAY;
+std::string events::families::WINDOW;
+std::string events::families::DROP;
+std::string events::families::KEYBOARD;
+std::string events::families::TEXT;
+std::string events::families::MOUSE;
+std::string events::families::JOYSTICK_DEVICE;
+std::string events::families::JOYSTICK;
+std::string events::families::CONTROLLER;
+std::string events::families::SENSOR;
+std::string events::families::AUDIO_DEVICE;
+std::string events::families::CLIPBOARD;
+
+std::string events::types::DISPLAY_ADD;
+std::string events::types::DISPLAY_REMOVE;
+std::string events::types::DISPLAY_ORIENT;
+std::string events::types::SHOW;
+std::string events::types::HIDE;
+std::string events::types::EXPOSE;
+std::string events::types::MOVE;
+std::string events::types::RESIZE;
+std::string events::types::MINIMIZE;
+std::string events::types::MAXIMIZE;
+std::string events::types::RESTORE;
+std::string events::types::FOCUS;
+std::string events::types::BLUR;
+std::string events::types::HOVER;
+std::string events::types::LEAVE;
+std::string events::types::KEY_DOWN;
+std::string events::types::KEY_UP;
+std::string events::types::TEXT_INPUT;
+std::string events::types::MOUSE_MOVE;
+std::string events::types::MOUSE_BUTTON_DOWN;
+std::string events::types::MOUSE_BUTTON_UP;
+std::string events::types::MOUSE_WHEEL;
+std::string events::types::DROP_BEGIN;
+std::string events::types::DROP_COMPLETE;
+std::string events::types::DROP_FILE;
+std::string events::types::DROP_TEXT;
+std::string events::types::CLOSE;
+std::string events::types::DEVICE_ADD;
+std::string events::types::DEVICE_REMOVE;
+std::string events::types::AXIS_MOTION;
+std::string events::types::BUTTON_DOWN;
+std::string events::types::BUTTON_UP;
+std::string events::types::BALL_MOTION;
+std::string events::types::HAT_MOTION;
+std::string events::types::REMAP;
+std::string events::types::UPDATE;
+
+
 Napi::Env *poll_env = nullptr;
 Napi::Function *poll_callback = nullptr;
 
@@ -18,27 +70,27 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 
 	switch (event.type) {
 		case SDL_DISPLAYEVENT: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::DISPLAY));
+			result.Set("family", events::families::DISPLAY);
 			result.Set("displayIndex", Napi::Number::New(env, event.display.display));
 
 			switch (event.display.event) {
-				case SDL_DISPLAYEVENT_CONNECTED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::DISPLAY_ADD)); break; }
-				case SDL_DISPLAYEVENT_DISCONNECTED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::DISPLAY_REMOVE)); break; }
-				case SDL_DISPLAYEVENT_ORIENTATION: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::DISPLAY_ORIENT)); break; }
+				case SDL_DISPLAYEVENT_CONNECTED: { result.Set("type", events::types::DISPLAY_ADD); break; }
+				case SDL_DISPLAYEVENT_DISCONNECTED: { result.Set("type", events::types::DISPLAY_REMOVE); break; }
+				case SDL_DISPLAYEVENT_ORIENTATION: { result.Set("type", events::types::DISPLAY_ORIENT); break; }
 			}
 			break;
 		}
 
 		case SDL_WINDOWEVENT: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::WINDOW));
+			result.Set("family", events::families::WINDOW);
 			result.Set("windowId", Napi::Number::New(env, event.window.windowID));
 
 			switch (event.window.event) {
-				case SDL_WINDOWEVENT_SHOWN: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::SHOW)); break; }
-				case SDL_WINDOWEVENT_HIDDEN: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::HIDE)); break; }
-				case SDL_WINDOWEVENT_EXPOSED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::EXPOSE)); break; }
+				case SDL_WINDOWEVENT_SHOWN: { result.Set("type", events::types::SHOW); break; }
+				case SDL_WINDOWEVENT_HIDDEN: { result.Set("type", events::types::HIDE); break; }
+				case SDL_WINDOWEVENT_EXPOSED: { result.Set("type", events::types::EXPOSE); break; }
 				case SDL_WINDOWEVENT_MOVED: {
-					result.Set("type", Napi::Number::New(env, (int) enums::EventType::MOVE));
+					result.Set("type", events::types::MOVE);
 					result.Set("x", Napi::Number::New(env, event.window.data1));
 					result.Set("y", Napi::Number::New(env, event.window.data2));
 					break;
@@ -55,37 +107,37 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 					int pixel_width, pixel_height;
 					SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-					result.Set("type", Napi::Number::New(env, (int) enums::EventType::RESIZE));
+					result.Set("type", events::types::RESIZE);
 					result.Set("width", Napi::Number::New(env, event.window.data1));
 					result.Set("height", Napi::Number::New(env, event.window.data2));
 					result.Set("pixelWidth", Napi::Number::New(env, pixel_width));
 					result.Set("pixelHeight", Napi::Number::New(env, pixel_height));
 					break;
 				}
-				case SDL_WINDOWEVENT_MINIMIZED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::MINIMIZE)); break; }
-				case SDL_WINDOWEVENT_MAXIMIZED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::MAXIMIZE)); break; }
-				case SDL_WINDOWEVENT_RESTORED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::RESTORE)); break; }
-				case SDL_WINDOWEVENT_FOCUS_GAINED: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::FOCUS)); break; }
-				case SDL_WINDOWEVENT_FOCUS_LOST: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::BLUR)); break; }
-				case SDL_WINDOWEVENT_ENTER: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::HOVER)); break; }
-				case SDL_WINDOWEVENT_LEAVE: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::LEAVE)); break; }
-				case SDL_WINDOWEVENT_CLOSE: { result.Set("type", Napi::Number::New(env, (int) enums::EventType::CLOSE)); break; }
+				case SDL_WINDOWEVENT_MINIMIZED: { result.Set("type", events::types::MINIMIZE); break; }
+				case SDL_WINDOWEVENT_MAXIMIZED: { result.Set("type", events::types::MAXIMIZE); break; }
+				case SDL_WINDOWEVENT_RESTORED: { result.Set("type", events::types::RESTORE); break; }
+				case SDL_WINDOWEVENT_FOCUS_GAINED: { result.Set("type", events::types::FOCUS); break; }
+				case SDL_WINDOWEVENT_FOCUS_LOST: { result.Set("type", events::types::BLUR); break; }
+				case SDL_WINDOWEVENT_ENTER: { result.Set("type", events::types::HOVER); break; }
+				case SDL_WINDOWEVENT_LEAVE: { result.Set("type", events::types::LEAVE); break; }
+				case SDL_WINDOWEVENT_CLOSE: { result.Set("type", events::types::CLOSE); break; }
 			}
 			break;
 		}
 
 		case SDL_DROPBEGIN:
 		case SDL_DROPCOMPLETE: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::DROP));
-			result.Set("type", Napi::Number::New(env, (int) (event.type == SDL_DROPBEGIN ? enums::EventType::DROP_BEGIN : enums::EventType::DROP_COMPLETE)));
+			result.Set("family", events::families::DROP);
+			result.Set("type", event.type == SDL_DROPBEGIN ? events::types::DROP_BEGIN : events::types::DROP_COMPLETE);
 			result.Set("windowId", Napi::Number::New(env, event.drop.windowID));
 			break;
 		}
 		case SDL_DROPFILE:
 		case SDL_DROPTEXT: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::DROP));
+			result.Set("family", events::families::DROP);
 			bool is_file = event.type == SDL_DROPFILE;
-			result.Set("type", Napi::Number::New(env, (int) (is_file ? enums::EventType::DROP_FILE : enums::EventType::DROP_TEXT)));
+			result.Set("type", is_file ? events::types::DROP_FILE : events::types::DROP_TEXT);
 			result.Set("windowId", Napi::Number::New(env, event.drop.windowID));
 			result.Set(is_file ? "file" : "text", Napi::String::New(env, event.drop.file));
 			break;
@@ -93,8 +145,8 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::KEYBOARD));
-			result.Set("type", Napi::Number::New(env, (int) (event.type == SDL_KEYDOWN ? enums::EventType::KEY_DOWN : enums::EventType::KEY_UP)));
+			result.Set("family", events::families::KEYBOARD);
+			result.Set("type", event.type == SDL_KEYDOWN ? events::types::KEY_DOWN : events::types::KEY_UP);
 			result.Set("windowId", Napi::Number::New(env, event.key.windowID));
 
 			SDL_Keysym symbol = event.key.keysym;
@@ -123,16 +175,16 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 
 		case SDL_TEXTINPUT: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::TEXT));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::TEXT_INPUT));
+			result.Set("family", events::families::TEXT);
+			result.Set("type", events::types::TEXT_INPUT);
 			result.Set("windowId", Napi::Number::New(env, event.text.windowID));
 			result.Set("text", Napi::String::New(env, event.text.text));
 			break ;
 		}
 
 		case SDL_MOUSEMOTION: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::MOUSE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::MOUSE_MOVE));
+			result.Set("family", events::families::MOUSE);
+			result.Set("type", events::types::MOUSE_MOVE);
 			result.Set("windowId", Napi::Number::New(env, event.motion.windowID));
 			result.Set("touch", Napi::Boolean::New(env, event.motion.which == SDL_TOUCH_MOUSEID));
 			result.Set("x", Napi::Number::New(env, event.motion.x));
@@ -141,8 +193,8 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::MOUSE));
-			result.Set("type", Napi::Number::New(env, (int) (event.type == SDL_MOUSEBUTTONDOWN ? enums::EventType::MOUSE_BUTTON_DOWN : enums::EventType::MOUSE_BUTTON_UP)));
+			result.Set("family", events::families::MOUSE);
+			result.Set("type", event.type == SDL_MOUSEBUTTONDOWN ? events::types::MOUSE_BUTTON_DOWN : events::types::MOUSE_BUTTON_UP);
 			result.Set("windowId", Napi::Number::New(env, event.button.windowID));
 			result.Set("touch", Napi::Boolean::New(env, event.button.which == SDL_TOUCH_MOUSEID));
 			result.Set("button", Napi::Number::New(env, event.button.button));
@@ -151,8 +203,8 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 			break;
 		}
 		case SDL_MOUSEWHEEL: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::MOUSE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::MOUSE_WHEEL));
+			result.Set("family", events::families::MOUSE);
+			result.Set("type", events::types::MOUSE_WHEEL);
 			result.Set("windowId", Napi::Number::New(env, event.wheel.windowID));
 			result.Set("touch", Napi::Boolean::New(env, event.wheel.which == SDL_TOUCH_MOUSEID));
 
@@ -168,30 +220,30 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 
 		case SDL_JOYDEVICEADDED: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK_DEVICE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::DEVICE_ADD));
+			result.Set("family", events::families::JOYSTICK_DEVICE);
+			result.Set("type", events::types::DEVICE_ADD);
 			result.Set("devices", joystick::_getDevices(env));
 			break;
 		}
 		case SDL_JOYDEVICEREMOVED: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK_DEVICE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::DEVICE_REMOVE));
+			result.Set("family", events::families::JOYSTICK_DEVICE);
+			result.Set("type", events::types::DEVICE_REMOVE);
 			result.Set("joystickId", Napi::Number::New(env, event.jdevice.which));
 			result.Set("devices", joystick::_getDevices(env));
 			break;
 		}
 
 		case SDL_JOYAXISMOTION: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::AXIS_MOTION));
+			result.Set("family", events::families::JOYSTICK);
+			result.Set("type", events::types::AXIS_MOTION);
 			result.Set("joystickId", Napi::Number::New(env, event.jaxis.which));
 			result.Set("axis", Napi::Number::New(env, event.jaxis.axis));
 			result.Set("value", Napi::Number::New(env, joystick::mapAxis(event.jaxis.value)));
 			break ;
 		}
 		case SDL_JOYBALLMOTION: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::BALL_MOTION));
+			result.Set("family", events::families::JOYSTICK);
+			result.Set("type", events::types::BALL_MOTION);
 			result.Set("joystickId", Napi::Number::New(env, event.jball.which));
 			result.Set("ball", Napi::Number::New(env, event.jball.ball));
 			result.Set("x", Napi::Number::New(env, event.jball.xrel));
@@ -200,24 +252,24 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK));
-			result.Set("type", Napi::Number::New(env, (int) (event.type == SDL_JOYBUTTONDOWN ? enums::EventType::BUTTON_DOWN : enums::EventType::BUTTON_UP)));
+			result.Set("family", events::families::JOYSTICK);
+			result.Set("type", event.type == SDL_JOYBUTTONDOWN ? events::types::BUTTON_DOWN : events::types::BUTTON_UP);
 			result.Set("joystickId", Napi::Number::New(env, event.jbutton.which));
 			result.Set("button", Napi::Number::New(env, event.jbutton.button));
 			break ;
 		}
 		case SDL_JOYHATMOTION: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::JOYSTICK));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::HAT_MOTION));
+			result.Set("family", events::families::JOYSTICK);
+			result.Set("type", events::types::HAT_MOTION);
 			result.Set("joystickId", Napi::Number::New(env, event.jhat.which));
 			result.Set("hat", Napi::Number::New(env, event.jhat.hat));
-			result.Set("value", Napi::Number::New(env, event.jhat.value));
+			result.Set("value", joystick::hat_positions[event.jhat.value]);
 			break ;
 		}
 
 		case SDL_CONTROLLERDEVICEREMAPPED: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::CONTROLLER));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::REMAP));
+			result.Set("family", events::families::CONTROLLER);
+			result.Set("type", events::types::REMAP);
 			SDL_JoystickID controller_id = event.cdevice.which;
 			result.Set("controllerId", Napi::Number::New(env, controller_id));
 
@@ -234,40 +286,40 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 
 		case SDL_CONTROLLERAXISMOTION: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::CONTROLLER));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::AXIS_MOTION));
+			result.Set("family", events::families::CONTROLLER);
+			result.Set("type", events::types::AXIS_MOTION);
 			result.Set("controllerId", Napi::Number::New(env, event.caxis.which));
-			result.Set("axis", Napi::Number::New(env, event.caxis.axis));
+			result.Set("axis", controller::axes[(SDL_GameControllerAxis) event.caxis.axis]);
 			result.Set("value", Napi::Number::New(env, joystick::mapAxis(event.caxis.value)));
 			break;
 		}
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::CONTROLLER));
-			result.Set("type", Napi::Number::New(env, (int) (event.type == SDL_CONTROLLERBUTTONDOWN ? enums::EventType::BUTTON_DOWN : enums::EventType::BUTTON_UP)));
+			result.Set("family", events::families::CONTROLLER);
+			result.Set("type", event.type == SDL_CONTROLLERBUTTONDOWN ? events::types::BUTTON_DOWN : events::types::BUTTON_UP);
 			result.Set("controllerId", Napi::Number::New(env, event.cbutton.which));
-			result.Set("button", Napi::Number::New(env, event.cbutton.button));
+			result.Set("button", controller::buttons[(SDL_GameControllerButton) event.cbutton.button]);
 			break;
 		}
 
 		case SDL_SENSORUPDATE: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::SENSOR));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::UPDATE));
+			result.Set("family", events::families::SENSOR);
+			result.Set("type", events::types::UPDATE);
 			result.Set("sensorId", Napi::Number::New(env, event.sensor.which));
 			break;
 		}
 
 		case SDL_AUDIODEVICEADDED: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::AUDIO_DEVICE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::DEVICE_ADD));
+			result.Set("family", events::families::AUDIO_DEVICE);
+			result.Set("type", events::types::DEVICE_ADD);
 			bool is_capture = event.adevice.iscapture;
 			result.Set("isRecorder", Napi::Boolean::New(env, is_capture));
 			result.Set("devices", audio::_getDevices(env, is_capture));
 			break;
 		}
 		case SDL_AUDIODEVICEREMOVED: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::AUDIO_DEVICE));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::DEVICE_REMOVE));
+			result.Set("family", events::families::AUDIO_DEVICE);
+			result.Set("type", events::types::DEVICE_REMOVE);
 			result.Set("audioId", Napi::Number::New(env, event.adevice.which));
 			bool is_capture = event.adevice.iscapture;
 			result.Set("isRecorder", Napi::Boolean::New(env, is_capture));
@@ -276,8 +328,8 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 		}
 
 		case SDL_CLIPBOARDUPDATE: {
-			result.Set("family", Napi::Number::New(env, (int) enums::EventFamily::CLIPBOARD));
-			result.Set("type", Napi::Number::New(env, (int) enums::EventType::UPDATE));
+			result.Set("family", events::families::CLIPBOARD);
+			result.Set("type", events::types::UPDATE);
 			break;
 		}
 

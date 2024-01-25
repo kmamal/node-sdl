@@ -2,7 +2,7 @@ const { test } = require('@kmamal/testing')
 const sdl = require('../src/javascript/index.js')
 
 test("sdl::power", (t) => {
-	t.ok([ 'unknown', 'noBattery', 'battery', 'charging', 'charged' ].includes(sdl.power.info.state))
+	t.ok([ 'noBattery', 'battery', 'charging', 'charged', null ].includes(sdl.power.info.state))
 
 	if (sdl.power.info.seconds !== null) {
 		t.equal(typeof sdl.power.info.seconds, 'number')
