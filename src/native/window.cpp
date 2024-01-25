@@ -85,28 +85,25 @@ updateRenderer(
 		SDL_SetWindowData(window, "texture", nullptr);
 	}
 
-	int renderer_flags = 0
-		| (*is_accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
-		| (*is_vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
-
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, renderer_flags);
-	if (renderer == nullptr) {
-		SDL_ClearError();
-		// Try again with is_vsync flipped
-		*is_vsync = !*is_vsync;
-
-		renderer_flags = 0
+	SDL_Renderer *renderer;
+	for (int i = 0; i < 4; i++) {
+		int renderer_flags = 0
 			| (*is_accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
 			| (*is_vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
 
 		renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+		if (renderer != nullptr) { break; }
 
-		if (renderer == nullptr) {
-			std::ostringstream message;
-			message << "SDL_CreateRenderer(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
+		SDL_ClearError();
+		*is_vsync = !*is_vsync;
+		if (i % 2) { *is_accelerated = !*is_accelerated; }
+	}
+
+	if (renderer == nullptr) {
+		std::ostringstream message;
+		message << "SDL_CreateRenderer(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
 	}
 
 	SDL_RendererInfo info;
