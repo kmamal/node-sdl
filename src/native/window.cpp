@@ -87,14 +87,26 @@ updateRenderer(
 
 	int renderer_flags = 0
 		| (*is_accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
-		| (*is_accelerated && *is_vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
+		| (*is_vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
 
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, renderer_flags);
 	if (renderer == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateRenderer(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
 		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		// Try again with is_vsync flipped
+		*is_vsync = !*is_vsync;
+
+		renderer_flags = 0
+			| (*is_accelerated ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE)
+			| (*is_vsync ? SDL_RENDERER_PRESENTVSYNC : 0);
+
+		renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+
+		if (renderer == nullptr) {
+			std::ostringstream message;
+			message << "SDL_CreateRenderer(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
 	}
 
 	SDL_RendererInfo info;
