@@ -94,7 +94,7 @@ expect -f - <<- EOF
 	send -- [string cat {pi} "\r"]
 
 	expect -exact {Password: }
-	sleep 5
+	sleep 15
 	send -- [string cat {raspberry} "\r"]
 
 	expect -exact {pi@raspberrypi}
