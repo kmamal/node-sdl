@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
 const validEvents = [
@@ -46,10 +46,25 @@ class JoystickInstance extends EventsViaPoll {
 	get firmwareVersion () { return this._firmwareVersion }
 	get serialNumber () { return this._serialNumber }
 
-	get axes () { return this._axes }
-	get balls () { return this._balls }
-	get buttons () { return this._buttons }
-	get hats () { return this._hats }
+	get axes () {
+		Globals.events.poll() // TODO
+		return this._axes
+	}
+
+	get balls () {
+		Globals.events.poll() // TODO
+		return this._balls
+	}
+
+	get buttons () {
+		Globals.events.poll() // TODO
+		return this._buttons
+	}
+
+	get hats () {
+		Globals.events.poll() // TODO
+		return this._hats
+	}
 
 	get power () { return Bindings.joystick_getPower(this._device.id) }
 
@@ -92,7 +107,7 @@ class JoystickInstance extends EventsViaPoll {
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
 		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
 
-		Globals.events.poll()
+		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
 		clearTimeout(this._rumbleTimeout)
 		this._rumbleTimeout = setTimeout(() => { this.stopRumble() }, duration)
@@ -115,7 +130,7 @@ class JoystickInstance extends EventsViaPoll {
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
 		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
 
-		Globals.events.poll()
+		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 		clearTimeout(this._rumbleTriggersTimeout)
 		this._rumbleTriggersTimeout = setTimeout(() => { this.stopRumble() }, duration)

@@ -64,8 +64,9 @@
     "version": "2.26.4"
   },
   "devDependencies": {
-    "@kmamal/testing": "^0.0.27",
-    "@types/node": "^20.11.5",
+    "@kmamal/evdev": "^0.0.1",
+    "@kmamal/testing": "^0.0.28",
+    "@types/node": "^20.11.6",
     "node-addon-api": "^7.1.0",
     "node-gyp": "^10.0.1"
   }

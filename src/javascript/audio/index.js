@@ -22,6 +22,7 @@ const audio = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
 	get devices () {
+		Globals.events.poll()
 		return [
 			...Globals.audioDevices.playback,
 			...Globals.audioDevices.recording,

@@ -7,7 +7,7 @@ import Tar from 'tar'
 const commonHeaders = {
 	"Accept": 'application/vnd.github+json',
 	"Authorization": `Bearer ${process.env.GITHUB_TOKEN}`,
-	'User-Agent': `@kmamal/sdl@${C.version}`,
+	'User-Agent': `@${C.owner}/${C.repo}@${C.version}`,
 }
 
 let response
@@ -36,6 +36,8 @@ getRelease: {
 			body: JSON.stringify({
 				tag_name: `v${C.version}`, // eslint-disable-line camelcase
 				name: `v${C.version}`,
+				prerelease: C.isPrerelease,
+				make_latest: `${!C.isPrerelease}`, // eslint-disable-line camelcase
 			}),
 		},
 	)

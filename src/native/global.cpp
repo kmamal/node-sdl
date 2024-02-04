@@ -16,7 +16,7 @@
 #endif
 
 
-SDL_threadID mainThreadId;
+static SDL_threadID mainThreadId;
 
 int filterEvents(void*, SDL_Event *event) {
 	if (SDL_ThreadID() != mainThreadId) { return 1; }

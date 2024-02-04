@@ -148,7 +148,7 @@ joystick::open (const Napi::CallbackInfo &info)
 	Napi::Value firmware_version = firmware == 0 ? env.Null() : Napi::Number::New(env, firmware);
 
 	const char *serial = SDL_JoystickGetSerial(joystick);
-	Napi::Value serial_number = serial == 0 ? env.Null() : Napi::String::New(env, serial);
+	Napi::Value serial_number = serial == nullptr ? env.Null() : Napi::String::New(env, serial);
 
 	SDL_bool has_led = SDL_JoystickHasLED(joystick);
 	SDL_bool has_rumble = SDL_JoystickHasRumble(joystick);
@@ -164,12 +164,16 @@ joystick::open (const Napi::CallbackInfo &info)
 
 	Napi::Array axes = Napi::Array::New(env, num_axes);
 
+	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
+
 	for (int i = 0; i < num_axes; i++) {
 		double value = joystick::mapAxis(SDL_JoystickGetAxis(joystick, i));
-		const char *error = SDL_GetError();
+		error = SDL_GetError();
 		if (error != global::no_error) {
 			std::ostringstream message;
-			message << "SDL_JoystickGetAxis(" << index << ", " << i << ") error: " << SDL_GetError();
+			message << "SDL_JoystickGetAxis(" << index << ", " << i << ") error: " << error;
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}

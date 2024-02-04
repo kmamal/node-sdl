@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
 const validEvents = [

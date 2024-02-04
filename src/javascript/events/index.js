@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 const { video: videoModule } = require('../video')
 const { mapping } = require('../keyboard/key-mapping')
 const { joystick: joystickModule } = require('../joystick')
@@ -392,19 +392,30 @@ const handleEvent = (event) => {
 
 const poll = () => { Bindings.events_poll(handleEvent) }
 
-let eventsInterval = null
+let pollInterval = null
 
-const startPolling = () => {
-	eventsInterval = setInterval(poll, 0)
+const switchToPollingFast = () => {
+	clearInterval(pollInterval)
+	pollInterval = setInterval(poll, 0)
+}
+
+const switchToPollingSlow = () => {
+	clearInterval(pollInterval)
+	pollInterval = setInterval(poll, 1e3)
+	pollInterval.unref()
 }
 
 const stopPolling = () => {
-	clearInterval(eventsInterval)
-	eventsInterval = null
+	clearInterval(pollInterval)
+	pollInterval = null
 }
 
+switchToPollingSlow()
+poll()
+
 Globals.events = {
-	startPolling,
-	stopPolling,
 	poll,
+	switchToPollingFast,
+	switchToPollingSlow,
+	stopPolling,
 }

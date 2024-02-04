@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 const { make: makeJoystickDevice } = require('./device')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { JoystickInstance } = require('./joystick-instance')
@@ -15,7 +15,10 @@ const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 const joystick = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
-	get devices () { return Globals.joystickDevices }
+	get devices () {
+		Globals.events.poll()
+		return Globals.joystickDevices
+	}
 
 	openDevice (device) { return new JoystickInstance(device) }
 }()

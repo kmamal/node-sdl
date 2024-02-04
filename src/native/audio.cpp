@@ -8,9 +8,13 @@
 Napi::Array
 audio::_getDevices(Napi::Env &env, bool is_capture)
 {
+	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
+
 	int num_devices = SDL_GetNumAudioDevices(is_capture ? 1 : 0);
 	if (num_devices == -1) {
-		const char *error = SDL_GetError();
+		error = SDL_GetError();
 		if (error != global::no_error) {
 			std::ostringstream message;
 			message << "SDL_GetNumAudioDevices(" << is_capture << ") error: " << error;
@@ -151,8 +155,12 @@ audio::dequeue (const Napi::CallbackInfo &info)
 	void *dst = info[1].As<Napi::Buffer<char>>().Data();
 	int size = info[2].As<Napi::Number>().Int32Value();
 
-	int num = SDL_DequeueAudio(audio_id, dst, size);
 	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
+
+	int num = SDL_DequeueAudio(audio_id, dst, size);
+	error = SDL_GetError();
 	if (error != global::no_error) {
 		std::ostringstream message;
 		message << "SDL_DequeueAudio(" << audio_id << ") error: " << error;

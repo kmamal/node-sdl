@@ -1,3 +1,4 @@
+const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { mapping, reverseMapping } = require('./key-mapping')
@@ -22,7 +23,10 @@ const keyboard = {
 		return Bindings.keyboard_getScancode(_key)
 	},
 
-	getState () { return Bindings.keyboard_getState() },
+	getState () {
+		Globals.events.poll()
+		return Bindings.keyboard_getState()
+	},
 }
 
 module.exports = { keyboard }

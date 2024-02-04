@@ -1,6 +1,6 @@
+const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
-const Globals = require('../globals')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioFormatHelpers } = require('./format-helpers')
 

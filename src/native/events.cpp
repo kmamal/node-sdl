@@ -60,8 +60,8 @@ std::string events::types::REMAP;
 std::string events::types::UPDATE;
 
 
-Napi::Env *poll_env = nullptr;
-Napi::Function *poll_callback = nullptr;
+static Napi::Env *poll_env = nullptr;
+static Napi::Function *poll_callback = nullptr;
 
 Napi::Object
 packageEvent (Napi::Env &env, const SDL_Event &event)

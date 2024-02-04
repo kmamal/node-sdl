@@ -1,5 +1,5 @@
-const Bindings = require('../bindings')
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 const {
 	make: makeControllerDevice,
 	filter: filterControllerDevice,
@@ -19,7 +19,10 @@ const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 const controller = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
-	get devices () { return Globals.controllerDevices }
+	get devices () {
+		Globals.events.poll()
+		return Globals.controllerDevices
+	}
 
 	openDevice (device) { return new ControllerInstance(device) }
 

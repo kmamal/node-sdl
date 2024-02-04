@@ -2,6 +2,9 @@ name: Build and upload
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: ${{ matrix.platform.name }}

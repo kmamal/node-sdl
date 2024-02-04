@@ -26,5 +26,5 @@ module.exports = {
 	},
 	audioInstances: new Map(),
 
-	events: null, // Set later to { startPolling, stopPolling, poll }
+	events: null, // Set later from events.js
 }

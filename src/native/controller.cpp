@@ -14,7 +14,9 @@ std::map<SDL_GameControllerButton, std::string> controller::buttons;
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)
 {
-	const char *error;
+	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
 
 	Napi::Object axes = Napi::Object::New(env);
 	axes.Set("leftStickX", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX))));
