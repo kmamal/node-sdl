@@ -24,7 +24,7 @@ int filterEvents(void*, SDL_Event *event) {
 		&& event->type == SDL_WINDOWEVENT
 		&& (false
 			|| event->window.event == SDL_WINDOWEVENT_MOVED
-			|| event->window.event == SDL_WINDOWEVENT_MOVED
+			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
 		)
 	) { events::dispatchEvent(*event); }
 
