@@ -79,7 +79,7 @@ const redraw = () => {
 
 window.on('expose', redraw)
 
-window.on('resize', ({width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
+window.on('resize', ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
 	ext.resize(pw, ph)
 	gl.viewport(0, 0, w, h)
 	gl.swap()

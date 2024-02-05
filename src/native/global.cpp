@@ -18,18 +18,15 @@
 
 static SDL_threadID mainThreadId;
 
-int filterEvents(void*, SDL_Event *event) {
-	if (SDL_ThreadID() != mainThreadId) { return 1; }
-
-	if (event->type != SDL_WINDOWEVENT) { return 1; }
-
-	int window_event_type = event->window.event;
+int watchEvents(void*, SDL_Event *event) {
 	if (true
-		&& window_event_type != SDL_WINDOWEVENT_MOVED
-		&& window_event_type != SDL_WINDOWEVENT_SIZE_CHANGED
-	) { return 1; }
-
-	events::dispatchEvent(*event);
+		&& SDL_ThreadID() == mainThreadId
+		&& event->type == SDL_WINDOWEVENT
+		&& (false
+			|| event->window.event == SDL_WINDOWEVENT_MOVED
+			|| event->window.event == SDL_WINDOWEVENT_MOVED
+		)
+	) { events::dispatchEvent(*event); }
 
 	return 0;
 }
@@ -332,7 +329,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	global::no_error = SDL_GetError();
 
 	mainThreadId = SDL_ThreadID();
-	SDL_SetEventFilter(filterEvents, nullptr);
+	SDL_AddEventWatch(watchEvents, nullptr);
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
 	SDL_StartTextInput(); // TODO

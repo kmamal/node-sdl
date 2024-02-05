@@ -2,6 +2,7 @@
 #define _WINDOW_H_
 
 #include <napi.h>
+#include <SDL.h>
 
 namespace window {
 
