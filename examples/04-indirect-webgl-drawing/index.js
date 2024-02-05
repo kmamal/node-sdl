@@ -3,7 +3,7 @@ import createContext from 'gl'
 
 const window = sdl.video.createWindow({
 	resizable: true,
-	accelerated: process.platform === 'win32',
+	accelerated: false,
 })
 
 const { pixelWidth: width, pixelHeight: height } = window
