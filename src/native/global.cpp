@@ -18,7 +18,7 @@
 
 static SDL_threadID mainThreadId;
 
-int watchEvents(void*, SDL_Event *event) {
+int filterEvents(void*, SDL_Event *event) {
 	if (true
 		&& SDL_ThreadID() == mainThreadId
 		&& event->type == SDL_WINDOWEVENT
@@ -28,7 +28,7 @@ int watchEvents(void*, SDL_Event *event) {
 		)
 	) { events::dispatchEvent(*event); }
 
-	return 0;
+	return 1;
 }
 
 
@@ -329,7 +329,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	global::no_error = SDL_GetError();
 
 	mainThreadId = SDL_ThreadID();
-	SDL_AddEventWatch(watchEvents, nullptr);
+	SDL_SetEventFilter(filterEvents, nullptr);
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
 	SDL_StartTextInput(); // TODO
