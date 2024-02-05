@@ -3,7 +3,7 @@ import createContext from 'gl'
 
 const window = sdl.video.createWindow({
 	resizable: true,
-	accelerated: false,
+	accelerated: process.platform === 'win32',
 })
 
 const { pixelWidth: width, pixelHeight: height } = window
@@ -72,6 +72,9 @@ gl.useProgram(program)
 gl.clearColor(0, 0, 0, 1)
 
 const redraw = () => {
+	gl.clear(gl.COLOR_BUFFER_BIT)
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+
 	const { pixelWidth: w, pixelHeight: h } = window
 	const buffer = new Uint8Array(w * h * 4)
 	gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buffer)
@@ -80,9 +83,7 @@ const redraw = () => {
 
 window.on('expose', redraw)
 
-window.on('resize', () => {
-	const { pixelWidth: w, pixelHeight: h } = window
+window.on('resize', ({ pixelWidth: w, pixelHeight: h }) => {
 	ext.resize(w, h)
-
 	redraw()
 })
