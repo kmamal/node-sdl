@@ -63,7 +63,7 @@ while (!window.destroyed) {
 				if (x > lastX) {
 					const y = (min - zeroSampleValue) / amplitude
 					const h = (max - min) / amplitude
-					ctx.fillRect(lastX / supersampling, y, 1, h)
+					ctx.fillRect(lastX / supersampling, y, 1, Math.max(1 / height, h))
 					lastX = x
 					min = Infinity
 					max = -Infinity

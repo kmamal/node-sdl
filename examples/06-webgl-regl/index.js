@@ -42,18 +42,12 @@ const drawTriangle = regl({
 	count: 3,
 })
 
-window.on('resize', () => {
-	const { pixelWidth: w, pixelHeight: h } = window
-	ext.resize(w, h)
-	regl.poll()
-	gl.swap()
-})
 
 let tic = Date.now()
 let toc
 let frames = 0
 
-const interval = setInterval(() => {
+const redraw = () => {
 	if (window.destroyed) {
 		clearInterval(interval)
 		return
@@ -92,4 +86,20 @@ const interval = setInterval(() => {
 			frames = 0
 		}
 	}
-}, 1e3 / 30)
+}
+
+window.on('resize', () => {
+	const {
+		width: w,
+		height: h,
+		pixelWidth: pw,
+		pixelHeight: ph,
+	} = window
+	ext.resize(pw, ph)
+	gl.viewport(0, 0, w, h)
+	gl.swap()
+
+	redraw()
+})
+
+const interval = setInterval(redraw, 1e3 / 30)

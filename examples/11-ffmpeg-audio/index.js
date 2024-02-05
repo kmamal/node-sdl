@@ -1,5 +1,6 @@
 import sdl from '@kmamal/sdl'
 import path from 'path'
+import url from 'url'
 import { loadAudio } from './ffmpeg.js'
 
 const channels = 1
@@ -10,7 +11,7 @@ const audioInstance = sdl.audio.openDevice({ type: 'playback' }, {
 	format: 'f32lsb',
 })
 
-const dir = path.dirname(import.meta.url)
+const dir = path.dirname(url.fileURLToPath(import.meta.url))
 const buffer = await loadAudio(
 	path.join(dir, 'assets/audio.wav'),
 	{ channels, frequency },
