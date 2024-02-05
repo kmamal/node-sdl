@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 import Canvas from 'canvas'
 import { fork } from 'node:child_process'
 import { once } from 'node:events'

@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 import createContext from '@kmamal/gl'
 
 const window = sdl.video.createWindow({

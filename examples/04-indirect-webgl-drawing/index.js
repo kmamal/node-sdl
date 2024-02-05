@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 import createContext from 'gl'
 
 const window = sdl.video.createWindow({
@@ -85,5 +85,7 @@ window.on('expose', redraw)
 
 window.on('resize', ({ pixelWidth: w, pixelHeight: h }) => {
 	ext.resize(w, h)
+	gl.viewport(0, 0, w, h)
+
 	redraw()
 })

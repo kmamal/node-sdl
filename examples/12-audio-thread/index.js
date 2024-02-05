@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 import { Worker } from 'node:worker_threads'
 import { fileURLToPath } from 'node:url'
 import Path from 'node:path'

@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl'
+import sdl from '../../src/javascript/index.js'
 import path from 'path'
 import url from 'url'
 import { setTimeout } from 'timers/promises'
