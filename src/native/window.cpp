@@ -30,6 +30,46 @@
 
 
 void
+updateTexture(
+	Napi::Env &env,
+	SDL_Window *window,
+	SDL_Renderer *renderer,
+	int pixel_width, int pixel_height,
+	SDL_Texture **texture_dst
+) {
+	int window_id = SDL_GetWindowID(window);
+	// Not likely to fail.
+
+	int format = SDL_GetWindowPixelFormat(window);
+	if (format == SDL_PIXELFORMAT_UNKNOWN) {
+		std::ostringstream message;
+		message << "SDL_GetWindowPixelFormat(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, pixel_width, pixel_height);
+	if (texture == nullptr) {
+		std::ostringstream message;
+		message << "SDL_CreateTexture(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE) < 0) {
+		std::ostringstream message;
+		message << "SDL_SetTextureBlendMode(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	SDL_Texture *old_texture = (SDL_Texture *) SDL_SetWindowData(window, "texture", texture);
+	if (old_texture != nullptr) { SDL_DestroyTexture(old_texture); }
+
+	if (texture_dst != nullptr) { *texture_dst = texture; }
+}
+
+void
 updateRenderer(
 	Napi::Env &env,
 	SDL_Window *window,
@@ -42,6 +82,7 @@ updateRenderer(
 	SDL_Renderer *old_renderer = SDL_GetRenderer(window);
 	if (old_renderer != nullptr) {
 		SDL_DestroyRenderer(old_renderer);
+		SDL_SetWindowData(window, "texture", nullptr);
 	}
 
 	SDL_Renderer *renderer;
@@ -77,6 +118,11 @@ updateRenderer(
 
 	*is_accelerated = info.flags & SDL_RENDERER_ACCELERATED;
 	*is_vsync = info.flags & SDL_RENDERER_PRESENTVSYNC;
+
+	int pixel_width, pixel_height;
+	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+
+	updateTexture(env, window, renderer, pixel_width, pixel_height, nullptr);
 }
 
 
@@ -546,37 +592,72 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
-	if (surface == nullptr) {
+	SDL_Texture *texture = (SDL_Texture *) SDL_GetWindowData(window, "texture");
+	if (texture == nullptr) {
+		std::ostringstream message;
+		message << "SDL_GetWindowData(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	unsigned int texture_format;
+	int texture_width, texture_height;
+	if (SDL_QueryTexture(texture, &texture_format, nullptr, &texture_width, &texture_height) < 0) {
+		std::ostringstream message;
+		message << "SDL_QueryTexture(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	int pixel_width, pixel_height;
+	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+
+	if (pixel_width != texture_width || pixel_height != texture_height) {
+		updateTexture(env, window, renderer, pixel_width, pixel_height, &texture);
+		texture_width = pixel_width;
+		texture_height = pixel_height;
+	}
+
+	SDL_Surface *src_surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+	if (src_surface == nullptr) {
 		std::ostringstream message;
 		message << "SDL_CreateRGBSurfaceWithFormatFrom(" << window_id << ", " << w << ", " << h << ", " << stride << ", " << format << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE) < 0) {
+	if (SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE) < 0) {
 		std::ostringstream message;
 		message << "SDL_SetSurfaceBlendMode(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-	if (texture == nullptr) {
+	void *texture_pixels;
+	int texture_stride;
+	if (SDL_LockTexture(texture, nullptr, &texture_pixels, &texture_stride) < 0) {
 		std::ostringstream message;
-		message << "SDL_CreateTextureFromSurface(" << window_id << ") error: " << SDL_GetError();
+		message << "SDL_LockTexture(" << window_id << ", " << texture_width << ", " << texture_height << ", " << texture_stride << ", " << texture_format << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_FreeSurface(surface);
-
-	if (SDL_RenderClear(renderer) < 0) {
+	SDL_Surface *dst_surface = SDL_CreateRGBSurfaceWithFormatFrom(texture_pixels, texture_width, texture_height, SDL_BITSPERPIXEL(texture_format), texture_stride, texture_format);
+	if (dst_surface == nullptr) {
 		std::ostringstream message;
-		message << "SDL_RenderClear(" << window_id << ") error: " << SDL_GetError();
+		message << "SDL_CreateRGBSurfaceWithFormatFrom(" << window_id << ", " << texture_width << ", " << texture_height << ", " << texture_stride << ", " << texture_format << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+
+	if (SDL_BlitScaled(src_surface, NULL, dst_surface, NULL) < 0) {
+		std::ostringstream message;
+		message << "SDL_BlitSurface(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	SDL_UnlockTexture(texture);
 
 	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr) < 0) {
 		std::ostringstream message;
@@ -586,6 +667,9 @@ window::render (const Napi::CallbackInfo &info)
 	}
 
 	SDL_RenderPresent(renderer);
+
+	SDL_FreeSurface(src_surface);
+	SDL_FreeSurface(dst_surface);
 
 	return env.Undefined();
 }
