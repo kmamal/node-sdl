@@ -1,4 +1,4 @@
-import sdl from '../../src/javascript/index.js'
+import sdl from '@kmamal/sdl'
 import path from 'path'
 import url from 'url'
 import { loadAudio } from './ffmpeg.js'

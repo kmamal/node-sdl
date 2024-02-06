@@ -1,4 +1,4 @@
-import sdl from '../../src/javascript/index.js'
+import sdl from '@kmamal/sdl'
 import Canvas from 'canvas'
 
 const window = sdl.video.createWindow({ resizable: true })
