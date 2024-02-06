@@ -9,81 +9,24 @@
 #include <SDL.h>
 #include <string>
 #include <sstream>
-#include <map>
+#include <vector>
 
 #if defined(__MACOSX__)
 	#include "cocoa-global.h"
 #endif
 
 
-static SDL_threadID main_thread_id;
-static Uint32 user_event;
-static std::map<Uint32, bool> pending_resize_events;
-
-
-Uint32
-postUserEvent (Uint32, void* data)
-{
-	SDL_Window *window = (SDL_Window*) data;
-	Uint32 window_id = SDL_GetWindowID(window);
-
-	bool is_event_pending = pending_resize_events[window_id];
-	pending_resize_events.erase(window_id);
-
-	if (!is_event_pending) { return 1; }
-
-	SDL_Event event;
-	SDL_memset(&event, 0, sizeof(event));
-	event.type = user_event;
-	event.user.data1 = data;
-	SDL_PushEvent(&event);
-
-	return 0;
-}
-
+static SDL_threadID mainThreadId;
 
 int filterEvents(void*, SDL_Event *event) {
-	if (!events::inside_poll) { return 1; }
-	if (SDL_ThreadID() != main_thread_id) { return 1; }
-
-	if (event->type == user_event) {
-		SDL_Window *window = (SDL_Window*) event->user.data1;
-		Uint32 window_id = SDL_GetWindowID(window);
-
-		SDL_Event resize_event;
-		SDL_memset(&resize_event, 0, sizeof(resize_event));
-		resize_event.type = SDL_WINDOWEVENT;
-		resize_event.window.event = SDL_WINDOWEVENT_SIZE_CHANGED;
-		resize_event.window.windowID = window_id;
-		events::dispatchEvent(resize_event);
-
-		return 1;
-	}
-
-	if (event->type != SDL_WINDOWEVENT) { return 1; }
-
-	int type = event->window.event;
-
-	if (type == SDL_WINDOWEVENT_MOVED) {
-		events::dispatchEvent(*event);
-		return 1;
-	}
-
-	if (type == SDL_WINDOWEVENT_SIZE_CHANGED) {
-		Uint32 window_id = event->window.windowID;
-
-		if (pending_resize_events.find(window_id) != pending_resize_events.end()) {
-			pending_resize_events[window_id] = true;
-			return 1;
-		}
-
-		events::dispatchEvent(*event);
-
-		pending_resize_events[window_id] = false;
-		SDL_AddTimer(100, postUserEvent, SDL_GetWindowFromID(window_id));
-
-		return 1;
-	}
+	if (true
+		&& SDL_ThreadID() == mainThreadId
+		&& event->type == SDL_WINDOWEVENT
+		&& (false
+			|| event->window.event == SDL_WINDOWEVENT_MOVED
+			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+		)
+	) { events::dispatchEvent(*event); }
 
 	return 1;
 }
@@ -272,7 +215,6 @@ global::initialize(const Napi::CallbackInfo &info)
 		| SDL_INIT_GAMECONTROLLER
 		| SDL_INIT_HAPTIC
 		| SDL_INIT_SENSOR
-		| SDL_INIT_TIMER
 	) < 0) {
 		std::ostringstream message;
 		message << "SDL_Init() error: " << SDL_GetError();
@@ -386,9 +328,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	SDL_ClearError();
 	global::no_error = SDL_GetError();
 
-	user_event = SDL_RegisterEvents(1);
-
-	main_thread_id = SDL_ThreadID();
+	mainThreadId = SDL_ThreadID();
 	SDL_SetEventFilter(filterEvents, nullptr);
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
