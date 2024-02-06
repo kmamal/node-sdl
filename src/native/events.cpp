@@ -104,12 +104,15 @@ packageEvent (Napi::Env &env, const SDL_Event &event)
 						throw Napi::Error::New(env, message.str());
 					}
 
+					int width, height;
+					SDL_GetWindowSize(window, &width, &height);
+
 					int pixel_width, pixel_height;
 					SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 					result.Set("type", events::types::RESIZE);
-					result.Set("width", Napi::Number::New(env, event.window.data1));
-					result.Set("height", Napi::Number::New(env, event.window.data2));
+					result.Set("width", Napi::Number::New(env, width));
+					result.Set("height", Napi::Number::New(env, height));
 					result.Set("pixelWidth", Napi::Number::New(env, pixel_width));
 					result.Set("pixelHeight", Napi::Number::New(env, pixel_height));
 					break;
@@ -371,6 +374,10 @@ events::dispatchEvent(const SDL_Event &event)
 	poll_callback->Call(poll_env->Global(), { packed });
 }
 
+
+bool events::inside_poll;
+
+
 Napi::Value
 events::poll (const Napi::CallbackInfo &info)
 {
@@ -381,8 +388,12 @@ events::poll (const Napi::CallbackInfo &info)
 	poll_env = &env;
 	poll_callback = &callback;
 
+	events::inside_poll = true;
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) { events::dispatchEvent(event); }
+
+	events::inside_poll = false;
 
 	poll_env = nullptr;
 	poll_callback = nullptr;
