@@ -1,22 +1,22 @@
 import sdl from '@kmamal/sdl'
 import path from 'path'
+import url from 'url'
 import { setTimeout } from 'timers/promises'
 import { loadImage, loadVideo } from './ffmpeg.js'
 
-const width = 640
-const height = 480
 const framerate = 25
 
-let startTime = null
-let lastIndex = null
+const window = sdl.video.createWindow()
+const { pixelWidth: width, pixelHeight: height } = window
 
-const dir = path.dirname(import.meta.url)
+const dir = path.dirname(url.fileURLToPath(import.meta.url))
 const [ image, video ] = await Promise.all([
 	loadImage(path.join(dir, '../assets/image.png'), { width, height }),
 	loadVideo(path.join(dir, '../assets/video.mp4'), { width, height, framerate }),
 ])
 
-const window = sdl.video.createWindow({ width, height })
+let startTime = null
+let lastIndex = null
 
 window.on('mouseButtonUp', () => {
 	startTime = startTime ? null : Date.now()
@@ -24,7 +24,7 @@ window.on('mouseButtonUp', () => {
 })
 
 const render = async () => {
-	for (;;) {
+	while (!window.destroyed) {
 		// Render pause image
 		if (!startTime) {
 			window.render(width, height, width * 3, 'rgb24', image)

@@ -1,0 +1,21 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-pkg",
+  "main": "src/index.js",
+  "scripts": {
+    "package": "cd scripts; node package.mjs"
+  },
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "bmp-js": "^0.1.0"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "*"
+  },
+  "pkg": {
+    "scripts": "src/**/*.js",
+    "assets": [ "assets/**/*" ],
+    "targets": [ "node20-linux-x64" ]
+  },
+  "bin": "src/index.js"
+}

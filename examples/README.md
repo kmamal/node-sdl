@@ -70,9 +70,13 @@ It does this by keeping the audio playback in a child process, separate from the
 
 Applies random changes to whatever text has been copied to the clipboard.
 
-## [15. Packaging for distribution](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging)
+## [15. Packaging to a ZIP](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging)
 
-Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/packager`](https://github.com/kmamal/packager#readme) here, but other packagers should work as well. There's also a [github workflow file](https://github.com/kmamal/node-sdl/tree/master/examples/12-packaging/.github/workflows/build.yml) that builds and bundles the project for all supported platforms.
+Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/packager`](https://github.com/kmamal/packager#readme) here, but other packagers should work as well. There's also a [github workflow file](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging/.github/workflows/build.yml) that builds and bundles the project for all supported platforms.
+
+## [16. Packaging using PKG](https://github.com/kmamal/node-sdl/tree/master/examples/16-pkg)
+
+This is an alternative packaging method using the [`@yao-pkg/pkg`](https://www.npmjs.com/package/@yao-pkg/pkg) package (a fork of the original [`vercel/pkg`](https://github.com/vercel/pkg)). One important thing to keep in mind is that ES modules are not yet supported by `pkg` so we have to use the old CommonJS modules. Another important detail is that SDL is dynamically linked, so you need to distribute the library files along with the executable.
 
 
 // TODO: more
