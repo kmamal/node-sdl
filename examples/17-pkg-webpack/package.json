@@ -1,0 +1,19 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-pkg",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "package": "cd scripts && node package.mjs"
+  },
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "bmp-js": "^0.1.0"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "*",
+    "@vercel/ncc": "^0.38.1",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
+  }
+}

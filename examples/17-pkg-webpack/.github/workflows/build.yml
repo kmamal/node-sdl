@@ -1,0 +1,30 @@
+name: Build and upload
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.platform.name }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+          - { name: 'Linux (x64)'   ,os: ubuntu-22.04              }
+          - { name: 'Windows (x64)' ,os: windows-2022              }
+          - { name: 'Mac (x64)'     ,os: macos-12                  }
+          - { name: 'Mac (arm64)'   ,os: macos-12     ,arch: arm64 }
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm i
+      - run: npm run package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist

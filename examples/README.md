@@ -78,5 +78,9 @@ Eventually you might want to make your application available for download somewh
 
 This is an alternative packaging method using the [`@yao-pkg/pkg`](https://www.npmjs.com/package/@yao-pkg/pkg) package (a fork of the original [`vercel/pkg`](https://github.com/vercel/pkg)). One important thing to keep in mind is that ES modules are not yet supported by `pkg` so we have to use the old CommonJS modules. Another important detail is that SDL is dynamically linked, so you need to distribute the library files along with the executable.
 
+## [17. Packaging using PKG and Webpack](https://github.com/kmamal/node-sdl/tree/master/examples/17-pkg-webpack)
+
+If we did want to use ES modules in our code, we would first have to transform our code before passing it to `pkg`. This example is similar to the previous one, except that we first run webpack to bundle the project into the `build` folder, and then run `pkg on that`. Note that the build folder needs its own `package.json` file.
+
 
 // TODO: more
