@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@kmamal/sdl": "*",
-    "bmp-js": "^0.1.0"
+    "bmp-js": "*"
   },
   "devDependencies": {
     "@yao-pkg/pkg": "*"
