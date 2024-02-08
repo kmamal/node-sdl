@@ -8,12 +8,11 @@
   },
   "dependencies": {
     "@kmamal/sdl": "*",
-    "bmp-js": "^0.1.0"
+    "bmp-js": "*"
   },
   "devDependencies": {
     "@yao-pkg/pkg": "*",
-    "@vercel/ncc": "^0.38.1",
-    "webpack": "^5.90.1",
-    "webpack-cli": "^5.1.4"
+    "webpack": "*",
+    "webpack-cli": "*"
   }
 }
