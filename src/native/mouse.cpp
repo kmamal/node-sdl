@@ -128,16 +128,17 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 
 	allocated_cursor = SDL_CreateColorCursor(surface, x, y);
 	if (allocated_cursor == nullptr) {
+		SDL_FreeSurface(surface);
+
 		std::ostringstream message;
 		message << "SDL_CreateColorCursor(" << x << ", " << y << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_FreeSurface(surface);
-
 	SDL_SetCursor(allocated_cursor);
 
+	SDL_FreeSurface(surface);
 	return env.Undefined();
 }
 

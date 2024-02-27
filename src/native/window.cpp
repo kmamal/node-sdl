@@ -563,15 +563,18 @@ window::render (const Napi::CallbackInfo &info)
 
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	if (texture == nullptr) {
+		SDL_FreeSurface(surface);
+
 		std::ostringstream message;
 		message << "SDL_CreateTextureFromSurface(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_FreeSurface(surface);
-
 	if (SDL_RenderClear(renderer) < 0) {
+		SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surface);
+
 		std::ostringstream message;
 		message << "SDL_RenderClear(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -579,6 +582,9 @@ window::render (const Napi::CallbackInfo &info)
 	}
 
 	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr) < 0) {
+		SDL_DestroyTexture(texture);
+		SDL_FreeSurface(surface);
+
 		std::ostringstream message;
 		message << "SDL_RenderCopy(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -587,6 +593,8 @@ window::render (const Napi::CallbackInfo &info)
 
 	SDL_RenderPresent(renderer);
 
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
 	return env.Undefined();
 }
 

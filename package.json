@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kmamal/node-sdl.git"
+    "url": "git+ssh://git@github.com/kmamal/node-sdl.git"
   },
   "main": "./src/javascript/index.js",
   "types": "./src/types/index.d.ts",
@@ -65,8 +65,8 @@
   },
   "devDependencies": {
     "@kmamal/evdev": "^0.0.1",
-    "@kmamal/testing": "^0.0.28",
-    "@types/node": "^20.11.6",
+    "@kmamal/testing": "^0.0.30",
+    "@types/node": "^20.11.20",
     "node-addon-api": "^7.1.0",
     "node-gyp": "^10.0.1"
   }

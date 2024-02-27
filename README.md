@@ -48,6 +48,7 @@ window.on('*', console.log)
 import sdl from '@kmamal/sdl'
 import { createCanvas } from 'canvas'
 
+// Setup
 const window = sdl.video.createWindow({ title: "Canvas" })
 const { pixelWidth: width, pixelHeight: height } = window
 const canvas = createCanvas(width, height)
@@ -56,6 +57,8 @@ const ctx = canvas.getContext('2d')
 // Clear screen to red
 ctx.fillStyle = 'red'
 ctx.fillRect(0, 0, width, height)
+
+// Render to window
 const buffer = canvas.toBuffer('raw')
 window.render(width, height, width * 4, 'bgra32', buffer)
 ```
@@ -65,6 +68,7 @@ window.render(width, height, width * 4, 'bgra32', buffer)
 import sdl from '@kmamal/sdl'
 import createContext from '@kmamal/gl'
 
+// Setup
 const window = sdl.video.createWindow({ title: "WebGL", opengl: true })
 const { pixelWidth: width, pixelHeight: height, native } = window
 const gl = createContext(width, height, { window: native })
@@ -72,6 +76,8 @@ const gl = createContext(width, height, { window: native })
 // Clear screen to red
 gl.clearColor(1, 0, 0, 1)
 gl.clear(gl.COLOR_BUFFER_BIT)
+
+// Render to window
 gl.swap()
 ```
 
@@ -80,12 +86,11 @@ gl.swap()
 import sdl from '@kmamal/sdl'
 import gpu from '@kmamal/gpu'
 
+// Setup
 const window = sdl.video.createWindow({ title: "WebGPU", webgpu: true })
-
 const instance = gpu.create([])
 const adapter = await instance.requestAdapter()
 const device = await adapter.requestDevice()
-
 const renderer = gpu.renderGPUDeviceToWindow({ device, window })
 
 // Clear screen to red
@@ -103,11 +108,14 @@ const renderPass = commandEncoder.beginRenderPass({
 renderPass.end()
 device.queue.submit([ commandEncoder.finish() ])
 
+// Render to window
 renderer.swap()
 
 ```
 
-There are more examples [in the `examples/` folder](https://github.com/kmamal/node-sdl/tree/master/examples).
+### More examples
+
+Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples) folder.
 
 
 # API Reference
