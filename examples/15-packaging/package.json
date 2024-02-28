@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "package": "packager --include '[ \"src/**/*.js\", \"assets/**/*\", \"package*.json\" ]' --out-dir dist"
+    "package": "packager --include \"src/**/*.js\" --include \"assets/**/*\" --include \"package*.json\" --out-dir dist"
   },
   "dependencies": {
     "@kmamal/sdl": "*",

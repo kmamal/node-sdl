@@ -1,9 +1,6 @@
-name: Build and upload
+name: Package
 
 on: workflow_dispatch
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -12,19 +9,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          - { name: 'Linux (x64)'   ,os: ubuntu-22.04              }
-          - { name: 'Windows (x64)' ,os: windows-2022              }
-          - { name: 'Mac (x64)'     ,os: macos-12                  }
-          - { name: 'Mac (arm64)'   ,os: macos-12     ,arch: arm64 }
+        platform:
+          - { name: 'Linux (x64)'   ,os: ubuntu-latest               }
+          - { name: 'Windows (x64)' ,os: windows-latest              }
+          - { name: 'Mac (x64)'     ,os: macos-latest                }
+          - { name: 'Mac (arm64)'   ,os: macos-latest   ,arch: arm64 }
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform.os }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - run: npm i
-      - run: npm run package
+      - run: |
+          npm i
+          npm run package
 
       - uses: actions/upload-artifact@v4
         with:
-          path: dist
+          name: ${{ matrix.platform.name }}.zip
+          path: dist/*.zip
