@@ -104,7 +104,7 @@ expect -f - <<- EOF
 	send -- [string cat {wget --progress=dot https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master} "\r"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" npm run release} "\r"]
+	send -- [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" NO_PARALLEL=1 npm run release} "\r"]
 
 	expect -exact {pi@raspberrypi}
 	send -- [string cat {sudo shutdown -h now} "\r"]
