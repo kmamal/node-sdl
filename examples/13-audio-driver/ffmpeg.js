@@ -1,6 +1,6 @@
 import ffmpeg from 'ffmpeg-static'
-import { spawn } from 'child_process'
-import path from 'path'
+import { spawn } from 'node:child_process'
+import path from 'node:path'
 
 export const loadAudio = async (filepath, { channels, frequency }) => {
 	const proc = spawn(
@@ -29,7 +29,7 @@ export const loadAudio = async (filepath, { channels, frequency }) => {
 		proc.on('close', (code) => {
 			code
 				? reject(Object.assign(new Error(`exit code ${code}`), {
-					stderr: stderrChunks.join('')
+					stderr: stderrChunks.join(''),
 				}))
 				: resolve(Buffer.concat(chunks))
 		})

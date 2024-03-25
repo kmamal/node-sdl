@@ -1,5 +1,5 @@
 import bmp from 'bmp-js'
-import fs from 'fs'
+import fs from 'node:fs'
 
 export const loadBmp = async (filePath) => {
 	const bmpBuffer = await fs.promises.readFile(filePath)

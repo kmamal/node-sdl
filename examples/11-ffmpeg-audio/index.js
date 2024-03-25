@@ -1,6 +1,6 @@
 import sdl from '@kmamal/sdl'
-import path from 'path'
-import url from 'url'
+import path from 'node:path'
+import url from 'node:url'
 import { loadAudio } from './ffmpeg.js'
 
 const channels = 1

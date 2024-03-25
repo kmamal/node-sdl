@@ -1,7 +1,7 @@
 import sdl from '@kmamal/sdl'
-import path from 'path'
-import url from 'url'
-import { setTimeout } from 'timers/promises'
+import path from 'node:path'
+import url from 'node:url'
+import { setTimeout } from 'node:timers/promises'
 import { loadImage, loadVideo } from './ffmpeg.js'
 
 const framerate = 25

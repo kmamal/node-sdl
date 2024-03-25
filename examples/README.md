@@ -1,6 +1,7 @@
 # Examples
 
-These serve as a collection of common use-cases, as well as a sort-of tutorial if read in order.
+These serve as a collection of common use-cases.
+Maybe in the future they can also serve as a sort-of tutorial if read in order.
 
 ## [0. Hello World](https://github.com/kmamal/node-sdl/tree/master/examples/00-hello-world)
 

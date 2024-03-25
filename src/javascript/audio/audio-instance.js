@@ -50,8 +50,6 @@ class AudioInstance extends EventsViaPoll {
 		this._minSampleValue = helper.minSampleValue
 		this._maxSampleValue = helper.maxSampleValue
 		this._zeroSampleValue = helper.zeroSampleValue
-		this._readerName = helper.readerName
-		this._writerName = helper.writerName
 		this._reader = helper.reader
 		this._writer = helper.writer
 
@@ -75,13 +73,9 @@ class AudioInstance extends EventsViaPoll {
 		return this._reader.call(buffer, offset)
 	}
 
-	get readerName () { return this._readerName }
-
 	writeSample (buffer, value, offset) {
 		return this._writer.call(buffer, value, offset)
 	}
-
-	get writerName () { return this._writerName }
 
 	get buffered () { return this._buffered }
 

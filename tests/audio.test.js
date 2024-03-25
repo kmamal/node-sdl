@@ -8,8 +8,6 @@ test("sdl::audio", async (t) => {
 	t.equal(sdl.audio.minSampleValue('f32lsb'), -1)
 	t.equal(sdl.audio.maxSampleValue('f32lsb'), 1)
 	t.equal(sdl.audio.zeroSampleValue('f32lsb'), 0)
-	t.equal(sdl.audio.readerName('f32lsb'), 'readFloatLE')
-	t.equal(sdl.audio.writerName('f32lsb'), 'writeFloatLE')
 
 
 	t.ok(Array.isArray(sdl.audio.devices))
@@ -63,12 +61,6 @@ test("sdl::audio", async (t) => {
 
 		t.equal(instance1.zeroSampleValue, 0)
 		t.equal(instance2.zeroSampleValue, 32767)
-
-		t.equal(instance1.readerName, 'readFloatLE')
-		t.equal(instance2.readerName, 'readUInt16LE')
-
-		t.equal(instance1.writerName, 'writeFloatLE')
-		t.equal(instance2.writerName, 'writeUInt16LE')
 
 		t.equal(instance1.buffered, 4096)
 		t.equal(instance2.buffered, 1024)
@@ -157,12 +149,6 @@ test("sdl::audio", async (t) => {
 
 		t.equal(instance1.zeroSampleValue, 0)
 		t.equal(instance2.zeroSampleValue, 32767)
-
-		t.equal(instance1.readerName, 'readFloatLE')
-		t.equal(instance2.readerName, 'readUInt16LE')
-
-		t.equal(instance1.writerName, 'writeFloatLE')
-		t.equal(instance2.writerName, 'writeUInt16LE')
 
 		t.equal(instance1.buffered, 4096)
 		t.equal(instance2.buffered, 1024)

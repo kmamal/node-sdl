@@ -115,7 +115,7 @@ renderer.swap()
 
 ### More examples
 
-Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples) folder.
+Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#readme) folder.
 
 
 # API Reference
@@ -310,9 +310,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples)
   * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
   * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
   * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
-  * [sdl.audio.readerName(format)](#sdlaudioreadernameformat)
   * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
-  * [sdl.audio.writerName(format)](#sdlaudiowriternameformat)
   * [sdl.audio.devices](#sdlaudiodevices)
   * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
   * [class AudioInstance](#class-audioinstance)
@@ -326,9 +324,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples)
     * [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
     * [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
     * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
-    * [audioInstance.readerName](#audioinstancereadername)
     * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancewritesamplebuffer-value-offset)
-    * [audioInstance.writerName](#audioinstancewritername)
     * [audioInstance.buffered](#audioinstancebuffered)
     * [audioInstance.playing](#audioinstanceplaying)
     * [audioInstance.play([play])](#audioinstanceplayplay)
@@ -347,6 +343,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples)
   * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
 * [sdl.power](#sdlpower)
   * [sdl.power.info](#sdlpowerinfo)
+* [helpers](#helpers)
 
 
 ## sdl
@@ -2220,12 +2217,16 @@ When this event is emitted, all instances that were opened from the removed devi
 
 Helper function which maps each sample format to the corresponding number of bytes its samples take up.
 
+This function is also available from `@kmamal/sdl/helpers`.
+
 ### sdl.audio.minSampleValue(format)
 
 * `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
 * Returns: `<number>` The minimum sample value.
 
 Helper function which maps each sample format to the corresponding minimum value its samples can take.
+
+This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.maxSampleValue(format)
 
@@ -2234,12 +2235,16 @@ Helper function which maps each sample format to the corresponding minimum value
 
 Helper function which maps each sample format to the corresponding maximum value its samples can take.
 
+This function is also available from `@kmamal/sdl/helpers`.
+
 ### sdl.audio.zeroSampleValue(format)
 
 * `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
 * Returns: `<number>` The zero sample value.
 
 Helper function which maps each sample format to the sample value that corresponds to silence.
+
+This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.readSample(format, buffer[, offset])
 
@@ -2251,14 +2256,7 @@ Helper function which maps each sample format to the sample value that correspon
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
-### sdl.audio.readerName(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<string>` The name of the read method.
-
-Helper function which returns the name of the appropriate `read*` method of `Buffer` based on the format argument.
-Most of the time you will want to use [sdl.audio.readSample](#sdlaudioreadsampleformat-buffer-offset) directly.
-The method name is only really useful for passing to worker threads.
+This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
@@ -2271,14 +2269,7 @@ The method name is only really useful for passing to worker threads.
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
-### sdl.audio.writerName(format)
-
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<string>` The name of the write method.
-
-Helper function which returns the name of the appropriate `write*` method of `Buffer` based on the format argument.
-Most of the time you will want to use [sdl.audio.writeSample](#sdlaudiowritesampleformat-buffer-value-offset) directly.
-The method name is only really useful for passing to worker threads.
+This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.devices
 
@@ -2411,14 +2402,6 @@ The sample value that corresponds to silence, based on the format the instance w
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
-### audioInstance.readerName
-
-* `<string>`
-
-The name of the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
-Most of the time you will want to use [audioInstance.readSample](#audioinstancereadsamplebuffer-offset) directly.
-The method name is only really useful for passing to worker threads.
-
 ### audioInstance.writeSample(buffer, value[, offset])
 
 * `buffer: <Buffer>` The buffer to write the sample to.
@@ -2428,14 +2411,6 @@ The method name is only really useful for passing to worker threads.
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
-
-### audioInstance.writerName
-
-* `<string>`
-
-The name of the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
-Most of the time you will want to use [audioInstance.writeSample](#audioinstancewritesamplebuffer-value-offset) directly.
-The method name is only really useful for passing to worker threads.
 
 ### audioInstance.buffered
 
@@ -2538,6 +2513,26 @@ Changes the text contents of the clipboard.
   * `percent: <number>|<null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
 
 The curent power information of the device.
+
+
+## Helpers
+
+The `@kmamal/sdl` library can only be imported from the main thread.
+If you try importing it from a `worker_thread` you will get an error.
+This is mainly due to some limitations in SDL itself (it's often unsafe to call functions from threads other than the one that called `SDL_Init`) as well as Node.js native modules (each thread gets it's own instance of the module and it's hard to make them talk with each other).
+
+It's often useful however to offload CPU-heavy work to a thread, so the main thread can respond to input events faster.
+This is still possible! Even if the threads do not have access to the SDL-related functions, they can still write data to buffers and then pass those buffers to the main thread from where they can be passed to SDL. One thing is missing: While the core of the library is not needed, it's nice to have the helper functions, for example when writing an audio renderer it's nice to have the [`readSample`](#sdlaudioreadsampleformat-buffer-offset), [`writeSample`](#sdlaudiowritesampleformat-buffer-value-offset), etc functions.
+
+Since these are just helpers and don't call any SLD code underneath it's safe to use them. They are made available through the `@kmamal/sdl/helpers` sub-module that does not load any of the native code. For an example of their use see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/12-audio-thread/audio-worker.js).
+
+The functions included in `@kmamal/sdl/helpers` are:
+- [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
+- [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
+- [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
+- [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
+- [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
+- [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
 
 
 ## Building from source

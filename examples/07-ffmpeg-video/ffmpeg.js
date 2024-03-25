@@ -1,6 +1,6 @@
 import ffmpeg from 'ffmpeg-static'
-import { spawn } from 'child_process'
-import path from 'path'
+import { spawn } from 'node:child_process'
+import path from 'node:path'
 
 export const loadImage = async (filepath, options) => (await loadVideo(filepath, options))[0]
 
@@ -50,7 +50,7 @@ export const loadVideo = async (filepath, { width, height, framerate }) => {
 		proc.on('close', (code) => {
 			code
 				? reject(Object.assign(new Error(`exit code ${code}`), {
-					stderr: stderrChunks.join('')
+					stderr: stderrChunks.join(''),
 				}))
 				: resolve(frames)
 		})

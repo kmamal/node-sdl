@@ -1,4 +1,5 @@
-import { workerData, parentPort } from 'worker_threads'
+import { workerData, parentPort } from 'node:worker_threads'
+import sdlHelpers from '@kmamal/sdl/helpers'
 
 const TWO_PI = 2 * Math.PI
 
@@ -6,14 +7,13 @@ const {
 	channels,
 	frequency,
 	buffered,
-	bytesPerSample,
-	minSampleValue,
-	maxSampleValue,
-	zeroSampleValue,
-	writerName,
+	format,
 } = workerData
 
-const writeSample = Buffer.prototype[writerName]
+const bytesPerSample = sdlHelpers.audio.bytesPerSample(format)
+const minSampleValue = sdlHelpers.audio.minSampleValue(format)
+const maxSampleValue = sdlHelpers.audio.maxSampleValue(format)
+const zeroSampleValue = sdlHelpers.audio.zeroSampleValue(format)
 
 const range = maxSampleValue - minSampleValue
 const amplitude = range / 2
@@ -29,9 +29,9 @@ let lastTime = startTime - leadTime
 
 setInterval(() => {
 	const now = Date.now()
-	const ellapsed = now - lastTime
-	if (ellapsed === 0) { return }
-	const numFrames = Math.floor(ellapsed / 1e3 * frequency)
+	const elapsed = now - lastTime
+	if (elapsed === 0) { return }
+	const numFrames = Math.floor(elapsed / 1e3 * frequency)
 	if (numFrames === 0) { return }
 	lastTime = now
 
@@ -45,7 +45,7 @@ setInterval(() => {
 		const angle = time / sinePeriod * TWO_PI
 		const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
 		for (let j = 0; j < channels; j++) {
-			offset = writeSample.call(buffer, sample, offset)
+			offset = sdlHelpers.audio.writeSample(format, buffer, sample, offset)
 		}
 	}
 

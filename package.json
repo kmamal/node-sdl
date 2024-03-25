@@ -42,6 +42,10 @@
     ".": {
       "types": "./src/types/index.d.ts",
       "default": "./src/javascript/index.js"
+    },
+    "./helpers": {
+      "types": "./src/types/helpers.d.ts",
+      "default": "./src/javascript/helpers.js"
     }
   },
   "gypfile": true,
@@ -56,7 +60,7 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
-    "tar": "^6.2.0"
+    "tar": "^6.2.1"
   },
   "sdl": {
     "owner": "kmamal",
@@ -66,8 +70,8 @@
   "devDependencies": {
     "@kmamal/evdev": "^0.0.1",
     "@kmamal/testing": "^0.0.30",
-    "@types/node": "^20.11.20",
-    "node-addon-api": "^7.1.0",
-    "node-gyp": "^10.0.1"
+    "@types/node": "^20.11.30",
+    "node-addon-api": "^8.0.0",
+    "node-gyp": "^10.1.0"
   }
 }

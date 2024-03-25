@@ -8,11 +8,7 @@ const {
 	channels,
 	frequency,
 	buffered,
-	bytesPerSample,
-	minSampleValue,
-	maxSampleValue,
-	zeroSampleValue,
-	writerName,
+	format,
 } = playbackInstance
 
 const __dirname = Path.dirname(fileURLToPath(import.meta.url))
@@ -23,11 +19,7 @@ const worker = new Worker(workerPath, {
 		channels,
 		frequency,
 		buffered,
-		bytesPerSample,
-		minSampleValue,
-		maxSampleValue,
-		zeroSampleValue,
-		writerName,
+		format,
 	},
 })
 

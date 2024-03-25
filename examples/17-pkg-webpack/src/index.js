@@ -1,6 +1,6 @@
 import sdl from '@kmamal/sdl'
-import path from 'path'
-import url from 'url'
+import path from 'node:path'
+import url from 'node:url'
 import { loadBmp } from './bmp.js'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
