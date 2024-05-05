@@ -60,7 +60,7 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
-    "tar": "^6.2.1"
+    "tar": "^7.1.0"
   },
   "sdl": {
     "owner": "kmamal",
@@ -70,7 +70,7 @@
   "devDependencies": {
     "@kmamal/evdev": "^0.0.1",
     "@kmamal/testing": "^0.0.30",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.12.8",
     "node-addon-api": "^8.0.0",
     "node-gyp": "^10.1.0"
   }

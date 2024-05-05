@@ -368,9 +368,9 @@ export namespace Sdl {
 				readonly height: number
 			}
 			readonly dpi: {
-				readonly horizontal: number
-				readonly vertical: number
-				readonly diagonal: number
+				readonly horizontal: number|null
+				readonly vertical: number|null
+				readonly diagonal: number|null
 			}
 		}
 

@@ -67,18 +67,18 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		usable.Set("width", Napi::Number::New(env, rect.w));
 		usable.Set("height", Napi::Number::New(env, rect.h));
 
+		// TODO: Is this an SDL bug? Do I have a ticket number?
 		float ddpi, hdpi, vdpi;
-		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayDPI(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-
 		Napi::Object dpi = Napi::Object::New(env);
-		dpi.Set("diagonal", Napi::Number::New(env, ddpi));
-		dpi.Set("horizontal", Napi::Number::New(env, hdpi));
-		dpi.Set("vertical", Napi::Number::New(env, vdpi));
+		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
+			dpi.Set("diagonal", env.Null());
+			dpi.Set("horizontal", env.Null());
+			dpi.Set("vertical", env.Null());
+		} else {
+			dpi.Set("diagonal", Napi::Number::New(env, ddpi));
+			dpi.Set("horizontal", Napi::Number::New(env, hdpi));
+			dpi.Set("vertical", Napi::Number::New(env, vdpi));
+		}
 
 		Napi::Object display = Napi::Object::New(env);
 		display.Set("name", Napi::String::New(env, name));

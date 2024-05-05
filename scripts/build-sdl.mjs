@@ -3,7 +3,7 @@ import Path from 'node:path'
 import { once } from 'node:events'
 import C from './util/common.js'
 import { fetch } from './util/fetch.js'
-import Tar from 'tar'
+import * as Tar from 'tar'
 
 const url = `https://github.com/${C.sdl.owner}/${C.sdl.repo}/archive/refs/tags/v${C.sdl.version}.tar.gz`
 
