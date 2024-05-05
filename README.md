@@ -515,10 +515,10 @@ Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
     * `x, y, width, height: <Rect>` The position and size of the display's geometry.
   * `usable: <object>` Similar to `geometry`, but excludes areas taken up by the OS or window manager such as menus, docks, e.t.c.
     * `x, y, width, height: <Rect>` The position and size of the display's usable region.
-  * `dpi: <object>` Return pixel density for the display in dots/pixels-per-inch units.
-    * `horizontal: <number>|<null>` The horizontal density. Might be `null` on some devices because of an SDL bug.
-    * `vertical: <number>|<null>` The vertical density. Might be `null` on some devices because of an SDL bug.
-    * `diagonal: <number>|<null>` The diagonal density. Might be `null` on some devices because of an SDL bug.
+  * `dpi: <object>|<null>` Return pixel density for the display in dots/pixels-per-inch units. Might be `null` on some devices if DPI info can't be retrieved.
+    * `horizontal: <number>` The horizontal density.
+    * `vertical: <number>` The vertical density.
+    * `diagonal: <number>` The diagonal density.
 
 A list of all detected displays.
 Sample output for two side-to-side monitors is below.

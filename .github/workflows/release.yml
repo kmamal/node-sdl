@@ -27,7 +27,7 @@ jobs:
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
         run: ./scripts/install-deps-mac.sh
 
-      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
+      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') && matrix.platform.arch != 'arm64' }}
         run: ./scripts/install-deps-ubuntu.sh
 
       - if: ${{ !startsWith(matrix.platform.os, 'ubuntu-') || matrix.platform.arch != 'arm64' }}

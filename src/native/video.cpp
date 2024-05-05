@@ -67,14 +67,12 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		usable.Set("width", Napi::Number::New(env, rect.w));
 		usable.Set("height", Napi::Number::New(env, rect.h));
 
-		// TODO: Is this an SDL bug? Do I have a ticket number?
+		Napi::Object dpi
 		float ddpi, hdpi, vdpi;
-		Napi::Object dpi = Napi::Object::New(env);
 		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
-			dpi.Set("diagonal", env.Null());
-			dpi.Set("horizontal", env.Null());
-			dpi.Set("vertical", env.Null());
+			dpi = env.Null();
 		} else {
+			dpi = Napi::Object::New(env);
 			dpi.Set("diagonal", Napi::Number::New(env, ddpi));
 			dpi.Set("horizontal", Napi::Number::New(env, hdpi));
 			dpi.Set("vertical", Napi::Number::New(env, vdpi));
