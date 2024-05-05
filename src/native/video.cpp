@@ -67,15 +67,16 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		usable.Set("width", Napi::Number::New(env, rect.w));
 		usable.Set("height", Napi::Number::New(env, rect.h));
 
-		Napi::Object dpi
+		Napi::Value dpi;
 		float ddpi, hdpi, vdpi;
-		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
+		if (true || SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
 			dpi = env.Null();
 		} else {
-			dpi = Napi::Object::New(env);
-			dpi.Set("diagonal", Napi::Number::New(env, ddpi));
-			dpi.Set("horizontal", Napi::Number::New(env, hdpi));
-			dpi.Set("vertical", Napi::Number::New(env, vdpi));
+			Napi::Object dpi_obj = Napi::Object::New(env);
+			dpi_obj.Set("diagonal", Napi::Number::New(env, ddpi));
+			dpi_obj.Set("horizontal", Napi::Number::New(env, hdpi));
+			dpi_obj.Set("vertical", Napi::Number::New(env, vdpi));
+			dpi = dpi_obj;
 		}
 
 		Napi::Object display = Napi::Object::New(env);
