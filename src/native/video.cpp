@@ -69,7 +69,7 @@ video::getDisplays(const Napi::CallbackInfo &info)
 
 		Napi::Value dpi;
 		float ddpi, hdpi, vdpi;
-		if (true || SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
+		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
 			dpi = env.Null();
 		} else {
 			Napi::Object dpi_obj = Napi::Object::New(env);

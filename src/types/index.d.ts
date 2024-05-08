@@ -400,7 +400,7 @@ export namespace Sdl {
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
 			on (event: 'dropComplete', listener: (event: Events.Window.DropComplete) => void): this
-			on (event: '*', listener: (event: Events.Window.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Window.Any) => void): this
 
 			readonly id: number
 
@@ -476,7 +476,7 @@ export namespace Sdl {
 			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
-			on (event: '*', listener: (event: Events.Display.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
 
 			readonly displays: Display[]
 
@@ -873,7 +873,7 @@ export namespace Sdl {
 			on (event: 'buttonUp', listener: (event: Events.Joystick.ButtonUp) => void): this
 			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
 			on (event: 'close', listener: (event: Events.Joystick.Close) => void): this
-			on (event: '*', listener: (event: Events.Joystick.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Joystick.Any) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -907,7 +907,7 @@ export namespace Sdl {
 		interface Module {
 			on (event: 'deviceAdd', listener: (event: Events.JoystickDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.JoystickDevice.Remove) => void): this
-			on (event: '*', listener: (event: Events.JoystickDevice.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.JoystickDevice.Any) => void): this
 
 			readonly devices: Device[]
 
@@ -965,7 +965,7 @@ export namespace Sdl {
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
 			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
-			on (event: '*', listener: (event: Events.Controller.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Controller.Any) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number
@@ -1025,7 +1025,7 @@ export namespace Sdl {
 		interface Module {
 			on (event: 'deviceAdd', listener: (event: Events.ControllerDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.ControllerDevice.Remove) => void): this
-			on (event: '*', listener: (event: Events.ControllerDevice.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.ControllerDevice.Any) => void): this
 
 			addMappings (mappings: string[]): void
 
@@ -1064,7 +1064,7 @@ export namespace Sdl {
 		export class SensorInstance {
 			on (event: 'update', listener: (event: Events.Sensor.Update) => void): this
 			on (event: 'close', listener: (event: Events.Sensor.Close) => void): this
-			on (event: '*', listener: (event: Events.Sensor.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Sensor.Any) => void): this
 
 			readonly device: Device
 
@@ -1121,7 +1121,7 @@ export namespace Sdl {
 
 		export class AudioInstance {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
-			on (event: '*', listener: (event: Events.Audio.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
 
 			readonly id: number
 			readonly device: Device
@@ -1167,7 +1167,7 @@ export namespace Sdl {
 		interface Module {
 			on (event: 'deviceAdd', listener: (event: Events.AudioDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.AudioDevice.Remove) => void): this
-			on (event: '*', listener: (event: Events.AudioDevice.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.AudioDevice.Any) => void): this
 
 			readonly devices: Device[]
 
@@ -1187,7 +1187,7 @@ export namespace Sdl {
 
 		interface Module {
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
-			on (event: '*', listener: (event: Events.Clipboard.Any) => void): this
+			on (event: '*', listener: (type: string, event: Events.Clipboard.Any) => void): this
 
 			readonly text: string
 			setText (text: string): void
