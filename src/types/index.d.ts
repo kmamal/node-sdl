@@ -62,7 +62,7 @@ export namespace Events {
 		export interface MouseButtonUp extends MouseButtonEvent { readonly type: 'mouseButtonUp' }
 
 		export interface MouseWheel extends MouseEvent {
-			readonly type: 'flipped'
+			readonly type: 'mouseWheel'
 			readonly dx: number
 			readonly dy: number
 			readonly flipped: boolean
