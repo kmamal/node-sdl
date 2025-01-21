@@ -7,5 +7,9 @@
     "@kmamal/gl": "*",
     "@kmamal/sdl": "*",
     "regl": "*"
-  }
+  },
+  "trustedDependencies": [
+    "@kmamal/gl",
+    "@kmamal/sdl"
+  ]
 }

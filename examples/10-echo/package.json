@@ -5,5 +5,8 @@
   "type": "module",
   "dependencies": {
     "@kmamal/sdl": "*"
-  }
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl"
+  ]
 }

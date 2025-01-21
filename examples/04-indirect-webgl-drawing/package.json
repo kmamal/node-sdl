@@ -6,5 +6,9 @@
   "dependencies": {
     "@kmamal/sdl": "*",
     "gl": "*"
-  }
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl",
+    "gl"
+  ]
 }

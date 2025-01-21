@@ -6,5 +6,9 @@
   "dependencies": {
     "@kmamal/sdl": "*",
     "canvas": "*"
-  }
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl",
+    "canvas"
+  ]
 }

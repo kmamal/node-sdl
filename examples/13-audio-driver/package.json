@@ -7,5 +7,10 @@
     "@kmamal/sdl": "*",
     "canvas": "*",
     "ffmpeg-static": "*"
-  }
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl",
+    "canvas",
+    "ffmpeg-static"
+  ]
 }
