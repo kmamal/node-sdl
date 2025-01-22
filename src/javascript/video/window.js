@@ -395,6 +395,19 @@ class Window extends EventsViaPoll {
 
 		this.emit('close', { type: 'close' })
 	}
+
+	destroyGently () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		let shouldPrevent = false
+		this.emit('beforeClose', {
+			type: 'beforeClose',
+			prevent: () => { shouldPrevent = true },
+		})
+		if (shouldPrevent) { return }
+
+		this.destroy()
+	}
 }
 
 module.exports = { Window }

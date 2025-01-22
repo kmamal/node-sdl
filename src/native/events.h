@@ -8,6 +8,7 @@
 namespace events {
 
 	namespace families {
+		extern std::string QUIT;
 		extern std::string DISPLAY;
 		extern std::string WINDOW;
 		extern std::string DROP;

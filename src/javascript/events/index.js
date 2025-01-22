@@ -74,6 +74,12 @@ const handleEvent = (event) => {
 	delete event.family
 
 	switch (family) {
+		case 'quit': {
+			for (const window of Globals.windows.all.values()) {
+				window.destroyGently()
+			}
+		} break
+
 		// TODO: this also needs a reconcile function
 		case 'display': {
 			const { displayIndex } = event
@@ -153,13 +159,9 @@ const handleEvent = (event) => {
 				} break
 
 				case 'close': {
-					let shouldPrevent = false
-					const prevent = () => { shouldPrevent = true }
-					const type2 = 'beforeClose'
-					const event2 = { type: type2, prevent }
-					window.emit(type2, event2)
-					if (shouldPrevent) { return }
-				} break
+					window.destroyGently()
+					return
+				}
 
 				default: return
 			}

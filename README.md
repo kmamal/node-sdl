@@ -208,6 +208,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.stopFlashing()](#windowstopflashing)
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
+    * [window.destroyGently()](#windowdestroygently)
 * [sdl.keyboard](#sdlkeyboard)
   * [Virtual keys](#virtual-keys)
   * [Enum: SCANCODE](#enum-scancode)
@@ -1057,6 +1058,11 @@ A destroyed window object should not be used any further.
 ### window.destroy()
 
 Destroys the window.
+
+### window.destroyGently()
+
+Asks before destroying the window.
+The difference between this function and [destroy()](#windowdestroy) is that this function will first make the window emit the [`'beforeClose'`](#event-beforeclose) event, giving you a chance to prevent the window from being destroyed.
 
 
 ## sdl.keyboard

@@ -40,7 +40,7 @@ global::initialize(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-
+	events::families::QUIT = "quit";
 	events::families::DISPLAY = "display";
 	events::families::WINDOW = "window";
 	events::families::DROP = "drop";

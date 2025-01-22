@@ -9,6 +9,7 @@
 #include <sstream>
 
 
+std::string events::families::QUIT;
 std::string events::families::DISPLAY;
 std::string events::families::WINDOW;
 std::string events::families::DROP;
@@ -72,6 +73,11 @@ events::dispatchEvent(const SDL_Event &event)
 	Napi::Object packed = Napi::Object::New(env);
 
 	switch (event.type) {
+		case SDL_QUIT: {
+			packed.Set("family", events::families::QUIT);
+			break;
+		}
+
 		case SDL_DISPLAYEVENT: {
 			packed.Set("family", events::families::DISPLAY);
 			packed.Set("displayIndex", Napi::Number::New(env, event.display.display));
