@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@kmamal/evdev": "^0.0.1",
-    "@kmamal/testing": "^0.0.30",
+    "@kmamal/testing": "^0.0.31",
     "@types/node": "^22.10.7",
     "node-addon-api": "^8.3.0",
     "node-gyp": "^11.0.0"
