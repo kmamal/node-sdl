@@ -8,7 +8,7 @@
 namespace events {
 
 	namespace families {
-		extern std::string QUIT;
+		extern std::string APP;
 		extern std::string DISPLAY;
 		extern std::string WINDOW;
 		extern std::string DROP;
@@ -24,6 +24,7 @@ namespace events {
 	};
 
 	namespace types {
+		extern std::string QUIT;
 		extern std::string DISPLAY_ADD;
 		extern std::string DISPLAY_REMOVE;
 		extern std::string DISPLAY_ORIENT;

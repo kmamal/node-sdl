@@ -9,7 +9,7 @@
 #include <sstream>
 
 
-std::string events::families::QUIT;
+std::string events::families::APP;
 std::string events::families::DISPLAY;
 std::string events::families::WINDOW;
 std::string events::families::DROP;
@@ -23,6 +23,7 @@ std::string events::families::SENSOR;
 std::string events::families::AUDIO_DEVICE;
 std::string events::families::CLIPBOARD;
 
+std::string events::types::QUIT;
 std::string events::types::DISPLAY_ADD;
 std::string events::types::DISPLAY_REMOVE;
 std::string events::types::DISPLAY_ORIENT;
@@ -74,7 +75,8 @@ events::dispatchEvent(const SDL_Event &event)
 
 	switch (event.type) {
 		case SDL_QUIT: {
-			packed.Set("family", events::families::QUIT);
+			packed.Set("family", events::families::APP);
+			packed.Set("type", events::types::QUIT);
 			break;
 		}
 

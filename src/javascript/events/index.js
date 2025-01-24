@@ -74,7 +74,9 @@ const handleEvent = (event) => {
 	delete event.family
 
 	switch (family) {
-		case 'quit': {
+		case 'app': {
+			if (event.type !== 'quit') { return }
+
 			for (const window of Globals.windows.all.values()) {
 				window.destroyGently()
 			}

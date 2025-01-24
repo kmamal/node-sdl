@@ -40,7 +40,7 @@ global::initialize(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	events::families::QUIT = "quit";
+	events::families::APP = "app";
 	events::families::DISPLAY = "display";
 	events::families::WINDOW = "window";
 	events::families::DROP = "drop";
@@ -54,6 +54,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::families::AUDIO_DEVICE = "audioDevice";
 	events::families::CLIPBOARD = "clipboard";
 
+	events::types::QUIT = "quit";
 	events::types::DISPLAY_ADD = "displayAdd";
 	events::types::DISPLAY_REMOVE = "displayRemove";
 	events::types::DISPLAY_ORIENT = "displayOrient";
