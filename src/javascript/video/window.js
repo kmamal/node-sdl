@@ -57,14 +57,14 @@ class Window extends EventsViaPoll {
 
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
 		if (display !== null && typeof display !== 'object') { throw Object.assign(new Error("display must be an object"), { display }) }
-		if (x !== null && !Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
-		if (y !== null && !Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (x !== null && !Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
+		if (y !== null && !Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 		if (width !== null) {
-			if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+			if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 			if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
 		}
 		if (height !== null) {
-			if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+			if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 			if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
 		}
 		if (typeof visible !== 'boolean') { throw Object.assign(new Error("visible must be a boolean"), { visible }) }
@@ -80,7 +80,7 @@ class Window extends EventsViaPoll {
 		if (typeof popupMenu !== 'boolean') { throw Object.assign(new Error("popupMenu must be a boolean"), { popupMenu }) }
 		if (typeof tooltip !== 'boolean') { throw Object.assign(new Error("tooltip must be a boolean"), { tooltip }) }
 		if (typeof utility !== 'boolean') { throw Object.assign(new Error("utility must be a boolean"), { utility }) }
-		if (display && (Number.isFinite(x) || Number.isFinite(y))) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
+		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 
@@ -186,8 +186,8 @@ class Window extends EventsViaPoll {
 	setPosition (x, y) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
-		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
+		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 
 		Bindings.window_setPosition(this._id, x, y)
 		this._x = x
@@ -199,12 +199,35 @@ class Window extends EventsViaPoll {
 	setSize (width, height) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
-		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
 
 		const { pixelWidth, pixelHeight } = Bindings.window_setSize(this._id, width, height)
+		this._width = Math.floor(width)
+		this._height = Math.floor(height)
+		this._pixelWidth = pixelWidth
+		this._pixelHeight = pixelHeight
+	}
+
+	setSizeInPixels (pixelWidth, pixelHeight) {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		if (!Number.isInteger(pixelWidth)) { throw Object.assign(new Error("pixelWidth must be an integer"), { pixelWidth }) }
+		if (pixelWidth <= 0) { throw Object.assign(new Error("invalid pixelWidth"), { pixelWidth }) }
+		if (!Number.isInteger(pixelHeight)) { throw Object.assign(new Error("pixelHeight must be an integer"), { pixelHeight }) }
+		if (pixelHeight <= 0) { throw Object.assign(new Error("invalid pixelHeight"), { pixelHeight }) }
+
+		const xRatio = this._width / this._pixelWidth
+		const yRatio = this._height / this._pixelHeight
+		const width = pixelWidth * xRatio
+		const height = pixelHeight * yRatio
+
+		if (!Number.isInteger(width)) { throw Object.assign(new Error(`pixelWidth must be a multiple of ${xRatio}`), { pixelWidth }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error(`pixelWidth must be a multiple of ${yRatio}`), { pixelWidth }) }
+
+		Bindings.window_setSize(this._id, width, height)
 		this._width = width
 		this._height = height
 		this._pixelWidth = pixelWidth
@@ -340,11 +363,11 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
-		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
-		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
-		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
+		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
@@ -359,11 +382,11 @@ class Window extends EventsViaPoll {
 	setIcon (width, height, stride, format, buffer) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
-		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
-		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
+		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }

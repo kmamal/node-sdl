@@ -7,7 +7,7 @@ const keyboard = {
 	get SCANCODE () { return Enums.scancodes },
 
 	getKey (scancode) {
-		if (!Number.isFinite(scancode)) { throw Object.assign(new Error("scancode must be a number"), { scancode }) }
+		if (!Number.isInteger(scancode)) { throw Object.assign(new Error("scancode must be an integer"), { scancode }) }
 		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("invalid scancode"), { scancode }) }
 
 		const _key = Bindings.keyboard_getKey(scancode)

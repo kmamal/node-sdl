@@ -73,7 +73,7 @@ sudo losetup -d "${LOOP}"
 sudo mkdir -p "$MOUNT"
 sudo mount -o loop,offset=4194304 "$IMAGE" "$MOUNT"
 
-printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0' | sudo tee "$MOUNT/userconf" > /dev/null
+printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0\n' | sudo tee "$MOUNT/userconf" > /dev/null
 
 expect -f - <<- EOF
 	set timeout -1
@@ -90,12 +90,21 @@ expect -f - <<- EOF
 		-device usb-net,netdev=net0 \
 		-append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=/dev/mmcblk0p2 rootdelay=1"
 
-	expect -exact {raspberrypi login: }
-	send -- [string cat {pi} "\r"]
+	while {true} {
+		expect -exact {raspberrypi login: }
+		send -- [string cat {pi} "\r"]
 
-	expect -exact {Password: }
-	sleep 5
-	send -- [string cat {raspberry} "\r"]
+		expect -exact {Password: }
+		send -- [string cat {raspberry} "\r"]
+
+		expect {
+			{pi@raspberrypi} {
+				send -- "\r"
+				break
+			}
+			{Login incorrect} {}
+		}
+	}
 
 	expect -exact {pi@raspberrypi}
 	send -- [string cat {curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs} "\r"]

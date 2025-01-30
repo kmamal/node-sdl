@@ -5,7 +5,7 @@ const mouse = {
 	get BUTTON () { return Enums.mouseButtons },
 
 	getButton (button) {
-		if (!Number.isFinite(button)) { throw Object.assign(new Error("button must be a number"), { button }) }
+		if (!Number.isInteger(button)) { throw Object.assign(new Error("button must be an integer"), { button }) }
 		if (button < 0 || button >= 32) { throw Object.assign(new Error("invalid button"), { button }) }
 
 		return Bindings.mouse_getButton(button)
@@ -14,8 +14,8 @@ const mouse = {
 	get position () { return Bindings.mouse_getPosition() },
 
 	setPosition (x, y) {
-		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
-		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
+		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 
 		Bindings.mouse_setPosition(x, y)
 	},
@@ -32,18 +32,18 @@ const mouse = {
 	resetCursor () { Bindings.mouse_resetCursor() },
 
 	setCursorImage (width, height, stride, format, buffer, x, y) {
-		if (!Number.isFinite(width)) { throw Object.assign(new Error("width must be a number"), { width }) }
+		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
-		if (!Number.isFinite(height)) { throw Object.assign(new Error("height must be a number"), { height }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
-		if (!Number.isFinite(stride)) { throw Object.assign(new Error("stride must be a number"), { stride }) }
+		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
-		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
 		if (x < 0 || x >= width) { throw Object.assign(new Error("invalid x"), { x }) }
-		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 		if (y < 0 || y >= height) { throw Object.assign(new Error("invalid y"), { y }) }
 
 		const _format = Enums.pixelFormat[format]

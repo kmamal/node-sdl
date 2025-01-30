@@ -20,8 +20,8 @@ const redraw = () => {
 
 window.on('expose', redraw)
 
-window.on('resize', ({ pixelWidth: width, pixelHeight: height }) => {
-	canvas = Canvas.createCanvas(width, height)
+window.on('resize', (event) => {
+	canvas = Canvas.createCanvas(event.pixelWidth, event.pixelHeight)
 	ctx = canvas.getContext('2d')
 	redraw()
 })

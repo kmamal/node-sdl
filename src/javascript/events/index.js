@@ -312,14 +312,14 @@ const handleEvent = (event) => {
 
 				case 'buttonDown': {
 					for (const controllerInstance of collection.values()) {
-						controllerInstance._axes[event.button] = true
+						controllerInstance._buttons[event.button] = true
 						controllerInstance.emit(event.type, event)
 					}
 				} break
 
 				case 'buttonUp': {
 					for (const controllerInstance of collection.values()) {
-						controllerInstance._axes[event.button] = true
+						controllerInstance._buttons[event.button] = false
 						controllerInstance.emit(event.type, event)
 					}
 				} break
@@ -394,7 +394,16 @@ const handleEvent = (event) => {
 }
 
 
-const poll = () => { Bindings.events_poll(handleEvent) }
+let polling = false
+
+const poll = () => {
+	if (polling) { return }
+	polling = true
+
+	Bindings.events_poll(handleEvent)
+
+	polling = false
+}
 
 let pollInterval = null
 

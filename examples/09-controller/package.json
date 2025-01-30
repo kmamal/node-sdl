@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-controller",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "canvas": "*"
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl",
+    "canvas"
+  ]
+}

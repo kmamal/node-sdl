@@ -47,22 +47,22 @@ class JoystickInstance extends EventsViaPoll {
 	get serialNumber () { return this._serialNumber }
 
 	get axes () {
-		Globals.events.poll() // TODO
+		Globals.events.poll()
 		return this._axes
 	}
 
 	get balls () {
-		Globals.events.poll() // TODO
+		Globals.events.poll()
 		return this._balls
 	}
 
 	get buttons () {
-		Globals.events.poll() // TODO
+		Globals.events.poll()
 		return this._buttons
 	}
 
 	get hats () {
-		Globals.events.poll() // TODO
+		Globals.events.poll()
 		return this._hats
 	}
 
@@ -71,8 +71,8 @@ class JoystickInstance extends EventsViaPoll {
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		if (!Number.isFinite(player)) { throw Object.assign(new Error("player must be a number"), { player }) }
-		if (player < 0) { throw Object.assign(new Error("player must be non-negative"), { player }) }
+		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
+		if (player < 0) { throw Object.assign(new Error("invalid player"), { player }) }
 
 		Bindings.joystick_setPlayer(this._device.id, player)
 	}
@@ -105,7 +105,8 @@ class JoystickInstance extends EventsViaPoll {
 		if (lowFreqRumble < 0 || lowFreqRumble > 1) { throw Object.assign(new Error("lowFreqRumble must be between 0 and 1"), { lowFreqRumble }) }
 		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
-		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
+		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
+		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
@@ -128,7 +129,8 @@ class JoystickInstance extends EventsViaPoll {
 		if (leftRumble < 0 || leftRumble > 1) { throw Object.assign(new Error("leftRumble must be between 0 and 1"), { leftRumble }) }
 		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
-		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
+		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
+		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)

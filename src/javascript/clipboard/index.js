@@ -8,7 +8,7 @@ const clipboard = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
 	get text () {
-		Globals.events.poll() // TODO
+		Globals.events.poll()
 		return Bindings.clipboard_getText()
 	}
 

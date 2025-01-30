@@ -173,6 +173,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.pixelWidth](#windowpixelwidth)
     * [window.pixelHeight](#windowpixelheight)
     * [window.setSize(width, height)](#windowsetsizewidth-height)
+    * [window.setSizeInPixels(pixelWidth, pixelHeight)](#windowsetsizeinpixelspixelwidth-pixelheight)
     * [window.visible](#windowvisible)
     * [window.show([show])](#windowshowshow)
     * [window.hide()](#windowhide)
@@ -819,13 +820,13 @@ The window's height.
 
 * `<number>`
 
-The window's width in pixels. This will be larger than `width` on [high-dpi](#high-dpi) displays.
+The window's width in pixels. This will be larger than [`width`](#windowwidth) on [high-dpi](#high-dpi) displays.
 
 ### window.pixelHeight
 
 * `<number>`
 
-The window's height in pixels. This will be larger than `height` on [high-dpi](#high-dpi) displays.
+The window's height in pixels. This will be larger than [`height`](#windowheight) on [high-dpi](#high-dpi) displays.
 
 ### window.setSize(width, height)
 
@@ -833,6 +834,14 @@ The window's height in pixels. This will be larger than `height` on [high-dpi](#
 * `height: <number>`: The new height.
 
 Changes the size of the window.
+
+### window.setSizeInPixels(pixelWidth, pixelHeight)
+
+* `pixelWidth: <number>`: The new width in pixels.
+* `pixelHeight: <number>`: The new height in pixels.
+
+Changes the size of the window.
+This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
 
 ### window.visible
 

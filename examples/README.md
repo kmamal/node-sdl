@@ -41,45 +41,53 @@ Uses the popular [`regl`](https://www.npmjs.com/package/regl) library to simplif
 
 There are many ways to load static assets into your application. In this example we use FFmpeg (through the [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static) package) to decode an image and a video into raw pixels that we can render to the screen.
 
-## [8. Sine wave](https://github.com/kmamal/node-sdl/tree/master/examples/08-sine-wave)
+## [8. Joystick monitor](https://github.com/kmamal/node-sdl/tree/master/examples/08-joystick)
+
+Opens all connected joystick devices and monitors their state.
+
+## [9. Controller monitor](https://github.com/kmamal/node-sdl/tree/master/examples/09-controller)
+
+Opens all connected controller devices and monitors their state.
+
+## [10. Sine wave](https://github.com/kmamal/node-sdl/tree/master/examples/10-sine-wave)
 
 Plays a 440Hz sine wave for 3 seconds.
 
-## [9. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/09-mic-waveform)
+## [11. Mic Waveform](https://github.com/kmamal/node-sdl/tree/master/examples/11-mic-waveform)
 
 Listens to the mic and plots the volume of recorded audio on the screen. Note how we have reduced the value of the `buffered` option to get audio samples more frequently (and with smaller delays) from the hardware.
 
-## [10. Echo effect](https://github.com/kmamal/node-sdl/tree/master/examples/10-echo)
+## [12. Echo effect](https://github.com/kmamal/node-sdl/tree/master/examples/12-echo)
 
 Use headphones for this one or you'll end up in a feedback loop. Listens to the mic and then plays back what it recorded plus an echo effect.
 
-## [11. FFmpeg audio loading](https://github.com/kmamal/node-sdl/tree/master/examples/11-ffmpeg-audio)
+## [13. FFmpeg audio loading](https://github.com/kmamal/node-sdl/tree/master/examples/13-ffmpeg-audio)
 
 This is like example #7, but this time with audio files. Again we are going to use [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static) to decode a .wav file into a raw PCM buffer we can use for playback.
 
-## [12. Audio rendering thread](https://github.com/kmamal/node-sdl/tree/master/examples/12-audio-thread)
+## [14. Audio rendering thread](https://github.com/kmamal/node-sdl/tree/master/examples/14-audio-thread)
 
 You can only use `@kmamal/sdl` from the main thread of your Node.js program, but you might still want to offload computationally expensive tasks to worker threads. This example shows how an audio rendering thread might be implemented.
 
-## [13. Changing audio driver dynamically](https://github.com/kmamal/node-sdl/tree/master/examples/13-audio-driver)
+## [15. Changing audio driver dynamically](https://github.com/kmamal/node-sdl/tree/master/examples/15-audio-driver)
 Once SDL has been initialized (which happens automatically when you import `@kmamal/sdl`) you can no longer change the audio or video driver.
 Your only option is to restart the process, passing different values to the `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` environment variables.
 This example shows how you could implement an audio player, that can change audio drivers without closing it's main window.
 It does this by keeping the audio playback in a child process, separate from the main window.
 
-## [14. Clipboard mutator](https://github.com/kmamal/node-sdl/tree/master/examples/14-clipboard-mutator)
+## [16. Clipboard mutator](https://github.com/kmamal/node-sdl/tree/master/examples/16-clipboard-mutator)
 
 Applies random changes to whatever text has been copied to the clipboard.
 
-## [15. Packaging to a ZIP](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging)
+## [17. Packaging to a ZIP](https://github.com/kmamal/node-sdl/tree/master/examples/17-packaging)
 
-Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/packager`](https://github.com/kmamal/packager#readme) here, but other packagers should work as well. There's also a [github workflow file](https://github.com/kmamal/node-sdl/tree/master/examples/15-packaging/.github/workflows/build.yml) that builds and bundles the project for all supported platforms.
+Eventually you might want to make your application available for download somewhere. Publishing as an npm package is an option, but requires that you users are already familiar with Node.js. A more traditional option is to just include all your dependencies in a `.zip` file and distribute that. This example shows how you would setup a project for exactly this use-case. I'm using [`@kmamal/packager`](https://github.com/kmamal/packager#readme) here, but other packagers should work as well. There's also a [github workflow file](https://github.com/kmamal/node-sdl/tree/master/examples/17-packaging/.github/workflows/build.yml) that builds and bundles the project for all supported platforms.
 
-## [16. Packaging using PKG](https://github.com/kmamal/node-sdl/tree/master/examples/16-pkg)
+## [18. Packaging using PKG](https://github.com/kmamal/node-sdl/tree/master/examples/18-pkg)
 
 This is an alternative packaging method using the [`@yao-pkg/pkg`](https://www.npmjs.com/package/@yao-pkg/pkg) package (a fork of the original [`vercel/pkg`](https://github.com/vercel/pkg)). One important thing to keep in mind is that ES modules are not yet supported by `pkg` so we have to use the old CommonJS modules. Another important detail is that SDL is dynamically linked, so you need to distribute the library files along with the executable.
 
-## [17. Packaging using PKG and Webpack](https://github.com/kmamal/node-sdl/tree/master/examples/17-pkg-webpack)
+## [19. Packaging using PKG and Webpack](https://github.com/kmamal/node-sdl/tree/master/examples/19-pkg-webpack)
 
 If we did want to use ES modules in our code, we would first have to transform our code before passing it to `pkg`. This example is similar to the previous one, except that we first run webpack to bundle the project into the `build` folder, and then run `pkg on that`. Note that the build folder needs its own `package.json` file.
 
