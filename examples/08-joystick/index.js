@@ -27,92 +27,104 @@ const doRender = () => {
 	ctx.fillStyle = 'black'
 	ctx.fillRect(0, 0, W, H)
 
-	for (const instance of instances.values()) {
-		const {
-			device: {
-				id,
-				name,
-			},
-			axes,
-			buttons,
-			balls,
-			hats,
-		} = instance
+	ctx.fillStyle = 'white'
 
+	if (instances.size === 0) {
 		x += 20
 		y += 20
 
-		ctx.fillStyle = 'white'
+		const message = "No joysticks connected"
+		ctx.fillText(message, x, y)
 
-		ctx.fillText(`[${id}] ${name}`, x, y)
-		y += 20
-		const topY = y
+		const metrics = ctx.measureText(message)
+		maxX = Math.ceil(x + metrics.width)
+		maxY = Math.ceil(y + metrics.actualBoundingBoxDescent)
+	} else {
+		for (const instance of instances.values()) {
+			const {
+				device: {
+					id,
+					name,
+				},
+				axes,
+				buttons,
+				balls,
+				hats,
+			} = instance
 
-		{
-			ctx.fillText("Axes", x, y)
+			x += 20
 			y += 20
 
-			for (let i = 0; i < axes.length; i++) {
-				ctx.fillText(`[${i}]: ${axes[i].toFixed(2)}`, x, y)
-				y += 20
-			}
-
-			x += 120
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
-
-		{
-			ctx.fillText("Buttons", x, y)
+			ctx.fillText(`[${id}] ${name}`, x, y)
 			y += 20
+			const topY = y
 
-			for (let i = 0; i < buttons.length; i++) {
-				ctx.fillText(`[${i}]: ${buttons[i]}`, x, y)
+			{
+				ctx.fillText("Axes", x, y)
 				y += 20
+
+				for (let i = 0; i < axes.length; i++) {
+					ctx.fillText(`[${i}]: ${axes[i].toFixed(2)}`, x, y)
+					y += 20
+				}
+
+				x += 120
+				maxY = Math.max(maxY, y)
+				y = topY
 			}
 
-			x += 120
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
-
-		{
-			ctx.fillText("Balls", x, y)
-			y += 20
-
-			for (let i = 0; i < balls.length; i++) {
-				ctx.fillText(`[${i}]: ${balls[i]}`, x, y)
+			{
+				ctx.fillText("Buttons", x, y)
 				y += 20
+
+				for (let i = 0; i < buttons.length; i++) {
+					ctx.fillText(`[${i}]: ${buttons[i]}`, x, y)
+					y += 20
+				}
+
+				x += 120
+				maxY = Math.max(maxY, y)
+				y = topY
 			}
 
-			x += 120
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
-
-		{
-			ctx.fillText("Hats", x, y)
-			y += 20
-
-			for (let i = 0; i < hats.length; i++) {
-				ctx.fillText(`[${i}]: ${hats[i]}`, x, y)
+			{
+				ctx.fillText("Balls", x, y)
 				y += 20
+
+				for (let i = 0; i < balls.length; i++) {
+					ctx.fillText(`[${i}]: ${balls[i]}`, x, y)
+					y += 20
+				}
+
+				x += 120
+				maxY = Math.max(maxY, y)
+				y = topY
 			}
 
-			x += 120
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
+			{
+				ctx.fillText("Hats", x, y)
+				y += 20
 
-		y = maxY
-		maxX = Math.max(maxX, x)
-		x = 0
+				for (let i = 0; i < hats.length; i++) {
+					ctx.fillText(`[${i}]: ${hats[i]}`, x, y)
+					y += 20
+				}
+
+				x += 120
+				maxY = Math.max(maxY, y)
+				y = topY
+			}
+
+			y = maxY
+			maxX = Math.max(maxX, x)
+			x = 0
+		}
 	}
 
 	maxY += 20
 	maxX += 20
 
-	if (maxX !== window.width || maxY !== window.height) {
+	if (maxX !== W || maxY !== H) {
 		window.setSizeInPixels(maxX, maxY)
 	} else {
 		const buffer = canvas.toBuffer('raw')
@@ -139,8 +151,8 @@ const openJoystick = (device) => {
 	const instance = sdl.joystick.openDevice(device)
 	instances.add(instance)
 
-	instance.on('*', (event) => {
-		if (event.type === 'close') {
+	instance.on('*', (eventType) => {
+		if (eventType === 'close') {
 			instances.delete(instance)
 		}
 		render()

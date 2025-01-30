@@ -7,11 +7,13 @@ const virtualJoystick = E.uinput.createDevice({
 			type: E.EV_KEY,
 			codes: [ E.BTN_A, E.BTN_B, E.BTN_X, E.BTN_Y ],
 		},
-		{ type: E.EV_ABS,
+		{
+			type: E.EV_ABS,
 			codes: [
 				{ code: E.ABS_X, min: -100, max: +100 },
 				{ code: E.ABS_Y, min: -100, max: +100 },
-			] },
+			],
+		},
 	],
 })
 

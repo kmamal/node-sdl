@@ -27,62 +27,74 @@ const doRender = () => {
 	ctx.fillStyle = 'black'
 	ctx.fillRect(0, 0, W, H)
 
-	for (const instance of instances.values()) {
-		const {
-			device: {
-				id,
-				name,
-			},
-			axes,
-			buttons,
-		} = instance
+	ctx.fillStyle = 'white'
 
+	if (instances.size === 0) {
 		x += 20
 		y += 20
 
-		ctx.fillStyle = 'white'
+		const message = "No controllers connected"
+		ctx.fillText(message, x, y)
 
-		ctx.fillText(`[${id}] ${name}`, x, y)
-		y += 20
-		const topY = y
+		const metrics = ctx.measureText(message)
+		maxX = Math.ceil(x + metrics.width)
+		maxY = Math.ceil(y + metrics.actualBoundingBoxDescent)
+	} else {
+		for (const instance of instances.values()) {
+			const {
+				device: {
+					id,
+					name,
+				},
+				axes,
+				buttons,
+			} = instance
 
-		{
-			ctx.fillText("Axes", x, y)
+			x += 20
 			y += 20
 
-			for (const [ key, value ] of Object.entries(axes)) {
-				ctx.fillText(`${key}: ${value.toFixed(2)}`, x, y)
-				y += 20
-			}
-
-			x += 200
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
-
-		{
-			ctx.fillText("Buttons", x, y)
+			ctx.fillText(`[${id}] ${name}`, x, y)
 			y += 20
+			const topY = y
 
-			for (const [ key, value ] of Object.entries(buttons)) {
-				ctx.fillText(`${key}: ${value}`, x, y)
+			{
+				ctx.fillText("Axes", x, y)
 				y += 20
+
+				for (const [ key, value ] of Object.entries(axes)) {
+					ctx.fillText(`${key}: ${value.toFixed(2)}`, x, y)
+					y += 20
+				}
+
+				x += 200
+				maxY = Math.max(maxY, y)
+				y = topY
 			}
 
-			x += 200
-			maxY = Math.max(maxY, y)
-			y = topY
-		}
+			{
+				ctx.fillText("Buttons", x, y)
+				y += 20
 
-		y = maxY
-		maxX = Math.max(maxX, x)
-		x = 0
+				for (const [ key, value ] of Object.entries(buttons)) {
+					ctx.fillText(`${key}: ${value}`, x, y)
+					y += 20
+				}
+
+				x += 200
+				maxY = Math.max(maxY, y)
+				y = topY
+			}
+
+			y = maxY
+			maxX = Math.max(maxX, x)
+			x = 0
+		}
 	}
 
 	maxY += 20
 	maxX += 20
 
-	if (maxX !== window.width || maxY !== window.height) {
+	if (maxX !== W || maxY !== H) {
 		window.setSizeInPixels(maxX, maxY)
 	} else {
 		const buffer = canvas.toBuffer('raw')
@@ -109,8 +121,8 @@ const openController = (device) => {
 	const instance = sdl.controller.openDevice(device)
 	instances.add(instance)
 
-	instance.on('*', (event) => {
-		if (event.type === 'close') {
+	instance.on('*', (eventType) => {
+		if (eventType === 'close') {
 			instances.delete(instance)
 		}
 		render()
