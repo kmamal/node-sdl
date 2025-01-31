@@ -92,7 +92,8 @@ const doRender = () => {
 				y += 20
 
 				for (let i = 0; i < balls.length; i++) {
-					ctx.fillText(`[${i}]: ${balls[i]}`, x, y)
+					const ball = balls[i]
+					ctx.fillText(`[${i}]: ${ball.x.toFixed(2)}, ${ball.y.toFixed(2)}`, x, y)
 					y += 20
 				}
 
