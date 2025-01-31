@@ -529,6 +529,7 @@ window::render (const Napi::CallbackInfo &info)
 	int stride = info[3].As<Napi::Number>().Int32Value();
 	unsigned int format = info[4].As<Napi::Number>().Int32Value();
 	void *pixels = info[5].As<Napi::Buffer<char>>().Data();
+	SDL_ScaleMode scaling = static_cast<SDL_ScaleMode>(info[6].As<Napi::Number>().Int32Value());
 
 	SDL_Window *window = SDL_GetWindowFromID(window_id);
 	if (window == nullptr) {
@@ -567,6 +568,13 @@ window::render (const Napi::CallbackInfo &info)
 
 		std::ostringstream message;
 		message << "SDL_CreateTextureFromSurface(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	if(SDL_SetTextureScaleMode(texture, scaling) < 0) {
+		std::ostringstream message;
+		message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}

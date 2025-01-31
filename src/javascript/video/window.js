@@ -357,7 +357,7 @@ class Window extends EventsViaPoll {
 	get tooltip () { return this._tooltip }
 	get utility () { return this._utility }
 
-	render (width, height, stride, format, buffer) {
+	render (width, height, stride, format, buffer, scaling = 'nearest') {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
@@ -372,11 +372,15 @@ class Window extends EventsViaPoll {
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+		if (scaling !== undefined && typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
 
 		const _format = Enums.pixelFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
-		Bindings.window_render(this._id, width, height, stride, _format, buffer)
+		const _scaling = Enums.scaleMode[scaling]
+		if (_scaling === undefined) { throw Object.assign(new Error("invalid scaling"), { scaling }) }
+
+		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling)
 	}
 
 	setIcon (width, height, stride, format, buffer) {

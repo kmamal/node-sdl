@@ -351,6 +351,11 @@ export namespace Sdl {
 			| 'nv12'
 			| 'nv21'
 
+		export type Scaling
+			= 'nearest'
+			| 'linear'
+			| 'best'
+
 		export interface Display {
 			readonly name: string
 			readonly format: Format
@@ -417,6 +422,7 @@ export namespace Sdl {
 
 			readonly pixelWidth: number
 			readonly pixelHeight: number
+			setSizeInPixels (pixelWidth: number, pixelHeight: number): void
 
 			readonly visible: boolean
 			show (show?: boolean): void
@@ -461,7 +467,7 @@ export namespace Sdl {
 			readonly tooltip: boolean
 			readonly utility: boolean
 
-			render (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
+			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, scaling?: Scaling): void
 
 			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
 
@@ -470,6 +476,7 @@ export namespace Sdl {
 
 			readonly destroyed: boolean
 			destroy (): void
+			destroyGently (): void
 		}
 
 		interface Module {

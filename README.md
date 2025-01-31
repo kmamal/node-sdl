@@ -25,7 +25,7 @@ SDL is bundled along with the binaries so a separate installation is not necessa
 This package is self-contained.
 Just run:
 
-```
+```bash
 npm install @kmamal/sdl
 ```
 
@@ -44,6 +44,7 @@ window.on('*', console.log)
 ```
 
 ### Canvas
+
 ```js
 import sdl from '@kmamal/sdl'
 import { createCanvas } from 'canvas'
@@ -64,6 +65,7 @@ window.render(width, height, width * 4, 'bgra32', buffer)
 ```
 
 ### WebGL
+
 ```js
 import sdl from '@kmamal/sdl'
 import createContext from '@kmamal/gl'
@@ -82,6 +84,7 @@ gl.swap()
 ```
 
 ### WebGPU
+
 ```js
 import sdl from '@kmamal/sdl'
 import gpu from '@kmamal/gpu'
@@ -203,7 +206,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.popupMenu](#windowpopupmenu)
     * [window.tooltip](#windowtooltip)
     * [window.utility](#windowutility)
-    * [window.render(width, height, stride, format, buffer)](#windowrenderwidth-height-stride-format-buffer)
+    * [window.render(width, height, stride, format, buffer[, scaling])](#windowrenderwidth-height-stride-format-buffer-scaling)
     * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
     * [window.flash(untilFocused)](#windowflashuntilfocused)
     * [window.stopFlashing()](#windowstopflashing)
@@ -231,6 +234,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   * [sdl.mouse.uncapture()](#sdlmouseuncapture)
 * [sdl.joystick](#sdljoystick)
   * [Hat positions](#hat-positions)
+  * [Power levels](#power-levels)
   * [Event: 'deviceAdd'](#joystick-event-deviceadd)
   * [Event: 'deviceRemove'](#joystick-event-deviceremove)
   * [sdl.joystick.devices](#sdljoystickdevices)
@@ -340,7 +344,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   * [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
     * [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
 * [sdl.clipboard](#sdlclipboard)
-  * [Event: 'update'](#event-update)
+  * [Event: 'update'](#clipboard-event-update)
   * [sdl.clipboard.text](#sdlclipboardtext)
   * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
 * [sdl.power](#sdlpower)
@@ -402,11 +406,13 @@ Sample data for Ubuntu:
 ### Image data
 
 There are 3 places in the API where you will need to provide an image to the library:
-* [`window.render()`](#windowrenderwidth-height-stride-format-buffer)
+
+* [`window.render()`](#windowrenderwidth-height-stride-format-buffer-scaling)
 * [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
 * [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
 
 All three of these functions accept the image as a series of arguments:
+
 * `width: <number>` The width of the image in pixels.
 * `height: <number>` The height of the image in pixels.
 * `stride: <number>` How many bytes each row of the image takes up in the buffer. This is usually equal to `width * bytesPerPixel`, but can be larger if the rows of the buffer are padded to always be some multiple of bytes.
@@ -592,6 +598,7 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
 Creates a new window.
 
 The following restrictions apply:
+
 * If you specify the `display` option, you can't also specify the `x` or `y` options, and vice-versa.
 * The `resizable` and `borderless` options are mutually exclusive.
 * The `opengl` and `webgpu` options are mutually exclusive.
@@ -599,7 +606,7 @@ The following restrictions apply:
 * The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
 
 If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
 
 ## class Window
 
@@ -941,7 +948,7 @@ If you have set the `opengl` or `webgpu` options, then calls to this function wi
 
 Will be `true` if the window was created in OpenGl mode.
 In OpenGL mode, you can only render to the window with OpenGL calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
 
 ### window.webgpu
 
@@ -949,7 +956,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
 
 Will be `true` if the window was created in WebGPU mode.
 In WebGPU mode, you can only render to the window with WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
 
 ### window.native
 
@@ -1030,15 +1037,24 @@ X11 only.
 Will be `true` if the window was created with `utility: true`.
 Such a window will always be treated as a utility window.
 
-### window.render(width, height, stride, format, buffer)
+### window.render(width, height, stride, format, buffer[, scaling])
 
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
+* `scaling: <string>` How to scale the image to match the window size. Default `'nearest'`
 
 Displays an image in the window.
-The provided image will be stretched over the entire window.
+If the dimensions of the image do not match the dimansions of the window, then the image will be stretched over the entire surface of the window.
+The `scaling` argument controls how exactly the scaling is implemented.
+Possible values are:
+
+| Value | Corresponding `SDL_ScaleMode` | Description |
+| --- | --- | --- |
+| `'nearest'` | `SDL_ScaleModeNearest` | nearest pixel sampling |
+| `'linear'` | `SDL_ScaleModeLinear` | linear filtering |
+| `'best'` | `SDL_ScaleModeBest` | anisotropic filtering |
 
 If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
 
 ### window.setIcon(width, height, stride, format, buffer)
 
@@ -1116,6 +1132,7 @@ The same key will always produce the same scancode.
 Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
 
 <details>
+
   <summary>Click to expand table</summary>
 
   | Value | Corresponding `SDL_Scancode` | Comment |
@@ -1362,6 +1379,7 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
   | `sdl.keyboard.SCANCODE.APP2` | `SDL_SCANCODE_APP2` | |
   | `sdl.keyboard.SCANCODE.AUDIOREWIND` | `SDL_SCANCODE_AUDIOREWIND` | |
   | `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD` | `SDL_SCANCODE_AUDIOFASTFORWARD` | |
+
 </details>
 
 ### sdl.keyboard.getKey(scancode)
@@ -1502,6 +1520,19 @@ String values used to represent the positions of a joystick hat
 | `'rightdown'` | `SDL_HAT_RIGHTDOWN` |
 | `'leftup'` | `SDL_HAT_LEFTUP` |
 | `'leftdown'` | `SDL_HAT_LEFTDOWN` |
+
+### Power levels
+
+String values used to represent the power level of a joystick or controller
+
+| Value | Corresponding `SDL_JoystickPowerLevel` |
+| --- | --- |
+| `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
+| `'low'` | `SDL_JOYSTICK_POWER_LOW` |
+| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
+| `'full'` | `SDL_JOYSTICK_POWER_FULL` |
+| `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
+| `'max'` | `SDL_JOYSTICK_POWER_MAX` |
 
 <a id="joystick-event-deviceadd"></a>
 
@@ -1677,20 +1708,9 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 ### joystickInstance.power
 
-* `<PowerLevel>|<null>`
+* [`<PowerLevel>`](#power-levels)`|<null>`
 
 The current power level of the joystick device, or `null` if it is unknown.
-
-Possible values are:
-
-| Value | Corresponding `SDL_JoystickPowerLevel` |
-| --- | --- |
-| `'empty'` | `SDL_JOYSTICK_POWER_EMPTY` |
-| `'low'` | `SDL_JOYSTICK_POWER_LOW` |
-| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM` |
-| `'full'` | `SDL_JOYSTICK_POWER_FULL` |
-| `'wired'` | `SDL_JOYSTICK_POWER_WIRED` |
-| `'max'` | `SDL_JOYSTICK_POWER_MAX` |
 
 ### joystickInstance.setPlayer(index)
 
@@ -1781,6 +1801,7 @@ A mapping is a string that consists of the device's name, it's GUID, and a serie
 See the sample output [`here`](#sdlcontrollerdevices) for an example.
 SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on https://github.com/gabomdq/SDL_GameControllerDB.
 You can add them via:
+
 ```js
 const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
 const result = await fetch(url)
@@ -1956,9 +1977,9 @@ The values will be `true` for buttons that are pressed and `false` otherwise.
 
 ### controllerInstance.power
 
-* [`<PowerLevel>`](#power-levels)
+* [`<PowerLevel>`](#power-levels)`|<null>`
 
-The current power level of the controller device.
+The current power level of the joystick device, or `null` if it is unknown.
 
 ### controllerInstance.setPlayer(index)
 
@@ -2075,7 +2096,7 @@ Instead, objects returned by [`sdl.sensor.openDevice()`](#sdlsensoropendevicedev
 ### Event: 'update'
 
 Fired when the sensor's data changes.
-Get the new data by accessing [`sensorInstance.data`](#sensorInstancedata)
+Get the new data by accessing [`sensorInstance.data`](#sensorinstancedata)
 
 <a id="sensor-instance-event-close"></a>
 
@@ -2093,7 +2114,7 @@ The [device](#sdlsensordevices) from which this instance was opened.
 ### sensorInstance.data
 
 * `<object>`
-  * `timestamp: <number>|<null>` The time this measurement was taken **in microseconds**, or `null` if that's not available.
+  * `timestamp: <number>|<null>` The time this measurement was taken __in microseconds__, or `null` if that's not available.
   * `x: <number>` X axis value.
   * `y: <number>` Y axis value.
   * `z: <number>` Z axis value.
@@ -2135,6 +2156,7 @@ An audio buffer is a sequence of frames, and each frame is a sequence of samples
 A _sample_ is a single number representing the intensity of an audio channel at a point in time.
 For audio with multiple channels, each point in time is represented by multiple samples (one per channel) that together make up a _frame_.
 The samples in a frame are arranged as follows:
+
 * For 1 channel (mono) a frame contains just the one sample.
 * For 2 channels (stereo) the frame's first sample will be the one for the left channel, followed by the one for the right channel.
 * For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
@@ -2500,6 +2522,8 @@ Takes recorded audio data that has been put on the queue, and writes it to the p
 
 ## sdl.clipboard
 
+<a id="clipboard-event-update"></a>
+
 ### Event: 'update'
 
 Fired when the contents of the clipboard have changed.
@@ -2523,7 +2547,7 @@ Changes the text contents of the clipboard.
 ### sdl.power.info
 
 * `<object>`
-  * `state: <string>|null` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Will be `null` if it can't be determinded.
+  * `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Will be `null` if it can't be determinded.
   * `seconds: <number>|<null>` Seconds of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
   * `percent: <number>|<null>` Percentage of battery life left. Will be `null` if not running on battery, or if it can't be determinded.
 
@@ -2542,12 +2566,13 @@ This is still possible! Even if the threads do not have access to the SDL-relate
 Since these are just helpers and don't call any SLD code underneath it's safe to use them. They are made available through the `@kmamal/sdl/helpers` sub-module that does not load any of the native code. For an example of their use see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/12-audio-thread/audio-worker.js).
 
 The functions included in `@kmamal/sdl/helpers` are:
-- [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
-- [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
-- [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
-- [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
-- [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
-- [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
+
+* [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
+* [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
+* [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
+* [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
+* [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
+* [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
 
 
 ## Building from source
@@ -2569,6 +2594,7 @@ You will need to have `cmake` installed for that to work.
 
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package.
 There are some npm scripts in `package.json` that could be of use to you:
+
 * `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
 * `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
 * `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
