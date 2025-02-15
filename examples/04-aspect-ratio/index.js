@@ -1,4 +1,4 @@
-import sdl from '../../src/javascript/index.js'
+import sdl from '@kmamal/sdl'
 import { PNG } from 'pngjs'
 import fs from 'node:fs'
 
