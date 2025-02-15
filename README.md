@@ -206,7 +206,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.popupMenu](#windowpopupmenu)
     * [window.tooltip](#windowtooltip)
     * [window.utility](#windowutility)
-    * [window.render(width, height, stride, format, buffer[, scaling])](#windowrenderwidth-height-stride-format-buffer-scaling)
+    * [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
     * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
     * [window.flash(untilFocused)](#windowflashuntilfocused)
     * [window.stopFlashing()](#windowstopflashing)
@@ -359,9 +359,9 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
 * `<object>`
   * `version: <object>`
     * `compile: <object>` The SDL version the bindings were compiled against.
-      * `major, minor, patch: <semver>` The components of the version.
+      * `major, minor, patch: <Semver>` The components of the version.
     * `runtime: <object>` The SDL version of the dynamic library the is loaded.
-      * `major, minor, patch: <semver>` The components of the version.
+      * `major, minor, patch: <Semver>` The components of the version.
   * `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'Mac OS X'`.
   * `drivers: <object>`
     * `video: <object>`
@@ -407,7 +407,7 @@ Sample data for Ubuntu:
 
 There are 3 places in the API where you will need to provide an image to the library:
 
-* [`window.render()`](#windowrenderwidth-height-stride-format-buffer-scaling)
+* [`window.render()`](#windowrenderwidth-height-stride-format-buffer-options)
 * [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
 * [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
 
@@ -606,7 +606,7 @@ The following restrictions apply:
 * The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
 
 If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
 
 ## class Window
 
@@ -948,7 +948,7 @@ If you have set the `opengl` or `webgpu` options, then calls to this function wi
 
 Will be `true` if the window was created in OpenGl mode.
 In OpenGL mode, you can only render to the window with OpenGL calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
 
 ### window.webgpu
 
@@ -956,7 +956,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) wi
 
 Will be `true` if the window was created in WebGPU mode.
 In WebGPU mode, you can only render to the window with WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
 
 ### window.native
 
@@ -1037,13 +1037,21 @@ X11 only.
 Will be `true` if the window was created with `utility: true`.
 Such a window will always be treated as a utility window.
 
-### window.render(width, height, stride, format, buffer[, scaling])
+### window.render(width, height, stride, format, buffer[, options])
 
 * `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
-* `scaling: <string>` How to scale the image to match the window size. Default `'nearest'`
+* `options: <object>`
+  * `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
+  * `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
+    * `x, y, width, height: <rect>` The components of the rectangle.
 
 Displays an image in the window.
-If the dimensions of the image do not match the dimansions of the window, then the image will be stretched over the entire surface of the window.
+
+By default the image is displayed over the entire surface of the window.
+You can pass the optional `dstRect` parameter to set where exactly on the window to display the image.
+The rest of the window will be filled with black.
+
+If the dimensions of the image do not match the dimensions of the area it should be displayed in, then the image will be stretched to match.
 The `scaling` argument controls how exactly the scaling is implemented.
 Possible values are:
 
@@ -1053,8 +1061,8 @@ Possible values are:
 | `'linear'` | `SDL_ScaleModeLinear` | linear filtering |
 | `'best'` | `SDL_ScaleModeBest` | anisotropic filtering |
 
-If you set the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-scaling) will fail.
+If the window was created with either of the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
+Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
 
 ### window.setIcon(width, height, stride, format, buffer)
 

@@ -467,7 +467,15 @@ export namespace Sdl {
 			readonly tooltip: boolean
 			readonly utility: boolean
 
-			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, scaling?: Scaling): void
+			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, options?: {
+				scaling?: Scaling,
+				dstRect?: {
+					x: number,
+					y: number,
+					width: number,
+					height: number,
+				}
+			}): void
 
 			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
 

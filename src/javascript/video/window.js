@@ -357,11 +357,16 @@ class Window extends EventsViaPoll {
 	get tooltip () { return this._tooltip }
 	get utility () { return this._utility }
 
-	render (width, height, stride, format, buffer, scaling = 'nearest') {
+	render (width, height, stride, format, buffer, options = {}) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
+
+		const {
+			scaling = 'nearest',
+			dstRect = null,
+		} = options
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
@@ -374,13 +379,23 @@ class Window extends EventsViaPoll {
 		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
 		if (scaling !== undefined && typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
 
+		if (dstRect !== null) {
+			if (typeof dstRect !== 'object') { throw Object.assign(new Error("dstRect must be an object"), { dstRect }) }
+			if (!Number.isInteger(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be an integer"), { dstRect }) }
+			if (!Number.isInteger(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be an integer"), { dstRect }) }
+			if (!Number.isInteger(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be an integer"), { dstRect }) }
+			if (dstRect.width <= 0) { throw Object.assign(new Error("invalid dstRect.width"), { dstRect }) }
+			if (!Number.isInteger(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be an integer"), { dstRect }) }
+			if (dstRect.height <= 0) { throw Object.assign(new Error("invalid dstRect.height"), { dstRect }) }
+		}
+
 		const _format = Enums.pixelFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		const _scaling = Enums.scaleMode[scaling]
 		if (_scaling === undefined) { throw Object.assign(new Error("invalid scaling"), { scaling }) }
 
-		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling)
+		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling, dstRect)
 	}
 
 	setIcon (width, height, stride, format, buffer) {

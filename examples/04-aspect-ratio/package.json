@@ -1,0 +1,14 @@
+{
+  "version": "0.0.0",
+  "name": "sdl-example-aspect-ratio",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@kmamal/sdl": "*",
+    "bmp-js": "^0.1.0",
+    "pngjs": "^7.0.0"
+  },
+  "trustedDependencies": [
+    "@kmamal/sdl"
+  ]
+}

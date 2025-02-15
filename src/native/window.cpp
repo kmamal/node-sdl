@@ -530,6 +530,16 @@ window::render (const Napi::CallbackInfo &info)
 	unsigned int format = info[4].As<Napi::Number>().Int32Value();
 	void *pixels = info[5].As<Napi::Buffer<char>>().Data();
 	SDL_ScaleMode scaling = static_cast<SDL_ScaleMode>(info[6].As<Napi::Number>().Int32Value());
+	Napi::Value dstRectVal = info[7];
+	bool hasDstRect = !dstRectVal.IsNull();
+	SDL_Rect rect;
+	if (hasDstRect) {
+		Napi::Object dstRect = dstRectVal.As<Napi::Object>();
+		rect.x = dstRect.Get("x").As<Napi::Number>().Int32Value();
+		rect.y = dstRect.Get("y").As<Napi::Number>().Int32Value();
+		rect.w = dstRect.Get("width").As<Napi::Number>().Int32Value();
+		rect.h = dstRect.Get("height").As<Napi::Number>().Int32Value();
+	}
 
 	SDL_Window *window = SDL_GetWindowFromID(window_id);
 	if (window == nullptr) {
@@ -589,7 +599,7 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (SDL_RenderCopy(renderer, texture, nullptr, nullptr) < 0) {
+	if (SDL_RenderCopy(renderer, texture, nullptr, hasDstRect ? &rect : nullptr) < 0) {
 		SDL_DestroyTexture(texture);
 		SDL_FreeSurface(surface);
 
