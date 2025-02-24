@@ -13,30 +13,44 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { name: 'Linux (x64)'   ,os: ubuntu-22.04              }
-          - { name: 'Linux (arm64)' ,os: ubuntu-22.04 ,arch: arm64 }
-          - { name: 'Windows (x64)' ,os: windows-2022              }
-          - { name: 'Mac (x64)'     ,os: macos-14     ,arch: x64   }
-          - { name: 'Mac (arm64)'   ,os: macos-14     ,arch: arm64 }
+          # - { name: 'Linux (x64)'   ,os: ubuntu-22.04              }
+          # # - { name: 'Linux (arm64)' ,os: ubuntu-22.04 ,arch: arm64 }
+          - { name: 'Linux (arm64)' ,os: ubuntu-22.04-arm          }
+          # - { name: 'Windows (x64)' ,os: windows-2022              }
+          # - { name: 'Mac (x64)'     ,os: macos-14     ,arch: x64   }
+          # - { name: 'Mac (arm64)'   ,os: macos-14     ,arch: arm64 }
 
     runs-on: ${{ matrix.platform.os }}
 
     steps:
+      # - uses: actions/checkout@v4
+
+      # - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
+      #   run: ./scripts/install-deps-mac.sh
+
+      # - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') && matrix.platform.arch != 'arm64' }}
+      #   run: sudo apt-get update && sudo ./scripts/install-deps-ubuntu.sh
+
+      # - if: ${{ !startsWith(matrix.platform.os, 'ubuntu-') || matrix.platform.arch != 'arm64' }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}
+      #   run: npm run release
+
+      # - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') && matrix.platform.arch == 'arm64' }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: ./scripts/release-rpi-qemu.sh
+
       - uses: actions/checkout@v4
 
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
         run: ./scripts/install-deps-mac.sh
 
-      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') && matrix.platform.arch != 'arm64' }}
-        run: ./scripts/install-deps-ubuntu.sh
+      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
+        run: sudo apt-get update && sudo ./scripts/install-deps-ubuntu.sh
 
-      - if: ${{ !startsWith(matrix.platform.os, 'ubuntu-') || matrix.platform.arch != 'arm64' }}
-        env:
+      - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}
         run: npm run release
-
-      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') && matrix.platform.arch == 'arm64' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./scripts/release-rpi-qemu.sh

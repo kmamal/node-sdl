@@ -16,7 +16,7 @@ echo "Working in $DIR"
 
 
 sudo apt-get update
-sudo apt-get install -y xz-utils qemu-system-arm expect
+sudo apt-get install -y jq xz-utils qemu-system-arm expect
 
 CACHED="/home/$USER/Desktop/$IMAGE.xz"
 if test -f "$CACHED"; then
@@ -75,6 +75,11 @@ sudo mount -o loop,offset=4194304 "$IMAGE" "$MOUNT"
 
 printf 'pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0\n' | sudo tee "$MOUNT/userconf" > /dev/null
 
+NODE_VERSION=$(curl -fsSL https://nodejs.org/download/release/index.json | jq -r '.[] | select(.lts) | .version' | sort -Vr | head -n1)
+NODE_NAME="node-$NODE_VERSION-linux-arm64"
+NODE_URL="https://nodejs.org/download/release/$NODE_VERSION/$NODE_NAME.tar.gz"
+REPO_URL="https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz"
+
 expect -f - <<- EOF
 	set timeout -1
 	# exp_internal 1
@@ -107,13 +112,22 @@ expect -f - <<- EOF
 	}
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs} "\r"]
+	send -- [string cat {curl -fsSL $NODE_URL | tar vxzf -} "\r"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {wget --progress=dot https://github.com/kmamal/node-sdl/archive/refs/heads/master.tar.gz && tar xvf master.tar.gz && cd node-sdl-master} "\r"]
+	send -- [string cat {export PATH="\$(pwd)/$NODE_NAME/bin:\$PATH"} "\r"]
 
 	expect -exact {pi@raspberrypi}
-	send -- [string cat {./scripts/install-deps-raspbian.sh && GITHUB_TOKEN="$GITHUB_TOKEN" NO_PARALLEL=1 npm run release} "\r"]
+	send -- [string cat {curl -fsSL $REPO_URL | tar vxzf -} "\r"]
+
+	expect -exact {pi@raspberrypi}
+	send -- [string cat {cd node-sdl-master} "\r"]
+
+	expect -exact {pi@raspberrypi}
+	send -- [string cat {sudo apt-get update && sudo ./scripts/install-deps-raspbian.sh} "\r"]
+
+	expect -exact {pi@raspberrypi}
+	send -- [string cat {GITHUB_TOKEN="$GITHUB_TOKEN" NO_PARALLEL=1 npm run release} "\r"]
 
 	expect -exact {pi@raspberrypi}
 	send -- [string cat {sudo shutdown -h now} "\r"]
