@@ -195,8 +195,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.webgpu](#windowwebgpu)
     * [window.native](#windownative)
     * [window.maximized](#windowmaximized)
-    * [window.object()](#windowmaximize)
-      * `handle : <Buffer>`
+    * [window.maximize()](#windowmaximize)
     * [window.minimized](#windowminimized)
     * [window.minimize()](#windowminimize)
     * [window.restore()](#windowrestore)
