@@ -118,7 +118,7 @@ test("sdl::window", (t) => {
 
 	t.equal(window1.opengl, false)
 	t.equal(window1.webgpu, false)
-	t.equal(window1.native, null)
+	t.ok(Buffer.isBuffer(window1.native.handle))
 
 	t.equal(window1.maximized, false)
 	t.equal(window1.minimized, false)

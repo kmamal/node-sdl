@@ -4,6 +4,12 @@
 #include "cocoa-window.h"
 
 
+extern "C" NSView *getCocoaWindowHandle(NSWindow *window) {
+	@autoreleasepool {
+		return [window contentView];
+	}
+}
+
 extern "C" CALayer *getCocoaGlView(NSWindow *window) {
 	@autoreleasepool {
 		NSView *view = [window contentView];

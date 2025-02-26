@@ -3,9 +3,12 @@
 
 
 #ifndef __OBJC__
+	class NSView;
 	class CALayer;
 #endif
 
+
+extern "C" NSView *getCocoaWindowHandle(NSWindow *);
 
 extern "C" CALayer *getCocoaGlView(NSWindow *);
 

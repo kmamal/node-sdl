@@ -195,7 +195,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.webgpu](#windowwebgpu)
     * [window.native](#windownative)
     * [window.maximized](#windowmaximized)
-    * [window.maximize()](#windowmaximize)
+    * [window.object()](#windowmaximize)
+      * `handle : <Buffer>`
     * [window.minimized](#windowminimized)
     * [window.minimize()](#windowminimize)
     * [window.restore()](#windowrestore)
@@ -960,10 +961,14 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 ### window.native
 
-* `<any>`
+* `<object>`
+  * `handle : <Buffer>` The platform-specific handle of the window.
 
-Holds a copy of the native (platform-specific) representation of the window.
-Only used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme).
+The native type of `handle` is HWND on Windows, NSView* on macOS, and Window (unsigned long) on Linux.
+It should work exactly like the [`win.getNativeWindowHandle()`](https://www.electronjs.org/docs/latest/api/browser-window#wingetnativewindowhandle) electron method.
+
+This object might also include extra fields that are used for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme).
+Please ignore these.
 
 ### window.maximized
 

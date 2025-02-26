@@ -6,6 +6,7 @@
 
 
 #if defined(__LINUX__)
+	#define NativeWindowHandle Window
 	#define GL_NativeWindow Window
 	struct GPU_NativeData {
 		Display *display;
@@ -13,6 +14,7 @@
 	};
 	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
 #elif defined(__WIN32__)
+	#define NativeWindowHandle HWND
 	#define GL_NativeWindow HWND
 	struct GPU_NativeData {
 		HWND hwnd;
@@ -21,6 +23,7 @@
 	#define GPU_WINDOW_FLAG 0
 #elif defined(__MACOSX__)
 	#include "cocoa-window.h"
+	#define NativeWindowHandle NSView *
 	#define GL_NativeWindow CALayer *
 	struct GPU_NativeData {
 		CALayer *layer;
@@ -150,52 +153,61 @@ window::create (const Napi::CallbackInfo &info)
 	int pixel_width, pixel_height;
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-	Napi::Value native;
+	Napi::Object native = Napi::Object::New(env);
 
-	if (is_opengl || is_webgpu) {
-		SDL_SysWMinfo info;
-		SDL_VERSION(&(info.version));
-		bool got_info = SDL_GetWindowWMInfo(window, &info);
-		if (got_info == SDL_FALSE) {
-			std::ostringstream message;
-			message << "SDL_GetWindowWMInfo(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
+	SDL_SysWMinfo sys_wm_info;
+	SDL_VERSION(&(sys_wm_info.version));
+	if (SDL_GetWindowWMInfo(window, &sys_wm_info) == SDL_FALSE) {
+		std::ostringstream message;
+		message << "SDL_GetWindowWMInfo(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
-		if (is_opengl) {
-			int native_size = sizeof(GL_NativeWindow);
-			Napi::Buffer<char> native_buffer = Napi::Buffer<char>::New(env, native_size);
-			GL_NativeWindow *native_window = (GL_NativeWindow *) native_buffer.Data();
-			native = native_buffer;
+	int native_handle_size = sizeof(NativeWindowHandle);
+	Napi::Buffer<char> native_handle_buffer = Napi::Buffer<char>::New(env, native_handle_size);
+	NativeWindowHandle *native_handle = (NativeWindowHandle *) native_handle_buffer.Data();
+	native.Set("handle", native_handle_buffer);
 
-			#if defined(__LINUX__)
-				*native_window = info.info.x11.window;
-			#elif defined(__WIN32__)
-				*native_window = info.info.win.window;
-			#elif defined(__MACOSX__)
-				*native_window = getCocoaGlView(info.info.cocoa.window);
-			#endif
-		} else if (is_webgpu) {
-			int native_size = sizeof(GPU_NativeData);
-			Napi::Buffer<char> native_buffer = Napi::Buffer<char>::New(env, native_size);
-			GPU_NativeData *native_data = (GPU_NativeData *) native_buffer.Data();
-			native = native_buffer;
+	#if defined(__LINUX__)
+		*native_handle = sys_wm_info.info.x11.window;
+	#elif defined(__WIN32__)
+		*native_handle = sys_wm_info.info.win.window;
+	#elif defined(__MACOSX__)
+		*native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
+	#endif
 
-			#if defined(__LINUX__)
-				native_data->display = info.info.x11.display;
-				native_data->window = info.info.x11.window;
-			#elif defined(__WIN32__)
-				native_data->hwnd = info.info.win.window;
-				native_data->hinstance = info.info.win.hinstance;
-			#elif defined(__MACOSX__)
-				native_data->layer = getCocoaGpuView(info.info.cocoa.window);
-			#endif
-		}
+	if (is_opengl) {
+		int native_gl_size = sizeof(GL_NativeWindow);
+		Napi::Buffer<char> native_gl_buffer = Napi::Buffer<char>::New(env, native_gl_size);
+		GL_NativeWindow *native_gl = (GL_NativeWindow *) native_gl_buffer.Data();
+		native.Set("gl", native_gl_buffer);
+
+		#if defined(__LINUX__)
+			*native_gl = sys_wm_info.info.x11.window;
+		#elif defined(__WIN32__)
+			*native_gl = sys_wm_info.info.win.window;
+		#elif defined(__MACOSX__)
+			*native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
+		#endif
+	} else if (is_webgpu) {
+		int native_gpu_size = sizeof(GPU_NativeData);
+		Napi::Buffer<char> native_gpu_buffer = Napi::Buffer<char>::New(env, native_gpu_size);
+		GPU_NativeData *native_gpu = (GPU_NativeData *) native_gpu_buffer.Data();
+		native.Set("gpu", native_gpu_buffer);
+
+		#if defined(__LINUX__)
+			native_gpu->display = sys_wm_info.info.x11.display;
+			native_gpu->window = sys_wm_info.info.x11.window;
+		#elif defined(__WIN32__)
+			native_gpu->hwnd = sys_wm_info.info.win.window;
+			native_gpu->hinstance = sys_wm_info.info.win.hinstance;
+		#elif defined(__MACOSX__)
+			native_gpu->layer = getCocoaGpuView(sys_wm_info.info.cocoa.window);
+		#endif
 	}
 	else {
 		updateRenderer(env, window, &is_accelerated, &is_vsync);
-		native = env.Null();
 	}
 
 	if (is_visible) { SDL_ShowWindow(window); }
