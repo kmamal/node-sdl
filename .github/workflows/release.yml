@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
-        run: ./scripts/install-deps-mac.sh
+        run: brew update && ./scripts/install-deps-mac.sh
 
       - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
         run: sudo apt-get update && sudo ./scripts/install-deps-ubuntu.sh

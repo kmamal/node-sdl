@@ -39,7 +39,7 @@ console.log("install to", C.dir.dist)
 await Fs.promises.rm(C.dir.dist, { recursive: true }).catch(() => {})
 await Fs.promises.mkdir(C.dir.dist, { recursive: true })
 await Promise.all([
-	Fs.promises.copyFile(
+	Fs.promises.cp(
 		Path.join(C.dir.build, 'Release/sdl.node'),
 		Path.join(C.dir.dist, 'sdl.node'),
 	),
