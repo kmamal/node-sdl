@@ -3,7 +3,17 @@
 #include <SDL_syswm.h>
 #include <string>
 #include <sstream>
+#include <map>
 
+struct CachedTexture {
+	SDL_Texture *texture;
+	int width;
+	int height;
+	unsigned int format;
+	SDL_ScaleMode scaling;
+};
+
+std::map<SDL_Window*, CachedTexture> cachedTextures;
 
 #if defined(__LINUX__)
 	#define NativeWindowHandle Window
@@ -31,7 +41,6 @@
 	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
 #endif
 
-
 void
 updateRenderer(
 	Napi::Env &env,
@@ -41,6 +50,12 @@ updateRenderer(
 ) {
 	int window_id = SDL_GetWindowID(window);
 	// Not likely to fail.
+
+	CachedTexture &cached = cachedTextures[window];
+	if (cached.texture != nullptr) {
+		SDL_DestroyTexture(cached.texture);
+		cached.texture = nullptr;
+	}
 
 	SDL_Renderer *old_renderer = SDL_GetRenderer(window);
 	if (old_renderer != nullptr) {
@@ -190,7 +205,8 @@ window::create (const Napi::CallbackInfo &info)
 		#elif defined(__MACOSX__)
 			*native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
 		#endif
-	} else if (is_webgpu) {
+	}
+	else if (is_webgpu) {
 		int native_gpu_size = sizeof(GPU_NativeData);
 		Napi::Buffer<char> native_gpu_buffer = Napi::Buffer<char>::New(env, native_gpu_size);
 		GPU_NativeData *native_gpu = (GPU_NativeData *) native_gpu_buffer.Data();
@@ -207,6 +223,7 @@ window::create (const Napi::CallbackInfo &info)
 		#endif
 	}
 	else {
+		cachedTextures[window] = {};
 		updateRenderer(env, window, &is_accelerated, &is_vsync);
 	}
 
@@ -536,8 +553,8 @@ window::render (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
-	int w = info[1].As<Napi::Number>().Int32Value();
-	int h = info[2].As<Napi::Number>().Int32Value();
+	int width = info[1].As<Napi::Number>().Int32Value();
+	int height = info[2].As<Napi::Number>().Int32Value();
 	int stride = info[3].As<Napi::Number>().Int32Value();
 	unsigned int format = info[4].As<Napi::Number>().Int32Value();
 	void *pixels = info[5].As<Napi::Buffer<char>>().Data();
@@ -569,42 +586,43 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
-	if (surface == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateRGBSurfaceWithFormatFrom(" << window_id << ", " << w << ", " << h << ", " << stride << ", " << format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+	CachedTexture &cached = cachedTextures[window];
+	SDL_Texture *texture = cached.texture;
+
+	if (texture == nullptr
+		|| cached.width != width
+		|| cached.height != height
+		|| cached.format != format
+		|| cached.scaling != scaling
+	) {
+		if (texture != nullptr) { SDL_DestroyTexture(texture); }
+
+		texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+
+		if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE) < 0) {
+			std::ostringstream message;
+			message << "SDL_SetTextureBlendMode(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
+		if(SDL_SetTextureScaleMode(texture, scaling) < 0) {
+			std::ostringstream message;
+			message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
+		cached.texture = texture;
+		cached.width = width;
+		cached.height = height;
+		cached.format = format;
+		cached.scaling = scaling;
 	}
 
-	if (SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE) < 0) {
-		std::ostringstream message;
-		message << "SDL_SetSurfaceBlendMode(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-	if (texture == nullptr) {
-		SDL_FreeSurface(surface);
-
-		std::ostringstream message;
-		message << "SDL_CreateTextureFromSurface(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	if(SDL_SetTextureScaleMode(texture, scaling) < 0) {
-		std::ostringstream message;
-		message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_UpdateTexture(texture, nullptr, pixels, stride);
 
 	if (SDL_RenderClear(renderer) < 0) {
-		SDL_DestroyTexture(texture);
-		SDL_FreeSurface(surface);
-
 		std::ostringstream message;
 		message << "SDL_RenderClear(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -612,9 +630,6 @@ window::render (const Napi::CallbackInfo &info)
 	}
 
 	if (SDL_RenderCopy(renderer, texture, nullptr, hasDstRect ? &rect : nullptr) < 0) {
-		SDL_DestroyTexture(texture);
-		SDL_FreeSurface(surface);
-
 		std::ostringstream message;
 		message << "SDL_RenderCopy(" << window_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -623,8 +638,6 @@ window::render (const Napi::CallbackInfo &info)
 
 	SDL_RenderPresent(renderer);
 
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(surface);
 	return env.Undefined();
 }
 
@@ -712,7 +725,13 @@ window::destroy (const Napi::CallbackInfo &info)
 	}
 
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
-	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
+	if (renderer != nullptr) {
+		SDL_DestroyRenderer(renderer);
+
+		CachedTexture &cached = cachedTextures[window];
+		if (cached.texture != nullptr) { SDL_DestroyTexture(cached.texture); }
+		cachedTextures.erase(window);
+	}
 
 	SDL_DestroyWindow(window);
 
