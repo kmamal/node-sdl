@@ -55,3 +55,8 @@ await Promise.all([
 		}))
 	})(),
 ])
+
+// Strip binaries on linux
+if (C.platform === 'linux') {
+	execSync(`strip -s ${Path.join(C.dir.dist, 'sdl.node')}`)
+}
