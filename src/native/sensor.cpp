@@ -33,8 +33,10 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		SDL_SensorType type = SDL_SensorGetDeviceType(i);
+		SDL_SensorType _type = SDL_SensorGetDeviceType(i);
 		// This function can only error if the index is invalid.
+		Napi::Value type = _type == SDL_SENSOR_UNKNOWN ? env.Null() : Napi::String::New(env, sensor::types[_type]);
+		Napi::Value side = _type == SDL_SENSOR_UNKNOWN || _type == SDL_SENSOR_ACCEL || _type == SDL_SENSOR_GYRO ? env.Null() : Napi::String::New(env, sensor::sides[_type]);
 
 		const char *name = SDL_SensorGetDeviceName(i);
 		// This function can only error if the index is invalid.
@@ -43,8 +45,8 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 		device.Set("_index", Napi::Number::New(env, i));
 		device.Set("id", Napi::Number::New(env, id));
 		device.Set("name", Napi::String::New(env, name));
-		device.Set("type", type == SDL_SENSOR_UNKNOWN ? env.Null() : Napi::String::New(env, sensor::types[type]));
-		device.Set("side", type == SDL_SENSOR_UNKNOWN || type == SDL_SENSOR_ACCEL || type == SDL_SENSOR_GYRO ? env.Null() : Napi::String::New(env, sensor::sides[type]));
+		device.Set("type", type);
+		device.Set("side", side);
 
 		devices.Set(i, device);
 	}

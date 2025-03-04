@@ -118,15 +118,18 @@ controller::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	int firmware = SDL_JoystickGetFirmwareVersion(joystick);
-	Napi::Value firmware_version = firmware == 0 ? env.Null() : Napi::Number::New(env, firmware);
+	int _firmware_version = SDL_JoystickGetFirmwareVersion(joystick);
+	Napi::Value firmware_version = _firmware_version == 0 ? env.Null() : Napi::Number::New(env, _firmware_version);
 
-	const char *serial = SDL_JoystickGetSerial(joystick);
-	Napi::Value serial_number = serial == 0 ? env.Null() : Napi::String::New(env, serial);
+	const char *_serial_number = SDL_JoystickGetSerial(joystick);
+	Napi::Value serial_number = _serial_number == 0 ? env.Null() : Napi::String::New(env, _serial_number);
 
 	bool has_led = SDL_JoystickHasLED(joystick);
 	bool has_rumble = SDL_JoystickHasRumble(joystick);
 	bool has_rumble_triggers = SDL_JoystickHasRumbleTriggers(joystick);
+
+	Uint64 _steam_handle = SDL_GameControllerGetSteamHandle(controller);
+	Napi::Value steam_handle = _steam_handle == 0 ? env.Null() : Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1);
 
 	Napi::Object result = Napi::Object::New(env);
 	// result.Set("id", Napi::Number::New(env, joystick_id)); // NOTE: Unused. Same as the device id
@@ -135,6 +138,7 @@ controller::open (const Napi::CallbackInfo &info)
 	result.Set("hasLed", Napi::Boolean::New(env, has_led));
 	result.Set("hasRumble", Napi::Boolean::New(env, has_rumble));
 	result.Set("hasRumbleTriggers", Napi::Boolean::New(env, has_rumble_triggers));
+	result.Set("steamHandle", steam_handle);
 
 	controller::getState(env, controller, result);
 

@@ -21,6 +21,7 @@ class ControllerInstance extends EventsViaPoll {
 		this._hasLed = result.hasLed
 		this._hasRumble = result.hasRumble
 		this._hasRumbleTriggers = result.hasRumbleTriggers
+		this._steamHandle = result.steamHandle
 		this._axes = result.axes
 		this._buttons = result.buttons
 
@@ -42,6 +43,7 @@ class ControllerInstance extends EventsViaPoll {
 	get device () { return this._device }
 	get firmwareVersion () { return this._firmwareVersion }
 	get serialNumber () { return this._serialNumber }
+	get steamHandle () { return this._steamHandle }
 
 	get axes () {
 		Globals.events.poll()

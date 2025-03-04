@@ -179,48 +179,39 @@ window::create (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	int native_handle_size = sizeof(NativeWindowHandle);
-	Napi::Buffer<char> native_handle_buffer = Napi::Buffer<char>::New(env, native_handle_size);
-	NativeWindowHandle *native_handle = (NativeWindowHandle *) native_handle_buffer.Data();
-	native.Set("handle", native_handle_buffer);
-
+	NativeWindowHandle native_handle;
 	#if defined(__LINUX__)
-		*native_handle = sys_wm_info.info.x11.window;
+		native_handle = sys_wm_info.info.x11.window;
 	#elif defined(__WIN32__)
-		*native_handle = sys_wm_info.info.win.window;
+		native_handle = sys_wm_info.info.win.window;
 	#elif defined(__MACOSX__)
-		*native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
+		native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
 	#endif
+	native.Set("handle", Napi::Buffer<NativeWindowHandle>::Copy(env, &native_handle, 1));
 
 	if (is_opengl) {
-		int native_gl_size = sizeof(GL_NativeWindow);
-		Napi::Buffer<char> native_gl_buffer = Napi::Buffer<char>::New(env, native_gl_size);
-		GL_NativeWindow *native_gl = (GL_NativeWindow *) native_gl_buffer.Data();
-		native.Set("gl", native_gl_buffer);
-
+		GL_NativeWindow native_gl;
 		#if defined(__LINUX__)
-			*native_gl = sys_wm_info.info.x11.window;
+			native_gl = sys_wm_info.info.x11.window;
 		#elif defined(__WIN32__)
-			*native_gl = sys_wm_info.info.win.window;
+			native_gl = sys_wm_info.info.win.window;
 		#elif defined(__MACOSX__)
-			*native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
+			native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
 		#endif
+		native.Set("gl", Napi::Buffer<GL_NativeWindow>::Copy(env, &native_gl, 1));
 	}
 	else if (is_webgpu) {
-		int native_gpu_size = sizeof(GPU_NativeData);
-		Napi::Buffer<char> native_gpu_buffer = Napi::Buffer<char>::New(env, native_gpu_size);
-		GPU_NativeData *native_gpu = (GPU_NativeData *) native_gpu_buffer.Data();
-		native.Set("gpu", native_gpu_buffer);
-
+		GPU_NativeData native_gpu;
 		#if defined(__LINUX__)
-			native_gpu->display = sys_wm_info.info.x11.display;
-			native_gpu->window = sys_wm_info.info.x11.window;
+			native_gpu.display = sys_wm_info.info.x11.display;
+			native_gpu.window = sys_wm_info.info.x11.window;
 		#elif defined(__WIN32__)
-			native_gpu->hwnd = sys_wm_info.info.win.window;
-			native_gpu->hinstance = sys_wm_info.info.win.hinstance;
+			native_gpu.hwnd = sys_wm_info.info.win.window;
+			native_gpu.hinstance = sys_wm_info.info.win.hinstance;
 		#elif defined(__MACOSX__)
-			native_gpu->layer = getCocoaGpuView(sys_wm_info.info.cocoa.window);
+			native_gpu.layer = getCocoaGpuView(sys_wm_info.info.cocoa.window);
 		#endif
+		native.Set("gpu", Napi::Buffer<GPU_NativeData>::Copy(env, &native_gpu, 1));
 	}
 	else {
 		cachedTextures[window] = {};

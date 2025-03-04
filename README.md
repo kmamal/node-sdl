@@ -281,6 +281,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [controllerInstance.device](#controllerinstancedevice)
     * [controllerInstance.firmwareVersion](#controllerinstancefirmwareversion)
     * [controllerInstance.serialNumber](#controllerinstanceserialnumber)
+    * [controllerInstance.steamHandle](#controllerinstancesteamhandle)
     * [controllerInstance.axes](#controllerinstanceaxes)
     * [controllerInstance.buttons](#controllerinstancebuttons)
     * [controllerInstance.power](#controllerinstancepower)
@@ -1946,6 +1947,13 @@ The controller's firmware version.
 * `<string>|<null>`
 
 The controller's serial number, or `null` if it's not available.
+
+### controllerInstance.steamHandle
+
+* `<Buffer>|<null>`
+
+The controller's steam handle, or `null` if it's not available.
+The `Buffer` will contain an `InputHandle_t` for the controller that can be used with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput)
 
 ### controllerInstance.axes
 

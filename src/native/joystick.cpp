@@ -64,17 +64,17 @@ joystick::_getDevices (Napi::Env &env)
 		char guid_string[33];
 		SDL_JoystickGetGUIDString(guid, guid_string, 33);
 
-		int vendor_number = SDL_JoystickGetDeviceVendor(i);
-		Napi::Value vendor = vendor_number == 0 ? env.Null() : Napi::Number::New(env, vendor_number);
+		int _vendor = SDL_JoystickGetDeviceVendor(i);
+		Napi::Value vendor = _vendor == 0 ? env.Null() : Napi::Number::New(env, _vendor);
 
-		int product_number = SDL_JoystickGetDeviceProduct(i);
-		Napi::Value product = product_number == 0 ? env.Null() : Napi::Number::New(env, product_number);
+		int _product = SDL_JoystickGetDeviceProduct(i);
+		Napi::Value product = _product == 0 ? env.Null() : Napi::Number::New(env, _product);
 
-		int version_number = SDL_JoystickGetDeviceProductVersion(i);
-		Napi::Value version = version_number == 0 ? env.Null() : Napi::Number::New(env, version_number);
+		int _Version = SDL_JoystickGetDeviceProductVersion(i);
+		Napi::Value version = _Version == 0 ? env.Null() : Napi::Number::New(env, _Version);
 
-		int player_number = SDL_JoystickGetDevicePlayerIndex(i);
-		Napi::Value player = player_number == -1 ? env.Null() : Napi::Number::New(env, player_number);
+		int _player = SDL_JoystickGetDevicePlayerIndex(i);
+		Napi::Value player = _player == -1 ? env.Null() : Napi::Number::New(env, _player);
 
 		bool is_controller = SDL_IsGameController(i);
 
@@ -144,11 +144,11 @@ joystick::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	int firmware = SDL_JoystickGetFirmwareVersion(joystick);
-	Napi::Value firmware_version = firmware == 0 ? env.Null() : Napi::Number::New(env, firmware);
+	int _firmware_version = SDL_JoystickGetFirmwareVersion(joystick);
+	Napi::Value firmware_version = _firmware_version == 0 ? env.Null() : Napi::Number::New(env, _firmware_version);
 
-	const char *serial = SDL_JoystickGetSerial(joystick);
-	Napi::Value serial_number = serial == nullptr ? env.Null() : Napi::String::New(env, serial);
+	const char *_serial_number = SDL_JoystickGetSerial(joystick);
+	Napi::Value serial_number = _serial_number == nullptr ? env.Null() : Napi::String::New(env, _serial_number);
 
 	SDL_bool has_led = SDL_JoystickHasLED(joystick);
 	SDL_bool has_rumble = SDL_JoystickHasRumble(joystick);

@@ -985,6 +985,7 @@ export namespace Sdl {
 			readonly device: Device
 			readonly firmwareVersion: number
 			readonly serialNumber: string
+			readonly steamHandle: Buffer | null
 
 			readonly axes: {
 				readonly leftStickX: number
