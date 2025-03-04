@@ -50,6 +50,7 @@ T.test("sdl::controller", (t) => {
 	t.equal(instance.device, device)
 	t.equal(instance.firmwareVersion, null)
 	t.equal(instance.serialNumber, null)
+	t.equal(instance.steamHandle, null)
 	t.equal(instance.hasLed, false)
 	t.equal(instance.hasRumble, false)
 	t.equal(instance.hasRumbleTriggers, false)
