@@ -76,9 +76,9 @@ const redraw = () => {
 	{
 		frames++
 		toc = Date.now()
-		const ellapsed = toc - tic
-		if (ellapsed >= 1e3) {
-			const fps = Math.round(frames / (ellapsed / 1e3))
+		const elapsed = toc - tic
+		if (elapsed >= 1e3) {
+			const fps = Math.round(frames / (elapsed / 1e3))
 
 			window.setTitle(`FPS: ${fps}`)
 

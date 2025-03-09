@@ -10,13 +10,13 @@ Provides window management, input events (keyboard, mouse, joysticks, controller
 It should work on Linux, Mac, and Windows.
 Prebuilt binaries are available for x64 architectures, arm-based Macs, and Raspberry Pi.
 
-#### Canvas, WebGL, and WebGPU
+#### Canvas2D, WebGL, and WebGPU
 
-One goal of this project is to allow using Canvas, WebGL, and WebGPU without a browser.
-You can use the [canvas](https://www.npmjs.com/package/canvas) package to render using the canvas API.
+One goal of this project is to allow using Canvas2D, WebGL, and WebGPU without a browser.
+You can use the [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas) package to render using the Canvas2D API.
 For WebGL you can use [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and for WebGPU you can use [@kmamal/gpu](https://github.com/kmamal/gpu#readme).
 Both WebGL and WebGPU support rendering directly to the window (without any intermediate buffer copying).
-Canvas still uses an intermediate buffer, but that might change in the future.
+Canvas2D still uses an intermediate buffer, but that might change in the future.
 
 
 ## Installation
@@ -43,14 +43,14 @@ const window = sdl.video.createWindow({ title: "Hello, World!" })
 window.on('*', console.log)
 ```
 
-### Canvas
+### Canvas2D
 
 ```js
 import sdl from '@kmamal/sdl'
-import { createCanvas } from 'canvas'
+import { createCanvas } from '@napi-rs/canvas'
 
 // Setup
-const window = sdl.video.createWindow({ title: "Canvas" })
+const window = sdl.video.createWindow({ title: "Canvas2D" })
 const { pixelWidth: width, pixelHeight: height } = window
 const canvas = createCanvas(width, height)
 const ctx = canvas.getContext('2d')
@@ -60,8 +60,8 @@ ctx.fillStyle = 'red'
 ctx.fillRect(0, 0, width, height)
 
 // Render to window
-const buffer = canvas.toBuffer('raw')
-window.render(width, height, width * 4, 'bgra32', buffer)
+const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+window.render(width, height, width * 4, 'rgba32', buffer)
 ```
 
 ### WebGL

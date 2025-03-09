@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import Canvas from 'canvas'
+import Canvas from '@napi-rs/canvas'
 import { fork } from 'node:child_process'
 import { once } from 'node:events'
 
@@ -98,8 +98,8 @@ const redraw = () => {
 		ctx.fillText(text, x + w / 2, y + h / 2)
 	}
 
-	const buffer = canvas.toBuffer('raw')
-	window.render(width, height, width * 4, 'bgra32', buffer)
+	const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+	window.render(width, height, width * 4, 'rgba32', buffer)
 }
 
 redraw()

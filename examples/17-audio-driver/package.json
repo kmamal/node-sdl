@@ -5,12 +5,12 @@
   "type": "module",
   "dependencies": {
     "@kmamal/sdl": "*",
-    "canvas": "*",
+    "@napi-rs/canvas": "*",
     "ffmpeg-static": "*"
   },
   "trustedDependencies": [
     "@kmamal/sdl",
-    "canvas",
+    "@napi-rs/canvas",
     "ffmpeg-static"
   ]
 }

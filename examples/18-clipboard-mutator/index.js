@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import Canvas from 'canvas'
+import Canvas from '@napi-rs/canvas'
 import { setTimeout } from 'timers/promises'
 
 const window = sdl.video.createWindow()
@@ -20,8 +20,8 @@ const redraw = () => {
 
 	ctx.fillText(text, 0, 0)
 
-	const buffer = canvas.toBuffer('raw')
-	window.render(width, height, stride, 'bgra32', buffer)
+	const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+	window.render(width, height, stride, 'rgba32', buffer)
 }
 
 const update = () => {

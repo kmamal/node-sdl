@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import Canvas from 'canvas'
+import Canvas from '@napi-rs/canvas'
 
 const window = sdl.video.createWindow({ resizable: true })
 let canvas
@@ -39,7 +39,8 @@ const doRender = () => {
 		const metrics = ctx.measureText(message)
 		maxX = Math.ceil(x + metrics.width)
 		maxY = Math.ceil(y + metrics.actualBoundingBoxDescent)
-	} else {
+	}
+	else {
 		for (const instance of instances.values()) {
 			const {
 				device: {
@@ -96,9 +97,10 @@ const doRender = () => {
 
 	if (maxX !== W || maxY !== H) {
 		window.setSizeInPixels(maxX, maxY)
-	} else {
-		const buffer = canvas.toBuffer('raw')
-		window.render(W, H, W * 4, 'bgra32', buffer)
+	}
+	else {
+		const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+		window.render(W, H, W * 4, 'rgba32', buffer)
 	}
 }
 

@@ -5,10 +5,10 @@
   "type": "module",
   "dependencies": {
     "@kmamal/sdl": "*",
-    "canvas": "*"
+    "@napi-rs/canvas": "*"
   },
   "trustedDependencies": [
     "@kmamal/sdl",
-    "canvas"
+    "@napi-rs/canvas"
   ]
 }

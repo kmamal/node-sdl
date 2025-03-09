@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import Canvas from 'canvas'
+import Canvas from '@napi-rs/canvas'
 
 const window = sdl.video.createWindow({ resizable: true })
 
@@ -14,8 +14,8 @@ const redraw = () => {
 	ctx.textAlign = 'center'
 	ctx.fillText("Hello, World!", width / 2, height / 2)
 
-	const buffer = canvas.toBuffer('raw')
-	window.render(width, height, width * 4, 'bgra32', buffer)
+	const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+	window.render(width, height, width * 4, 'rgba32', buffer)
 }
 
 window.on('expose', redraw)

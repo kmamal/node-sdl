@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import Canvas from 'canvas'
+import Canvas from '@napi-rs/canvas'
 import { setTimeout } from 'timers/promises'
 
 const window = sdl.video.createWindow()
@@ -76,7 +76,7 @@ while (!window.destroyed) {
 		}
 		ctx.restore()
 
-		const pixelBuffer = canvas.toBuffer('raw')
+		const pixelBuffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
 		window.render(width, height, width * 4, 'bgra32', pixelBuffer)
 	}
 

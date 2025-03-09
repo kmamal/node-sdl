@@ -20,9 +20,9 @@ while (!window.destroyed) {
 	{
 		frames++
 		toc = Date.now()
-		const ellapsed = (toc - tic) / 1e3
-		if (ellapsed >= 1) {
-			const fps = Math.round(frames / ellapsed)
+		const elapsed = (toc - tic) / 1e3
+		if (elapsed >= 1) {
+			const fps = Math.round(frames / elapsed)
 
 			window.setTitle(`FPS: ${fps}`)
 

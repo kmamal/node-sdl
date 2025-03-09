@@ -34,7 +34,7 @@ Additionally, since this example is displaying pixel art, we make sure to only s
 
 ## [5. Canvas Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/05-canvas-drawing)
 
-Instead of filling the buffer by hand we can use the popular [`canvas`](https://www.npmjs.com/package/canvas) library which does the same thing using the familiar Canvas API.
+Instead of filling the buffer by hand we can use the [`@napi-rs/canvas`](https://www.npmjs.com/package/@napi-rs/canvas) library which does the same thing using the familiar Canvas API.
 Note the pixel format that the canvas library's buffer uses.
 
 ## [6. (Indirect) WebGL Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/06-indirect-webgl-drawing)
