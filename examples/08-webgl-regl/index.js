@@ -47,7 +47,7 @@ let tic = Date.now()
 let toc
 let frames = 0
 
-const redraw = () => {
+const render = () => {
 	if (window.destroyed) {
 		clearInterval(interval)
 		return
@@ -93,7 +93,7 @@ window.on('resize', ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) =
 	gl.viewport(0, 0, w, h)
 	gl.swap()
 
-	redraw()
+	render()
 })
 
-const interval = setInterval(redraw, 1e3 / 30)
+const interval = setInterval(render, 1e3 / 30)

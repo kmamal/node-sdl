@@ -71,7 +71,7 @@ gl.useProgram(program)
 
 gl.clearColor(0, 0, 0, 1)
 
-const redraw = () => {
+const render = () => {
 	gl.clear(gl.COLOR_BUFFER_BIT)
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
@@ -81,11 +81,11 @@ const redraw = () => {
 	window.render(w, h, w * 4, 'rgba32', Buffer.from(buffer))
 }
 
-window.on('expose', redraw)
+window.on('expose', render)
 
 window.on('resize', ({ pixelWidth: w, pixelHeight: h }) => {
 	ext.resize(w, h)
 	gl.viewport(0, 0, w, h)
 
-	redraw()
+	render()
 })

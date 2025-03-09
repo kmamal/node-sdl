@@ -2,7 +2,7 @@ import sdl from '@kmamal/sdl'
 
 const window = sdl.video.createWindow({ resizable: true })
 
-const redraw = () => {
+const render = () => {
 	const { pixelWidth: width, pixelHeight: height } = window
 	const stride = width * 4
 	const buffer = Buffer.alloc(stride * height)
@@ -21,5 +21,5 @@ const redraw = () => {
 }
 
 window
-	.on('resize', redraw)
-	.on('expose', redraw)
+	.on('resize', render)
+	.on('expose', render)

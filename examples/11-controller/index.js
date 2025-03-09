@@ -5,6 +5,8 @@ const window = sdl.video.createWindow({ resizable: true })
 let canvas
 let ctx
 
+Canvas.GlobalFonts.loadSystemFonts()
+
 const instances = new Set()
 
 const doRender = () => {
@@ -20,7 +22,7 @@ const doRender = () => {
 	let maxX = 0
 	let maxY = 0
 
-	ctx.font = '12px mono'
+	ctx.font = '12px "DejaVu Sans Mono"'
 	ctx.textAlign = 'left'
 	ctx.textBaseline = 'top'
 
@@ -99,7 +101,7 @@ const doRender = () => {
 		window.setSizeInPixels(maxX, maxY)
 	}
 	else {
-		const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
+		const buffer = Buffer.from(ctx.getImageData(0, 0, W, H).data)
 		window.render(W, H, W * 4, 'rgba32', buffer)
 	}
 }

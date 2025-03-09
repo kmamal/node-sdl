@@ -46,7 +46,8 @@ while (!window.destroyed) {
 
 	// Render
 	{
-		ctx.clearRect(0, 0, width, height)
+		ctx.fillStyle = 'black'
+		ctx.fillRect(0, 0, width, height)
 		ctx.fillStyle = 'white'
 
 		ctx.save()

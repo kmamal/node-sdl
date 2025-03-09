@@ -5,18 +5,21 @@ import { setTimeout } from 'timers/promises'
 const window = sdl.video.createWindow()
 const { pixelWidth: width, pixelHeight: height } = window
 const stride = width * 4
+
+Canvas.GlobalFonts.loadSystemFonts()
 const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
-ctx.font = '14px monospace'
-ctx.fillStyle = 'white'
+ctx.font = '14px "DejaVu Sans Mono"'
 ctx.textAlign = 'left'
 ctx.textBaseline = 'top'
 
 let text = ''
 
-const redraw = () => {
-	ctx.clearRect(0, 0, width, height)
+const render = () => {
+	ctx.fillStyle = 'black'
+	ctx.fillRect(0, 0, width, height)
+	ctx.fillStyle = 'white'
 
 	ctx.fillText(text, 0, 0)
 
@@ -26,7 +29,7 @@ const redraw = () => {
 
 const update = () => {
 	text = sdl.clipboard.text
-	redraw()
+	render()
 }
 
 window.on('focus', update)
@@ -51,7 +54,7 @@ while (!window.destroyed) {
 		text = [ ...before, char, ...after ].join('')
 	}
 
-	redraw()
+	render()
 	await setTimeout(100)
 }
 

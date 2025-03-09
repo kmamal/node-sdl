@@ -26,7 +26,7 @@ const restartAudioProcessWith = async (driver) => {
 			case 'time': { currentTime = message.time } break
 			// No default
 		}
-		redraw()
+		render()
 	})
 
 	if (currentState === 'playing') {
@@ -69,6 +69,8 @@ const height = 90 + audioDrivers.length * 30 + 10
 
 const window = sdl.video.createWindow({ width, height })
 const { pixelWidth, pixelHeight } = window
+
+Canvas.GlobalFonts.loadSystemFonts()
 const canvas = Canvas.createCanvas(pixelWidth, pixelHeight)
 const ctx = canvas.getContext('2d')
 
@@ -76,15 +78,16 @@ const scaleX = pixelWidth / width
 const scaleY = pixelHeight / height
 ctx.scale(scaleX, scaleY)
 
-ctx.font = '15px monospace'
-ctx.fillStyle = 'white'
+ctx.font = '14px "DejaVu Sans Mono"'
 ctx.strokeStyle = 'white'
 ctx.lineWidth = 2 * Math.min(scaleX, scaleY)
 ctx.textAlign = 'center'
 ctx.textBaseline = 'middle'
 
-const redraw = () => {
-	ctx.clearRect(0, 0, width, height)
+const render = () => {
+	ctx.fillStyle = 'black'
+	ctx.fillRect(0, 0, width, height)
+	ctx.fillStyle = 'white'
 
 	const time = Math.round(currentTime / 1e3)
 	const minutes = Math.floor(time / 60).toString().padStart(2, '0')
@@ -102,7 +105,7 @@ const redraw = () => {
 	window.render(width, height, width * 4, 'rgba32', buffer)
 }
 
-redraw()
+render()
 
 let processing = false
 window.on('mouseButtonUp', async (event) => {
@@ -116,7 +119,7 @@ window.on('mouseButtonUp', async (event) => {
 		if (x <= event.x && event.x <= x + w && y <= event.y && event.y <= y + h) {
 			console.log(`Clicked: ${button.text}`)
 			await button.fn()
-			redraw()
+			render()
 			break
 		}
 	}
