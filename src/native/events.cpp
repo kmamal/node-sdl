@@ -98,12 +98,6 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("windowId", Napi::Number::New(env, event.window.windowID));
 
 			switch (event.window.event) {
-				case SDL_WINDOWEVENT_DISPLAY_CHANGED: {
-					packed.Set("type", events::types::DISPLAY_CHANGE);
-					packed.Set("displayIndex", Napi::Number::New(env, event.window.data1));
-					break;
-				}
-
 				case SDL_WINDOWEVENT_SHOWN: { packed.Set("type", events::types::SHOW); break; }
 				case SDL_WINDOWEVENT_HIDDEN: { packed.Set("type", events::types::HIDE); break; }
 				case SDL_WINDOWEVENT_EXPOSED: { packed.Set("type", events::types::EXPOSE); break; }
@@ -133,6 +127,11 @@ events::dispatchEvent(const SDL_Event &event)
 					packed.Set("height", Napi::Number::New(env, event.window.data2));
 					packed.Set("pixelWidth", Napi::Number::New(env, pixel_width));
 					packed.Set("pixelHeight", Napi::Number::New(env, pixel_height));
+					break;
+				}
+				case SDL_WINDOWEVENT_DISPLAY_CHANGED: {
+					packed.Set("type", events::types::DISPLAY_CHANGE);
+					packed.Set("displayIndex", Napi::Number::New(env, event.window.data1));
 					break;
 				}
 				case SDL_WINDOWEVENT_MINIMIZED: { packed.Set("type", events::types::MINIMIZE); break; }

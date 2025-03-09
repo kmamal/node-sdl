@@ -158,6 +158,9 @@ test("sdl::window", (t) => {
 	t.equal(typeof window1.flash, 'function')
 	t.equal(typeof window1.stopFlashing, 'function')
 
+	t.equal(window1.display, sdl.video.displays[0])
+	t.equal(window2.display, sdl.video.displays[0])
+
 	t.equal(window1.destroyed, false)
 	t.equal(window2.destroyed, false)
 	window1.destroy()
