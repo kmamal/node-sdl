@@ -10,7 +10,6 @@ struct CachedTexture {
 	int width;
 	int height;
 	unsigned int format;
-	SDL_ScaleMode scaling;
 };
 
 std::map<SDL_Window*, CachedTexture> cachedTextures;
@@ -168,6 +167,14 @@ window::create (const Napi::CallbackInfo &info)
 	int pixel_width, pixel_height;
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
+	display = SDL_GetWindowDisplayIndex(window);
+	if (display < 0) {
+		std::ostringstream message;
+		message << "SDL_GetWindowDisplayIndex(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
 	Napi::Object native = Napi::Object::New(env);
 
 	SDL_SysWMinfo sys_wm_info;
@@ -228,6 +235,7 @@ window::create (const Napi::CallbackInfo &info)
 	result.Set("height", Napi::Number::New(env, height));
 	result.Set("pixelWidth", Napi::Number::New(env, pixel_width));
 	result.Set("pixelHeight", Napi::Number::New(env, pixel_height));
+	result.Set("displayIndex", Napi::Number::New(env, display));
 	result.Set("fullscreen", Napi::Boolean::New(env, is_fullscreen));
 	result.Set("resizable", Napi::Boolean::New(env, is_resizable));
 	result.Set("borderless", Napi::Boolean::New(env, is_borderless));
@@ -584,7 +592,6 @@ window::render (const Napi::CallbackInfo &info)
 		|| cached.width != width
 		|| cached.height != height
 		|| cached.format != format
-		|| cached.scaling != scaling
 	) {
 		if (texture != nullptr) { SDL_DestroyTexture(texture); }
 
@@ -597,18 +604,17 @@ window::render (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		if(SDL_SetTextureScaleMode(texture, scaling) < 0) {
-			std::ostringstream message;
-			message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-
 		cached.texture = texture;
 		cached.width = width;
 		cached.height = height;
 		cached.format = format;
-		cached.scaling = scaling;
+	}
+
+	if(SDL_SetTextureScaleMode(texture, scaling) < 0) {
+		std::ostringstream message;
+		message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
 	}
 
 	SDL_UpdateTexture(texture, nullptr, pixels, stride);

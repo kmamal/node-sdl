@@ -58,6 +58,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::DISPLAY_ADD = "displayAdd";
 	events::types::DISPLAY_REMOVE = "displayRemove";
 	events::types::DISPLAY_ORIENT = "displayOrient";
+	events::types::DISPLAY_CHANGE = "displayChange";
 	events::types::SHOW = "show";
 	events::types::HIDE = "hide";
 	events::types::EXPOSE = "expose";

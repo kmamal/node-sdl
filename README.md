@@ -148,6 +148,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [Event: 'restore'](#event-restore)
     * [Event: 'move'](#event-move)
     * [Event: 'resize'](#event-resize)
+    * [Event: 'displayChange'](#event-displaychange)
     * [Event: 'focus'](#event-focus)
     * [Event: 'blur'](#event-blur)
     * [Event: 'hover'](#event-hover)
@@ -177,6 +178,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.pixelHeight](#windowpixelheight)
     * [window.setSize(width, height)](#windowsetsizewidth-height)
     * [window.setSizeInPixels(pixelWidth, pixelHeight)](#windowsetsizeinpixelspixelwidth-pixelheight)
+    * [window.display](#windowdisplay)
     * [window.visible](#windowvisible)
     * [window.show([show])](#windowshowshow)
     * [window.hide()](#windowhide)
@@ -654,6 +656,12 @@ Fired when the window changes position.
 
 Fired when the window changes size.
 
+### Event: 'displayChange'
+
+* `display: <object>` An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the window's new display.
+
+Fired when a window moves from one display to another.
+
 ### Event: 'focus'
 
 Fired when a window gains the keyboard focus.
@@ -850,6 +858,13 @@ Changes the size of the window.
 
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
+
+### window.display
+
+* `<object>`
+
+An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display this window belongs to.
+If the window spans multiple displays, then the display containing the center of the window is returned.
 
 ### window.visible
 

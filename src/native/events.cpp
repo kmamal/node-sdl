@@ -27,6 +27,7 @@ std::string events::types::QUIT;
 std::string events::types::DISPLAY_ADD;
 std::string events::types::DISPLAY_REMOVE;
 std::string events::types::DISPLAY_ORIENT;
+std::string events::types::DISPLAY_CHANGE;
 std::string events::types::SHOW;
 std::string events::types::HIDE;
 std::string events::types::EXPOSE;
@@ -97,6 +98,12 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("windowId", Napi::Number::New(env, event.window.windowID));
 
 			switch (event.window.event) {
+				case SDL_WINDOWEVENT_DISPLAY_CHANGED: {
+					packed.Set("type", events::types::DISPLAY_CHANGE);
+					packed.Set("displayIndex", Napi::Number::New(env, event.window.data1));
+					break;
+				}
+
 				case SDL_WINDOWEVENT_SHOWN: { packed.Set("type", events::types::SHOW); break; }
 				case SDL_WINDOWEVENT_HIDDEN: { packed.Set("type", events::types::HIDE); break; }
 				case SDL_WINDOWEVENT_EXPOSED: { packed.Set("type", events::types::EXPOSE); break; }

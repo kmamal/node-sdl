@@ -12,6 +12,7 @@ const validEvents = [
 	'restore',
 	'move',
 	'resize',
+	'displayChange',
 	'focus',
 	'blur',
 	'hover',
@@ -121,6 +122,7 @@ class Window extends EventsViaPoll {
 		this._height = result.height
 		this._pixelWidth = result.pixelWidth
 		this._pixelHeight = result.pixelHeight
+		this._displayIndex = result.displayIndex
 		this._fullscreen = result.fullscreen
 		this._resizable = result.resizable
 		this._borderless = result.borderless
@@ -236,6 +238,10 @@ class Window extends EventsViaPoll {
 
 	get pixelWidth () { return this._pixelWidth }
 	get pixelHeight () { return this._pixelHeight }
+
+	get display () {
+		return Globals.displays[this._displayIndex]
+	}
 
 	get visible () { return this._visible }
 	show (show = true) {

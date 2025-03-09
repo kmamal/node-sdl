@@ -86,6 +86,10 @@ export namespace Events {
 			readonly pixelWidth: number
 			readonly pixelHeight: number
 		}
+		export interface DisplayChange extends WindowEvent {
+			readonly type: 'displayChange'
+			readonly display: Sdl.Video.Display
+		}
 		export interface Focus extends WindowEvent { readonly type: 'focus' }
 		export interface Blur extends WindowEvent { readonly type: 'blur' }
 		export interface Hover extends WindowEvent { readonly type: 'hover' }
@@ -123,6 +127,7 @@ export namespace Events {
 			| Restore
 			| Move
 			| Resize
+			| DisplayChange
 			| Focus
 			| Blur
 			| Hover
@@ -388,6 +393,7 @@ export namespace Sdl {
 			on (event: 'restore', listener: (event: Events.Window.Restore) => void): this
 			on (event: 'move', listener: (event: Events.Window.Move) => void): this
 			on (event: 'resize', listener: (event: Events.Window.Resize) => void): this
+			on (event: 'displayChange', listener: (event: Events.Window.DisplayChange) => void): this
 			on (event: 'focus', listener: (event: Events.Window.Focus) => void): this
 			on (event: 'blur', listener: (event: Events.Window.Blur) => void): this
 			on (event: 'hover', listener: (event: Events.Window.Hover) => void): this
@@ -423,6 +429,8 @@ export namespace Sdl {
 			readonly pixelWidth: number
 			readonly pixelHeight: number
 			setSizeInPixels (pixelWidth: number, pixelHeight: number): void
+
+			readonly display: Display
 
 			readonly visible: boolean
 			show (show?: boolean): void

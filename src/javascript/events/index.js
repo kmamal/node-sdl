@@ -33,13 +33,15 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 		if (cmp === 0) {
 			mainDevice = mainList[++mainIndex]
 			currDevice = currList[++currIndex]
-		} else if (cmp < 0) {
+		}
+		else if (cmp < 0) {
 			mainList.splice(mainIndex, 1)
 			const type = 'deviceRemove'
 			const event = { type, device: mainDevice }
 			emitter.emit(type, event)
 			mainDevice = mainList[mainIndex]
-		} else {
+		}
+		else {
 			mainList.splice(mainIndex, 0, currDevice)
 			mainDevice = mainList[++mainIndex]
 			const type = 'deviceAdd'
@@ -56,7 +58,8 @@ const reconcileDevices = (emitter, mainList, currList, compare) => {
 			const event = { type, device: mainDevice }
 			emitter.emit(type, event)
 		}
-	} else {
+	}
+	else {
 		while (currIndex < currList.length) {
 			mainList.push(currDevice)
 			const type = 'deviceAdd'
@@ -115,6 +118,11 @@ const handleEvent = (event) => {
 					window._height = event.height
 					window._pixelWidth = event.pixelWidth
 					window._pixelHeight = event.pixelHeight
+				} break
+				case 'displayChange': {
+					window._displayIndex = event.displayIndex
+					delete event.displayIndex
+					event.display = window.display
 				} break
 
 				case 'show': {

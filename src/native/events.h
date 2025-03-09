@@ -28,6 +28,7 @@ namespace events {
 		extern std::string DISPLAY_ADD;
 		extern std::string DISPLAY_REMOVE;
 		extern std::string DISPLAY_ORIENT;
+		extern std::string DISPLAY_CHANGE;
 		extern std::string SHOW;
 		extern std::string HIDE;
 		extern std::string EXPOSE;
