@@ -1,17 +1,8 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
-const {
-	make: makeControllerDevice,
-	filter: filterControllerDevice,
-} = require('./device')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { ControllerInstance } = require('./controller-instance')
-
-Globals.controllerDevices = Bindings.joystick_getDevices()
-	.filter(filterControllerDevice)
-for (const controllerDevice of Globals.controllerDevices) {
-	makeControllerDevice(controllerDevice)
-}
+const { reconcileJoystickAndControllerDevices } = require('../events/reconcile-joystick-and-controller-devices')
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
@@ -33,6 +24,9 @@ const controller = new class extends EventsViaPoll {
 		}
 
 		Bindings.controller_addMappings(mappings)
+
+		const devices = Bindings.joystick_getDevices()
+		reconcileJoystickAndControllerDevices(devices)
 	}
 }()
 

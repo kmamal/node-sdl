@@ -33,18 +33,26 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
+		// This function can only error if the index is invalid.
 		SDL_SensorType _type = SDL_SensorGetDeviceType(i);
-		// This function can only error if the index is invalid.
-		Napi::Value type = _type == SDL_SENSOR_UNKNOWN ? env.Null() : Napi::String::New(env, sensor::types[_type]);
-		Napi::Value side = _type == SDL_SENSOR_UNKNOWN || _type == SDL_SENSOR_ACCEL || _type == SDL_SENSOR_GYRO ? env.Null() : Napi::String::New(env, sensor::sides[_type]);
+		Napi::Value type = _type != SDL_SENSOR_UNKNOWN
+			? Napi::String::New(env, sensor::types[_type])
+			: env.Null();
+		Napi::Value side = (
+			_type != SDL_SENSOR_UNKNOWN &&
+			_type != SDL_SENSOR_ACCEL &&
+			_type != SDL_SENSOR_GYRO
+		)
+			? Napi::String::New(env, sensor::sides[_type])
+			: env.Null();
 
-		const char *name = SDL_SensorGetDeviceName(i);
 		// This function can only error if the index is invalid.
+		const char *name = SDL_SensorGetDeviceName(i);
 
 		Napi::Object device = Napi::Object::New(env);
-		device.Set("_index", Napi::Number::New(env, i));
-		device.Set("id", Napi::Number::New(env, id));
-		device.Set("name", Napi::String::New(env, name));
+		device.Set("_index", i);
+		device.Set("id", id);
+		device.Set("name", name);
 		device.Set("type", type);
 		device.Set("side", side);
 
@@ -87,20 +95,23 @@ sensor::getData (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	Uint64 timestamp;
+	Uint64 _timestamp;
 	float data[3];
-	if (SDL_SensorGetDataWithTimestamp(sensor, &timestamp, data, 3) == -1) {
+	if (SDL_SensorGetDataWithTimestamp(sensor, &_timestamp, data, 3) == -1) {
 		std::ostringstream message;
 		message << "SDL_SensorGetDataWithTimestamp(" << sensor_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+	Napi::Value timestamp = _timestamp != 0
+		? Napi::Number::New(env, _timestamp)
+		: env.Null();
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("timestamp", timestamp == 0 ? env.Null() : Napi::Number::New(env, timestamp));
-	result.Set("x", Napi::Number::New(env, data[0]));
-	result.Set("y", Napi::Number::New(env, data[1]));
-	result.Set("z", Napi::Number::New(env, data[2]));
+	result.Set("timestamp", timestamp);
+	result.Set("x", data[0]);
+	result.Set("y", data[1]);
+	result.Set("z", data[2]);
 
 	return result;
 }

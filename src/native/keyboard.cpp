@@ -50,7 +50,7 @@ keyboard::getState(const Napi::CallbackInfo &info)
 	Napi::Array result = Napi::Array::New(env, keyboard::num_keys);
 
 	for (int i = 0 ; i < keyboard::num_keys; i++) {
-		result.Set(i, Napi::Boolean::New(env, !!keyboard::keys[i]));
+		result.Set(i, !!keyboard::keys[i]);
 	}
 
 	return result;

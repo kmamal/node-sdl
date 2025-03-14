@@ -134,6 +134,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   * [Event: 'displayAdd'](#event-displayadd)
   * [Event: 'displayRemove'](#event-displayremove)
   * [Event: 'displayOrient'](#event-displayorient)
+  * [Event: 'displayMove'](#event-displaymove)
   * [sdl.video.displays](#sdlvideodisplays)
   * [sdl.video.windows](#sdlvideowindows)
   * [sdl.video.focused](#sdlvideofocused)
@@ -511,9 +512,15 @@ Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 ### Event: 'displayOrient'
 
 * `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+* `orientation: <string>`: The display's new orientation.
 
 Fired when a display changes orientation.
-Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
+
+### Event: 'displayMove'
+
+* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+
+Fired when a display changes position.
 
 
 ### sdl.video.displays
@@ -530,8 +537,19 @@ Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
     * `horizontal: <number>` The horizontal density.
     * `vertical: <number>` The vertical density.
     * `diagonal: <number>` The diagonal density.
+  * `orientation: <string>|<null>` The orientation of the display.
 
 A list of all detected displays.
+
+Possible values for `orientation` are `null` if it is unknown, or one of:
+
+| Value | Corresponding `SDL_DisplayOrientation` |
+| --- | --- |
+| `'landscape'` | `SDL_ORIENTATION_LANDSCAPE` |
+| `'landscapeFlipped'` | `SDL_ORIENTATION_LANDSCAPE_FLIPPED` |
+| `'portrait'` | `SDL_ORIENTATION_PORTRAIT` |
+| `'portraitFlipped'` | `SDL_ORIENTATION_PORTRAIT_FLIPPED` |
+
 Sample output for two side-to-side monitors is below.
 Notice how the geometries don't overlap:
 
@@ -1585,10 +1603,10 @@ When this event is emitted, all instances that were opened from the removed devi
 
 * `<object>[]`
   * `id: <number>` The unique id for the device.
-  * `type: <JoystickType>` The type of the device.
   * `name: <string>` The name of the device.
   * `path: <string>` The implementation dependent path of the device.
   * `guid: <string>` The GUID of the device.
+  * `type: <JoystickType>|<null>` The type of the device.
   * `vendor: <number>|<null>` The USB vendor ID of the device. Will be `null` if it can't be determined.
   * `product: <number>|<null>` The USB product ID of the device. Will be `null` if it can't be determined.
   * `version: <number>|<null>` The USB product version of the device. Will be `null` if it can't be determined.
@@ -1596,7 +1614,7 @@ When this event is emitted, all instances that were opened from the removed devi
 
 A list of all the detected joystick devices.
 
-Possible values for `type` are:
+Possible values for `type` are `null` if it is unknown, or one of:
 
 | Value | Corresponding `SDL_JoystickType` |
 | --- | --- |
@@ -1616,10 +1634,10 @@ Sample output:
 [
   {
     id: 0,
-    type: 'gamecontroller',
     name: 'DragonRise Inc. Generic USB Joystick',
     path: '/dev/input/event21',
     guid: '03000000790000000600000010010000',
+    type: 'gamecontroller',
     vendor: 121,
     product: 6,
     version: 272,
@@ -1819,13 +1837,13 @@ Closes the instance.
 ## sdl.controller
 
 An SDL controller is an abstraction over [`joysticks`](#sdljoystick) based on the xbox360 controller: They have a dpad, two analog sticks, 4 buttons on the right (called A, B, X, Y), shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
-The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the x-axis of the left analog stick, or `controllerInstance.buttons.b` is always the rightmost buttons of the 4 buttons on the right.
+The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the x-axis of the left analog stick, or `controllerInstance.buttons.b` is always the rightmost button of the 4 buttons on the right.
 This makes it easy to provide consistent input bindings, like "press B to jump, move around with the left analog stick".
 With a pure joystick instance it's impossible to know which axis or button corresponds to which physical axis/button on the device.
 
 Because controllers are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a controller device have the same id, then they refer to the same underlying physical device).
 For a joystick device to also be available as a controller device it needs a "mapping".
-A mapping is a string that consists of the device's name, it's GUID, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name.
+A mapping is a string that consists of the device's GUID, it's name, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name.
 See the sample output [`here`](#sdlcontrollerdevices) for an example.
 SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on https://github.com/gabomdq/SDL_GameControllerDB.
 You can add them via:
@@ -1834,7 +1852,7 @@ You can add them via:
 const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
 const result = await fetch(url)
 const text = await result.text()
-const mappings = text.split('\n')
+const mappings = text.split('\n').filter((line) => line && !line.startsWith('#'))
 sdl.controller.addMappings(mappings)
 ```
 
@@ -1871,6 +1889,7 @@ This can cause already opened controller instances to be [remapped](#event-remap
   * `name: <string>` The name of the device.
   * `path: <string>` The implementation dependent path of the device.
   * `guid: <string>` The GUID of the device.
+  * `type: <string>|null` The type of the device.
   * `vendor: <number>|<null>` The USB vendor ID of the device. Will be `null` if it can't be determined.
   * `product: <number>|<null>` The USB product ID of the device. Will be `null` if it can't be determined.
   * `version: <number>|<null>` The USB product version of the device. Will be `null` if it can't be determined.
@@ -1878,6 +1897,25 @@ This can cause already opened controller instances to be [remapped](#event-remap
   * `mapping: <string>` The axis and button mapping for this device.
 
 A list of all the detected controller devices.
+
+Possible values for `type` are `null` if it is unknown, or one of:
+
+| Value | Corresponding `SDL_GameControllerType` |
+| --- | --- |
+| `'xbox360'` | SDL_CONTROLLER_TYPE_XBOX360 |
+| `'xboxOne'` | SDL_CONTROLLER_TYPE_XBOXONE |
+| `'ps3'` | SDL_CONTROLLER_TYPE_PS3 |
+| `'ps4'` | SDL_CONTROLLER_TYPE_PS4 |
+| `'nintendoSwitchPro'` | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO |
+| `'virtual'` | SDL_CONTROLLER_TYPE_VIRTUAL |
+| `'ps5'` | SDL_CONTROLLER_TYPE_PS5 |
+| `'amazonLuna'` | SDL_CONTROLLER_TYPE_AMAZON_LUNA |
+| `'googleStadia'` | SDL_CONTROLLER_TYPE_GOOGLE_STADIA |
+| `'nvidiaShield'` | SDL_CONTROLLER_TYPE_NVIDIA_SHIELD |
+| `'nintendoSwitchJoyconLeft'` | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT |
+| `'nintendoSwitchJoyconRight'` | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT |
+| `'nintendoSwitchJoyconPair'` | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR |
+
 Sample output:
 
 ```js
@@ -1887,6 +1925,7 @@ Sample output:
     name: 'DragonRise Inc. Generic USB Joystick',
     path: '/dev/input/event21',
     guid: '03000000790000000600000010010000',
+    type: null,
     vendor: 121,
     product: 6,
     version: 272,

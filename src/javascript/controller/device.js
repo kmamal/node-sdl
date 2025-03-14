@@ -1,7 +1,18 @@
 
 const make = (device) => {
-	delete device.type
-	delete device.isController
+	const {
+		isController,
+		controllerMapping,
+		controllerName,
+		controllerType,
+		...rest
+	} = device
+	return {
+		...rest,
+		mapping: controllerMapping,
+		name: controllerName,
+		type: controllerType,
+	}
 }
 
 const compare = (a, b) => a.id - b.id

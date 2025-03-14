@@ -24,6 +24,7 @@
 			'NAPI_VERSION=<(napi_build_version)',
 			'NODE_ADDON_API_DISABLE_DEPRECATED',
 		],
+		'cflags': [ '-Werror', '-Wall', '-Wextra' ],
 		'conditions': [
 			['OS == "linux"', {
 				'cflags': [ '-D_REENTRANT' ],

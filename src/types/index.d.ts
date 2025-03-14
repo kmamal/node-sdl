@@ -11,11 +11,25 @@ export namespace Events {
 			readonly display: Sdl.Video.Display
 		}
 
-		export interface Add extends DisplayEvent { readonly type: 'deviceAdd' }
-		export interface Remove extends DisplayEvent { readonly type: 'deviceRemove' }
-		export interface Orient extends DisplayEvent { readonly type: 'deviceOrient' }
+		export interface Add extends DisplayEvent {
+			readonly type: 'deviceAdd'
+			readonly device: Sdl.Video.Display
+		}
+		export interface Remove extends DisplayEvent {
+			readonly type: 'deviceRemove'
+			readonly device: Sdl.Video.Display
+		}
+		export interface Orient extends DisplayEvent {
+			readonly type: 'deviceOrient'
+			readonly device: Sdl.Video.Display
+			readonly orientation: Sdl.Video.Orientation
+		}
+		export interface Move extends DisplayEvent {
+			readonly type: 'deviceMove'
+			readonly device: Sdl.Video.Display
+		}
 
-		export type Any = Add | Remove | Orient
+		export type Any = Add | Remove | Orient | Move
 
 	}
 
@@ -318,6 +332,12 @@ export namespace Sdl {
 
 	export namespace Video {
 
+		export type Orientation
+			= 'portrait'
+			| 'portraitFlipped'
+			| 'landscape'
+			| 'landscapeFlipped'
+
 		export type Format
 			= 'rgb332'
 			| 'rgb444'
@@ -382,6 +402,7 @@ export namespace Sdl {
 				readonly vertical: number
 				readonly diagonal: number
 			} | null
+			readonly orientation: Orientation | null
 		}
 
 		export class Window {
@@ -499,6 +520,7 @@ export namespace Sdl {
 			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
+			on (event: 'displayMove', listener: (event: Events.Display.Move) => void): this
 			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
 
 			readonly displays: Display[]
@@ -848,7 +870,8 @@ export namespace Sdl {
 		}
 
 		export type JoystickType
-			= 'gamecontroller'
+			= null
+			| 'gamecontroller'
 			| 'wheel'
 			| 'arcadestick'
 			| 'flightstick'
@@ -879,10 +902,10 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly id: number
-			readonly type: JoystickType
 			readonly name: string
 			readonly path: string
 			readonly guid: string
+			readonly type: JoystickType | null
 			readonly vendor: number | null
 			readonly product: number | null
 			readonly version: number | null
@@ -941,17 +964,21 @@ export namespace Sdl {
 
 	export namespace Controller {
 
-		export interface Device {
-			readonly id: number
-			readonly name: string
-			readonly path: string
-			readonly guid: string
-			readonly vendor: number
-			readonly product: number
-			readonly version: number
-			readonly player: number
-			readonly mapping: string
-		}
+		export type ControllerType
+			= null
+			| 'xbox360'
+			| 'xboxOne'
+			| 'ps3'
+			| 'ps4'
+			| 'nintendoSwitchPro'
+			| 'virtual'
+			| 'ps5'
+			| 'amazonLuna'
+			| 'googleStadia'
+			| 'nvidiaShield'
+			| 'nintendoSwitchJoyconLeft'
+			| 'nintendoSwitchJoyconRight'
+			| 'nintendoSwitchJoyconPair'
 
 		export type Axis
 			= 'leftStickX'
@@ -981,6 +1008,19 @@ export namespace Sdl {
 			| 'paddle2'
 			| 'paddle3'
 			| 'paddle4'
+
+		export interface Device {
+			readonly id: number
+			readonly name: string
+			readonly path: string
+			readonly guid: string
+			readonly type: ControllerType | null;
+			readonly vendor: number | null
+			readonly product: number | null
+			readonly version: number | null
+			readonly player: number | null
+			readonly mapping: string
+		}
 
 		export class ControllerInstance {
 			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this

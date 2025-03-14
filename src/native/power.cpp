@@ -14,9 +14,15 @@ power::getInfo (const Napi::CallbackInfo &info)
 	int _seconds, _percent;
 	SDL_PowerState _state = SDL_GetPowerInfo(&_seconds, &_percent);
 
-	Napi::Value state = _state == SDL_POWERSTATE_UNKNOWN ? env.Null() : Napi::String::New(env, power::states[_state]);
-	Napi::Value seconds = _seconds == -1 ? env.Null() : Napi::Number::New(env, _seconds);
-	Napi::Value percent = _percent == -1 ? env.Null() : Napi::Number::New(env, _percent);
+	Napi::Value state = _state != SDL_POWERSTATE_UNKNOWN
+		? Napi::String::New(env, power::states[_state])
+		: env.Null();
+	Napi::Value seconds = _seconds != -1
+		? Napi::Number::New(env, _seconds)
+		: env.Null();
+	Napi::Value percent = _percent != -1
+		? Napi::Number::New(env, _percent)
+		: env.Null();
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("state", state);

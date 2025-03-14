@@ -228,25 +228,25 @@ window::create (const Napi::CallbackInfo &info)
 	if (is_visible) { SDL_ShowWindow(window); }
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("id", Napi::Number::New(env, window_id));
-	result.Set("x", Napi::Number::New(env, x));
-	result.Set("y", Napi::Number::New(env, y));
-	result.Set("width", Napi::Number::New(env, width));
-	result.Set("height", Napi::Number::New(env, height));
-	result.Set("pixelWidth", Napi::Number::New(env, pixel_width));
-	result.Set("pixelHeight", Napi::Number::New(env, pixel_height));
-	result.Set("displayIndex", Napi::Number::New(env, display));
-	result.Set("fullscreen", Napi::Boolean::New(env, is_fullscreen));
-	result.Set("resizable", Napi::Boolean::New(env, is_resizable));
-	result.Set("borderless", Napi::Boolean::New(env, is_borderless));
-	result.Set("alwaysOnTop", Napi::Boolean::New(env, is_always_on_top));
-	result.Set("accelerated", Napi::Boolean::New(env, is_accelerated));
-	result.Set("vsync", Napi::Boolean::New(env, is_vsync));
+	result.Set("id", window_id);
+	result.Set("x", x);
+	result.Set("y", y);
+	result.Set("width", width);
+	result.Set("height", height);
+	result.Set("pixelWidth", pixel_width);
+	result.Set("pixelHeight", pixel_height);
+	result.Set("displayIndex", display);
+	result.Set("fullscreen", is_fullscreen);
+	result.Set("resizable", is_resizable);
+	result.Set("borderless", is_borderless);
+	result.Set("alwaysOnTop", is_always_on_top);
+	result.Set("accelerated", is_accelerated);
+	result.Set("vsync", is_vsync);
 	result.Set("native", native);
-	result.Set("skipTaskbar", Napi::Boolean::New(env, should_skip_taskbar));
-	result.Set("popupMenu", Napi::Boolean::New(env, is_popup_menu));
-	result.Set("tooltip", Napi::Boolean::New(env, is_tooltip));
-	result.Set("utility", Napi::Boolean::New(env, is_utility));
+	result.Set("skipTaskbar", should_skip_taskbar);
+	result.Set("popupMenu", is_popup_menu);
+	result.Set("tooltip", is_tooltip);
+	result.Set("utility", is_utility);
 
 	return result;
 }
@@ -317,8 +317,8 @@ window::setSize (const Napi::CallbackInfo &info)
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("pixelWidth", Napi::Number::New(env, pixel_width));
-	result.Set("pixelHeight", Napi::Number::New(env, pixel_height));
+	result.Set("pixelWidth", pixel_width);
+	result.Set("pixelHeight", pixel_height);
 
 	return result;
 }
@@ -420,8 +420,8 @@ window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 	updateRenderer(env, window, &is_accelerated, &is_vsync);
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("accelerated", Napi::Boolean::New(env, is_accelerated));
-	result.Set("vsync", Napi::Boolean::New(env, is_vsync));
+	result.Set("accelerated", is_accelerated);
+	result.Set("vsync", is_vsync);
 
 	return result;
 }

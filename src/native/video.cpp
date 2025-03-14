@@ -5,6 +5,7 @@
 #include <map>
 
 
+std::map<SDL_DisplayOrientation, std::string> video::orientations;
 std::map<SDL_PixelFormatEnum, std::string> video::formats;
 
 
@@ -49,10 +50,10 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		}
 
 		Napi::Object geometry = Napi::Object::New(env);
-		geometry.Set("x", Napi::Number::New(env, rect.x));
-		geometry.Set("y", Napi::Number::New(env, rect.y));
-		geometry.Set("width", Napi::Number::New(env, rect.w));
-		geometry.Set("height", Napi::Number::New(env, rect.h));
+		geometry.Set("x", rect.x);
+		geometry.Set("y", rect.y);
+		geometry.Set("width", rect.w);
+		geometry.Set("height", rect.h);
 
 		if(SDL_GetDisplayUsableBounds(i, &rect) < 0) {
 			std::ostringstream message;
@@ -62,10 +63,10 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		}
 
 		Napi::Object usable = Napi::Object::New(env);
-		usable.Set("x", Napi::Number::New(env, rect.x));
-		usable.Set("y", Napi::Number::New(env, rect.y));
-		usable.Set("width", Napi::Number::New(env, rect.w));
-		usable.Set("height", Napi::Number::New(env, rect.h));
+		usable.Set("x", rect.x);
+		usable.Set("y", rect.y);
+		usable.Set("width", rect.w);
+		usable.Set("height", rect.h);
 
 		Napi::Value dpi;
 		float ddpi, hdpi, vdpi;
@@ -73,19 +74,26 @@ video::getDisplays(const Napi::CallbackInfo &info)
 			dpi = env.Null();
 		} else {
 			Napi::Object dpi_obj = Napi::Object::New(env);
-			dpi_obj.Set("diagonal", Napi::Number::New(env, ddpi));
-			dpi_obj.Set("horizontal", Napi::Number::New(env, hdpi));
-			dpi_obj.Set("vertical", Napi::Number::New(env, vdpi));
+			dpi_obj.Set("diagonal", ddpi);
+			dpi_obj.Set("horizontal", hdpi);
+			dpi_obj.Set("vertical", vdpi);
 			dpi = dpi_obj;
 		}
 
+		SDL_DisplayOrientation _orientation = SDL_GetDisplayOrientation(i);
+		Napi::Value orientation = _orientation != SDL_ORIENTATION_UNKNOWN
+			? Napi::String::New(env, video::orientations[_orientation])
+			: env.Null();
+
 		Napi::Object display = Napi::Object::New(env);
-		display.Set("name", Napi::String::New(env, name));
+		display.Set("_index", i);
+		display.Set("name", name);
 		display.Set("format", video::formats[(SDL_PixelFormatEnum) mode.format]);
-		display.Set("frequency", Napi::Number::New(env, mode.refresh_rate));
+		display.Set("frequency", mode.refresh_rate);
 		display.Set("geometry", geometry);
 		display.Set("usable", usable);
 		display.Set("dpi", dpi);
+		display.Set("orientation", orientation);
 
 		displays.Set(i, display);
 	}

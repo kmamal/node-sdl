@@ -5,6 +5,7 @@
 #include "joystick.h"
 #include "controller.h"
 #include "sensor.h"
+#include "audio.h"
 #include "power.h"
 #include <SDL.h>
 #include <string>
@@ -58,6 +59,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::DISPLAY_ADD = "displayAdd";
 	events::types::DISPLAY_REMOVE = "displayRemove";
 	events::types::DISPLAY_ORIENT = "displayOrient";
+	events::types::DISPLAY_MOVE = "displayMove";
 	events::types::DISPLAY_CHANGE = "displayChange";
 	events::types::SHOW = "show";
 	events::types::HIDE = "hide";
@@ -92,6 +94,12 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::HAT_MOTION = "hatMotion";
 	events::types::REMAP = "remap";
 	events::types::UPDATE = "update";
+
+	// video::orientations[SDL_ORIENTATION_UNKNOWN] = nullptr;
+	video::orientations[SDL_ORIENTATION_LANDSCAPE] = "landscape";
+	video::orientations[SDL_ORIENTATION_LANDSCAPE_FLIPPED] = "landscapeFlipped";
+	video::orientations[SDL_ORIENTATION_PORTRAIT] = "portrait";
+	video::orientations[SDL_ORIENTATION_PORTRAIT_FLIPPED] = "portraitFlipped";
 
 	video::formats[SDL_PIXELFORMAT_RGB332] = "rgb332";
 	video::formats[SDL_PIXELFORMAT_RGB444] = "rgb444";
@@ -130,6 +138,17 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::formats[SDL_PIXELFORMAT_NV12] = "nv12";
 	video::formats[SDL_PIXELFORMAT_NV21] = "nv21";
 
+	// joystick::types[SDL_JOYSTICK_TYPE_UNKNOWN] = nullptr;
+	joystick::types[SDL_JOYSTICK_TYPE_GAMECONTROLLER] = "gamecontroller";
+	joystick::types[SDL_JOYSTICK_TYPE_WHEEL] = "wheel";
+	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_STICK] = "arcadestick";
+	joystick::types[SDL_JOYSTICK_TYPE_FLIGHT_STICK] = "flightstick";
+	joystick::types[SDL_JOYSTICK_TYPE_DANCE_PAD] = "dancepad";
+	joystick::types[SDL_JOYSTICK_TYPE_GUITAR] = "guitar";
+	joystick::types[SDL_JOYSTICK_TYPE_DRUM_KIT] = "drumkit";
+	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_PAD] = "arcadepad";
+	joystick::types[SDL_JOYSTICK_TYPE_THROTTLE] = "throttle";
+
 	// joystick::power_levels[SDL_JOYSTICK_POWER_UNKNOWN] = nullptr;
 	joystick::power_levels[SDL_JOYSTICK_POWER_EMPTY] = "empty";
 	joystick::power_levels[SDL_JOYSTICK_POWER_LOW] = "low";
@@ -137,17 +156,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	joystick::power_levels[SDL_JOYSTICK_POWER_FULL] = "full";
 	joystick::power_levels[SDL_JOYSTICK_POWER_WIRED] = "wired";
 	joystick::power_levels[SDL_JOYSTICK_POWER_MAX] = "max";
-
-	// joystick::joystick_types[SDL_JOYSTICK_TYPE_UNKNOWN] = nullptr; // Only possible on error
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_GAMECONTROLLER] = "gamecontroller";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_WHEEL] = "wheel";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_ARCADE_STICK] = "arcadestick";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_FLIGHT_STICK] = "flightstick";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_DANCE_PAD] = "dancepad";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_GUITAR] = "guitar";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_DRUM_KIT] = "drumkit";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_ARCADE_PAD] = "arcadepad";
-	joystick::joystick_types[SDL_JOYSTICK_TYPE_THROTTLE] = "throttle";
 
 	joystick::hat_positions[SDL_HAT_CENTERED] = "centered";
 	joystick::hat_positions[SDL_HAT_UP] = "up";
@@ -158,6 +166,21 @@ global::initialize(const Napi::CallbackInfo &info)
 	joystick::hat_positions[SDL_HAT_RIGHTDOWN] = "rightdown";
 	joystick::hat_positions[SDL_HAT_LEFTUP] = "leftup";
 	joystick::hat_positions[SDL_HAT_LEFTDOWN] = "leftdown";
+
+	// controller::types[SDL_CONTROLLER_TYPE_UNKNOWN] = nullptr;
+	controller::types[SDL_CONTROLLER_TYPE_XBOX360] = "xbox360";
+	controller::types[SDL_CONTROLLER_TYPE_XBOXONE] = "xboxOne";
+	controller::types[SDL_CONTROLLER_TYPE_PS3] = "ps3";
+	controller::types[SDL_CONTROLLER_TYPE_PS4] = "ps4";
+	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO] = "nintendoSwitchPro";
+	controller::types[SDL_CONTROLLER_TYPE_VIRTUAL] = "virtual";
+	controller::types[SDL_CONTROLLER_TYPE_PS5] = "ps5";
+	controller::types[SDL_CONTROLLER_TYPE_AMAZON_LUNA] = "amazonLuna";
+	controller::types[SDL_CONTROLLER_TYPE_GOOGLE_STADIA] = "googleStadia";
+	controller::types[SDL_CONTROLLER_TYPE_NVIDIA_SHIELD] = "nvidiaShield";
+	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT] = "nintendoSwitchJoyconLeft";
+	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT] = "nintendoSwitchJoyconRight";
+	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR] = "nintendoSwitchJoyconPair";
 
 	controller::axes[SDL_CONTROLLER_AXIS_LEFTX] = "leftStickX";
 	controller::axes[SDL_CONTROLLER_AXIS_LEFTY] = "leftStickY";
@@ -202,6 +225,9 @@ global::initialize(const Napi::CallbackInfo &info)
 	sensor::sides[SDL_SENSOR_ACCEL_R] = "right";
 	sensor::sides[SDL_SENSOR_GYRO_R] = "right";
 
+	audio::device_types[true] = "recording";
+	audio::device_types[false] = "playback";
+
 	// power::states[SDL_POWERSTATE_UNKNOWN] = nullptr;
 	power::states[SDL_POWERSTATE_NO_BATTERY] = "noBattery";
 	power::states[SDL_POWERSTATE_ON_BATTERY] = "battery";
@@ -228,17 +254,17 @@ global::initialize(const Napi::CallbackInfo &info)
 	SDL_VERSION(&sdl_compile_version);
 
 	Napi::Object compile_version = Napi::Object::New(env);
-	compile_version.Set("major", Napi::Number::New(env, sdl_compile_version.major));
-	compile_version.Set("minor", Napi::Number::New(env, sdl_compile_version.minor));
-	compile_version.Set("patch", Napi::Number::New(env, sdl_compile_version.patch));
+	compile_version.Set("major", sdl_compile_version.major);
+	compile_version.Set("minor", sdl_compile_version.minor);
+	compile_version.Set("patch", sdl_compile_version.patch);
 
 	SDL_version sdl_runtime_version;
 	SDL_GetVersion(&sdl_runtime_version);
 
 	Napi::Object runtime_version = Napi::Object::New(env);
-	runtime_version.Set("major", Napi::Number::New(env, sdl_runtime_version.major));
-	runtime_version.Set("minor", Napi::Number::New(env, sdl_runtime_version.minor));
-	runtime_version.Set("patch", Napi::Number::New(env, sdl_runtime_version.patch));
+	runtime_version.Set("major", sdl_runtime_version.major);
+	runtime_version.Set("minor", sdl_runtime_version.minor);
+	runtime_version.Set("patch", sdl_runtime_version.patch);
 
 	Napi::Object versions = Napi::Object::New(env);
 	versions.Set("compile", compile_version);
@@ -263,7 +289,7 @@ global::initialize(const Napi::CallbackInfo &info)
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}
-		all_video_drivers.Set(all_video_drivers.Length(), Napi::String::New(env, name));
+		all_video_drivers.Set(all_video_drivers.Length(), name);
 	}
 
 	Napi::Value current_video_driver;
@@ -302,7 +328,7 @@ global::initialize(const Napi::CallbackInfo &info)
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}
-		all_audio_drivers.Set(all_audio_drivers.Length(), Napi::String::New(env, name));
+		all_audio_drivers.Set(all_audio_drivers.Length(), name);
 	}
 
 	Napi::Value current_audio_driver;
@@ -342,7 +368,7 @@ global::initialize(const Napi::CallbackInfo &info)
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("version", versions);
-	result.Set("platform", Napi::String::New(env, platform_name));
+	result.Set("platform", platform_name);
 	result.Set("drivers", drivers);
 
 	return result;

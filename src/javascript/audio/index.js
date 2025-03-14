@@ -1,19 +1,13 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
-const { make: makeAudioDevice } = require('./device')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackInstance } = require('./audio-playback-instance')
 const { AudioRecordingInstance } = require('./audio-recording-instance')
 const { AudioFormatHelpers } = require('./format-helpers')
 
+
 Globals.audioDevices.playback = Bindings.audio_getDevices(false)
-for (const audioDevice of Globals.audioDevices.playback) {
-	makeAudioDevice(audioDevice)
-}
 Globals.audioDevices.recording = Bindings.audio_getDevices(true)
-for (const audioDevice of Globals.audioDevices.recording) {
-	makeAudioDevice(audioDevice)
-}
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]

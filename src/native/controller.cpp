@@ -1,5 +1,4 @@
 #include "controller.h"
-#include "joystick.h"
 #include "global.h"
 #include <SDL.h>
 #include <map>
@@ -7,9 +6,21 @@
 #include <sstream>
 
 
+std::map<SDL_GameControllerType, std::string> controller::types;
 std::map<SDL_GameControllerAxis, std::string> controller::axes;
 std::map<SDL_GameControllerButton, std::string> controller::buttons;
 
+
+double
+controller::mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis) {
+	return mapAxisValue(controller, axis, SDL_GameControllerGetAxis(controller, axis));
+}
+
+double
+controller::mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis axis, int value) {
+	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
+	return value / range;
+}
 
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)
@@ -19,12 +30,12 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	SDL_ClearError();
 
 	Napi::Object axes = Napi::Object::New(env);
-	axes.Set("leftStickX", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX))));
-	axes.Set("leftStickY", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY))));
-	axes.Set("rightStickX", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX))));
-	axes.Set("rightStickY", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY))));
-	axes.Set("leftTrigger", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT))));
-	axes.Set("rightTrigger", Napi::Number::New(env, joystick::mapAxis(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT))));
+	axes.Set("leftStickX", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTX));
+	axes.Set("leftStickY", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTY));
+	axes.Set("rightStickX", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX));
+	axes.Set("rightStickY", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY));
+	axes.Set("leftTrigger", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT));
+	axes.Set("rightTrigger", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT));
 
 	error = SDL_GetError();
 	if (error != global::no_error) {
@@ -35,25 +46,25 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	}
 
 	Napi::Object buttons = Napi::Object::New(env);
-	buttons.Set("dpadLeft", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT)));
-	buttons.Set("dpadRight", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)));
-	buttons.Set("dpadUp", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP)));
-	buttons.Set("dpadDown", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN)));
-	buttons.Set("a", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A)));
-	buttons.Set("b", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B)));
-	buttons.Set("x", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X)));
-	buttons.Set("y", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)));
-	buttons.Set("guide", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_GUIDE)));
-	buttons.Set("back", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK)));
-	buttons.Set("start", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START)));
-	buttons.Set("leftStick", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK)));
-	buttons.Set("rightStick", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK)));
-	buttons.Set("leftShoulder", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)));
-	buttons.Set("rightShoulder", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)));
-	buttons.Set("paddle1", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE1)));
-	buttons.Set("paddle2", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE2)));
-	buttons.Set("paddle3", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE3)));
-	buttons.Set("paddle4", Napi::Boolean::New(env, SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE4)));
+	buttons.Set("dpadLeft", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+	buttons.Set("dpadRight", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+	buttons.Set("dpadUp", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP));
+	buttons.Set("dpadDown", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+	buttons.Set("a", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A));
+	buttons.Set("b", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B));
+	buttons.Set("x", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X));
+	buttons.Set("y", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y));
+	buttons.Set("guide", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_GUIDE));
+	buttons.Set("back", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK));
+	buttons.Set("start", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START));
+	buttons.Set("leftStick", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSTICK));
+	buttons.Set("rightStick", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSTICK));
+	buttons.Set("leftShoulder", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+	buttons.Set("rightShoulder", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+	buttons.Set("paddle1", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE1));
+	buttons.Set("paddle2", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE2));
+	buttons.Set("paddle3", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE3));
+	buttons.Set("paddle4", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE4));
 
 	error = SDL_GetError();
 	if (error != global::no_error) {
@@ -102,42 +113,31 @@ controller::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GameControllerGetJoystick(" << index << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	int _firmware_version = SDL_GameControllerGetFirmwareVersion(controller);
+	Napi::Value firmware_version = _firmware_version != 0
+		? Napi::Number::New(env, _firmware_version)
+		: env.Null() ;
 
-	SDL_JoystickID joystick_id = SDL_JoystickInstanceID(joystick);
-	if (joystick_id < 0) {
-		std::ostringstream message;
-		message << "SDL_JoystickInstanceID(" << index << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	const char *_serial_number = SDL_GameControllerGetSerial(controller);
+	Napi::Value serial_number = _serial_number != 0
+		? Napi::String::New(env, _serial_number)
+		: env.Null();
 
-	int _firmware_version = SDL_JoystickGetFirmwareVersion(joystick);
-	Napi::Value firmware_version = _firmware_version == 0 ? env.Null() : Napi::Number::New(env, _firmware_version);
-
-	const char *_serial_number = SDL_JoystickGetSerial(joystick);
-	Napi::Value serial_number = _serial_number == 0 ? env.Null() : Napi::String::New(env, _serial_number);
-
-	bool has_led = SDL_JoystickHasLED(joystick);
-	bool has_rumble = SDL_JoystickHasRumble(joystick);
-	bool has_rumble_triggers = SDL_JoystickHasRumbleTriggers(joystick);
+	bool has_led = SDL_GameControllerHasLED(controller);
+	bool has_rumble = SDL_GameControllerHasRumble(controller);
+	bool has_rumble_triggers = SDL_GameControllerHasRumbleTriggers(controller);
 
 	Uint64 _steam_handle = SDL_GameControllerGetSteamHandle(controller);
-	Napi::Value steam_handle = _steam_handle == 0 ? env.Null() : Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1);
+	Napi::Value steam_handle = _steam_handle != 0
+		? Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1)
+		: env.Null();
 
 	Napi::Object result = Napi::Object::New(env);
-	// result.Set("id", Napi::Number::New(env, joystick_id)); // NOTE: Unused. Same as the device id
 	result.Set("firmwareVersion", firmware_version);
 	result.Set("serialNumber", serial_number);
-	result.Set("hasLed", Napi::Boolean::New(env, has_led));
-	result.Set("hasRumble", Napi::Boolean::New(env, has_rumble));
-	result.Set("hasRumbleTriggers", Napi::Boolean::New(env, has_rumble_triggers));
+	result.Set("hasLed", has_led);
+	result.Set("hasRumble", has_rumble);
+	result.Set("hasRumbleTriggers", has_rumble_triggers);
 	result.Set("steamHandle", steam_handle);
 
 	controller::getState(env, controller, result);

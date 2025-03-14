@@ -8,11 +8,12 @@
 
 namespace joystick {
 
-	extern std::map<SDL_JoystickType, std::string> joystick_types;
+	extern std::map<SDL_JoystickType, std::string> types;
 	extern std::map<Uint8, std::string> hat_positions;
 	extern std::map<SDL_JoystickPowerLevel, std::string> power_levels;
 
-	double mapAxis (int value);
+	double mapAxis (SDL_Joystick *joystick, int axis);
+	double mapAxisValue (SDL_Joystick *joystick, int axis, int value);
 	Napi::Array _getDevices (Napi::Env &env);
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);

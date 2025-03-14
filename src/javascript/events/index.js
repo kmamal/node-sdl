@@ -1,74 +1,11 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { video: videoModule } = require('../video')
+const { reconcileDisplays } = require('./reconcile-displays')
 const { mapping } = require('../keyboard/key-mapping')
-const { joystick: joystickModule } = require('../joystick')
-const { controller: controllerModule } = require('../controller')
-const { audio: audioModule } = require('../audio')
+const { reconcileAudioDevices } = require('./reconcile-audio-devices')
+const { reconcileJoystickAndControllerDevices } = require('./reconcile-joystick-and-controller-devices')
 const { clipboard: clipboardModule } = require('../clipboard')
-const {
-	make: makeJoystickDevice,
-	compare: compareJoystickDevice,
-} = require('../joystick/device')
-const {
-	make: makeControllerDevice,
-	compare: compareControllerDevice,
-	filter: filterControllerDevice,
-} = require('../controller/device')
-const {
-	make: makeAudioDevice,
-	compare: compareAudioDevice,
-} = require('../audio/device')
-
-
-const reconcileDevices = (emitter, mainList, currList, compare) => {
-	currList.sort(compare)
-
-	let mainIndex = 0
-	let currIndex = 0
-	let mainDevice = mainList[mainIndex]
-	let currDevice = currList[currIndex]
-	while (mainIndex < mainList.length && currIndex < currList.length) {
-		const cmp = compare(mainDevice, currDevice)
-		if (cmp === 0) {
-			mainDevice = mainList[++mainIndex]
-			currDevice = currList[++currIndex]
-		}
-		else if (cmp < 0) {
-			mainList.splice(mainIndex, 1)
-			const type = 'deviceRemove'
-			const event = { type, device: mainDevice }
-			emitter.emit(type, event)
-			mainDevice = mainList[mainIndex]
-		}
-		else {
-			mainList.splice(mainIndex, 0, currDevice)
-			mainDevice = mainList[++mainIndex]
-			const type = 'deviceAdd'
-			const event = { type, device: currDevice }
-			emitter.emit(type, event)
-			currDevice = currList[++currIndex]
-		}
-	}
-
-	if (mainIndex < mainList.length) {
-		while (mainIndex < mainList.length) {
-			[ mainDevice ] = mainList.splice(mainIndex, 1)
-			const type = 'deviceRemove'
-			const event = { type, device: mainDevice }
-			emitter.emit(type, event)
-		}
-	}
-	else {
-		while (currIndex < currList.length) {
-			mainList.push(currDevice)
-			const type = 'deviceAdd'
-			const event = { type, device: currDevice }
-			emitter.emit(type, event)
-			currDevice = currList[++currIndex]
-		}
-	}
-}
 
 
 const handleEvent = (event) => {
@@ -78,7 +15,7 @@ const handleEvent = (event) => {
 
 	switch (family) {
 		case 'app': {
-			if (event.type !== 'quit') { return }
+			if (type !== 'quit') { return }
 
 			for (const window of Globals.windows.all.values()) {
 				window.destroyGently()
@@ -90,15 +27,40 @@ const handleEvent = (event) => {
 			const { displayIndex } = event
 			delete event.displayIndex
 
-			const oldDisplays = Globals.displays
-			Globals.displays = Bindings.video_getDisplays()
-			const newDisplays = Globals.displays
+			switch (type) {
+				case 'displayAdd':
+				case 'displayRemove':
+				{
+					const { displays } = event
+					delete event.displays
 
-			event.display = event.type === 'displayRemove'
-				? oldDisplays[displayIndex]
-				: newDisplays[displayIndex]
+					reconcileDisplays(displays)
+					return
+				}
 
-			videoModule.emit(event.type, event)
+				case 'displayOrient': {
+					const display = Globals.displays[displayIndex]
+					display.orientation = event.orientation
+				} break
+
+				case 'displayMove': {
+					const { geometryX, geometryY, usableX, usableY } = event
+					delete event.geometryX
+					delete event.geometryY
+					delete event.usableX
+					delete event.usableY
+
+					const display = Globals.displays[displayIndex]
+					display.geometry.x = geometryX
+					display.geometry.y = geometryY
+					display.usable.x = usableX
+					display.usable.y = usableY
+				} break
+
+				// No default
+			}
+
+			videoModule.emit(type, event)
 		} break
 
 		case 'window': {
@@ -176,7 +138,7 @@ const handleEvent = (event) => {
 				default: return
 			}
 
-			window.emit(event.type, event)
+			window.emit(type, event)
 		} break
 
 		case 'keyboard': {
@@ -189,7 +151,7 @@ const handleEvent = (event) => {
 			const { key } = event
 			event.key = mapping[key] ?? (key?.length === 1 ? key : null)
 
-			window.emit(event.type, event)
+			window.emit(type, event)
 		} break
 
 		case 'mouse':
@@ -201,7 +163,7 @@ const handleEvent = (event) => {
 			const window = Globals.windows.all.get(windowId)
 			if (!window) { return }
 
-			window.emit(event.type, event)
+			window.emit(type, event)
 		} break
 
 		case 'joystickDevice': {
@@ -226,33 +188,10 @@ const handleEvent = (event) => {
 				}
 			}
 
-			const { devices: joystickDevices } = event
+			const { devices } = event
 			delete event.devices
 
-			const controllerDevices = JSON.parse(JSON.stringify(joystickDevices
-				.filter(filterControllerDevice)))
-
-			for (const joystickDevice of joystickDevices) {
-				makeJoystickDevice(joystickDevice)
-			}
-
-			for (const controllerDevice of controllerDevices) {
-				makeControllerDevice(controllerDevice)
-			}
-
-			reconcileDevices(
-				joystickModule,
-				Globals.joystickDevices,
-				joystickDevices,
-				compareJoystickDevice,
-			)
-
-			reconcileDevices(
-				controllerModule,
-				Globals.controllerDevices,
-				controllerDevices,
-				compareControllerDevice,
-			)
+			reconcileJoystickAndControllerDevices(devices)
 		} break
 
 		case 'joystick': {
@@ -266,7 +205,7 @@ const handleEvent = (event) => {
 				case 'axisMotion': {
 					for (const joystickInstance of collection) {
 						joystickInstance._axes[event.axis] = event.value
-						joystickInstance.emit(event.type, event)
+						joystickInstance.emit(type, event)
 					}
 				} break
 
@@ -275,27 +214,27 @@ const handleEvent = (event) => {
 						const ball = joystickInstance._balls[event.ball]
 						ball.x = event.x
 						ball.y = event.y
-						joystickInstance.emit(event.type, event)
+						joystickInstance.emit(type, event)
 					}
 				} break
 
 				case 'buttonDown': {
 					for (const joystickInstance of collection) {
 						joystickInstance._buttons[event.button] = true
-						joystickInstance.emit(event.type, event)
+						joystickInstance.emit(type, event)
 					}
 				} break
 				case 'buttonUp': {
 					for (const joystickInstance of collection) {
 						joystickInstance._buttons[event.button] = false
-						joystickInstance.emit(event.type, event)
+						joystickInstance.emit(type, event)
 					}
 				} break
 
 				case 'hatMotion': {
 					for (const joystickInstance of collection) {
 						joystickInstance._hats[event.hat] = event.value
-						joystickInstance.emit(event.type, event)
+						joystickInstance.emit(type, event)
 					}
 				} break
 
@@ -314,21 +253,21 @@ const handleEvent = (event) => {
 				case 'axisMotion': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._axes[event.axis] = event.value
-						controllerInstance.emit(event.type, event)
+						controllerInstance.emit(type, event)
 					}
 				} break
 
 				case 'buttonDown': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._buttons[event.button] = true
-						controllerInstance.emit(event.type, event)
+						controllerInstance.emit(type, event)
 					}
 				} break
 
 				case 'buttonUp': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._buttons[event.button] = false
-						controllerInstance.emit(event.type, event)
+						controllerInstance.emit(type, event)
 					}
 				} break
 
@@ -340,7 +279,7 @@ const handleEvent = (event) => {
 					for (const controllerInstance of collection.values()) {
 						Object.assign(controllerInstance._axes, axes)
 						Object.assign(controllerInstance._buttons, buttons)
-						controllerInstance.emit(event.type, event)
+						controllerInstance.emit(type, event)
 					}
 				} break
 
@@ -358,7 +297,7 @@ const handleEvent = (event) => {
 			switch (type) {
 				case 'update': {
 					for (const sensorInstance of collection.values()) {
-						sensorInstance.emit(event.type, event)
+						sensorInstance.emit(type, event)
 					}
 				} break
 
@@ -367,8 +306,8 @@ const handleEvent = (event) => {
 		} break
 
 		case 'audioDevice': {
-			const { isRecorder } = event
-			delete event.isRecorder
+			const { audioDeviceType } = event
+			delete event.audioDeviceType
 
 			if (type === 'deviceRemove') {
 				const { audioId } = event
@@ -378,23 +317,14 @@ const handleEvent = (event) => {
 				if (audioInstance) { audioInstance.close() }
 			}
 
-			const { devices: audioDevices } = event
+			const { devices } = event
 			delete event.devices
 
-			for (const audioDevice of audioDevices) {
-				makeAudioDevice(audioDevice)
-			}
-
-			reconcileDevices(
-				audioModule,
-				Globals.audioDevices[isRecorder ? 'recording' : 'playback'],
-				audioDevices,
-				compareAudioDevice,
-			)
+			reconcileAudioDevices(devices, audioDeviceType)
 		} break
 
 		case 'clipboard': {
-			clipboardModule.emit(event.type, event)
+			clipboardModule.emit(type, event)
 		} break
 
 		// No default

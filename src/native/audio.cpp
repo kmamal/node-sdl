@@ -5,6 +5,9 @@
 #include <sstream>
 
 
+std::map<bool, std::string> audio::device_types;
+
+
 Napi::Array
 audio::_getDevices(Napi::Env &env, bool is_capture)
 {
@@ -26,6 +29,8 @@ audio::_getDevices(Napi::Env &env, bool is_capture)
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
 
+	std::string device_type = audio::device_types[is_capture];
+
 	for (int i = 0; i < num_devices; i++) {
 		const char *name = SDL_GetAudioDeviceName(i, is_capture);
 		if (name == nullptr) {
@@ -36,8 +41,8 @@ audio::_getDevices(Napi::Env &env, bool is_capture)
 		}
 
 		Napi::Object device = Napi::Object::New(env);
-		device.Set("isRecorder", Napi::Boolean::New(env, is_capture));
-		device.Set("name", Napi::String::New(env, name));
+		device.Set("name", name);
+		device.Set("type", device_type);
 
 		devices.Set(i, device);
 	}

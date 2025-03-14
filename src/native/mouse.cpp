@@ -28,8 +28,8 @@ mouse::getPosition (const Napi::CallbackInfo &info)
 	SDL_GetGlobalMouseState(&x, &y);
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("x", Napi::Number::New(env, x));
-	result.Set("y", Napi::Number::New(env, y));
+	result.Set("x", x);
+	result.Set("y", y);
 
 	return result;
 }

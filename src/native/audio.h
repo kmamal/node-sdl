@@ -2,8 +2,12 @@
 #define _AUDIO_H_
 
 #include <napi.h>
+#include <map>
+#include <string>
 
 namespace audio {
+
+	extern std::map<bool, std::string> device_types;
 
 	Napi::Array _getDevices(Napi::Env &env, bool is_capture);
 

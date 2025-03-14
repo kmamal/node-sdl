@@ -23,7 +23,8 @@ test("sdl::audio", async (t) => {
 
 	if (playbackDevices.length === 0) {
 		console.warn("NO AUDIO PLAYBACK FOUND")
-	} else {
+	}
+	else {
 		const device = { type: 'playback' }
 
 		const instance1 = sdl.audio.openDevice(device)
@@ -111,7 +112,8 @@ test("sdl::audio", async (t) => {
 
 	if (recordingDevices.length === 0) {
 		console.warn("NO AUDIO RECORDING FOUND")
-	} else {
+	}
+	else {
 		const device = { type: 'recording' }
 
 		const instance1 = sdl.audio.openDevice(device)

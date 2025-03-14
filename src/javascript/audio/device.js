@@ -1,10 +1,4 @@
 
-const make = (device) => {
-	const { isRecorder } = device
-	delete device.isRecorder
-	device.type = isRecorder ? 'recording' : 'playback'
-}
-
 const compare = (a, b) => {
 	const { name: aName } = a
 	const { name: bName } = b
@@ -12,7 +6,4 @@ const compare = (a, b) => {
 	return a.name < b.name ? -1 : 1
 }
 
-module.exports = {
-	make,
-	compare,
-}
+module.exports = { compare }

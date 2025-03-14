@@ -28,8 +28,14 @@ test("sdl::video", (t) => {
 		t.equal(typeof display.usable.width, 'number')
 		t.equal(typeof display.usable.height, 'number')
 
-		t.equal(typeof display.dpi.horizontal, 'number')
-		t.equal(typeof display.dpi.vertical, 'number')
-		t.equal(typeof display.dpi.diagonal, 'number')
+		if (display.dpi !== null) {
+			t.equal(typeof display.dpi.horizontal, 'number')
+			t.equal(typeof display.dpi.vertical, 'number')
+			t.equal(typeof display.dpi.diagonal, 'number')
+		}
+
+		if (display.orientation !== null) {
+			t.ok(typeof display.orientation, 'string')
+		}
 	}
 })
