@@ -14,6 +14,8 @@ class ControllerInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		if (!Globals.controllerDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+
 		const result = Bindings.controller_open(device._index)
 
 		this._firmwareVersion = result.firmwareVersion

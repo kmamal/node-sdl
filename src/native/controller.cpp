@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "joystick.h"
 #include "global.h"
 #include <SDL.h>
 #include <map>
@@ -18,6 +19,12 @@ controller::mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis
 
 double
 controller::mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis axis, int value) {
+	SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForAxis(controller, axis);
+	if (bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+		SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
+		return joystick::mapAxisValue(joystick, bind.value.axis, value);
+	}
+
 	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
 	return value / range;
 }
@@ -25,10 +32,6 @@ controller::mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)
 {
-	const char *error = SDL_GetError();
-	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
-	SDL_ClearError();
-
 	Napi::Object axes = Napi::Object::New(env);
 	axes.Set("leftStickX", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTX));
 	axes.Set("leftStickY", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTY));
@@ -36,6 +39,8 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	axes.Set("rightStickY", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY));
 	axes.Set("leftTrigger", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT));
 	axes.Set("rightTrigger", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT));
+
+	const char *error;
 
 	error = SDL_GetError();
 	if (error != global::no_error) {
@@ -94,7 +99,13 @@ controller::addMappings (const Napi::CallbackInfo &info)
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}
+
+		// SDL_GameControllerAddMapping produces errors even though it succeeds
+		const char *error = SDL_GetError();
+		if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+		SDL_ClearError();
 	}
+
 	return env.Undefined();
 }
 
@@ -112,6 +123,11 @@ controller::open (const Napi::CallbackInfo &info)
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+
+	// SDL_GameControllerOpen produces errors even though it succeeds
+	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
 
 	int _firmware_version = SDL_GameControllerGetFirmwareVersion(controller);
 	Napi::Value firmware_version = _firmware_version != 0

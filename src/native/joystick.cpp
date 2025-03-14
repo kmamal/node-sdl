@@ -20,7 +20,7 @@ joystick::mapAxis (SDL_Joystick *joystick, int axis) {
 double
 joystick::mapAxisValue (SDL_Joystick *joystick, int axis, int value) {
 	Sint16 initial;
-	SDL_JoystickGetAxisInitialState(joystick, axis, &initial);
+	if (!SDL_JoystickGetAxisInitialState(joystick, axis, &initial)) { initial = 0; }
 	double range = value < initial
 		? initial - SDL_JOYSTICK_AXIS_MIN
 		: SDL_JOYSTICK_AXIS_MAX - initial;
@@ -179,6 +179,11 @@ joystick::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	// SDL_JoystickOpen produces errors even though it succeeds
+	const char *error = SDL_GetError();
+	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	SDL_ClearError();
+
 	int _firmware_version = SDL_JoystickGetFirmwareVersion(joystick);
 	Napi::Value firmware_version = _firmware_version != 0
 		? Napi::Number::New(env, _firmware_version)
@@ -202,10 +207,6 @@ joystick::open (const Napi::CallbackInfo &info)
 	}
 
 	Napi::Array axes = Napi::Array::New(env, num_axes);
-
-	const char *error = SDL_GetError();
-	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
-	SDL_ClearError();
 
 	for (int i = 0; i < num_axes; i++) {
 		double value = joystick::mapAxis(joystick, i);

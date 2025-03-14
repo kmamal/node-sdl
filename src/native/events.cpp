@@ -299,9 +299,18 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_JOYAXISMOTION: {
 			packed.Set("family", events::families::JOYSTICK);
 			packed.Set("type", events::types::AXIS_MOTION);
-			packed.Set("joystickId", event.jaxis.which);
+
+			int joystick_id = event.jaxis.which;
+			SDL_Joystick *joystick = SDL_JoystickFromInstanceID(joystick_id);
+			if (joystick == nullptr) {
+				std::ostringstream message;
+				message << "SDL_JoystickFromInstanceID(" << joystick_id << ") error: " << SDL_GetError();
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
+
+			packed.Set("joystickId", joystick_id);
 			packed.Set("axis", event.jaxis.axis);
-			SDL_Joystick *joystick = SDL_JoystickFromInstanceID(event.jaxis.which);
 			packed.Set("value", joystick::mapAxisValue(joystick, event.jaxis.axis, event.jaxis.value));
 			break ;
 		}
@@ -339,9 +348,8 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_CONTROLLERDEVICEREMAPPED: {
 			packed.Set("family", events::families::CONTROLLER);
 			packed.Set("type", events::types::REMAP);
-			SDL_JoystickID controller_id = event.cdevice.which;
-			packed.Set("controllerId", controller_id);
 
+			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
 				std::ostringstream message;
@@ -350,6 +358,7 @@ events::dispatchEvent(const SDL_Event &event)
 				throw Napi::Error::New(env, message.str());
 			}
 
+			packed.Set("controllerId", controller_id);
 			controller::getState(env, controller, packed);
 			break;
 		}
@@ -357,10 +366,19 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_CONTROLLERAXISMOTION: {
 			packed.Set("family", events::families::CONTROLLER);
 			packed.Set("type", events::types::AXIS_MOTION);
-			packed.Set("controllerId", event.caxis.which);
+
+			int controller_id = event.caxis.which;
+			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
+			if (controller == nullptr) {
+				std::ostringstream message;
+				message << "SDL_GameControllerFromInstanceID(" << controller_id << ") error: " << SDL_GetError();
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
 			SDL_GameControllerAxis axis = (SDL_GameControllerAxis) event.caxis.axis;
+
+			packed.Set("controllerId", controller_id);
 			packed.Set("axis", controller::axes[axis]);
-			SDL_GameController *controller = SDL_GameControllerFromInstanceID(event.caxis.which);
 			packed.Set("value", controller::mapAxisValue(controller, axis, event.caxis.value));
 			break;
 		}
@@ -396,8 +414,10 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_AUDIODEVICEREMOVED: {
 			packed.Set("family", events::families::AUDIO_DEVICE);
 			packed.Set("type", events::types::DEVICE_REMOVE);
-			packed.Set("audioId", event.adevice.which);
+
 			bool is_capture = event.adevice.iscapture;
+
+			packed.Set("audioId", event.adevice.which);
 			packed.Set("audioDeviceType", audio::device_types[is_capture]);
 			packed.Set("devices", audio::_getDevices(env, is_capture));
 			break;

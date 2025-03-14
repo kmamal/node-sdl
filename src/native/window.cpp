@@ -596,6 +596,12 @@ window::render (const Napi::CallbackInfo &info)
 		if (texture != nullptr) { SDL_DestroyTexture(texture); }
 
 		texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+		if (texture == nullptr) {
+			std::ostringstream message;
+			message << "SDL_CreateTexture(" << width << ", " << height << ", " << format << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
 
 		if (SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE) < 0) {
 			std::ostringstream message;

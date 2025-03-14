@@ -4,7 +4,6 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { ControllerInstance } = require('./controller-instance')
 const { reconcileJoystickAndControllerDevices } = require('../events/reconcile-joystick-and-controller-devices')
 
-
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 const controller = new class extends EventsViaPoll {
@@ -24,6 +23,7 @@ const controller = new class extends EventsViaPoll {
 		}
 
 		Bindings.controller_addMappings(mappings)
+		Globals.events.poll()
 
 		const devices = Bindings.joystick_getDevices()
 		reconcileJoystickAndControllerDevices(devices)

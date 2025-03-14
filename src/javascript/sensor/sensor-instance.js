@@ -11,6 +11,8 @@ class SensorInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+
 		Bindings.sensor_open(device._index)
 
 		this._device = device

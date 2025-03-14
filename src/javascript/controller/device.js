@@ -15,7 +15,7 @@ const make = (device) => {
 	}
 }
 
-const compare = (a, b) => a.id - b.id
+const compare = (a, b) => a._index - b._index
 
 const filter = (device) => device.isController
 

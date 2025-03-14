@@ -18,7 +18,7 @@ const reconcileDevices = (
 	while (mainIndex < mainList.length && currIndex < currList.length) {
 		const cmp = compare(mainDevice, currDevice)
 		if (cmp === 0) {
-			mainList[mainIndex] = currList[currIndex]
+			Object.assign(mainList[mainIndex], currList[currIndex])
 			mainDevice = mainList[++mainIndex]
 			currDevice = currList[++currIndex]
 		}

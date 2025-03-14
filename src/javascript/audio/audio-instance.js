@@ -19,9 +19,8 @@ class AudioInstance extends EventsViaPoll {
 			buffered = 4096,
 		} = options
 
-		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("name must be a string"), { name }) }
-		if (typeof type !== 'string') { throw Object.assign(new Error("type must be a string"), { type }) }
-		if (type !== 'playback' && type !== 'recording') { throw Object.assign(new Error("type must be either 'playback' or 'recording'"), { type }) }
+		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("device.name must be a string"), { name }) }
+		// We already tested device.type in sdl.audio.openDevice()
 		if (!Number.isInteger(channels)) { throw Object.assign(new Error("channels must be an integer"), { channels }) }
 		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
 		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }

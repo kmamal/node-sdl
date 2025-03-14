@@ -15,6 +15,8 @@ class JoystickInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+
 		const result = Bindings.joystick_open(device._index)
 
 		this._firmwareVersion = result.firmwareVersion

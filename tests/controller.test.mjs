@@ -86,6 +86,11 @@ T.test("sdl::controller", (t) => {
 		paddle4: false,
 	})
 
+	const newMapping = device.mapping.replace(device.name, 'foobar')
+	sdl.controller.addMappings([ newMapping ])
+	t.equal(instance.device, device)
+	t.equal(instance.device.name, 'foobar')
+
 	t.equal(instance.closed, false)
 	instance.close()
 	t.equal(instance.closed, true)

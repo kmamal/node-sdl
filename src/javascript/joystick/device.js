@@ -10,7 +10,7 @@ const make = (device) => {
 	return rest
 }
 
-const compare = (a, b) => a.id - b.id
+const compare = (a, b) => a._index - b._index
 
 module.exports = {
 	make,
