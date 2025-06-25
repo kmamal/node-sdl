@@ -1,6 +1,6 @@
 {
-  "version": "0.11.8",
-  "name": "@bmsuseluda/sdl",
+  "version": "0.11.7",
+  "name": "@kmamal/sdl",
   "description": "SDL bindings for Node.js",
   "keywords": [
     "sdl",
@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/bmsuseluda/node-sdl.git"
+    "url": "git+ssh://git@github.com/kmamal/node-sdl.git"
   },
   "main": "./src/javascript/index.js",
   "types": "./src/types/index.d.ts",
@@ -65,7 +65,7 @@
     "tar": "^7.4.3"
   },
   "sdl": {
-    "owner": "bmsuseluda",
+    "owner": "kmamal",
     "repo": "build-sdl",
     "version": "2.32.8"
   },
