@@ -29,6 +29,9 @@ await Promise.all([
 	Fs.promises.cp(
 		Path.join(sdlDist, 'lib'),
 		Path.join(C.dir.sdl, 'lib'),
-		{ recursive: true },
+		{
+			recursive: true,
+			verbatimSymlinks: true,
+		},
 	),
 ])

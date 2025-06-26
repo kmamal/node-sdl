@@ -30,7 +30,8 @@ const fetch = async (_url, options = {}) => {
 		if (body?.length) {
 			if (!Buffer.isBuffer(body)) { body = Buffer.from(body) }
 			body = Promise.resolve(body)
-		} else {
+		}
+		else {
 			body = _consume(body)
 		}
 
@@ -54,8 +55,10 @@ const fetch = async (_url, options = {}) => {
 
 		if (!(200 <= statusCode && statusCode < 300)) {
 			let responseBody
-			try { responseBody = (await _consume(response)).toString() } catch (_) {}
-			try { responseBody = JSON.parse(responseBody) } catch (_) {}
+			try { responseBody = (await _consume(response)).toString() }
+			catch (_) {}
+			try { responseBody = JSON.parse(responseBody) }
+			catch (_) {}
 			throw Object.assign(new Error(`bad status code ${statusCode}`), {
 				statusCode,
 				responseBody,
