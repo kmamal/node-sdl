@@ -67,7 +67,7 @@
   "sdl": {
     "owner": "kmamal",
     "repo": "build-sdl",
-    "version": "2.32.2"
+    "version": "2.32.8"
   },
   "devDependencies": {
     "@kmamal/evdev": "^0.0.2",
