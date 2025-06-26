@@ -211,7 +211,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * [window.utility](#windowutility)
     * [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
     * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
-    * [window.flash(untilFocused)](#windowflashuntilfocused)
+    * [window.flash([untilFocused])](#windowflashuntilfocused)
     * [window.stopFlashing()](#windowstopflashing)
     * [window.destroyed](#windowdestroyed)
     * [window.destroy()](#windowdestroy)
@@ -1100,7 +1100,7 @@ Possible values are:
 | `'best'` | `SDL_ScaleModeBest` | anisotropic filtering |
 
 If the window was created with either of the `opengl` or `webgpu` options, then you can only render to the window with OpenGL/WebGPU calls.
-Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
+Calls to `render()` will fail.
 
 ### window.setIcon(width, height, stride, format, buffer)
 
@@ -1108,7 +1108,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 Set's the window's icon, usually displayed in the title bar and the taskbar.
 
-### window.flash(untilFocused)
+### window.flash([untilFocused])
 
 * `untilFocused: <boolean>` Whether to keep flashing the window until the user focuses it. Default: `false`
 
