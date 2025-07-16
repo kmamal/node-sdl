@@ -59,10 +59,18 @@ joystick::_getDevices (Napi::Env &env)
 
 		const char *path = SDL_JoystickPathForIndex(i);
 		if (path == nullptr) {
-			std::ostringstream message;
-			message << "SDL_JoystickPathForIndex(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			// SDL_JoystickPathForIndex may not be supported
+			// In this case, instead of throwing an error, we'll just set path to null so we don't crash the application
+			// For other cases, we'll throw the error
+			const char *error = SDL_GetError();
+			if (error && SDL_strcmp(error, "That operation is not supported") == 0) {
+				SDL_ClearError();
+			} else {
+				std::ostringstream message;
+				message << "SDL_JoystickPathForIndex(" << i << ") error: " << (error ? error : "Unknown error");
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
 		}
 
 		// This function can only error if the index is invalid.
@@ -137,7 +145,7 @@ joystick::_getDevices (Napi::Env &env)
 		device.Set("_index", i);
 		device.Set("id", id);
 		device.Set("name", name);
-		device.Set("path", path);
+		device.Set("path", path ? Napi::String::New(env, path) : env.Null());
 		device.Set("guid", guid_string);
 		device.Set("type", type);
 		device.Set("vendor", vendor);
