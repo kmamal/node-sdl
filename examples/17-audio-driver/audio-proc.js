@@ -1,14 +1,12 @@
 import sdl from '@kmamal/sdl'
 import { loadAudio } from './ffmpeg.js'
 import path from 'node:path'
-import url from 'node:url'
 
 const channels = 1
 const frequency = 48e3
 
-const dir = path.dirname(url.fileURLToPath(import.meta.url))
 const audioBuffer = await loadAudio(
-	path.join(dir, 'assets/audio.wav'),
+	path.join(import.meta.dirname, 'assets/audio.wav'),
 	{ channels, frequency },
 )
 

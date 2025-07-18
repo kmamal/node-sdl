@@ -1,13 +1,10 @@
 import path from 'node:path'
-import url from 'node:url'
-
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 export default {
 	mode: 'development',
 	entry: './src/index.js',
 	output: {
-		path: path.join(__dirname, 'build'),
+		path: path.join(import.meta.dirname, 'build'),
 		filename: 'index.js',
 	},
 	target: 'node',

@@ -1,6 +1,5 @@
 import sdl from '@kmamal/sdl'
 import path from 'node:path'
-import url from 'node:url'
 import { setTimeout } from 'node:timers/promises'
 import { loadImage, loadVideo } from './ffmpeg.js'
 
@@ -9,10 +8,9 @@ const framerate = 25
 const window = sdl.video.createWindow()
 const { pixelWidth: width, pixelHeight: height } = window
 
-const dir = path.dirname(url.fileURLToPath(import.meta.url))
 const [ image, video ] = await Promise.all([
-	loadImage(path.join(dir, 'assets/image.png'), { width, height }),
-	loadVideo(path.join(dir, 'assets/video.mp4'), { width, height, framerate }),
+	loadImage(path.join(import.meta.dirname, 'assets/image.png'), { width, height }),
+	loadVideo(path.join(import.meta.dirname, 'assets/video.mp4'), { width, height, framerate }),
 ])
 
 let startTime = null

@@ -1,11 +1,8 @@
 import sdl from '@kmamal/sdl'
 import path from 'node:path'
-import url from 'node:url'
 import { loadBmp } from './bmp.js'
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
-
-const imagePath = path.join(__dirname, '../assets/image.bmp')
+const imagePath = path.join(import.meta.dirname, '../assets/image.bmp')
 const { width, height, data } = await loadBmp(imagePath)
 
 const window = sdl.video.createWindow({ width, height })

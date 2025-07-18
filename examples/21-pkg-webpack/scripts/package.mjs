@@ -1,11 +1,9 @@
 import { execSync } from 'node:child_process'
-import url from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs'
 import { rootCertificates } from 'node:tls'
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
-const rootDir = path.resolve(__dirname, '..')
+const rootDir = path.resolve(import.meta.dirname, '..')
 
 execSync('npx webpack', {
 	cwd: rootDir,
@@ -34,8 +32,8 @@ execSync(`npx pkg --target ${target} --output dist/example${ext} ./build/package
 })
 
 await fs.promises.cp(
-	path.join(__dirname, '../node_modules/@kmamal/sdl/dist'),
-	path.join(__dirname, '../dist'),
+	path.join(import.meta.dirname, '../node_modules/@kmamal/sdl/dist'),
+	path.join(import.meta.dirname, '../dist'),
 	{
 		recursive: true,
 		verbatimSymlinks: true,
