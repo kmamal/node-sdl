@@ -1,11 +1,12 @@
 const Globals = require('../globals')
 const { reconcileDevices } = require('./reconcile')
 
+const { video: videoModule } = require('../video')
 const { compare: compareDisplays } = require('../video/display')
 
 const reconcileDisplays = (displays) => {
 	reconcileDevices(
-		require('../video').video,
+		videoModule,
 		Globals.displays,
 		displays,
 		compareDisplays,

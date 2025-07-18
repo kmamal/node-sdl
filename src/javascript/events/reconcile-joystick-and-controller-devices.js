@@ -1,10 +1,13 @@
 const Globals = require('../globals')
 const { reconcileDevices } = require('./reconcile')
 
+const { joystick: joystickModule } = require('../joystick')
 const {
 	make: makeJoystickDevice,
 	compare: compareJoystickDevice,
 } = require('../joystick/device')
+
+const { controller: controllerModule } = require('../controller')
 const {
 	make: makeControllerDevice,
 	compare: compareControllerDevice,
@@ -20,14 +23,14 @@ const reconcileJoystickAndControllerDevices = (devices) => {
 		.map(makeControllerDevice)
 
 	reconcileDevices(
-		require('../joystick').joystick,
+		joystickModule,
 		Globals.joystickDevices,
 		joystickDevices,
 		compareJoystickDevice,
 	)
 
 	reconcileDevices(
-		require('../controller').controller,
+		controllerModule,
 		Globals.controllerDevices,
 		controllerDevices,
 		compareControllerDevice,
