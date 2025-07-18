@@ -27,6 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Started keeping this changelog.
 
 [unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.9...HEAD
-[v0.11.8]: https://github.com/kmamal/node-sdl/compare/v0.11.8...v0.11.9
+[v0.11.9]: https://github.com/kmamal/node-sdl/compare/v0.11.8...v0.11.9
 [v0.11.8]: https://github.com/kmamal/node-sdl/compare/v0.11.7...v0.11.8
 [v0.11.7]: https://github.com/kmamal/node-sdl/releases/tag/v0.11.7
