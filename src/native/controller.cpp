@@ -135,7 +135,7 @@ controller::open (const Napi::CallbackInfo &info)
 		: env.Null() ;
 
 	const char *_serial_number = SDL_GameControllerGetSerial(controller);
-	Napi::Value serial_number = _serial_number != 0
+	Napi::Value serial_number = _serial_number != nullptr
 		? Napi::String::New(env, _serial_number)
 		: env.Null();
 

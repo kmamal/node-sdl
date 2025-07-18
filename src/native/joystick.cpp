@@ -10,7 +10,7 @@
 std::map<Uint8, std::string> joystick::hat_positions;
 std::map<SDL_JoystickType, std::string> joystick::types;
 std::map<SDL_JoystickPowerLevel, std::string> joystick::power_levels;
-
+SDL_JoystickGUID joystick::zero_guid;
 
 double
 joystick::mapAxis (SDL_Joystick *joystick, int axis) {
@@ -49,37 +49,27 @@ joystick::_getDevices (Napi::Env &env)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		const char *name = SDL_JoystickNameForIndex(i);
-		if (name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_JoystickNameForIndex(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+		const char *_name = SDL_JoystickNameForIndex(i);
+		Napi::Value name = _name != nullptr
+			? Napi::String::New(env, _name)
+			: env.Null();
+
+		const char *_path = SDL_JoystickPathForIndex(i);
+		Napi::Value path = _path != nullptr
+			? Napi::String::New(env, _path)
+			: env.Null();
+
+		SDL_JoystickGUID _guid = SDL_JoystickGetDeviceGUID(i);
+		Napi::Value guid;
+		if (SDL_memcmp(&_guid, &zero_guid, sizeof(SDL_JoystickGUID)) != 0) {
+			char guid_string[33];
+			SDL_JoystickGetGUIDString(_guid, guid_string, 33);
+			guid = Napi::String::New(env, guid_string);
+		}
+		else {
+			guid = env.Null();
 		}
 
-		const char *path = SDL_JoystickPathForIndex(i);
-		if (path == nullptr) {
-			// SDL_JoystickPathForIndex may not be supported
-			// In this case, instead of throwing an error, we'll just set path to null so we don't crash the application
-			// For other cases, we'll throw the error
-			const char *error = SDL_GetError();
-			if (error && SDL_strcmp(error, "That operation is not supported") == 0) {
-				SDL_ClearError();
-			} else {
-				std::ostringstream message;
-				message << "SDL_JoystickPathForIndex(" << i << ") error: " << (error ? error : "Unknown error");
-				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
-			}
-		}
-
-		// This function can only error if the index is invalid.
-		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(i);
-
-		char guid_string[33];
-		SDL_JoystickGetGUIDString(guid, guid_string, 33);
-
-		// This function can only error if the index is invalid.
 		SDL_JoystickType _type = SDL_JoystickGetDeviceType(i);
 		Napi::Value type = _type != SDL_JOYSTICK_TYPE_UNKNOWN
 			? Napi::String::New(env, joystick::types[_type])
@@ -112,30 +102,23 @@ joystick::_getDevices (Napi::Env &env)
 		Napi::Value controller_type;
 
 		if (is_controller) {
-			const char *_controller_mapping = SDL_GameControllerMappingForDeviceIndex(i);
-			if (_controller_mapping == nullptr) {
-				std::ostringstream message;
-				message << "SDL_GameControllerMappingForDeviceIndex(" << i << ") error: " << SDL_GetError();
-				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
-			}
-			controller_mapping = Napi::String::New(env, _controller_mapping);
+			char *_controller_mapping = SDL_GameControllerMappingForDeviceIndex(i);
+			controller_mapping = _controller_mapping != nullptr
+				? Napi::String::New(env, _controller_mapping)
+				: env.Null();
+			SDL_free(_controller_mapping);
 
 			const char *_controller_name = SDL_GameControllerNameForIndex(i);
-			if (_controller_name == nullptr) {
-				std::ostringstream message;
-				message << "SDL_GameControllerNameForIndex(" << i << ") error: " << SDL_GetError();
-				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
-			}
-			controller_name = Napi::String::New(env, _controller_name);
+			controller_name = _controller_name != nullptr
+				? Napi::String::New(env, _controller_name)
+				: env.Null();
 
-			// This function can only error if the index is invalid.
 			SDL_GameControllerType _controller_type = SDL_GameControllerTypeForIndex(i);
 			controller_type = _controller_type != SDL_CONTROLLER_TYPE_UNKNOWN
 				? Napi::String::New(env, controller::types[_controller_type])
 				: env.Null();
-		} else {
+		}
+		else {
 				controller_mapping = env.Null();
 				controller_name = env.Null();
 				controller_type = env.Null();
@@ -145,9 +128,9 @@ joystick::_getDevices (Napi::Env &env)
 		device.Set("_index", i);
 		device.Set("id", id);
 		device.Set("name", name);
-		device.Set("path", path ? Napi::String::New(env, path) : env.Null());
-		device.Set("guid", guid_string);
+		device.Set("path", path);
 		device.Set("type", type);
+		device.Set("guid", guid);
 		device.Set("vendor", vendor);
 		device.Set("product", product);
 		device.Set("version", version);

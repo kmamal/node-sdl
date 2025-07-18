@@ -382,7 +382,7 @@ export namespace Sdl {
 			| 'best'
 
 		export interface Display {
-			readonly name: string
+			readonly name: string | null
 			readonly format: Format
 			readonly frequency: number
 			readonly geometry: {
@@ -508,7 +508,7 @@ export namespace Sdl {
 
 			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
 
-			flash (untilFocused: boolean): void
+			flash (untilFocused?: boolean): void
 			stopFlashing (): void
 
 			readonly destroyed: boolean
@@ -902,10 +902,10 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly id: number
-			readonly name: string
-			readonly path: string
-			readonly guid: string
+			readonly name: string | null
+			readonly path: string | null
 			readonly type: JoystickType | null
+			readonly guid: string | null
 			readonly vendor: number | null
 			readonly product: number | null
 			readonly version: number | null
@@ -1012,14 +1012,14 @@ export namespace Sdl {
 		export interface Device {
 			readonly id: number
 			readonly name: string
-			readonly path: string
-			readonly guid: string
-			readonly type: ControllerType | null;
+			readonly path: string | null
+			readonly type: ControllerType | null
+			readonly guid: string | null
 			readonly vendor: number | null
 			readonly product: number | null
 			readonly version: number | null
 			readonly player: number | null
-			readonly mapping: string
+			readonly mapping: string | null
 		}
 
 		export class ControllerInstance {

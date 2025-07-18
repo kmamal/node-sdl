@@ -10,7 +10,7 @@ const make = (device) => {
 	return {
 		...rest,
 		mapping: controllerMapping,
-		name: controllerName,
+		name: controllerName ?? rest.name,
 		type: controllerType,
 	}
 }

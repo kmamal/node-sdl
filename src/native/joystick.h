@@ -11,6 +11,7 @@ namespace joystick {
 	extern std::map<SDL_JoystickType, std::string> types;
 	extern std::map<Uint8, std::string> hat_positions;
 	extern std::map<SDL_JoystickPowerLevel, std::string> power_levels;
+	extern SDL_JoystickGUID zero_guid;
 
 	double mapAxis (SDL_Joystick *joystick, int axis);
 	double mapAxisValue (SDL_Joystick *joystick, int axis, int value);

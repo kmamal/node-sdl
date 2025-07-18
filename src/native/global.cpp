@@ -167,6 +167,8 @@ global::initialize(const Napi::CallbackInfo &info)
 	joystick::hat_positions[SDL_HAT_LEFTUP] = "leftup";
 	joystick::hat_positions[SDL_HAT_LEFTDOWN] = "leftdown";
 
+	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
+
 	// controller::types[SDL_CONTROLLER_TYPE_UNKNOWN] = nullptr;
 	controller::types[SDL_CONTROLLER_TYPE_XBOX360] = "xbox360";
 	controller::types[SDL_CONTROLLER_TYPE_XBOXONE] = "xboxOne";
@@ -302,7 +304,8 @@ global::initialize(const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 		current_video_driver = Napi::String::New(env, name);
-	} else {
+	}
+	else {
 		current_video_driver = env.Null();
 	}
 
@@ -341,7 +344,8 @@ global::initialize(const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 		current_audio_driver = Napi::String::New(env, name);
-	} else {
+	}
+	else {
 		current_audio_driver = env.Null();
 	}
 

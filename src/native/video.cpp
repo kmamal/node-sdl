@@ -25,13 +25,10 @@ video::getDisplays(const Napi::CallbackInfo &info)
 	Napi::Array displays = Napi::Array::New(env, num_displays);
 
 	for (int i = 0; i < num_displays; i++) {
-		const char *name = SDL_GetDisplayName(i);
-		if(name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayName(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
+		const char *_name = SDL_GetDisplayName(i);
+		Napi::Value name = _name != nullptr
+			? Napi::String::New(env, _name)
+			: env.Null();
 
 		SDL_DisplayMode mode;
 		if (SDL_GetCurrentDisplayMode(i, &mode) < 0) {
@@ -72,7 +69,8 @@ video::getDisplays(const Napi::CallbackInfo &info)
 		float ddpi, hdpi, vdpi;
 		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
 			dpi = env.Null();
-		} else {
+		}
+		else {
 			Napi::Object dpi_obj = Napi::Object::New(env);
 			dpi_obj.Set("diagonal", ddpi);
 			dpi_obj.Set("horizontal", hdpi);

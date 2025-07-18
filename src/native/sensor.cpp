@@ -33,7 +33,6 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		// This function can only error if the index is invalid.
 		SDL_SensorType _type = SDL_SensorGetDeviceType(i);
 		Napi::Value type = _type != SDL_SENSOR_UNKNOWN
 			? Napi::String::New(env, sensor::types[_type])
