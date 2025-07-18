@@ -18,7 +18,7 @@ const { platform, arch } = process
 const targetArch = process.env.CROSS_COMPILE_ARCH || arch
 const assetName = `sdl.node-v${version}-${platform}-${targetArch}.tar.gz`
 
-const sdl = pkg.sdl
+const sdl = pkg.config.sdl
 sdl.assetName = `SDL-v${sdl.version}-${platform}-${targetArch}.tar.gz`
 
 module.exports = {
