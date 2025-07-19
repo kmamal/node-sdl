@@ -17,16 +17,15 @@ SDL bindings for Node.js. Provides access to systems that are not normally avail
 - 🔋 Battery status
 - 🧭 Sensors
 
-Also allows using Canvas2D, WebGL, and WebGPU without a browser:
+Also allows using Canvas2D, WebGL, and WebGPU without a browser, through these libraries:
 
-* __Canvas2D:__ Available via [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, this is the fastest library out of the many available on npm.
-* __WebGL:__ Available via [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). This is a fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) that I've modified to render directly on SDL windows.
-* __WebGPU:__ Available via [@kmamal/gpu](https://github.com/kmamal/gpu#readme). This is a fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) that I've modified to render directly on SDL windows.
+- __Canvas2D:__ [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, this is the fastest library out of the many available on npm.
+- __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). This is a fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) that I've modified to render directly to SDL windows.
+- __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). This is a fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) that I've modified to render directly to SDL windows.
 
 Officially supports Linux (x64, arm64), Mac (x64, arm64), and Windows (x64).
-Should technically work for any system supported by both SDL and Node.js, but I haven't tried.
+Should theoretically work on any system supported by both SDL and Node.js, but I haven't tried any others.
 Prebuilt binaries are available for the supported architectures.
-
 
 ## Installation
 
@@ -39,7 +38,6 @@ npm install @kmamal/sdl
 You do __not__ have to manually install any other libs or DLLs to your system. A compatible version of SDL will be automatically downloaded by the install script and placed inside `node_modules` along with this lib's prebuilt binding binaries.
 
 (But if the install script fails, have a look at the instructions for [building the package manually](#building-from-source))
-
 
 ## Examples
 
@@ -129,267 +127,265 @@ renderer.swap()
 
 Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#readme) folder.
 
-
 # API Reference
 
 ## Contents
 
-* [sdl](#sdl)
-  * [sdl.info](#sdlinfo)
-* [sdl.video](#sdlvideo)
-  * [Image data](#image-data)
-  * [High-DPI](#high-dpi)
-  * [Pixel formats](#pixel-formats)
-  * [Event: 'displayAdd'](#event-displayadd)
-  * [Event: 'displayRemove'](#event-displayremove)
-  * [Event: 'displayOrient'](#event-displayorient)
-  * [Event: 'displayMove'](#event-displaymove)
-  * [sdl.video.displays](#sdlvideodisplays)
-  * [sdl.video.windows](#sdlvideowindows)
-  * [sdl.video.focused](#sdlvideofocused)
-  * [sdl.video.hovered](#sdlvideohovered)
-  * [sdl.video.createWindow([options])](#sdlvideocreatewindowoptions)
-  * [class Window](#class-window)
-    * [Event: 'show'](#event-show)
-    * [Event: 'hide'](#event-hide)
-    * [Event: 'expose'](#event-expose)
-    * [Event: 'minimize'](#event-minimize)
-    * [Event: 'maximize'](#event-maximize)
-    * [Event: 'restore'](#event-restore)
-    * [Event: 'move'](#event-move)
-    * [Event: 'resize'](#event-resize)
-    * [Event: 'displayChange'](#event-displaychange)
-    * [Event: 'focus'](#event-focus)
-    * [Event: 'blur'](#event-blur)
-    * [Event: 'hover'](#event-hover)
-    * [Event: 'leave'](#event-leave)
-    * [Event: 'beforeClose'](#event-beforeclose)
-    * [Event: 'close'](#event-close)
-    * [Event: 'keyDown'](#event-keydown)
-    * [Event: 'keyUp'](#event-keyup)
-    * [Event: 'textInput'](#event-textinput)
-    * [Event: 'mouseButtonDown'](#event-mousebuttondown)
-    * [Event: 'mouseButtonUp'](#event-mousebuttonup)
-    * [Event: 'mouseMove'](#event-mousemove)
-    * [Event: 'mouseWheel'](#event-mousewheel)
-    * [Event: 'dropBegin'](#event-dropbegin)
-    * [Event: 'dropText'](#event-droptext)
-    * [Event: 'dropFile'](#event-dropfile)
-    * [Event: 'dropComplete'](#event-dropcomplete)
-    * [window.id](#windowid)
-    * [window.title](#windowtitle)
-    * [window.setTitle(title)](#windowsettitletitle)
-    * [window.x](#windowx)
-    * [window.y](#windowy)
-    * [window.setPosition(x, y)](#windowsetpositionx-y)
-    * [window.width](#windowwidth)
-    * [window.height](#windowheight)
-    * [window.pixelWidth](#windowpixelwidth)
-    * [window.pixelHeight](#windowpixelheight)
-    * [window.setSize(width, height)](#windowsetsizewidth-height)
-    * [window.setSizeInPixels(pixelWidth, pixelHeight)](#windowsetsizeinpixelspixelwidth-pixelheight)
-    * [window.display](#windowdisplay)
-    * [window.visible](#windowvisible)
-    * [window.show([show])](#windowshowshow)
-    * [window.hide()](#windowhide)
-    * [window.fullscreen](#windowfullscreen)
-    * [window.setFullscreen(fullscreen)](#windowsetfullscreenfullscreen)
-    * [window.resizable](#windowresizable)
-    * [window.setResizable(resizable)](#windowsetresizableresizable)
-    * [window.borderless](#windowborderless)
-    * [window.alwaysOnTop](#windowalwaysontop)
-    * [window.setBorderless(borderless)](#windowsetborderlessborderless)
-    * [window.accelerated](#windowaccelerated)
-    * [window.setAccelerated(accelerated)](#windowsetacceleratedaccelerated)
-    * [window.vsync](#windowvsync)
-    * [window.setVsync(vsync)](#windowsetvsyncvsync)
-    * [window.opengl](#windowopengl)
-    * [window.webgpu](#windowwebgpu)
-    * [window.native](#windownative)
-    * [window.maximized](#windowmaximized)
-    * [window.maximize()](#windowmaximize)
-    * [window.minimized](#windowminimized)
-    * [window.minimize()](#windowminimize)
-    * [window.restore()](#windowrestore)
-    * [window.focused](#windowfocused)
-    * [window.focus()](#windowfocus)
-    * [window.hovered](#windowhovered)
-    * [window.skipTaskbar](#windowskiptaskbar)
-    * [window.popupMenu](#windowpopupmenu)
-    * [window.tooltip](#windowtooltip)
-    * [window.utility](#windowutility)
-    * [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
-    * [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
-    * [window.flash([untilFocused])](#windowflashuntilfocused)
-    * [window.stopFlashing()](#windowstopflashing)
-    * [window.destroyed](#windowdestroyed)
-    * [window.destroy()](#windowdestroy)
-    * [window.destroyGently()](#windowdestroygently)
-* [sdl.keyboard](#sdlkeyboard)
-  * [Virtual keys](#virtual-keys)
-  * [Enum: SCANCODE](#enum-scancode)
-  * [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
-  * [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
-  * [sdl.keyboard.getState()](#sdlkeyboardgetstate)
-* [sdl.mouse](#sdlmouse)
-  * [Enum: BUTTON](#enum-button)
-  * [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
-  * [sdl.mouse.position](#sdlmouseposition)
-  * [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
-  * [sdl.mouse.setCursor(cursor)](#sdlmousesetcursorcursor)
-  * [sdl.mouse.resetCursor()](#sdlmouseresetcursor)
-  * [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
-  * [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
-  * [sdl.mouse.hideCursor()](#sdlmousehidecursor)
-  * [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
-  * [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
-  * [sdl.mouse.uncapture()](#sdlmouseuncapture)
-* [sdl.joystick](#sdljoystick)
-  * [Hat positions](#hat-positions)
-  * [Power levels](#power-levels)
-  * [Event: 'deviceAdd'](#joystick-event-deviceadd)
-  * [Event: 'deviceRemove'](#joystick-event-deviceremove)
-  * [sdl.joystick.devices](#sdljoystickdevices)
-  * [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
-  * [class JoystickInstance](#class-joystickinstance)
-    * [Event: 'axisMotion'](#joystick-instance-event-axismotion)
-    * [Event: 'ballMotion'](#event-ballmotion)
-    * [Event: 'buttonDown'](#joystick-instance-event-buttondown)
-    * [Event: 'buttonUp'](#joystick-instance-event-buttonup)
-    * [Event: 'hatMotion'](#event-hatmotion)
-    * [Event: 'close'](#joystick-instance-event-close)
-    * [joystickInstance.device](#joystickinstancedevice)
-    * [joystickInstance.firmwareVersion](#joystickinstancefirmwareversion)
-    * [joystickInstance.serialNumber](#joystickinstanceserialnumber)
-    * [joystickInstance.axes](#joystickinstanceaxes)
-    * [joystickInstance.balls](#joystickinstanceballs)
-    * [joystickInstance.buttons](#joystickinstancebuttons)
-    * [joystickInstance.hats](#joystickinstancehats)
-    * [joystickInstance.power](#joystickinstancepower)
-    * [joystickInstance.setPlayer(index)](#joystickinstancesetplayerindex)
-    * [joystickInstance.resetPlayer()](#joystickinstanceresetplayer)
-    * [joystickInstance.hasLed](#joystickinstancehasled)
-    * [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
-    * [joystickInstance.hasRumble](#joystickinstancehasrumble)
-    * [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelow-high-duration)
-    * [joystickInstance.stopRumble()](#joystickinstancestoprumble)
-    * [joystickInstance.hasRumbleTriggers](#joystickinstancehasrumbletriggers)
-    * [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleft-right-duration)
-    * [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
-    * [joystickInstance.closed](#joystickinstanceclosed)
-    * [joystickInstance.close()](#joystickinstanceclose)
-* [sdl.controller](#sdlcontroller)
-  * [Event: 'deviceAdd'](#controller-event-deviceadd)
-  * [Event: 'deviceRemove'](#controller-event-deviceremove)
-  * [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
-  * [sdl.controller.devices](#sdlcontrollerdevices)
-  * [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
-  * [class ControllerInstance](#class-controllerinstance)
-    * [Event: 'axisMotion'](#controller-instance-event-axismotion)
-    * [Event: 'buttonDown'](#controller-instance-event-buttondown)
-    * [Event: 'buttonUp'](#controller-instance-event-buttonup)
-    * [Event: 'remap'](#event-remap)
-    * [Event: 'close'](#controller-instance-event-close)
-    * [controllerInstance.device](#controllerinstancedevice)
-    * [controllerInstance.firmwareVersion](#controllerinstancefirmwareversion)
-    * [controllerInstance.serialNumber](#controllerinstanceserialnumber)
-    * [controllerInstance.steamHandle](#controllerinstancesteamhandle)
-    * [controllerInstance.axes](#controllerinstanceaxes)
-    * [controllerInstance.buttons](#controllerinstancebuttons)
-    * [controllerInstance.power](#controllerinstancepower)
-    * [controllerInstance.setPlayer(index)](#controllerinstancesetplayerindex)
-    * [controllerInstance.resetPlayer()](#controllerinstanceresetplayer)
-    * [controllerInstance.hasLed](#controllerinstancehasled)
-    * [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
-    * [controllerInstance.hasRumble](#controllerinstancehasrumble)
-    * [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelow-high-duration)
-    * [controllerInstance.stopRumble()](#controllerinstancestoprumble)
-    * [controllerInstance.hasRumbleTriggers](#controllerinstancehasrumbletriggers)
-    * [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleft-right-duration)
-    * [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
-    * [controllerInstance.closed](#controllerinstanceclosed)
-    * [controllerInstance.close()](#controllerinstanceclose)
-* [sdl.sensor](#sdlsensor)
-  * [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandard_gravity)
-  * [sdl.sensor.devices](#sdlsensordevices)
-  * [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
-  * [class SensorInstance](#class-sensorinstance)
-    * [Event: 'update'](#sensor-instance-event-update)
-    * [sensorInstance.device](#sensorinstancedevice)
-    * [sensorInstance.data](#sensorinstancedata)
-    * [sensorInstance.closed](#sensorinstanceclosed)
-    * [sensorInstance.close()](#sensorinstanceclose)
-* [sdl.audio](#sdlaudio)
-  * [Audio data](#audio-data)
-  * [Sample formats](#sample-formats)
-  * [Event: 'deviceAdd'](#audio-event-deviceadd)
-  * [Event: 'deviceRemove'](#audio-event-deviceremove)
-  * [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
-  * [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
-  * [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
-  * [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
-  * [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
-  * [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
-  * [sdl.audio.devices](#sdlaudiodevices)
-  * [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
-  * [class AudioInstance](#class-audioinstance)
-    * [Event: 'close'](#audio-instance-event-close)
-    * [audioInstance.id](#audioinstanceid)
-    * [audioInstance.channels](#audioinstancechannels)
-    * [audioInstance.frequency](#audioinstancefrequency)
-    * [audioInstance.format](#audioinstanceformat)
-    * [audioInstance.bytesPerSample](#audioinstancebytespersample)
-    * [audioInstance.minSampleValue](#audioinstanceminsamplevalue)
-    * [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
-    * [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
-    * [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
-    * [audioInstance.writeSample(buffer, value[, offset])](#audioinstancewritesamplebuffer-value-offset)
-    * [audioInstance.buffered](#audioinstancebuffered)
-    * [audioInstance.playing](#audioinstanceplaying)
-    * [audioInstance.play([play])](#audioinstanceplayplay)
-    * [audioInstance.pause()](#audioinstancepause)
-    * [audioInstance.queued](#audioinstancequeued)
-    * [audioInstance.clearQueue()](#audioinstanceclearqueue)
-    * [audioInstance.closed](#audioinstanceclosed)
-    * [audioInstance.close()](#audioinstanceclose)
-  * [class AudioPlaybackInstance extends AudioInstance](#class-audioplaybackinstance-extends-audioinstance)
-    * [playbackInstance.enqueue(buffer[, bytes])](#playbackinstanceenqueuebuffer-bytes)
-  * [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
-    * [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
-* [sdl.clipboard](#sdlclipboard)
-  * [Event: 'update'](#clipboard-event-update)
-  * [sdl.clipboard.text](#sdlclipboardtext)
-  * [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
-* [sdl.power](#sdlpower)
-  * [sdl.power.info](#sdlpowerinfo)
-* [helpers](#helpers)
-
+- [sdl](#sdl)
+  - [sdl.info](#sdlinfo)
+- [sdl.video](#sdlvideo)
+  - [Image data](#image-data)
+  - [High-DPI](#high-dpi)
+  - [Pixel formats](#pixel-formats)
+  - [Event: 'displayAdd'](#event-displayadd)
+  - [Event: 'displayRemove'](#event-displayremove)
+  - [Event: 'displayOrient'](#event-displayorient)
+  - [Event: 'displayMove'](#event-displaymove)
+  - [sdl.video.displays](#sdlvideodisplays)
+  - [sdl.video.windows](#sdlvideowindows)
+  - [sdl.video.focused](#sdlvideofocused)
+  - [sdl.video.hovered](#sdlvideohovered)
+  - [sdl.video.createWindow([options])](#sdlvideocreatewindowoptions)
+  - [class Window](#class-window)
+    - [Event: 'show'](#event-show)
+    - [Event: 'hide'](#event-hide)
+    - [Event: 'expose'](#event-expose)
+    - [Event: 'minimize'](#event-minimize)
+    - [Event: 'maximize'](#event-maximize)
+    - [Event: 'restore'](#event-restore)
+    - [Event: 'move'](#event-move)
+    - [Event: 'resize'](#event-resize)
+    - [Event: 'displayChange'](#event-displaychange)
+    - [Event: 'focus'](#event-focus)
+    - [Event: 'blur'](#event-blur)
+    - [Event: 'hover'](#event-hover)
+    - [Event: 'leave'](#event-leave)
+    - [Event: 'beforeClose'](#event-beforeclose)
+    - [Event: 'close'](#event-close)
+    - [Event: 'keyDown'](#event-keydown)
+    - [Event: 'keyUp'](#event-keyup)
+    - [Event: 'textInput'](#event-textinput)
+    - [Event: 'mouseButtonDown'](#event-mousebuttondown)
+    - [Event: 'mouseButtonUp'](#event-mousebuttonup)
+    - [Event: 'mouseMove'](#event-mousemove)
+    - [Event: 'mouseWheel'](#event-mousewheel)
+    - [Event: 'dropBegin'](#event-dropbegin)
+    - [Event: 'dropText'](#event-droptext)
+    - [Event: 'dropFile'](#event-dropfile)
+    - [Event: 'dropComplete'](#event-dropcomplete)
+    - [window.id](#windowid)
+    - [window.title](#windowtitle)
+    - [window.setTitle(title)](#windowsettitletitle)
+    - [window.x](#windowx)
+    - [window.y](#windowy)
+    - [window.setPosition(x, y)](#windowsetpositionx-y)
+    - [window.width](#windowwidth)
+    - [window.height](#windowheight)
+    - [window.pixelWidth](#windowpixelwidth)
+    - [window.pixelHeight](#windowpixelheight)
+    - [window.setSize(width, height)](#windowsetsizewidth-height)
+    - [window.setSizeInPixels(pixelWidth, pixelHeight)](#windowsetsizeinpixelspixelwidth-pixelheight)
+    - [window.display](#windowdisplay)
+    - [window.visible](#windowvisible)
+    - [window.show([show])](#windowshowshow)
+    - [window.hide()](#windowhide)
+    - [window.fullscreen](#windowfullscreen)
+    - [window.setFullscreen(fullscreen)](#windowsetfullscreenfullscreen)
+    - [window.resizable](#windowresizable)
+    - [window.setResizable(resizable)](#windowsetresizableresizable)
+    - [window.borderless](#windowborderless)
+    - [window.alwaysOnTop](#windowalwaysontop)
+    - [window.setBorderless(borderless)](#windowsetborderlessborderless)
+    - [window.accelerated](#windowaccelerated)
+    - [window.setAccelerated(accelerated)](#windowsetacceleratedaccelerated)
+    - [window.vsync](#windowvsync)
+    - [window.setVsync(vsync)](#windowsetvsyncvsync)
+    - [window.opengl](#windowopengl)
+    - [window.webgpu](#windowwebgpu)
+    - [window.native](#windownative)
+    - [window.maximized](#windowmaximized)
+    - [window.maximize()](#windowmaximize)
+    - [window.minimized](#windowminimized)
+    - [window.minimize()](#windowminimize)
+    - [window.restore()](#windowrestore)
+    - [window.focused](#windowfocused)
+    - [window.focus()](#windowfocus)
+    - [window.hovered](#windowhovered)
+    - [window.skipTaskbar](#windowskiptaskbar)
+    - [window.popupMenu](#windowpopupmenu)
+    - [window.tooltip](#windowtooltip)
+    - [window.utility](#windowutility)
+    - [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
+    - [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
+    - [window.flash([untilFocused])](#windowflashuntilfocused)
+    - [window.stopFlashing()](#windowstopflashing)
+    - [window.destroyed](#windowdestroyed)
+    - [window.destroy()](#windowdestroy)
+    - [window.destroyGently()](#windowdestroygently)
+- [sdl.keyboard](#sdlkeyboard)
+  - [Virtual keys](#virtual-keys)
+  - [Enum: SCANCODE](#enum-scancode)
+  - [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
+  - [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
+  - [sdl.keyboard.getState()](#sdlkeyboardgetstate)
+- [sdl.mouse](#sdlmouse)
+  - [Enum: BUTTON](#enum-button)
+  - [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
+  - [sdl.mouse.position](#sdlmouseposition)
+  - [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
+  - [sdl.mouse.setCursor(cursor)](#sdlmousesetcursorcursor)
+  - [sdl.mouse.resetCursor()](#sdlmouseresetcursor)
+  - [sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
+  - [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
+  - [sdl.mouse.hideCursor()](#sdlmousehidecursor)
+  - [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
+  - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
+  - [sdl.mouse.uncapture()](#sdlmouseuncapture)
+- [sdl.joystick](#sdljoystick)
+  - [Hat positions](#hat-positions)
+  - [Power levels](#power-levels)
+  - [Event: 'deviceAdd'](#joystick-event-deviceadd)
+  - [Event: 'deviceRemove'](#joystick-event-deviceremove)
+  - [sdl.joystick.devices](#sdljoystickdevices)
+  - [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
+  - [class JoystickInstance](#class-joystickinstance)
+    - [Event: 'axisMotion'](#joystick-instance-event-axismotion)
+    - [Event: 'ballMotion'](#event-ballmotion)
+    - [Event: 'buttonDown'](#joystick-instance-event-buttondown)
+    - [Event: 'buttonUp'](#joystick-instance-event-buttonup)
+    - [Event: 'hatMotion'](#event-hatmotion)
+    - [Event: 'close'](#joystick-instance-event-close)
+    - [joystickInstance.device](#joystickinstancedevice)
+    - [joystickInstance.firmwareVersion](#joystickinstancefirmwareversion)
+    - [joystickInstance.serialNumber](#joystickinstanceserialnumber)
+    - [joystickInstance.axes](#joystickinstanceaxes)
+    - [joystickInstance.balls](#joystickinstanceballs)
+    - [joystickInstance.buttons](#joystickinstancebuttons)
+    - [joystickInstance.hats](#joystickinstancehats)
+    - [joystickInstance.power](#joystickinstancepower)
+    - [joystickInstance.setPlayer(index)](#joystickinstancesetplayerindex)
+    - [joystickInstance.resetPlayer()](#joystickinstanceresetplayer)
+    - [joystickInstance.hasLed](#joystickinstancehasled)
+    - [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
+    - [joystickInstance.hasRumble](#joystickinstancehasrumble)
+    - [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelow-high-duration)
+    - [joystickInstance.stopRumble()](#joystickinstancestoprumble)
+    - [joystickInstance.hasRumbleTriggers](#joystickinstancehasrumbletriggers)
+    - [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleft-right-duration)
+    - [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
+    - [joystickInstance.closed](#joystickinstanceclosed)
+    - [joystickInstance.close()](#joystickinstanceclose)
+- [sdl.controller](#sdlcontroller)
+  - [Event: 'deviceAdd'](#controller-event-deviceadd)
+  - [Event: 'deviceRemove'](#controller-event-deviceremove)
+  - [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
+  - [sdl.controller.devices](#sdlcontrollerdevices)
+  - [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
+  - [class ControllerInstance](#class-controllerinstance)
+    - [Event: 'axisMotion'](#controller-instance-event-axismotion)
+    - [Event: 'buttonDown'](#controller-instance-event-buttondown)
+    - [Event: 'buttonUp'](#controller-instance-event-buttonup)
+    - [Event: 'remap'](#event-remap)
+    - [Event: 'close'](#controller-instance-event-close)
+    - [controllerInstance.device](#controllerinstancedevice)
+    - [controllerInstance.firmwareVersion](#controllerinstancefirmwareversion)
+    - [controllerInstance.serialNumber](#controllerinstanceserialnumber)
+    - [controllerInstance.steamHandle](#controllerinstancesteamhandle)
+    - [controllerInstance.axes](#controllerinstanceaxes)
+    - [controllerInstance.buttons](#controllerinstancebuttons)
+    - [controllerInstance.power](#controllerinstancepower)
+    - [controllerInstance.setPlayer(index)](#controllerinstancesetplayerindex)
+    - [controllerInstance.resetPlayer()](#controllerinstanceresetplayer)
+    - [controllerInstance.hasLed](#controllerinstancehasled)
+    - [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
+    - [controllerInstance.hasRumble](#controllerinstancehasrumble)
+    - [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelow-high-duration)
+    - [controllerInstance.stopRumble()](#controllerinstancestoprumble)
+    - [controllerInstance.hasRumbleTriggers](#controllerinstancehasrumbletriggers)
+    - [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleft-right-duration)
+    - [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
+    - [controllerInstance.closed](#controllerinstanceclosed)
+    - [controllerInstance.close()](#controllerinstanceclose)
+- [sdl.sensor](#sdlsensor)
+  - [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandard_gravity)
+  - [sdl.sensor.devices](#sdlsensordevices)
+  - [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
+  - [class SensorInstance](#class-sensorinstance)
+    - [Event: 'update'](#sensor-instance-event-update)
+    - [sensorInstance.device](#sensorinstancedevice)
+    - [sensorInstance.data](#sensorinstancedata)
+    - [sensorInstance.closed](#sensorinstanceclosed)
+    - [sensorInstance.close()](#sensorinstanceclose)
+- [sdl.audio](#sdlaudio)
+  - [Audio data](#audio-data)
+  - [Sample formats](#sample-formats)
+  - [Event: 'deviceAdd'](#audio-event-deviceadd)
+  - [Event: 'deviceRemove'](#audio-event-deviceremove)
+  - [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
+  - [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
+  - [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
+  - [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
+  - [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
+  - [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
+  - [sdl.audio.devices](#sdlaudiodevices)
+  - [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
+  - [class AudioInstance](#class-audioinstance)
+    - [Event: 'close'](#audio-instance-event-close)
+    - [audioInstance.id](#audioinstanceid)
+    - [audioInstance.channels](#audioinstancechannels)
+    - [audioInstance.frequency](#audioinstancefrequency)
+    - [audioInstance.format](#audioinstanceformat)
+    - [audioInstance.bytesPerSample](#audioinstancebytespersample)
+    - [audioInstance.minSampleValue](#audioinstanceminsamplevalue)
+    - [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
+    - [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
+    - [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
+    - [audioInstance.writeSample(buffer, value[, offset])](#audioinstancewritesamplebuffer-value-offset)
+    - [audioInstance.buffered](#audioinstancebuffered)
+    - [audioInstance.playing](#audioinstanceplaying)
+    - [audioInstance.play([play])](#audioinstanceplayplay)
+    - [audioInstance.pause()](#audioinstancepause)
+    - [audioInstance.queued](#audioinstancequeued)
+    - [audioInstance.clearQueue()](#audioinstanceclearqueue)
+    - [audioInstance.closed](#audioinstanceclosed)
+    - [audioInstance.close()](#audioinstanceclose)
+  - [class AudioPlaybackInstance extends AudioInstance](#class-audioplaybackinstance-extends-audioinstance)
+    - [playbackInstance.enqueue(buffer[, bytes])](#playbackinstanceenqueuebuffer-bytes)
+  - [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
+    - [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
+- [sdl.clipboard](#sdlclipboard)
+  - [Event: 'update'](#clipboard-event-update)
+  - [sdl.clipboard.text](#sdlclipboardtext)
+  - [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
+- [sdl.power](#sdlpower)
+  - [sdl.power.info](#sdlpowerinfo)
+- [helpers](#helpers)
 
 ## sdl
 
 ### sdl.info
 
-* `<object>`
-  * `version: <object>`
-    * `compile: <object>` The version of the SDL library that this package was compiled against.
-      * `major, minor, patch: <Semver>` The components of the version.
-    * `runtime: <object>` The version of the SDL library that was found and loaded at runtime.
-      * `major, minor, patch: <Semver>` The components of the version.
-  * `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'Mac OS X'`.
-  * `drivers: <object>`
-    * `video: <object>`
-      * `all: <string>[]` A list of all video drivers.
-      * `current: <string>|<null>` The video driver that is currently selected.
-    * `audio: <object>`
-      * `all: <string>[]` A list of all audio drivers.
-      * `current: <string>|<null>` The audio driver that is currently selected.
-  * `initialized: <object>`
-    * `video: <boolean>`: Is `true` if the video subsystem was sucessfully initialized, or `false` otherwise.
-    * `audio: <boolean>`: Is `true` if the audio subsystem was sucessfully initialized, or `false` otherwise.
-    * `joystick: <boolean>`: Is `true` if the joystick subsystem was sucessfully initialized, or `false` otherwise.
-    * `controller: <boolean>`: Is `true` if the controller subsystem was sucessfully initialized, or `false` otherwise.
-    * `haptic: <boolean>`: Is `true` if the haptic subsystem was sucessfully initialized, or `false` otherwise.
-    * `sensor: <boolean>`: Is `true` if the sensor subsystem was sucessfully initialized, or `false` otherwise.
+- `<object>`
+  - `version: <object>`
+    - `compile: <object>` The version of the SDL library that this package was compiled against.
+      - `major, minor, patch: <Semver>` The components of the version.
+    - `runtime: <object>` The version of the SDL library that was found and loaded at runtime.
+      - `major, minor, patch: <Semver>` The components of the version.
+  - `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'Mac OS X'`.
+  - `drivers: <object>`
+    - `video: <object>`
+      - `all: <string>[]` A list of all video drivers.
+      - `current: <string>|<null>` The video driver that is currently selected.
+    - `audio: <object>`
+      - `all: <string>[]` A list of all audio drivers.
+      - `current: <string>|<null>` The audio driver that is currently selected.
+  - `initialized: <object>`
+    - `video: <boolean>`: Is `true` if the video subsystem was sucessfully initialized, or `false` otherwise.
+    - `audio: <boolean>`: Is `true` if the audio subsystem was sucessfully initialized, or `false` otherwise.
+    - `joystick: <boolean>`: Is `true` if the joystick subsystem was sucessfully initialized, or `false` otherwise.
+    - `controller: <boolean>`: Is `true` if the controller subsystem was sucessfully initialized, or `false` otherwise.
+    - `haptic: <boolean>`: Is `true` if the haptic subsystem was sucessfully initialized, or `false` otherwise.
+    - `sensor: <boolean>`: Is `true` if the sensor subsystem was sucessfully initialized, or `false` otherwise.
 
 The `sdl.info` object is filled with information produced during the initialization of SDL.
 All the values remain constant throughout the execution of the program.
@@ -429,24 +425,23 @@ Sample data for Ubuntu:
 }
 ```
 
-
 ## sdl.video
 
 ### Image data
 
 There are 3 places in the API where you must provide an image to the library:
 
-* [`window.render()`](#windowrenderwidth-height-stride-format-buffer-options)
-* [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
-* [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
+- [`window.render()`](#windowrenderwidth-height-stride-format-buffer-options)
+- [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer)
+- [`mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y)
 
 All three of these functions accept the image as a series of arguments:
 
-* `width: <number>` The width of the image in pixels.
-* `height: <number>` The height of the image in pixels.
-* `stride: <number>` How many bytes each row of the image takes up in the buffer. Usually equal to `width * bytesPerPixel`, but may be larger if the rows of the buffer are padded to always be some multiple of bytes.
-* `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
-* `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
+- `width: <number>` The width of the image in pixels.
+- `height: <number>` The height of the image in pixels.
+- `stride: <number>` How many bytes each row of the image takes up in the buffer. Usually equal to `width * bytesPerPixel`, but may be larger if the rows of the buffer are padded to always be some multiple of bytes.
+- `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
+- `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
 
 So, for example, to fill the window with a red+green gradient you could do:
 
@@ -520,50 +515,48 @@ String values used to represent how the pixels of an image are stored in a Buffe
 | `'nv12'` | `SDL_PIXELFORMAT_NV12` | planar mode: Y + U/V interleaved (2 planes) |
 | `'nv21'` | `SDL_PIXELFORMAT_NV21` | planar mode: Y + V/U interleaved (2 planes) |
 
-
 ### Event: 'displayAdd'
 
-* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 
 Fired when a display is added to the system.
 Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
 ### Event: 'displayRemove'
 
-* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 
 Fired when a display is removed from the system.
 Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
 ### Event: 'displayOrient'
 
-* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
-* `orientation: <string>`: The display's new orientation.
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `orientation: <string>`: The display's new orientation.
 
 Fired when a display changes orientation.
 
 ### Event: 'displayMove'
 
-* `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 
 Fired when a display changes position.
 
-
 ### sdl.video.displays
 
-* `<object>[]`
-  * `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
-  * `format: `[`<PixelFormat>`](#pixel-formats) The pixel format of the display.
-  * `frequency: <number>` The refresh rate of the display.
-  * `geometry: <object>` The desktop region represented by the display.
-    * `x, y, width, height: <Rect>` The position and size of the display's geometry.
-  * `usable: <object>` Similar to `geometry`, but excludes areas taken up by the OS or window manager such as menus, docks, e.t.c.
-    * `x, y, width, height: <Rect>` The position and size of the display's usable region.
-  * `dpi: <object>|<null>` Return pixel density for the display in dots/pixels-per-inch units. Might be `null` on some devices if DPI info can't be retrieved.
-    * `horizontal: <number>` The horizontal density.
-    * `vertical: <number>` The vertical density.
-    * `diagonal: <number>` The diagonal density.
-  * `orientation: <string>|<null>` The orientation of the display.
+- `<object>[]`
+  - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
+  - `format: `[`<PixelFormat>`](#pixel-formats) The pixel format of the display.
+  - `frequency: <number>` The refresh rate of the display.
+  - `geometry: <object>` The desktop region represented by the display.
+    - `x, y, width, height: <Rect>` The position and size of the display's geometry.
+  - `usable: <object>` Similar to `geometry`, but excludes areas taken up by the OS or window manager such as menus, docks, e.t.c.
+    - `x, y, width, height: <Rect>` The position and size of the display's usable region.
+  - `dpi: <object>|<null>` Return pixel density for the display in dots/pixels-per-inch units. Might be `null` on some devices if DPI info can't be retrieved.
+    - `horizontal: <number>` The horizontal density.
+    - `vertical: <number>` The vertical density.
+    - `diagonal: <number>` The diagonal density.
+  - `orientation: <string>|<null>` The orientation of the display.
 
 A list of all detected displays.
 
@@ -602,55 +595,55 @@ Notice how the geometries don't overlap:
 
 ### sdl.video.windows
 
-* [`<Window>`](#class-window)`[]`
+- [`<Window>`](#class-window)`[]`
 
 A list of all open windows.
 
 ### sdl.video.focused
 
-* [`<Window>`](#class-window)`|<null>`
+- [`<Window>`](#class-window)`|<null>`
 
 The window that has the current keyboard focus, or `null` if no window has the keyboard focus.
 
 ### sdl.video.hovered
 
-* [`<Window>`](#class-window)`|<null>`
+- [`<Window>`](#class-window)`|<null>`
 
 The window that the mouse is hovered over, or `null` if the mouse is not over a window.
 
 ### sdl.video.createWindow([options])
 
-* `options: <object>`
-  * `title: <string>` Appears in the window's title bar. Default: `''`
-  * `display: <number>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays). Default: `sdl.video.displays[0]`
-  * `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
-  * `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
-  * `width: <number>` The width of the window. Default: `640`
-  * `height: <number>` The height of the window. Default: `480`
-  * `visible: <boolean>` Set to `false` to create a hidden window that will only be shown when you call [`window.show()`](#windowshowshow). Default: `true`
-  * `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
-  * `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
-  * `borderless: <boolean>` Set to `true` to completely hide the window's borders and title bar. Default: `false`
-  * `alwaysOnTop: <boolean>` Set to `true` to always show the window above others. Default: `false`
-  * `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
-  * `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
-  * `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
-  * `webgpu: <boolean>` Set to `true` to create an WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
-  * `skipTaskbar: <boolean>` X11 only. Set to `true` to not add the window to the taskbar. Default: `false`
-  * `popupMenu: <boolean>` X11 only. Set to `true` to treat the window like a popup menu. Default: `false`
-  * `tooltip: <boolean>` X11 only. Set to `true` to treat the window like a tooltip. Default: `false`
-  * `utility: <boolean>` X11 only. Set to `true` to treat the window like a utility window. Default: `false`
-* Returns: [`<Window>`](#class-window) an object representing the new window.
+- `options: <object>`
+  - `title: <string>` Appears in the window's title bar. Default: `''`
+  - `display: <number>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays). Default: `sdl.video.displays[0]`
+  - `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
+  - `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
+  - `width: <number>` The width of the window. Default: `640`
+  - `height: <number>` The height of the window. Default: `480`
+  - `visible: <boolean>` Set to `false` to create a hidden window that will only be shown when you call [`window.show()`](#windowshowshow). Default: `true`
+  - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
+  - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
+  - `borderless: <boolean>` Set to `true` to completely hide the window's borders and title bar. Default: `false`
+  - `alwaysOnTop: <boolean>` Set to `true` to always show the window above others. Default: `false`
+  - `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
+  - `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
+  - `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
+  - `webgpu: <boolean>` Set to `true` to create an WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
+  - `skipTaskbar: <boolean>` X11 only. Set to `true` to not add the window to the taskbar. Default: `false`
+  - `popupMenu: <boolean>` X11 only. Set to `true` to treat the window like a popup menu. Default: `false`
+  - `tooltip: <boolean>` X11 only. Set to `true` to treat the window like a tooltip. Default: `false`
+  - `utility: <boolean>` X11 only. Set to `true` to treat the window like a utility window. Default: `false`
+- Returns: [`<Window>`](#class-window) an object representing the new window.
 
 Creates a new window.
 
 The following restrictions apply:
 
-* The `display` option is mutually exclusive with the `x` and `y` options.
-* The `resizable` and `borderless` options are mutually exclusive.
-* The `opengl` and `webgpu` options are mutually exclusive.
-* The `vsync` option only applies to windows that are also `accelerated`.
-* The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
+- The `display` option is mutually exclusive with the `x` and `y` options.
+- The `resizable` and `borderless` options are mutually exclusive.
+- The `opengl` and `webgpu` options are mutually exclusive.
+- The `vsync` option only applies to windows that are also `accelerated`.
+- The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
 
 If you set the `opengl` or `webgpu` options, then you must use OpenGL/WebGPU calls to render to the window.
 Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
@@ -686,23 +679,23 @@ Fired when the window gets restored.
 
 ### Event: 'move'
 
-* `x: <number>` The window's new x position, relative to the screen.
-* `y: <number>` The window's new y position, relative to the screen.
+- `x: <number>` The window's new x position, relative to the screen.
+- `y: <number>` The window's new y position, relative to the screen.
 
 Fired when the window changes position.
 
 ### Event: 'resize'
 
-* `width: <number>` The window's new width.
-* `height: <number>` The window's new height.
-* `pixelWidth: <number>` The window's new width in pixels. See [high-dpi](#high-dpi).
-* `pixelHeight: <number>` The window's new height in pixels. See [high-dpi](#high-dpi).
+- `width: <number>` The window's new width.
+- `height: <number>` The window's new height.
+- `pixelWidth: <number>` The window's new width in pixels. See [high-dpi](#high-dpi).
+- `pixelHeight: <number>` The window's new height in pixels. See [high-dpi](#high-dpi).
 
 Fired when the window changes size.
 
 ### Event: 'displayChange'
 
-* `display: <object>` An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the window's new display.
+- `display: <object>` An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the window's new display.
 
 Fired when the window moves from one display to another.
 
@@ -724,7 +717,7 @@ Fired when the mouse leaves the window.
 
 ### Event: 'beforeClose'
 
-* `prevent: <function (void) => void>` Call this function to prevent the window from closing.
+- `prevent: <function (void) => void>` Call this function to prevent the window from closing.
 
 Fired to indicate that the user requested that the window should close (usually by clicking the "x" button).
 If you need to display any confirmation dialogs, call `event.prevent()` and afterwards handle destruction manually.
@@ -737,73 +730,73 @@ Handle any cleanup here.
 
 ### Event: 'keyDown'
 
-* `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
-* `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
-* `repeat: <boolean>` Is `true` if the event was generated by holding down a key for a long time.
-* `shift: <boolean>` Is `true` if the Shift key was pressed when the event was generated.
-* `ctrl: <boolean>` Is `true` if the Ctrl key was pressed when the event was generated.
-* `alt: <boolean>` Is `true` if the Alt key was pressed when the event was generated.
-* `super: <boolean>` Is `true` if the "Windows" key was pressed when the event was generated.
-* `altgr: <boolean>` Is `true` if the AltGr key was pressed when the event was generated.
-* `capslock: <boolean>` Is `true` if CapsLock was active when the event was generated.
-* `numlock: <boolean>` Is `true` if NumLock was active when the event was generated.
+- `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
+- `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
+- `repeat: <boolean>` Is `true` if the event was generated by holding down a key for a long time.
+- `shift: <boolean>` Is `true` if the Shift key was pressed when the event was generated.
+- `ctrl: <boolean>` Is `true` if the Ctrl key was pressed when the event was generated.
+- `alt: <boolean>` Is `true` if the Alt key was pressed when the event was generated.
+- `super: <boolean>` Is `true` if the "Windows" key was pressed when the event was generated.
+- `altgr: <boolean>` Is `true` if the AltGr key was pressed when the event was generated.
+- `capslock: <boolean>` Is `true` if CapsLock was active when the event was generated.
+- `numlock: <boolean>` Is `true` if NumLock was active when the event was generated.
 
 Fired when a key is pressed, and will also be fired repeatedly afterwards if the key is held down.
 
 ### Event: 'keyUp'
 
-* `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
-* `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
-* `shift: <boolean>` Is `true` if the Shift key was pressed when the event was generated.
-* `ctrl: <boolean>` Is `true` if the Ctrl key was pressed when the event was generated.
-* `alt: <boolean>` Is `true` if the Alt key was pressed when the event was generated.
-* `super: <boolean>` Is `true` if the "Windows" key was pressed when the event was generated.
-* `altgr: <boolean>` Is `true` if the AltGr key was pressed when the event was generated.
-* `capslock: <boolean>` Is `true` if CapsLock was active when the event was generated.
-* `numlock: <boolean>` Is `true` if NumLock was active when the event was generated.
+- `scancode: `[`<Scancode>`](#enum-scancode) The scancode of the key that caused the event.
+- `key: `[`<Key>`](#virtual-keys)`|<null>` The virtual key that caused the event, or `null` if the physical key does not correspond to any virtual key.
+- `shift: <boolean>` Is `true` if the Shift key was pressed when the event was generated.
+- `ctrl: <boolean>` Is `true` if the Ctrl key was pressed when the event was generated.
+- `alt: <boolean>` Is `true` if the Alt key was pressed when the event was generated.
+- `super: <boolean>` Is `true` if the "Windows" key was pressed when the event was generated.
+- `altgr: <boolean>` Is `true` if the AltGr key was pressed when the event was generated.
+- `capslock: <boolean>` Is `true` if CapsLock was active when the event was generated.
+- `numlock: <boolean>` Is `true` if NumLock was active when the event was generated.
 
 Fired when a key is released.
 
 ### Event: 'textInput'
 
-* `text: <string>` The unicode representation of the character that was entered.
+- `text: <string>` The unicode representation of the character that was entered.
 
 Fired when text is entered via the keyboard.
 
 ### Event: 'mouseButtonDown'
 
-* `x: <number>` The mouse's x position when the event happened, relative to the window.
-* `y: <number>` The mouse's y position when the event happened, relative to the window.
-* `touch: <boolean>` Is `true` if the event was caused by a touch event.
-* `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was pressed.
+- `x: <number>` The mouse's x position when the event happened, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was pressed.
 
 Fired when a mouse button is pressed.
 
 ### Event: 'mouseButtonUp'
 
-* `x: <number>` The mouse's x position when the event happened, relative to the window.
-* `y: <number>` The mouse's y position when the event happened, relative to the window.
-* `touch: <boolean>` Is `true` if the event was caused by a touch event.
-* `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was released.
+- `x: <number>` The mouse's x position when the event happened, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was released.
 
 Fired when a mouse button is released.
 
 ### Event: 'mouseMove'
 
-* `x: <number>` The mouse's x position when the event happened, relative to the window.
-* `y: <number>` The mouse's y position when the event happened, relative to the window.
-* `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `x: <number>` The mouse's x position when the event happened, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `touch: <boolean>` Is `true` if the event was caused by a touch event.
 
 Fired when the mouse moves.
 
 ### Event: 'mouseWheel'
 
-* `x: <number>` The mouse's x position when the event happened, relative to the window.
-* `y: <number>` The mouse's y position when the event happened, relative to the window.
-* `touch: <boolean>` Is `true` if the event was caused by a touch event.
-* `dx: <number>` The wheel's x movement, relative to its last position.
-* `dy: <number>` The wheel's y movement, relative to its last position.
-* `flipped: <boolean>` Is `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
+- `x: <number>` The mouse's x position when the event happened, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `dx: <number>` The wheel's x movement, relative to its last position.
+- `dy: <number>` The wheel's y movement, relative to its last position.
+- `flipped: <boolean>` Is `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
 
 Fired when the mouse wheel is scrolled.
 
@@ -813,13 +806,13 @@ When you drop a set of items onto a window, first the [`'dropBegin'`](#event-dro
 
 ### Event: 'dropText'
 
-* `text: <string>`: The text that was dropped onto the window.
+- `text: <string>`: The text that was dropped onto the window.
 
 Fired when one of the drops is a text item.
 
 ### Event: 'dropFile'
 
-* `file: <string>`: The path to the file that was dropped onto the window.
+- `file: <string>`: The path to the file that was dropped onto the window.
 
 Fired when one of the drops is a file.
 
@@ -829,98 +822,98 @@ Fired after a set of items has been dropped on a window.
 
 ### window.id
 
-* `<number>`
+- `<number>`
 
 A unique identifier for the window.
 
 ### window.title
 
-* `<string>`
+- `<string>`
 
 The text that appears in the window's title bar.
 
 ### window.setTitle(title)
 
-* `title: <string>`: The new title.
+- `title: <string>`: The new title.
 
 Changes the text that appears in the window's title bar.
 
 ### window.x
 
-* `<number>`
+- `<number>`
 
 The window's x position, relative to the screen.
 
 ### window.y
 
-* `<number>`
+- `<number>`
 
 The window's y position, relative to the screen.
 
 ### window.setPosition(x, y)
 
-* `x: <number>`: The new x position, relative to the screen.
-* `y: <number>`: The new y position, relative to the screen.
+- `x: <number>`: The new x position, relative to the screen.
+- `y: <number>`: The new y position, relative to the screen.
 
 Moves the window to a new position on the screen.
 
 ### window.width
 
-* `<number>`
+- `<number>`
 
 The window's width.
 
 ### window.height
 
-* `<number>`
+- `<number>`
 
 The window's height.
 
 ### window.pixelWidth
 
-* `<number>`
+- `<number>`
 
 The window's width in pixels.
 Is larger than [`width`](#windowwidth) on [high-dpi](#high-dpi) displays.
 
 ### window.pixelHeight
 
-* `<number>`
+- `<number>`
 
 The window's height in pixels.
 Is larger than [`height`](#windowheight) on [high-dpi](#high-dpi) displays.
 
 ### window.setSize(width, height)
 
-* `width: <number>`: The new width.
-* `height: <number>`: The new height.
+- `width: <number>`: The new width.
+- `height: <number>`: The new height.
 
 Changes the size of the window.
 
 ### window.setSizeInPixels(pixelWidth, pixelHeight)
 
-* `pixelWidth: <number>`: The new width in pixels.
-* `pixelHeight: <number>`: The new height in pixels.
+- `pixelWidth: <number>`: The new width in pixels.
+- `pixelHeight: <number>`: The new height in pixels.
 
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
 
 ### window.display
 
-* `<object>`
+- `<object>`
 
 An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display the window belongs to.
 If the window spans multiple displays, then the display that contains the center of the window is returned.
 
 ### window.visible
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is visible.
 
 ### window.show([show])
 
-* `show: <boolean>` Set to `true` to make the window visible, `false` to hide it. Default: `true`
+- `show: <boolean>` Set to `true` to make the window visible, `false` to hide it. Default: `true`
 
 Shows or hides the window.
 
@@ -930,59 +923,59 @@ Equivalent to [`window.show(false)`](#windowshowshow).
 
 ### window.fullscreen
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is fullscreen.
 A fullscreen window is displayed over the entire screen.
 
 ### window.setFullscreen(fullscreen)
 
-* `fullscreen: <boolean>` The new value of the property.
+- `fullscreen: <boolean>` The new value of the property.
 
 Changes the window's fullscreen property.
 
 ### window.resizable
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is resizable.
 A resizable window can be resized by dragging its borders.
 
 ### window.setResizable(resizable)
 
-* `resizable: <boolean>` The new value of the property.
+- `resizable: <boolean>` The new value of the property.
 
 Changes the window's resizable property.
 
 ### window.borderless
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is borderless.
 A borderless window has no borders or title bar.
 
 ### window.setBorderless(borderless)
 
-* `borderless: <boolean>` The new value of the property.
+- `borderless: <boolean>` The new value of the property.
 
 Changes the window's borderless property.
 
 ### window.alwaysOnTop
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window was created with `alwaysOnTop: true`.
 Such a window is always be shown above other windows.
 
 ### window.accelerated
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is using hardware accelerated rendering.
 
 ### window.setAccelerated(accelerated)
 
-* `accelerated: <boolean>` The new value of the property.
+- `accelerated: <boolean>` The new value of the property.
 
 Changes the window's accelerated property.
 
@@ -990,7 +983,7 @@ If you have set the `opengl` or `webgpu` options, then calls to this function wi
 
 ### window.vsync
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is using vsync.
 Vsync synchronizes the window's frame rate with the display's refresh rate to prevent tearing.
@@ -998,7 +991,7 @@ Note that vsync can only be set to `true` if [`accelerated`](#windowaccelerated)
 
 ### window.setVsync(vsync)
 
-* `vsync: <boolean>` The new value of the property.
+- `vsync: <boolean>` The new value of the property.
 
 Changes the window's vsync property.
 
@@ -1006,7 +999,7 @@ If you have set the `opengl` or `webgpu` options, then calls to this function wi
 
 ### window.opengl
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window was created in OpenGl mode.
 In OpenGL mode, you must use OpenGL calls to render to the window.
@@ -1014,7 +1007,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 ### window.webgpu
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window was created in WebGPU mode.
 In WebGPU mode, you must use WebGPU calls to render to the window.
@@ -1022,8 +1015,8 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 ### window.native
 
-* `<object>`
-  * `handle : <Buffer>` The platform-specific handle of the window.
+- `<object>`
+  - `handle : <Buffer>` The platform-specific handle of the window.
 
 The native type of `handle` is HWND on Windows, NSView* on macOS, and Window (unsigned long) on Linux.
 It should work exactly like the [`win.getNativeWindowHandle()`](https://www.electronjs.org/docs/latest/api/browser-window#wingetnativewindowhandle) electron method.
@@ -1034,7 +1027,7 @@ They are used internally for passing to [@kmamal/gl](https://github.com/kmamal/h
 
 ### window.maximized
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is maximized.
 
@@ -1044,7 +1037,7 @@ Maximizes the window.
 
 ### window.minimized
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is minimized.
 
@@ -1058,7 +1051,7 @@ Restores the window so it is neither minimized nor maximized.
 
 ### window.focused
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window has keyboard input.
 
@@ -1068,13 +1061,13 @@ Gives the window the keyboard focus.
 
 ### window.hovered
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the mouse is over the window.
 
 ### window.skipTaskbar
 
-* `<boolean>`
+- `<boolean>`
 
 X11 only.
 Is `true` if the window was created with `skipTaskbar: true`.
@@ -1082,7 +1075,7 @@ Such a window is not added to the taskbar.
 
 ### window.popupMenu
 
-* `<boolean>`
+- `<boolean>`
 
 X11 only.
 Is `true` if the window was created with `popupMenu: true`.
@@ -1090,7 +1083,7 @@ Such a window is always treated as a popup menu.
 
 ### window.tooltip
 
-* `<boolean>`
+- `<boolean>`
 
 X11 only.
 Is `true` if the window was created with `tooltip: true`.
@@ -1098,7 +1091,7 @@ Such a window is always treated as a tooltip.
 
 ### window.utility
 
-* `<boolean>`
+- `<boolean>`
 
 X11 only.
 Is `true` if the window was created with `utility: true`.
@@ -1106,11 +1099,11 @@ Such a window is always treated as a utility window.
 
 ### window.render(width, height, stride, format, buffer[, options])
 
-* `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
-* `options: <object>`
-  * `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
-  * `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
-    * `x, y, width, height: <rect>` The components of the rectangle.
+- `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
+- `options: <object>`
+  - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
+  - `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
+    - `x, y, width, height: <rect>` The components of the rectangle.
 
 Displays an image in the window.
 
@@ -1133,13 +1126,13 @@ Calls to `render()` will fail.
 
 ### window.setIcon(width, height, stride, format, buffer)
 
-* `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display as the icon of the window.
+- `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display as the icon of the window.
 
 Set's the window's icon, usually displayed in the title bar and the taskbar.
 
 ### window.flash([untilFocused])
 
-* `untilFocused: <boolean>` Whether to keep flashing the window until the user focuses it. Default: `false`
+- `untilFocused: <boolean>` Whether to keep flashing the window until the user focuses it. Default: `false`
 
 Flash the window briefly to get attention.
 If `untilFocused` is set, the window will continue flashing until the user focuses it.
@@ -1150,7 +1143,7 @@ Stop the window from flashing.
 
 ### window.destroyed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the window is destroyed.
 A destroyed window object must not be used any further.
@@ -1163,7 +1156,6 @@ Destroys the window.
 
 Asks before destroying the window.
 The difference between this function and [destroy()](#windowdestroy) is that this function first makes the window emit the [`'beforeClose'`](#event-beforeclose) event, giving you a chance to prevent the window from being destroyed.
-
 
 ## sdl.keyboard
 
@@ -1189,7 +1181,6 @@ But sometimes the application doesn't care about individual keys at all, but abo
 Consider for example what happens when a user on a Greek keyboard layout enters an accent mark "´" followed by the letter "α" to produce the character "ά": Two keys were pressed, but only a single character was produced.
 Trying to handle text input by manually translating key presses to text is not a very viable solution.
 It's better to let the OS handle all the text logic, and get the final text by handling the rasulting ([`'textInput'`](#event-textinput)) events.
-
 
 ### Virtual keys
 
@@ -1460,16 +1451,16 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
 
 ### sdl.keyboard.getKey(scancode)
 
-* `scancode: `[`<Scancode>`](#enum-scancode)
-* Returns: [`<Key>`](#virtual-keys)`|<null>`
+- `scancode: `[`<Scancode>`](#enum-scancode)
+- Returns: [`<Key>`](#virtual-keys)`|<null>`
 
 Maps a scancode to the corresponding key based on the current keyboard mapping.
 Retuns `null` if the scancode does not currespond to a key in the current mapping.
 
 ### sdl.keyboard.getScancode(key)
 
-* `key: `[`<Key>`](#virtual-keys)
-* Returns: [`<Scancode>`](#enum-scancode)`|<null>`
+- `key: `[`<Key>`](#virtual-keys)
+- Returns: [`<Scancode>`](#enum-scancode)`|<null>`
 
 Maps a key to the corresponding scancode based on the current keyboard mapping.
 Retuns `null` if the key does not currespond to a scancode in the current mapping.
@@ -1477,11 +1468,10 @@ If multiple physical keys produce the same virtual key, then only the first one 
 
 ### sdl.keyboard.getState()
 
-* Returns: `<boolean[]>` an array representing the state of each key.
+- Returns: `<boolean[]>` an array representing the state of each key.
 
 The returned array can be indexed with [`Scancode`](#enum-scancode) values.
 Each value in the array is either `true` if the corresponding key is pressed, or `false` otherwise.
-
 
 ## sdl.mouse
 
@@ -1498,29 +1488,29 @@ A mouse can have many buttons, but the values for the three most common ones are
 
 ### sdl.mouse.getButton(button)
 
-* `button: <number>` The index of the button.
-* Returns: `<boolean>` Is `true` if the button is pressed.
+- `button: <number>` The index of the button.
+- Returns: `<boolean>` Is `true` if the button is pressed.
 
 Queries the state of a single mouse button.
 
 ### sdl.mouse.position
 
-* `<object>`
-  * `x: <number>` The x position of the mouse, relative to the screen.
-  * `y: <number>` The y position of the mouse, relative to the screen.
+- `<object>`
+  - `x: <number>` The x position of the mouse, relative to the screen.
+  - `y: <number>` The y position of the mouse, relative to the screen.
 
 The position of the mouse on the screen.
 
 ### sdl.mouse.setPosition(x, y)
 
-* `x: <number>` The new x position of the mouse, relative to the screen.
-* `y: <number>` The new y position of the mouse, relative to the screen.
+- `x: <number>` The new x position of the mouse, relative to the screen.
+- `y: <number>` The new y position of the mouse, relative to the screen.
 
 Moves the mouse to the specified position.
 
 ### sdl.mouse.setCursor(cursor)
 
-* `cursor: <MouseCursor>` The icon to use for the cursor.
+- `cursor: <MouseCursor>` The icon to use for the cursor.
 
 Changes the icon that is displayed for the mouse cursor.
 
@@ -1547,16 +1537,16 @@ Switched back to the default cursor.
 
 ### sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)
 
-* `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to use as a cursor.
-* `x: <number>` The x position of the cursor image's hotspot.
-* `y: <number>` The y position of the cursor image's hotspot.
+- `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to use as a cursor.
+- `x: <number>` The x position of the cursor image's hotspot.
+- `y: <number>` The y position of the cursor image's hotspot.
 
 Sets a image to be the mouse cursor.
 The hotspot represents the pixel that is considered to be under the mouse.
 
 ### sdl.mouse.showCursor([show])
 
-* `show: <boolean>` If `true` then the mouse cursor is made visible. Default: `true`
+- `show: <boolean>` If `true` then the mouse cursor is made visible. Default: `true`
 
 Changes the visibility of the mouse cursor.
 
@@ -1570,14 +1560,13 @@ Forces a cursor redraw.
 
 ### sdl.mouse.capture([capture])
 
-* `capture: <boolean>` If `true` the mouse is to be captured by the current window. Default: `true`
+- `capture: <boolean>` If `true` the mouse is to be captured by the current window. Default: `true`
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
 
 ### sdl.mouse.uncapture()
 
 Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
-
 
 ## sdl.joystick
 
@@ -1614,7 +1603,7 @@ String values used to represent the power level of a joystick or controller
 
 ### Event: 'deviceAdd'
 
-* `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
 
 Fired when a new joystick device becomes available.
 Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
@@ -1623,7 +1612,7 @@ Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joyst
 
 ### Event: 'deviceRemove'
 
-* `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.joystick.devices`](#sdljoystickdevices) indicating the device that caused the event.
 
 Fired when an existing joystick device is removed.
 Check [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
@@ -1631,16 +1620,16 @@ When this event is emitted, all instances that were opened from the removed devi
 
 ### sdl.joystick.devices
 
-* `<object>[]`
-  * `id: <number>` The unique id for the device.
-  * `name: <string>` The name of the device.
-  * `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
-  * `type: <JoystickType>|<null>` The type of the device, or `null` if it can't be determined.
-  * `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
-  * `vendor: <number>|<null>` The USB vendor ID of the device, or `null` if it can't be determined.
-  * `product: <number>|<null>` The USB product ID of the device, or `null` if it can't be determined.
-  * `version: <number>|<null>` The USB product version of the device, or `null` if it can't be determined.
-  * `player: <number>|<null>` The player index for the device, or `null` if it can't be determined.
+- `<object>[]`
+  - `id: <number>` The unique id for the device.
+  - `name: <string>` The name of the device.
+  - `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
+  - `type: <JoystickType>|<null>` The type of the device, or `null` if it can't be determined.
+  - `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
+  - `vendor: <number>|<null>` The USB vendor ID of the device, or `null` if it can't be determined.
+  - `product: <number>|<null>` The USB product ID of the device, or `null` if it can't be determined.
+  - `version: <number>|<null>` The USB product version of the device, or `null` if it can't be determined.
+  - `player: <number>|<null>` The player index for the device, or `null` if it can't be determined.
 
 A list of all the detected joystick devices.
 
@@ -1678,8 +1667,8 @@ Sample output:
 
 ### sdl.joystick.openDevice(device)
 
-* `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that is to be opened.
-* Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
+- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that is to be opened.
+- Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
 
 Initializes a joystick device and returns a corresponding instance.
 
@@ -1692,16 +1681,16 @@ Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevic
 
 ### Event: 'axisMotion'
 
-* `axis: <number>` The index of the axis that moved.
-* `value: <number>` The new axis position.
+- `axis: <number>` The index of the axis that moved.
+- `value: <number>` The new axis position.
 
 Fired when one of the joystick's axes moves.
 
 ### Event: 'ballMotion'
 
-* `ball: <number>` The index of the ball that moved.
-* `x: <number>` The new x-position of the ball.
-* `y: <number>` The new y-position of the ball.
+- `ball: <number>` The index of the ball that moved.
+- `x: <number>` The new x-position of the ball.
+- `y: <number>` The new y-position of the ball.
 
 Fired when one of the joystick's balls moves.
 
@@ -1709,7 +1698,7 @@ Fired when one of the joystick's balls moves.
 
 ### Event: 'buttonDown'
 
-* `button: <number>` The index of the button that was pressed.
+- `button: <number>` The index of the button that was pressed.
 
 Fired when one of the joystick's buttons is pressed.
 
@@ -1717,14 +1706,14 @@ Fired when one of the joystick's buttons is pressed.
 
 ### Event: 'buttonUp'
 
-* `button: <number>` The index of the button that was released.
+- `button: <number>` The index of the button that was released.
 
 Fired when one of the joystick's buttons is released.
 
 ### Event: 'hatMotion'
 
-* `hat: <number>` The index of the hat that was moved.
-* `value: `[`<HatPosition>`](#hat-positions) The new hat position.
+- `hat: <number>` The index of the hat that was moved.
+- `value: `[`<HatPosition>`](#hat-positions) The new hat position.
 
 Fired when one of the joystick's hats is moved.
 
@@ -1737,25 +1726,25 @@ Handle cleanup here.
 
 ### joystickInstance.device
 
-* `<object>`
+- `<object>`
 
 The [device](#sdljoystickdevices) from which the instance was opened.
 
 ### joystickInstance.firmwareVersion
 
-* `<number>|<null>`
+- `<number>|<null>`
 
 The joystick's firmware version, or `null` if it is not available.
 
 ### joystickInstance.serialNumber
 
-* `<string>|<null>`
+- `<string>|<null>`
 
 The joystick's serial number, or `null` if it is not available.
 
 ### joystickInstance.axes
 
-* `<number>[]`
+- `<number>[]`
 
 An array of values, each corresponding to the position of one of the joystick's axes.
 The values are normalized from `-1` to `+1`.
@@ -1763,34 +1752,34 @@ It may be necessary to impose certain tolerances on these values to account for 
 
 ### joystickInstance.balls
 
-* `<object>[]`
-  * `x: <number>` The horizontal position of the joystick's ball.
-  * `y: <number>` The vertical position of the joystick's ball.
+- `<object>[]`
+  - `x: <number>` The horizontal position of the joystick's ball.
+  - `y: <number>` The vertical position of the joystick's ball.
 
 An array of values, each corresponding to the position of one of the joystick's balls.
 
 ### joystickInstance.buttons
 
-* `<boolean>[]`
+- `<boolean>[]`
 
 An array of values, each corresponding to the state of one of the joystick's buttons.
 Each value in the object isarray is either `true` if the corresponding button is pressed, or `false` otherwise.
 
 ### joystickInstance.hats
 
-* [`<HatPosition>`](#hat-positions)`[]`
+- [`<HatPosition>`](#hat-positions)`[]`
 
 An array of values, each corresponding to the position of one of the joystick's hats.
 
 ### joystickInstance.power
 
-* [`<PowerLevel>`](#power-levels)`|<null>`
+- [`<PowerLevel>`](#power-levels)`|<null>`
 
 The current power level of the joystick device, or `null` if it is unknown.
 
 ### joystickInstance.setPlayer(index)
 
-* `index: <number>` The player index to assign to the joystick.
+- `index: <number>` The player index to assign to the joystick.
 
 Sets the player index of the joystick.
 
@@ -1800,29 +1789,29 @@ Clears player assignment and player led.
 
 ### joystickInstance.hasLed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the joystick has a LED light whose color can be controlled.
 
 ### joystickInstance.setLed(red, green, blue)
 
-* `red: <number>` The red component of the led color, from `0` to `1`.
-* `green: <number>` The green component of the led color, from `0` to `1`.
-* `blue: <number>` The blue component of the led color, from `0` to `1`.
+- `red: <number>` The red component of the led color, from `0` to `1`.
+- `green: <number>` The green component of the led color, from `0` to `1`.
+- `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the LED light on the joystick.
 
 ### joystickInstance.hasRumble
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the joystick has rumble motors.
 
 ### joystickInstance.rumble([low[, high[, duration]]])
 
-* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
-* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+- `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the joystick rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -1834,15 +1823,15 @@ Equivalent to [`joystickInstance.rumble(0, 0)`](#joystickinstancerumblelow-high-
 
 ### joystickInstance.hasRumbleTriggers
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the joystick has rumble motors on the triggers.
 
 ### joystickInstance.rumbleTriggers([left[, right[, duration]]])
 
-* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
-* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+- `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the joystick triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -1854,7 +1843,7 @@ Equivalent to [`joystickInstance.rumbleTriggers(0, 0)`](#joystickinstancerumblet
 
 ### joystickInstance.closed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the instance is closed.
 A closed instance object must not be used any further.
@@ -1862,7 +1851,6 @@ A closed instance object must not be used any further.
 ### joystickInstance.close()
 
 Closes the instance.
-
 
 ## sdl.controller
 
@@ -1890,7 +1878,7 @@ sdl.controller.addMappings(mappings)
 
 ### Event: 'deviceAdd'
 
-* `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
 
 Fired when a new controller device becomes available.
 Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
@@ -1899,7 +1887,7 @@ Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of c
 
 ### Event: 'deviceRemove'
 
-* `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
 
 Fired when an existing controller device is removed.
 Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
@@ -1907,24 +1895,24 @@ When this event is emitted, all instances that were opened from the removed devi
 
 ### sdl.controller.addMappings(mappings)
 
-* `mappings: <string>[]` An array of mappings to register.
+- `mappings: <string>[]` An array of mappings to register.
 
 Registers new mappings for controllers.
 This may cause already opened controller instances to be [remapped](#event-remap).
 
 ### sdl.controller.devices
 
-* `<object>[]`
-  * `id: <number>` The unique id for the device.
-  * `name: <string>` The name of the device.
-  * `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
-  * `type: <string>|<null>` The type of the device, or `null` if it can't be determined.
-  * `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
-  * `vendor: <number>|<null>` The USB vendor ID of the device, or `null` if it can't be determined.
-  * `product: <number>|<null>` The USB product ID of the device, or `null` if it can't be determined.
-  * `version: <number>|<null>` The USB product version of the device, or `null` if it can't be determined.
-  * `player: <number>|<null>` The player index for the device, or `null` if it can't be determined.
-  * `mapping: <string>|<null>` The axis and button mapping for the device, or `null` if it can't be determined.
+- `<object>[]`
+  - `id: <number>` The unique id for the device.
+  - `name: <string>` The name of the device.
+  - `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
+  - `type: <string>|<null>` The type of the device, or `null` if it can't be determined.
+  - `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
+  - `vendor: <number>|<null>` The USB vendor ID of the device, or `null` if it can't be determined.
+  - `product: <number>|<null>` The USB product ID of the device, or `null` if it can't be determined.
+  - `version: <number>|<null>` The USB product version of the device, or `null` if it can't be determined.
+  - `player: <number>|<null>` The player index for the device, or `null` if it can't be determined.
+  - `mapping: <string>|<null>` The axis and button mapping for the device, or `null` if it can't be determined.
 
 A list of all the detected controller devices.
 
@@ -1967,8 +1955,8 @@ Sample output:
 
 ### sdl.controller.openDevice(device)
 
-* `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that is to be opened.
-* Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
+- `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that is to be opened.
+- Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
 
 Initializes an controller device and returns a corresponding instance.
 
@@ -1981,8 +1969,8 @@ Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropend
 
 ### Event: 'axisMotion'
 
-* `axis:`[`<Axis>`](#controllerinstanceaxes) The axis that moved.
-* `value: <number>` The new axis position.
+- `axis:`[`<Axis>`](#controllerinstanceaxes) The axis that moved.
+- `value: <number>` The new axis position.
 
 Fired when one of the controller's axes moves.
 
@@ -1990,7 +1978,7 @@ Fired when one of the controller's axes moves.
 
 ### Event: 'buttonDown'
 
-* `button:`[`<Button>`](#controllerinstancebuttons) The button that was pressed.
+- `button:`[`<Button>`](#controllerinstancebuttons) The button that was pressed.
 
 Fired when one of the controller's buttons is pressed.
 
@@ -1998,7 +1986,7 @@ Fired when one of the controller's buttons is pressed.
 
 ### Event: 'buttonUp'
 
-* `button: <number>` The index of the button that was released.
+- `button: <number>` The index of the button that was released.
 
 Fired when one of the controller's buttons is released.
 
@@ -2016,38 +2004,38 @@ Handle cleanup here.
 
 ### controllerInstance.device
 
-* `<object>`
+- `<object>`
 
 The [device](#sdlcontrollerdevices) from which the instance was opened.
 
 ### controllerInstance.firmwareVersion
 
-* `<number>`
+- `<number>`
 
 The controller's firmware version.
 
 ### controllerInstance.serialNumber
 
-* `<string>|<null>`
+- `<string>|<null>`
 
 The controller's serial number, or `null` if it is not available.
 
 ### controllerInstance.steamHandle
 
-* `<Buffer>|<null>`
+- `<Buffer>|<null>`
 
 The controller's steam handle, or `null` if it is not available.
 The `Buffer` contains an `InputHandle_t` for the controller that can be used with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput)
 
 ### controllerInstance.axes
 
-* `<object>`
-  * `leftStickX: <number>` Left stick horizontal position
-  * `leftStickY: <number>` Left stick vertical position
-  * `rightStickX: <number>` Right stick horizontal position
-  * `rightStickY: <number>` Right stick vertical position
-  * `leftTrigger: <number>` Left trigger position
-  * `rightTrigger: <number>` Right trigger position
+- `<object>`
+  - `leftStickX: <number>` Left stick horizontal position
+  - `leftStickY: <number>` Left stick vertical position
+  - `rightStickX: <number>` Right stick horizontal position
+  - `rightStickY: <number>` Right stick vertical position
+  - `leftTrigger: <number>` Left trigger position
+  - `rightTrigger: <number>` Right trigger position
 
 An object mapping each axis of the controller's axes to its position.
 The values are normalized from `-1` to `+1`.
@@ -2055,39 +2043,39 @@ It may be necessary to impose certain tolerances on these values to account for 
 
 ### controllerInstance.buttons
 
-* `<object>`
-  * `dpadLeft: <boolean>` D-Pad left pressed
-  * `dpadRight: <boolean>`  D-Pad right pressed
-  * `dpadUp: <boolean>`  D-Pad up pressed
-  * `dpadDown: <boolean>`  D-Pad down pressed
-  * `a: <boolean>` A button pressed
-  * `b: <boolean>` B button pressed
-  * `x: <boolean>` X button pressed
-  * `y: <boolean>` Y button pressed
-  * `guide: <boolean>` Middle button pressed
-  * `back: <boolean>` Back button pressed
-  * `start: <boolean>` Start button pressed
-  * `leftStick: <boolean>` Left stick pressed
-  * `rightStick: <boolean>` Right stick pressed
-  * `leftShoulder: <boolean>` Left shoulder button pressed
-  * `rightShoulder: <boolean>` Right shoulder button pressed
-  * `paddle1: <boolean>` Paddle 1 pressed
-  * `paddle2: <boolean>` Paddle 2 pressed
-  * `paddle3: <boolean>` Paddle 3 pressed
-  * `paddle4: <boolean>` Paddle 4 pressed
+- `<object>`
+  - `dpadLeft: <boolean>` D-Pad left pressed
+  - `dpadRight: <boolean>`  D-Pad right pressed
+  - `dpadUp: <boolean>`  D-Pad up pressed
+  - `dpadDown: <boolean>`  D-Pad down pressed
+  - `a: <boolean>` A button pressed
+  - `b: <boolean>` B button pressed
+  - `x: <boolean>` X button pressed
+  - `y: <boolean>` Y button pressed
+  - `guide: <boolean>` Middle button pressed
+  - `back: <boolean>` Back button pressed
+  - `start: <boolean>` Start button pressed
+  - `leftStick: <boolean>` Left stick pressed
+  - `rightStick: <boolean>` Right stick pressed
+  - `leftShoulder: <boolean>` Left shoulder button pressed
+  - `rightShoulder: <boolean>` Right shoulder button pressed
+  - `paddle1: <boolean>` Paddle 1 pressed
+  - `paddle2: <boolean>` Paddle 2 pressed
+  - `paddle3: <boolean>` Paddle 3 pressed
+  - `paddle4: <boolean>` Paddle 4 pressed
 
 An object mapping each of the controller's buttons to a boolean value.
 Each value in the object is either `true` if the corresponding button is pressed, or `false` otherwise.
 
 ### controllerInstance.power
 
-* [`<PowerLevel>`](#power-levels)`|<null>`
+- [`<PowerLevel>`](#power-levels)`|<null>`
 
 The current power level of the joystick device, or `null` if it is unknown.
 
 ### controllerInstance.setPlayer(index)
 
-* `index: <number>` The player index to assign to the controller.
+- `index: <number>` The player index to assign to the controller.
 
 Sets the player index of the controller.
 
@@ -2097,29 +2085,29 @@ Clears player assignment and player led.
 
 ### controllerInstance.hasLed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the controller has a LED light whose color can be controlled.
 
 ### controllerInstance.setLed(red, green, blue)
 
-* `red: <number>` The red component of the led color, from `0` to `1`.
-* `green: <number>` The green component of the led color, from `0` to `1`.
-* `blue: <number>` The blue component of the led color, from `0` to `1`.
+- `red: <number>` The red component of the led color, from `0` to `1`.
+- `green: <number>` The green component of the led color, from `0` to `1`.
+- `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the LED light on the controller.
 
 ### controllerInstance.hasRumble
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the controller has rumble motors.
 
 ### controllerInstance.rumble([low[, high[, duration]]])
 
-* `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
-* `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+- `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the controller rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -2131,15 +2119,15 @@ Equivalent to [`controllerInstance.rumble(0, 0)`](#controllerinstancerumblelow-h
 
 ### controllerInstance.hasRumbleTriggers
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the controller has rumble motors on the triggers.
 
 ### controllerInstance.rumbleTriggers([left[, right[, duration]]])
 
-* `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
-* `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-* `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+- `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
 
 Makes the controller triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
@@ -2151,7 +2139,7 @@ Equivalent to [`controllerInstance.rumbleTriggers(0, 0)`](#controllerinstancerum
 
 ### controllerInstance.closed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the instance is closed.
 A closed instance object must not be used any further.
@@ -2160,12 +2148,11 @@ A closed instance object must not be used any further.
 
 Closes the instance.
 
-
 ## sdl.sensor
 
 ### sdl.sensor.STANDARD_GRAVITY
 
-* `<number>`
+- `<number>`
 
 Accelerometers are affected by the force of gravity:
 even if the device is completely at rest, it will still indicata an acceleration with a magnitude of [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity) away from the center of the earth.
@@ -2173,11 +2160,11 @@ Use the `sdl.sensor.STANDARD_GRAVITY` constant to correct for gravitational acce
 
 ### sdl.sensor.devices
 
-* `<object>[]`
-  * `id: <number>` The unique id of the device.
-  * `name: <string>` The name of the device.
-  * `type: <string>|<null>` Either `'accelerometer'` or `'gyroscope'`. Is `null` if it can't be determined.
-  * `side: <string>|<null>` Either `'left'` or `'right'`. Is `null` if the sensor does not have a side, or the value can't be determined.
+- `<object>[]`
+  - `id: <number>` The unique id of the device.
+  - `name: <string>` The name of the device.
+  - `type: <string>|<null>` Either `'accelerometer'` or `'gyroscope'`. Is `null` if it can't be determined.
+  - `side: <string>|<null>` Either `'left'` or `'right'`. Is `null` if the sensor does not have a side, or the value can't be determined.
 
 A list of all the detected sensor devices.
 
@@ -2190,8 +2177,8 @@ Sample output:
 
 ### sdl.sensor.openDevice(device)
 
-* `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) that is to be opened.
-* Returns: [`<SensorInstance>`](#class-sensorinstance) an object representing the opened sensor device instance.
+- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) that is to be opened.
+- Returns: [`<SensorInstance>`](#class-sensorinstance) an object representing the opened sensor device instance.
 
 Initializes a sensor device and returns a corresponding instance.
 
@@ -2216,17 +2203,17 @@ Handle cleanup here.
 
 ### sensorInstance.device
 
-* `<object>`
+- `<object>`
 
 The [device](#sdlsensordevices) from which the `sensorInstance` was opened.
 
 ### sensorInstance.data
 
-* `<object>`
-  * `timestamp: <number>|<null>` The time the latest measurement was taken __in microseconds__, or `null` if it can't be determined.
-  * `x: <number>` X axis value.
-  * `y: <number>` Y axis value.
-  * `z: <number>` Z axis value.
+- `<object>`
+  - `timestamp: <number>|<null>` The time the latest measurement was taken __in microseconds__, or `null` if it can't be determined.
+  - `x: <number>` X axis value.
+  - `y: <number>` Y axis value.
+  - `z: <number>` Z axis value.
 
 An object reporting the latest measurement from the sensor.
 
@@ -2238,13 +2225,13 @@ For gyroscopes, the `x`, `y`, and `z` values correspond to the current rate of r
 The rotation is positive in the counter-clockwise direction, meaning that an observer looking from a positive location on one of the axes would see positive rotation on that axis when it appeared to be rotating counter-clockwise.
 
 For phones held in portrait mode and game controllers held in front of you, the axes are defined as follows:
-* -X ... +X : left ... right
-* -Y ... +Y : bottom ... top
-* -Z ... +Z : farther ... closer
+- -X ... +X : left ... right
+- -Y ... +Y : bottom ... top
+- -Z ... +Z : farther ... closer
 
 ### sensorInstance.closed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the instance is closed.
 A closed instance object must not be used any further.
@@ -2252,7 +2239,6 @@ A closed instance object must not be used any further.
 ### sensorInstance.close()
 
 Closes the instance.
-
 
 ## sdl.audio
 
@@ -2266,10 +2252,10 @@ A _sample_ is a single number representing the intensity of an audio channel at 
 For audio with multiple channels, each point in time is represented by multiple samples (one per channel) that together make up a _frame_.
 The samples in a frame are arranged as follows:
 
-* For 1 channel (mono) a frame contains just the one sample.
-* For 2 channels (stereo) the frame contains two samples and the layout is: left, right. This means that the first sample corresponds to the left channel and the second sample corresponds to the right channel.
-* For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
-* For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
+- For 1 channel (mono) a frame contains just the one sample.
+- For 2 channels (stereo) the frame contains two samples and the layout is: left, right. This means that the first sample corresponds to the left channel and the second sample corresponds to the right channel.
+- For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
+- For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
 
 So for example, to play 3 seconds of a 440Hz sine wave, you could do:
 
@@ -2341,7 +2327,7 @@ String values used to represent how audio samples are stored in a Buffer.
 
 ### Event: 'deviceAdd'
 
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
 
 Fired when a new audio device becomes available.
 Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
@@ -2350,7 +2336,7 @@ Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devic
 
 ### Event: 'deviceRemove'
 
-* `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
 
 Fired when an existing audio device is removed.
 Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
@@ -2358,8 +2344,8 @@ When the `'deviceRemove'` event is emitted, all instances that were opened from 
 
 ### sdl.audio.bytesPerSample(format)
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The number of bytes.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- Returns: `<number>` The number of bytes.
 
 Helper function which maps each sample format to the corresponding number of bytes its samples take up.
 
@@ -2367,8 +2353,8 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.minSampleValue(format)
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The minimum sample value.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- Returns: `<number>` The minimum sample value.
 
 Helper function which maps each sample format to the corresponding minimum value its samples can take.
 
@@ -2376,8 +2362,8 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.maxSampleValue(format)
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The maximum sample value.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- Returns: `<number>` The maximum sample value.
 
 Helper function which maps each sample format to the corresponding maximum value its samples can take.
 
@@ -2385,8 +2371,8 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.zeroSampleValue(format)
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* Returns: `<number>` The zero sample value.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- Returns: `<number>` The zero sample value.
 
 Helper function which maps each sample format to the sample value that corresponds to silence.
 
@@ -2394,10 +2380,10 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.readSample(format, buffer[, offset])
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* `buffer: <Buffer>` The buffer to read the sample from.
-* `offset: <number>` The position from which to read the sample. Default: `0`
-* Returns: `<number>` The value of the sample read.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- `buffer: <Buffer>` The buffer to read the sample from.
+- `offset: <number>` The position from which to read the sample. Default: `0`
+- Returns: `<number>` The value of the sample read.
 
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
@@ -2406,11 +2392,11 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
-* `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
-* `buffer: <Buffer>` The buffer to write the sample to.
-* `value: <number>` The value of the sample to write.
-* `offset: <number>` The position at which to write the sample. Default: `0`
-* Returns: `<number>` The updated `offset`.
+- `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
+- `buffer: <Buffer>` The buffer to write the sample to.
+- `value: <number>` The value of the sample to write.
+- `offset: <number>` The position at which to write the sample. Default: `0`
+- Returns: `<number>` The updated `offset`.
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
 For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
@@ -2419,9 +2405,9 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.audio.devices
 
-* `<object>[]`
-  * `type: <string>` Either `'playback'` or `'recording'`.
-  * `name: <string>` The name of the device.
+- `<object>[]`
+  - `type: <string>` Either `'playback'` or `'recording'`.
+  - `name: <string>` The name of the device.
 
 A list of all the detected audio devices.
 Sample output for PulseAudio:
@@ -2442,15 +2428,15 @@ const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
 
 ### sdl.audio.openDevice(device[, options])
 
-* `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices), or a custom device.
-  * `type: <string>`: Either `'playback'` or `'recording'`.
-  * `name: <string>|<null>`: The name of the device. Optional.
-* `options: <object>`
-  * `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
-  * `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
-  * `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
-  * `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`. Default: `4096`
-* Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
+- `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices), or a custom device.
+  - `type: <string>`: Either `'playback'` or `'recording'`.
+  - `name: <string>|<null>`: The name of the device. Optional.
+- `options: <object>`
+  - `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
+  - `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
+  - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
+  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`. Default: `4096`
+- Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
 
 Initializes an audio device for playback/recording and returns a corresponding instance.
 If the opened device is a playback device, then it returns an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it returns an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
@@ -2478,7 +2464,6 @@ The `buffered` option specifies the "delay" between the application and the audi
 With smaller values you have smaller delays, but you also have to read/write data from/to the driver more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
 
-
 ## class AudioInstance
 
 The `AudioInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
@@ -2493,92 +2478,92 @@ Handle cleanup here.
 
 ### audioInstance.id
 
-* `<number>`
+- `<number>`
 
 A unique identifier for the instance.
 
 ### audioInstance.device
 
-* `<object>`
+- `<object>`
 
 The device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when the `audioInstance` was opened.
 
 ### audioInstance.channels
 
-* `<number>`
+- `<number>`
 
 The number of channels the instance was opened with.
 
 ### audioInstance.frequency
 
-* `<number>`
+- `<number>`
 
 The sampling frequency (in frames per second) the instance was opened with.
 
 ### audioInstance.format
 
-* [`<SampleFormat>`](#sample-formats)
+- [`<SampleFormat>`](#sample-formats)
 
 The audio sample format the instance was opened with.
 
 ### audioInstance.bytesPerSample
 
-* `<number>`
+- `<number>`
 
 The number of bytes that make up a single audio sample, based on the format the instance was opened with.
 
 ### audioInstance.minSampleValue
 
-* `<number>`
+- `<number>`
 
 The minimum value a sample can take, based on the format the instance was opened with.
 
 ### audioInstance.maxSampleValue
 
-* `<number>`
+- `<number>`
 
 The maximum value a sample can take, based on the format the instance was opened with.
 
 ### audioInstance.zeroSampleValue
 
-* `<number>`
+- `<number>`
 
 The sample value that corresponds to silence, based on the format the instance was opened with.
 
 ### audioInstance.readSample(buffer[, offset])
 
-* `buffer: <Buffer>` The buffer to read the sample from.
-* `offset: <number>` The position from which to read the sample. Default: `0`
-* Returns: `<number>` The value of the sample read.
+- `buffer: <Buffer>` The buffer to read the sample from.
+- `offset: <number>` The position from which to read the sample. Default: `0`
+- Returns: `<number>` The value of the sample read.
 
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
 ### audioInstance.writeSample(buffer, value[, offset])
 
-* `buffer: <Buffer>` The buffer to write the sample to.
-* `value: <number>` The value of the sample to write.
-* `offset: <number>` The position at which to write the sample. Default: `0`
-* Returns: `<number>` The updated `offset`.
+- `buffer: <Buffer>` The buffer to write the sample to.
+- `value: <number>` The value of the sample to write.
+- `offset: <number>` The position at which to write the sample. Default: `0`
+- Returns: `<number>` The updated `offset`.
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
 For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
 ### audioInstance.buffered
 
-* `<number>`
+- `<number>`
 
 The buffer size (in frames) the instance was opened with.
 
 ### audioInstance.playing
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the instance is currently playing.
 
 ### audioInstance.play([play])
 
-* `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
+- `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
 
 Starts or stops the instance.
 
@@ -2588,7 +2573,7 @@ Equivalent to [`audioInstance.play(false)`](#audioinstanceplayplay)
 
 ### audioInstance.queued
 
-* `<number>`
+- `<number>`
 
 The number of bytes that are currently queued up, waiting to be either played by the system or dequeued by the user.
 
@@ -2598,7 +2583,7 @@ Clears the queued data.
 
 ### audioInstance.closed
 
-* `<boolean>`
+- `<boolean>`
 
 Is `true` if the instance is closed.
 A closed instance object must not be used any further.
@@ -2607,7 +2592,6 @@ A closed instance object must not be used any further.
 
 Closes the instance.
 
-
 ## class AudioPlaybackInstance extends AudioInstance
 
 The `AudioPlaybackInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
@@ -2615,11 +2599,10 @@ Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevic
 
 ### playbackInstance.enqueue(buffer[, bytes])
 
-* `buffer: <Buffer>` The buffer to read data from.
-* `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
+- `buffer: <Buffer>` The buffer to read data from.
+- `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
 
 Takes the audio data that you have written to the buffer, and writes it to the queue, from where it will be played back as audio.
-
 
 ## class AudioRecordingInstance extends AudioInstance
 
@@ -2628,12 +2611,11 @@ Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevic
 
 ### recordingInstance.dequeue(buffer[, bytes])
 
-* `buffer: <Buffer>` The buffer to write data to.
-* `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
-* Returns: `<number>` The actual number of bytes read.
+- `buffer: <Buffer>` The buffer to write data to.
+- `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
+- Returns: `<number>` The actual number of bytes read.
 
 Takes recorded audio data that has is waiting on the queue, and writes it to the provided buffer.
-
 
 ## sdl.clipboard
 
@@ -2646,28 +2628,26 @@ Check [`sdl.clipboard.text`](#sdlclipboardtext) to get the new contents of the c
 
 ### sdl.clipboard.text
 
-* `<string>`
+- `<string>`
 
 The current text value on the clipboard.
 
 ### sdl.clipboard.setText(text)
 
-* `text: <string>` The new value to save on the clipboard.
+- `text: <string>` The new value to save on the clipboard.
 
 Changes the text contents of the clipboard.
-
 
 ## sdl.power
 
 ### sdl.power.info
 
-* `<object>`
-  * `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determinded.
-  * `seconds: <number>|<null>` Seconds of battery life left, or `null` if not running on battery or if it can't be determinded.
-  * `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determinded.
+- `<object>`
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determinded.
+  - `seconds: <number>|<null>` Seconds of battery life left, or `null` if not running on battery or if it can't be determinded.
+  - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determinded.
 
 The curent power information of the device.
-
 
 ## Helpers
 
@@ -2686,13 +2666,12 @@ For an example of their use see [this example](https://github.com/kmamal/node-sd
 
 The functions included in `@kmamal/sdl/helpers` are:
 
-* [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
-* [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
-* [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
-* [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
-* [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
-* [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
-
+- [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
+- [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
+- [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
+- [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
+- [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
+- [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
 
 ## Building from source
 
@@ -2714,11 +2693,11 @@ You need to have `cmake` installed for that to work.
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package.
 There are some npm scripts in `package.json` that could be of use to you:
 
-* `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
-* `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
-* `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
-* `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
-* `NODE_SDL_FROM_SOURCE=1 npm install` runs the install script normally, but skips the inital attempt to download the binaries, and goes straight to building from source.
+- `npm run clean` deletes all folders that are created during the build, as well as `node_modules`.
+- `npm run download-release` downloads the prebuilt binaries. This is the first thing the install script tries to do.
+- `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
+- `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
+- `NODE_SDL_FROM_SOURCE=1 npm install` runs the install script normally, but skips the inital attempt to download the binaries, and goes straight to building from source.
 
 The SDL headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
 
