@@ -328,6 +328,14 @@ export namespace Sdl {
 				readonly current: string
 			}
 		}
+		readonly initialized: {
+			video: boolean
+			audio: boolean
+			joystick: boolean
+			controller: boolean
+			haptic: boolean
+			sensor: boolean
+		}
 	}
 
 	export namespace Video {

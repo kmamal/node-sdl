@@ -167,8 +167,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	joystick::hat_positions[SDL_HAT_LEFTUP] = "leftup";
 	joystick::hat_positions[SDL_HAT_LEFTDOWN] = "leftdown";
 
-	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
-
 	// controller::types[SDL_CONTROLLER_TYPE_UNKNOWN] = nullptr;
 	controller::types[SDL_CONTROLLER_TYPE_XBOX360] = "xbox360";
 	controller::types[SDL_CONTROLLER_TYPE_XBOXONE] = "xboxOne";
@@ -237,15 +235,11 @@ global::initialize(const Napi::CallbackInfo &info)
 	power::states[SDL_POWERSTATE_CHARGED] = "charged";
 
 
+	Napi::Object initialized = Napi::Object::New(env);
+
 	SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
 
-	if (SDL_Init(0
-		| SDL_INIT_EVENTS
-		| SDL_INIT_JOYSTICK
-		| SDL_INIT_GAMECONTROLLER
-		| SDL_INIT_HAPTIC
-		| SDL_INIT_SENSOR
-	) < 0) {
+	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0) {
 		std::ostringstream message;
 		message << "SDL_Init() error: " << SDL_GetError();
 		SDL_ClearError();
@@ -272,7 +266,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	versions.Set("compile", compile_version);
 	versions.Set("runtime", runtime_version);
 
-	const char *platform_name = SDL_GetPlatform();
+	const char *platform = SDL_GetPlatform();
 
 	Napi::Array all_video_drivers = Napi::Array::New(env);
 
@@ -304,9 +298,11 @@ global::initialize(const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 		current_video_driver = Napi::String::New(env, name);
+		initialized.Set("video", true);
 	}
 	else {
 		current_video_driver = env.Null();
+		initialized.Set("video", false);
 	}
 
 	Napi::Object video_drivers = Napi::Object::New(env);
@@ -344,9 +340,11 @@ global::initialize(const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 		current_audio_driver = Napi::String::New(env, name);
+		initialized.Set("audio", true);
 	}
 	else {
 		current_audio_driver = env.Null();
+		initialized.Set("audio", false);
 	}
 
 	Napi::Object audio_drivers = Napi::Object::New(env);
@@ -356,6 +354,11 @@ global::initialize(const Napi::CallbackInfo &info)
 	Napi::Object drivers = Napi::Object::New(env);
 	drivers.Set("video", video_drivers);
 	drivers.Set("audio", audio_drivers);
+
+	initialized.Set("joystick", SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0);
+	initialized.Set("controller", SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0);
+	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
+	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR) == 0);
 
 	SDL_ClearError();
 	global::no_error = SDL_GetError();
@@ -370,10 +373,13 @@ global::initialize(const Napi::CallbackInfo &info)
 	reenableInertialScrolling();
 #endif
 
+	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
+
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("version", versions);
-	result.Set("platform", platform_name);
+	result.Set("platform", platform);
 	result.Set("drivers", drivers);
+	result.Set("initialized", initialized);
 
 	return result;
 }

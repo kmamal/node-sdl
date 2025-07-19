@@ -6,10 +6,9 @@ import * as Tar from 'tar'
 
 const url = `https://github.com/${C.sdl.owner}/${C.sdl.repo}/releases/download/v${C.sdl.version}/${C.sdl.assetName}`
 
-console.log("fetch", url)
 try {
+	console.log("fetch", url)
 	const response = await fetch(url)
-
 
 	console.log("unpack to", C.dir.sdl)
 	await Fs.promises.rm(C.dir.sdl, { recursive: true }).catch(() => {})
@@ -17,7 +16,8 @@ try {
 	const tar = Tar.extract({ gzip: true, C: C.dir.sdl })
 	response.stream().pipe(tar)
 	await once(tar, 'finish')
-} catch (error) {
+}
+catch (error) {
 	console.log(error)
 	throw error
 }

@@ -383,6 +383,13 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     * `audio: <object>`
       * `all: <string>[]` A list of all audio drivers.
       * `current: <string>|<null>` The audio driver that is currently selected.
+  * `initialized: <object>`
+    * `video: <boolean>`: Is `true` if the video subsystem was sucessfully initialized, or `false` otherwise.
+    * `audio: <boolean>`: Is `true` if the audio subsystem was sucessfully initialized, or `false` otherwise.
+    * `joystick: <boolean>`: Is `true` if the joystick subsystem was sucessfully initialized, or `false` otherwise.
+    * `controller: <boolean>`: Is `true` if the controller subsystem was sucessfully initialized, or `false` otherwise.
+    * `haptic: <boolean>`: Is `true` if the haptic subsystem was sucessfully initialized, or `false` otherwise.
+    * `sensor: <boolean>`: Is `true` if the sensor subsystem was sucessfully initialized, or `false` otherwise.
 
 The `sdl.info` object is filled with information produced during the initialization of SDL.
 All the values remain constant throughout the execution of the program.
@@ -410,6 +417,14 @@ Sample data for Ubuntu:
       all: [ 'pulseaudio', 'alsa', 'sndio', 'dsp', 'disk', 'dummy' ],
       current: 'pulseaudio',
     },
+  },
+  initialized: {
+    video: true,
+    audio: true,
+    joystick: true,
+    controller: true,
+    haptic: true,
+    sensor: true,
   },
 }
 ```
