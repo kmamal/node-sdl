@@ -8,6 +8,7 @@ const validEvents = [
 	'buttonDown',
 	'buttonUp',
 	'hatMotion',
+	'powerUpdate',
 	'close',
 ]
 
@@ -28,6 +29,7 @@ class JoystickInstance extends EventsViaPoll {
 		this._balls = result.balls
 		this._buttons = result.buttons
 		this._hats = result.hats
+		this._power = result.power
 
 		this._device = device
 
@@ -68,7 +70,7 @@ class JoystickInstance extends EventsViaPoll {
 		return this._hats
 	}
 
-	get power () { return Bindings.joystick_getPower(this._device.id) }
+	get power () { return this._power }
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }

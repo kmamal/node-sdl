@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.11] - 2025-07-21
+
+### Added
+
+- The `powerUpdate` event lets you know when a joystick or controller's power level has changed.
+- The `steamHandleUpdate` event lets you know when a controller's Steam handle has changed.
+- The `keymapChanged` event lets you know when the keyboard layout has changed.
+
 ## [v0.11.10] - 2025-07-19
 
 ### Changed
@@ -32,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Started keeping this changelog.
 
-[unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.10...HEAD
+[unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.11...HEAD
+[v0.11.11]: https://github.com/kmamal/node-sdl/compare/v0.11.10...v0.11.11
 [v0.11.10]: https://github.com/kmamal/node-sdl/compare/v0.11.9...v0.11.10
 [v0.11.9]: https://github.com/kmamal/node-sdl/compare/v0.11.8...v0.11.9
 [v0.11.8]: https://github.com/kmamal/node-sdl/compare/v0.11.7...v0.11.8

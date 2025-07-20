@@ -61,6 +61,8 @@ std::string events::types::BUTTON_DOWN;
 std::string events::types::BUTTON_UP;
 std::string events::types::BALL_MOTION;
 std::string events::types::HAT_MOTION;
+std::string events::types::POWER_UPDATE;
+std::string events::types::STEAM_HANDLE_UPDATE;
 std::string events::types::REMAP;
 std::string events::types::UPDATE;
 
@@ -237,7 +239,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::TEXT_INPUT);
 			packed.Set("windowId", event.text.windowID);
 			packed.Set("text", event.text.text);
-			break ;
+			break;
 		}
 
 		case SDL_MOUSEMOTION: {
@@ -312,7 +314,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("joystickId", joystick_id);
 			packed.Set("axis", event.jaxis.axis);
 			packed.Set("value", joystick::mapAxisValue(joystick, event.jaxis.axis, event.jaxis.value));
-			break ;
+			break;
 		}
 		case SDL_JOYBALLMOTION: {
 			packed.Set("family", events::families::JOYSTICK);
@@ -321,7 +323,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("ball", event.jball.ball);
 			packed.Set("x", event.jball.xrel);
 			packed.Set("y", event.jball.yrel);
-			break ;
+			break;
 		}
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP: {
@@ -334,7 +336,7 @@ events::dispatchEvent(const SDL_Event &event)
 			);
 			packed.Set("joystickId", event.jbutton.which);
 			packed.Set("button", event.jbutton.button);
-			break ;
+			break;
 		}
 		case SDL_JOYHATMOTION: {
 			packed.Set("family", events::families::JOYSTICK);
@@ -342,7 +344,33 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("joystickId", event.jhat.which);
 			packed.Set("hat", event.jhat.hat);
 			packed.Set("value", joystick::hat_positions[event.jhat.value]);
-			break ;
+			break;
+		}
+
+		case SDL_JOYBATTERYUPDATED: {
+			packed.Set("family", events::families::JOYSTICK);
+			packed.Set("type", events::types::POWER_UPDATE);
+			packed.Set("joystickId", event.jbattery.which);
+			packed.Set("power", joystick::mapPowerLevel(env, event.jbattery.level));
+			break;
+		}
+
+		case SDL_CONTROLLERSTEAMHANDLEUPDATED: {
+			packed.Set("family", events::families::CONTROLLER);
+			packed.Set("type", events::types::REMAP);
+
+			SDL_JoystickID controller_id = event.cdevice.which;
+			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
+			if (controller == nullptr) {
+				std::ostringstream message;
+				message << "SDL_GameControllerFromInstanceID(" << controller_id << ") error: " << SDL_GetError();
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
+
+			packed.Set("controllerId", controller_id);
+			packed.Set("steamHandle", controller::getSteamHandle(env, controller));
+			break;
 		}
 
 		case SDL_CONTROLLERDEVICEREMAPPED: {

@@ -92,6 +92,8 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::BUTTON_UP = "buttonUp";
 	events::types::BALL_MOTION = "ballMotion";
 	events::types::HAT_MOTION = "hatMotion";
+	events::types::POWER_UPDATE = "powerUpdate";
+	events::types::STEAM_HANDLE_UPDATE = "steamHandleUpdate";
 	events::types::REMAP = "remap";
 	events::types::UPDATE = "update";
 

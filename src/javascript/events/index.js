@@ -238,6 +238,21 @@ const handleEvent = (event) => {
 					}
 				} break
 
+				case 'powerUpdate': {
+					for (const joystickInstance of collection) {
+						joystickInstance._power = event.power
+						joystickInstance.emit(type, event)
+					}
+
+					const otherCollection = Globals.controllerInstances.byId.get(joystickId)
+					if (!otherCollection) { break }
+
+					for (const controllerInstance of otherCollection) {
+						controllerInstance._power = event.power
+						controllerInstance.emit(type, event)
+					}
+				} break
+
 				// No default
 			}
 		} break
@@ -267,6 +282,13 @@ const handleEvent = (event) => {
 				case 'buttonUp': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._buttons[event.button] = false
+						controllerInstance.emit(type, event)
+					}
+				} break
+
+				case 'steamHandleUpdate': {
+					for (const controllerInstance of collection.values()) {
+						controllerInstance._steamHandle = event.steamHandle
 						controllerInstance.emit(type, event)
 					}
 				} break

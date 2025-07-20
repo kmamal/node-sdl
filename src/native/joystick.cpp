@@ -146,6 +146,21 @@ joystick::_getDevices (Napi::Env &env)
 	return devices;
 }
 
+Napi::Value
+joystick::getPowerLevel (Napi::Env &env, SDL_Joystick *joystick)
+{
+	SDL_JoystickPowerLevel power = SDL_JoystickCurrentPowerLevel(joystick);
+	return mapPowerLevel(env, power);
+}
+
+Napi::Value
+joystick::mapPowerLevel (Napi::Env &env, SDL_JoystickPowerLevel power)
+{
+	return power != SDL_JOYSTICK_POWER_UNKNOWN
+		? Napi::String::New(env, joystick::power_levels[power])
+		: env.Null();
+}
+
 
 Napi::Value
 joystick::getDevices(const Napi::CallbackInfo &info)
@@ -267,6 +282,8 @@ joystick::open (const Napi::CallbackInfo &info)
 		hats.Set(i, joystick::hat_positions[hat_position]);
 	}
 
+	Napi::Value power = getPowerLevel(env, joystick);
+
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("firmwareVersion", firmware_version);
 	result.Set("serialNumber", serial_number);
@@ -277,29 +294,9 @@ joystick::open (const Napi::CallbackInfo &info)
 	result.Set("balls", balls);
 	result.Set("buttons", buttons);
 	result.Set("hats", hats);
+	result.Set("power", power);
 
 	return result;
-}
-
-Napi::Value
-joystick::getPower (const Napi::CallbackInfo &info)
-{
-	Napi::Env env = info.Env();
-
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
-
-	SDL_Joystick *joystick = SDL_JoystickFromInstanceID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_JoystickFromInstanceID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	SDL_JoystickPowerLevel power_level = SDL_JoystickCurrentPowerLevel(joystick);
-	if (power_level == SDL_JOYSTICK_POWER_UNKNOWN) { return env.Null(); }
-
-	return Napi::String::New(env, joystick::power_levels[power_level]);
 }
 
 Napi::Value

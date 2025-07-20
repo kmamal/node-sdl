@@ -15,6 +15,7 @@ namespace controller {
 	double mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis);
 	double mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis axis, int value);
 	void getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst);
+	Napi::Value getSteamHandle(Napi::Env &env, SDL_GameController *controller);
 
 	Napi::Value addMappings(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);

@@ -6,6 +6,8 @@ const validEvents = [
 	'axisMotion',
 	'buttonDown',
 	'buttonUp',
+	'powerUpdate',
+	'steamHandleUpdate',
 	'remap',
 	'close',
 ]
@@ -24,6 +26,7 @@ class ControllerInstance extends EventsViaPoll {
 		this._hasRumble = result.hasRumble
 		this._hasRumbleTriggers = result.hasRumbleTriggers
 		this._steamHandle = result.steamHandle
+		this._power = result.power
 		this._axes = result.axes
 		this._buttons = result.buttons
 
@@ -57,7 +60,7 @@ class ControllerInstance extends EventsViaPoll {
 		return this._buttons
 	}
 
-	get power () { return Bindings.joystick_getPower(this._device.id) }
+	get power () { return this._power }
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }

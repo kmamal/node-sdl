@@ -62,7 +62,6 @@ init (Napi::Env env, Napi::Object exports)
 
 	exports.Set("joystick_getDevices", Napi::Function::New<joystick::getDevices>(env));
 	exports.Set("joystick_open", Napi::Function::New<joystick::open>(env));
-	exports.Set("joystick_getPower", Napi::Function::New<joystick::getPower>(env));
 	exports.Set("joystick_setLed", Napi::Function::New<joystick::setLed>(env));
 	exports.Set("joystick_setPlayer", Napi::Function::New<joystick::setPlayer>(env));
 	exports.Set("joystick_rumble", Napi::Function::New<joystick::rumble>(env));

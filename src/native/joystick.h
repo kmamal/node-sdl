@@ -16,10 +16,11 @@ namespace joystick {
 	double mapAxis (SDL_Joystick *joystick, int axis);
 	double mapAxisValue (SDL_Joystick *joystick, int axis, int value);
 	Napi::Array _getDevices (Napi::Env &env);
+	Napi::Value getPowerLevel(Napi::Env &env, SDL_Joystick *joystick);
+	Napi::Value mapPowerLevel(Napi::Env &env, SDL_JoystickPowerLevel power);
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);
-	Napi::Value getPower(const Napi::CallbackInfo &info);
 	Napi::Value setLed(const Napi::CallbackInfo &info);
 	Napi::Value setPlayer(const Napi::CallbackInfo &info);
 	Napi::Value rumble(const Napi::CallbackInfo &info);

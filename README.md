@@ -254,6 +254,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     - [Event: 'buttonDown'](#joystick-instance-event-buttondown)
     - [Event: 'buttonUp'](#joystick-instance-event-buttonup)
     - [Event: 'hatMotion'](#event-hatmotion)
+    - [Event: 'powerUpdate'](#joystick-instance-event-power-update)
     - [Event: 'close'](#joystick-instance-event-close)
     - [joystickInstance.device](#joystickinstancedevice)
     - [joystickInstance.firmwareVersion](#joystickinstancefirmwareversion)
@@ -285,6 +286,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     - [Event: 'axisMotion'](#controller-instance-event-axismotion)
     - [Event: 'buttonDown'](#controller-instance-event-buttondown)
     - [Event: 'buttonUp'](#controller-instance-event-buttonup)
+    - [Event: 'powerUpdate'](#controller-instance-event-power-update)
+    - [Event: 'steamHandleUpdate'](#event-steamhandleupdate)
     - [Event: 'remap'](#event-remap)
     - [Event: 'close'](#controller-instance-event-close)
     - [controllerInstance.device](#controllerinstancedevice)
@@ -1717,6 +1720,14 @@ Fired when one of the joystick's buttons is released.
 
 Fired when one of the joystick's hats is moved.
 
+<a id="joystick-instance-event-power-update"></a>
+
+### Event: 'powerUpdate'
+
+- `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
+
+Fired when the joystick's [power level](#controllerinstancepower) changes.
+
 <a id="joystick-instance-event-close"></a>
 
 ### Event: 'close'
@@ -1989,6 +2000,20 @@ Fired when one of the controller's buttons is pressed.
 - `button: <number>` The index of the button that was released.
 
 Fired when one of the controller's buttons is released.
+
+<a id="controller-instance-event-power-update"></a>
+
+### Event: 'powerUpdate'
+
+- `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
+
+Fired when the controller's [power level](#controllerinstancepowerlevel) changes.
+
+### Event: 'steamHandleUpdate'
+
+- `steamHandle: <Buffer>|<null>` The new steam handle.
+
+Fired when the controller's [`steamHandle`](#controllerinstancesteamhandle) changes.
 
 ### Event: 'remap'
 

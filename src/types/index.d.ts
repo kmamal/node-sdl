@@ -185,6 +185,11 @@ export namespace Events {
 			readonly value: Sdl.Joystick.HatPosition
 		}
 
+		export interface PowerUpdate extends JoystickEvent {
+			readonly type: 'powerUpdate'
+			readonly power: Sdl.Joystick.PowerLevel | null
+		}
+
 		export interface Close extends JoystickEvent { readonly type: 'close' }
 
 		export type Any
@@ -193,6 +198,7 @@ export namespace Events {
 			| ButtonDown
 			| ButtonUp
 			| HatMotion
+			| PowerUpdate
 			| Close
 
 	}
@@ -227,6 +233,16 @@ export namespace Events {
 		export interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
 		export interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
+		export interface PowerUpdate extends ControllerEvent {
+			readonly type: 'powerUpdate'
+			readonly power: Sdl.Joystick.PowerLevel | null
+		}
+
+		export interface SteamHandleUpdate extends ControllerEvent {
+			readonly type: 'steamHandleUpdate'
+			readonly steamHandle: Buffer | null
+		}
+
 		export interface Remap extends ControllerEvent { readonly type: 'remap' }
 
 		export interface Close extends ControllerEvent { readonly type: 'close' }
@@ -235,6 +251,8 @@ export namespace Events {
 			= AxisMotion
 			| ButtonDown
 			| ButtonUp
+			| PowerUpdate
+			| SteamHandleUpdate
 			| Remap
 			| Close
 
@@ -926,6 +944,7 @@ export namespace Sdl {
 			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Joystick.ButtonUp) => void): this
 			on (event: 'hatMotion', listener: (event: Events.Joystick.HatMotion) => void): this
+			on (event: 'powerUpdate', listener: (event: Events.Joystick.PowerUpdate) => void): this
 			on (event: 'close', listener: (event: Events.Joystick.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Joystick.Any) => void): this
 
@@ -1034,6 +1053,8 @@ export namespace Sdl {
 			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
+			on (event: 'powerUpdate', listener: (event: Events.Controller.PowerUpdate) => void): this
+			on (event: 'steamHandleUpdate', listener: (event: Events.Controller.SteamHandleUpdate) => void): this
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
 			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Controller.Any) => void): this

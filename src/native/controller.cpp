@@ -29,6 +29,15 @@ controller::mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis
 	return value / range;
 }
 
+Napi::Value
+controller::getSteamHandle (Napi::Env &env, SDL_GameController *controller)
+{
+	Uint64 _steam_handle = SDL_GameControllerGetSteamHandle(controller);
+	return _steam_handle != 0
+		? Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1)
+		: env.Null();
+}
+
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)
 {
@@ -132,7 +141,7 @@ controller::open (const Napi::CallbackInfo &info)
 	int _firmware_version = SDL_GameControllerGetFirmwareVersion(controller);
 	Napi::Value firmware_version = _firmware_version != 0
 		? Napi::Number::New(env, _firmware_version)
-		: env.Null() ;
+		: env.Null();
 
 	const char *_serial_number = SDL_GameControllerGetSerial(controller);
 	Napi::Value serial_number = _serial_number != nullptr
@@ -143,10 +152,10 @@ controller::open (const Napi::CallbackInfo &info)
 	bool has_rumble = SDL_GameControllerHasRumble(controller);
 	bool has_rumble_triggers = SDL_GameControllerHasRumbleTriggers(controller);
 
-	Uint64 _steam_handle = SDL_GameControllerGetSteamHandle(controller);
-	Napi::Value steam_handle = _steam_handle != 0
-		? Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1)
-		: env.Null();
+	Napi::Value steam_handle = getSteamHandle(env, controller);
+
+	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
+	Napi::Value power = joystick::getPowerLevel(env, joystick);
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("firmwareVersion", firmware_version);
@@ -155,6 +164,7 @@ controller::open (const Napi::CallbackInfo &info)
 	result.Set("hasRumble", has_rumble);
 	result.Set("hasRumbleTriggers", has_rumble_triggers);
 	result.Set("steamHandle", steam_handle);
+	result.Set("power", power);
 
 	controller::getState(env, controller, result);
 

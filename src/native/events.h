@@ -61,6 +61,8 @@ namespace events {
 		extern std::string BUTTON_UP;
 		extern std::string BALL_MOTION;
 		extern std::string HAT_MOTION;
+		extern std::string POWER_UPDATE;
+		extern std::string STEAM_HANDLE_UPDATE;
 		extern std::string REMAP;
 		extern std::string UPDATE;
 	};
