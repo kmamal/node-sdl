@@ -2,6 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { video: videoModule } = require('../video')
 const { reconcileDisplays } = require('./reconcile-displays')
+const { keyboard: keyboardModule } = require('../keyboard')
 const { mapping } = require('../keyboard/key-mapping')
 const { reconcileAudioDevices } = require('./reconcile-audio-devices')
 const { reconcileJoystickAndControllerDevices } = require('./reconcile-joystick-and-controller-devices')
@@ -139,6 +140,10 @@ const handleEvent = (event) => {
 			}
 
 			window.emit(type, event)
+		} break
+
+		case 'keymap': {
+			keyboardModule.emit(type, event)
 		} break
 
 		case 'keyboard': {

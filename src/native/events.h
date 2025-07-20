@@ -12,6 +12,7 @@ namespace events {
 		extern std::string DISPLAY;
 		extern std::string WINDOW;
 		extern std::string DROP;
+		extern std::string KEYMAP;
 		extern std::string KEYBOARD;
 		extern std::string TEXT;
 		extern std::string MOUSE;
@@ -54,6 +55,7 @@ namespace events {
 		extern std::string DROP_FILE;
 		extern std::string DROP_TEXT;
 		extern std::string CLOSE;
+		extern std::string KEYMAP_CHANGE;
 		extern std::string DEVICE_ADD;
 		extern std::string DEVICE_REMOVE;
 		extern std::string AXIS_MOTION;

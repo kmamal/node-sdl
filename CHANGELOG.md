@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `powerUpdate` event lets you know when a joystick or controller's power level has changed.
 - The `steamHandleUpdate` event lets you know when a controller's Steam handle has changed.
-- The `keymapChanged` event lets you know when the keyboard layout has changed.
+- The `keymapChange` event lets you know when the keyboard layout has changed.
 
 ## [v0.11.10] - 2025-07-19
 

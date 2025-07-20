@@ -45,6 +45,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::families::DISPLAY = "display";
 	events::families::WINDOW = "window";
 	events::families::DROP = "drop";
+	events::families::KEYMAP = "keymap";
 	events::families::KEYBOARD = "keyboard";
 	events::families::TEXT = "text";
 	events::families::MOUSE = "mouse";
@@ -85,6 +86,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::DROP_FILE = "dropFile";
 	events::types::DROP_TEXT = "dropText";
 	events::types::CLOSE = "close";
+	events::types::KEYMAP_CHANGE = "keymapChange";
 	events::types::DEVICE_ADD = "deviceAdd";
 	events::types::DEVICE_REMOVE = "deviceRemove";
 	events::types::AXIS_MOTION = "axisMotion";

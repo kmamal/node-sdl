@@ -14,6 +14,7 @@ std::string events::families::APP;
 std::string events::families::DISPLAY;
 std::string events::families::WINDOW;
 std::string events::families::DROP;
+std::string events::families::KEYMAP;
 std::string events::families::KEYBOARD;
 std::string events::families::TEXT;
 std::string events::families::MOUSE;
@@ -54,6 +55,7 @@ std::string events::types::DROP_COMPLETE;
 std::string events::types::DROP_FILE;
 std::string events::types::DROP_TEXT;
 std::string events::types::CLOSE;
+std::string events::types::KEYMAP_CHANGE;
 std::string events::types::DEVICE_ADD;
 std::string events::types::DEVICE_REMOVE;
 std::string events::types::AXIS_MOTION;
@@ -239,6 +241,12 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::TEXT_INPUT);
 			packed.Set("windowId", event.text.windowID);
 			packed.Set("text", event.text.text);
+			break;
+		}
+
+		case SDL_KEYMAPCHANGED: {
+			packed.Set("family", events::families::KEYMAP);
+			packed.Set("type", events::types::KEYMAP_CHANGE);
 			break;
 		}
 

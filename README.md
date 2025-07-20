@@ -225,6 +225,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
 - [sdl.keyboard](#sdlkeyboard)
   - [Virtual keys](#virtual-keys)
   - [Enum: SCANCODE](#enum-scancode)
+  - [Event: 'keymapChange'](#event-keymapchange)
   - [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
   - [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
   - [sdl.keyboard.getState()](#sdlkeyboardgetstate)
@@ -1451,6 +1452,12 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
   | `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD`   | `SDL_SCANCODE_AUDIOFASTFORWARD`   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 </details>
+
+### Event: 'keymapChange'
+
+Fired when the keymap changes due to a system event such as an input language or keyboard layout change.
+After this event, the correspondance between physical and logical keys might have changed.
+You should assume that any previous result you have gotten from [`getKey()`](#sdlkeyboardgetkeyscancode) or [`getScancode()`](#sdlkeyboardgetscancodekey) are not invalid.
 
 ### sdl.keyboard.getKey(scancode)
 

@@ -155,6 +155,17 @@ export namespace Events {
 
 	}
 
+	export namespace Keyboard {
+
+		interface KeyboardEvent extends BaseEvent {}
+
+		export interface KeymapChange extends KeyboardEvent { readonly type: 'keymapChange' }
+
+		export type Any
+			= KeymapChange
+
+	}
+
 	export namespace Joystick {
 
 		interface JoystickEvent extends BaseEvent {}
@@ -831,6 +842,8 @@ export namespace Sdl {
 
 		interface Module {
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
+
+			on (event: 'keymapChange', listener: (event: Events.Keyboard.KeymapChange) => void): this
 
 			getKey (scancode: Scancode): Key | null
 			getScancode (key: Key): Scancode | null
