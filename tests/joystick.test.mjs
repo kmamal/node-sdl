@@ -1,31 +1,31 @@
 import E from '@kmamal/evdev'
-
-const virtualJoystick = E.uinput.createDevice({
-	name: 'Emulated Joystick',
-	events: [
-		{
-			type: E.EV_KEY,
-			codes: [ E.BTN_A, E.BTN_B, E.BTN_X, E.BTN_Y ],
-		},
-		{
-			type: E.EV_ABS,
-			codes: [
-				{ code: E.ABS_X, min: -100, max: +100 },
-				{ code: E.ABS_Y, min: -100, max: +100 },
-			],
-		},
-	],
-})
-
-
-await new Promise((resolve) => { setTimeout(resolve, 3e3) })
-
-
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
 
-T.test("sdl::joystick", (t) => {
+T.test("sdl::joystick", async (t) => {
+	t.timeout(3e3)
+
 	t.ok(Array.isArray(sdl.joystick.devices))
+
+	t.equal(sdl.joystick.devices.length, 0)
+
+	const virtualJoystick = E.uinput.createDevice({
+		name: 'Emulated Joystick',
+		events: [
+			{
+				type: E.EV_KEY,
+				codes: [ E.BTN_A, E.BTN_B, E.BTN_X, E.BTN_Y ],
+			},
+			{
+				type: E.EV_ABS,
+				codes: [
+					{ code: E.ABS_X, min: -100, max: +100 },
+					{ code: E.ABS_Y, min: -100, max: +100 },
+				],
+			},
+		],
+	})
+	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
 
 	t.equal(sdl.joystick.devices.length, 1)
 
@@ -58,7 +58,7 @@ T.test("sdl::joystick", (t) => {
 	}
 
 	t.ok(Array.isArray(instance.buttons))
-	t.equal(instance.buttons.length, 2)
+	t.equal(instance.buttons.length, 4)
 	for (const button of instance.buttons) {
 		t.equal(typeof button, 'boolean')
 	}
@@ -74,4 +74,5 @@ T.test("sdl::joystick", (t) => {
 	t.equal(instance.closed, true)
 
 	virtualJoystick.destroy()
+	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
 })

@@ -6,6 +6,7 @@ module.exports = {
 		focused: null,
 		hovered: null,
 	},
+	touchDevices: null,
 	joystickDevices: [],
 	joystickInstances: {
 		all: new Set(),

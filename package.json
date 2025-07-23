@@ -5,6 +5,7 @@
   "keywords": [
     "sdl",
     "sdl2",
+    "game",
     "gui",
     "desktop",
     "canvas",
@@ -14,9 +15,10 @@
     "window",
     "screen",
     "video",
-    "input",
-    "mouse",
     "keyboard",
+    "mouse",
+    "touch",
+    "multitouch",
     "joystick",
     "controller",
     "gamepad",
@@ -26,10 +28,12 @@
     "speaker",
     "microphone",
     "mic",
+    "sensor",
+    "accelerometer",
+    "gyroscope",
     "clipboard",
     "power",
-    "battery",
-    "game"
+    "battery"
   ],
   "license": "MIT",
   "repository": {
@@ -63,9 +67,9 @@
     "tar": "^7.4.3"
   },
   "devDependencies": {
-    "@kmamal/evdev": "^0.0.2",
-    "@kmamal/testing": "^0.0.31",
-    "@types/node": "^24.0.15",
+    "@kmamal/evdev": "^0.0.6",
+    "@kmamal/testing": "^0.0.33",
+    "@types/node": "^24.1.0",
     "node-addon-api": "^8.5.0",
     "node-gyp": "^11.2.0"
   },

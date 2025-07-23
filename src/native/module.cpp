@@ -7,6 +7,7 @@
 #include "window.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "touch.h"
 #include "joystick.h"
 #include "controller.h"
 #include "sensor.h"
@@ -59,6 +60,8 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("mouse_setCursorImage", Napi::Function::New<mouse::setCursorImage>(env));
 	exports.Set("mouse_showCursor", Napi::Function::New<mouse::showCursor>(env));
 	exports.Set("mouse_redrawCursor", Napi::Function::New<mouse::redrawCursor>(env));
+
+	exports.Set("touch_getDevices", Napi::Function::New<touch::getDevices>(env));
 
 	exports.Set("joystick_getDevices", Napi::Function::New<joystick::getDevices>(env));
 	exports.Set("joystick_open", Napi::Function::New<joystick::open>(env));

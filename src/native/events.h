@@ -16,6 +16,7 @@ namespace events {
 		extern std::string KEYBOARD;
 		extern std::string TEXT;
 		extern std::string MOUSE;
+		extern std::string TOUCH;
 		extern std::string JOYSTICK_DEVICE;
 		extern std::string JOYSTICK;
 		extern std::string CONTROLLER;
@@ -56,6 +57,9 @@ namespace events {
 		extern std::string DROP_TEXT;
 		extern std::string CLOSE;
 		extern std::string KEYMAP_CHANGE;
+		extern std::string FINGER_DOWN;
+		extern std::string FINGER_UP;
+		extern std::string FINGER_MOVE;
 		extern std::string DEVICE_ADD;
 		extern std::string DEVICE_REMOVE;
 		extern std::string AXIS_MOTION;

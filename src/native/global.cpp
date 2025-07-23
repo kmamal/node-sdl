@@ -2,6 +2,7 @@
 #include "events.h"
 #include "keyboard.h"
 #include "video.h"
+#include "touch.h"
 #include "joystick.h"
 #include "controller.h"
 #include "sensor.h"
@@ -49,6 +50,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::families::KEYBOARD = "keyboard";
 	events::families::TEXT = "text";
 	events::families::MOUSE = "mouse";
+	events::families::TOUCH = "touch";
 	events::families::JOYSTICK_DEVICE = "joystickDevice";
 	events::families::JOYSTICK = "joystick";
 	events::families::CONTROLLER = "controller";
@@ -87,6 +89,9 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::DROP_TEXT = "dropText";
 	events::types::CLOSE = "close";
 	events::types::KEYMAP_CHANGE = "keymapChange";
+	events::types::FINGER_DOWN = "fingerDown";
+	events::types::FINGER_UP = "fingerUp";
+	events::types::FINGER_MOVE = "fingerMove";
 	events::types::DEVICE_ADD = "deviceAdd";
 	events::types::DEVICE_REMOVE = "deviceRemove";
 	events::types::AXIS_MOTION = "axisMotion";
@@ -141,6 +146,11 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::formats[SDL_PIXELFORMAT_YVYU] = "yvyu";
 	video::formats[SDL_PIXELFORMAT_NV12] = "nv12";
 	video::formats[SDL_PIXELFORMAT_NV21] = "nv21";
+
+	// touch::device_types[SDL_TOUCH_DEVICE_INVALID] = nullptr;
+	touch::device_types[SDL_TOUCH_DEVICE_DIRECT] = "direct";
+	touch::device_types[SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE] = "indirectAbsolute";
+	touch::device_types[SDL_TOUCH_DEVICE_INDIRECT_RELATIVE] = "indirectRelative";
 
 	// joystick::types[SDL_JOYSTICK_TYPE_UNKNOWN] = nullptr;
 	joystick::types[SDL_JOYSTICK_TYPE_GAMECONTROLLER] = "gamecontroller";

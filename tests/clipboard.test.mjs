@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::clipboard", (t) => {
+T.test("sdl::clipboard", (t) => {
 	if (sdl.clipboard.text !== null) {
 		t.equal(typeof sdl.clipboard.text, 'string')
 	}

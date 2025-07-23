@@ -85,9 +85,9 @@ joystick::_getDevices (Napi::Env &env)
 			? Napi::Number::New(env, _product)
 			: env.Null();
 
-		int _Version = SDL_JoystickGetDeviceProductVersion(i);
-		Napi::Value version = _Version != 0
-			? Napi::Number::New(env, _Version)
+		int _version = SDL_JoystickGetDeviceProductVersion(i);
+		Napi::Value version = _version != 0
+			? Napi::Number::New(env, _version)
 			: env.Null();
 
 		int _player = SDL_JoystickGetDevicePlayerIndex(i);

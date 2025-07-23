@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::video", (t) => {
+T.test("sdl::video", (t) => {
 	t.ok(Array.isArray(sdl.video.displays))
 
 	if (sdl.video.displays.length === 0) {

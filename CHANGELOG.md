@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.11.12] - 2025-07-23
+
+### Added
+
+- Touch support
+  - Added `sdl.touch` which lists the available touch devices.
+  - Added `fingerDown`, `fingerUp`, and `fingerMove` events to window.
+
 ## [v0.11.11] - 2025-07-21
 
 ### Added
@@ -40,7 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Started keeping this changelog.
 
-[unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.11...HEAD
+[unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.12...HEAD
+[v0.11.12]: https://github.com/kmamal/node-sdl/compare/v0.11.11...v0.11.12
 [v0.11.11]: https://github.com/kmamal/node-sdl/compare/v0.11.10...v0.11.11
 [v0.11.10]: https://github.com/kmamal/node-sdl/compare/v0.11.9...v0.11.10
 [v0.11.9]: https://github.com/kmamal/node-sdl/compare/v0.11.8...v0.11.9

@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::power", (t) => {
+T.test("sdl::power", (t) => {
 	t.ok([ 'noBattery', 'battery', 'charging', 'charged', null ].includes(sdl.power.info.state))
 
 	if (sdl.power.info.seconds !== null) {

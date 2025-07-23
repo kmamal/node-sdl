@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::info", (t) => {
+T.test("sdl::info", (t) => {
 	t.equal(typeof sdl.info.version.compile.major, 'number')
 	t.equal(typeof sdl.info.version.compile.minor, 'number')
 	t.equal(typeof sdl.info.version.compile.patch, 'number')

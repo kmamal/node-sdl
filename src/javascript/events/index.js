@@ -171,6 +171,26 @@ const handleEvent = (event) => {
 			window.emit(type, event)
 		} break
 
+		case 'touch': {
+			const { touchId } = event
+			delete event.touchId
+
+			let device = Globals.touchState.devices.find(({ id }) => id === touchId)
+			if (device === undefined) {
+				Globals.touchDevices = Bindings.touch_getDevices()
+				device = Globals.touchState.devices.find(({ id }) => id === touchId)
+			}
+
+			const { windowId } = event
+			delete event.windowId
+
+			const window = Globals.windows.all.get(windowId)
+			if (!window) { return }
+
+			event.device = device
+			window.emit(type, event)
+		} break
+
 		case 'joystickDevice': {
 			if (type === 'deviceRemove') {
 				const { joystickId } = event

@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::mouse", async (t) => {
+T.test("sdl::mouse", async (t) => {
 	const buttons = Object.entries(sdl.mouse.BUTTON).map(([ , v ]) => v)
 	t.ok(buttons.length > 1)
 	const buttonSet = new Set(buttons)

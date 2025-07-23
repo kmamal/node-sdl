@@ -18,6 +18,7 @@ std::string events::families::KEYMAP;
 std::string events::families::KEYBOARD;
 std::string events::families::TEXT;
 std::string events::families::MOUSE;
+std::string events::families::TOUCH;
 std::string events::families::JOYSTICK_DEVICE;
 std::string events::families::JOYSTICK;
 std::string events::families::CONTROLLER;
@@ -56,6 +57,9 @@ std::string events::types::DROP_FILE;
 std::string events::types::DROP_TEXT;
 std::string events::types::CLOSE;
 std::string events::types::KEYMAP_CHANGE;
+std::string events::types::FINGER_DOWN;
+std::string events::types::FINGER_UP;
+std::string events::types::FINGER_MOVE;
 std::string events::types::DEVICE_ADD;
 std::string events::types::DEVICE_REMOVE;
 std::string events::types::AXIS_MOTION;
@@ -292,6 +296,36 @@ events::dispatchEvent(const SDL_Event &event)
 			break;
 		}
 
+		case SDL_FINGERUP:
+		case SDL_FINGERDOWN: {
+			packed.Set("family", events::families::TOUCH);
+			packed.Set("type", event.type == SDL_FINGERUP
+				? events::types::FINGER_UP
+				: events::types::FINGER_DOWN);
+			packed.Set("windowId", event.tfinger.windowID);
+			packed.Set("mouse", event.tfinger.touchId == SDL_MOUSE_TOUCHID);
+			packed.Set("touchId", event.tfinger.touchId);
+			packed.Set("fingerId", event.tfinger.fingerId);
+			packed.Set("x", event.tfinger.x);
+			packed.Set("y", event.tfinger.y);
+			packed.Set("pressure", event.tfinger.pressure);
+			break;
+		}
+		case SDL_FINGERMOTION: {
+			packed.Set("family", events::families::TOUCH);
+			packed.Set("type", events::types::FINGER_MOVE);
+			packed.Set("windowId", event.tfinger.windowID);
+			packed.Set("mouse", event.tfinger.touchId == SDL_MOUSE_TOUCHID);
+			packed.Set("touchId", event.tfinger.touchId);
+			packed.Set("fingerId", event.tfinger.fingerId);
+			packed.Set("x", event.tfinger.x);
+			packed.Set("y", event.tfinger.y);
+			packed.Set("dx", event.tfinger.dx);
+			packed.Set("dy", event.tfinger.dy);
+			packed.Set("pressure", event.tfinger.pressure);
+			break;
+		}
+
 		case SDL_JOYDEVICEADDED: {
 			packed.Set("family", events::families::JOYSTICK_DEVICE);
 			packed.Set("type", events::types::DEVICE_ADD);
@@ -464,30 +498,6 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::UPDATE);
 			break;
 		}
-
-		// case SDL_FINGERUP:
-		// case SDL_FINGERDOWN: {
-		// 	SET_STRING(object, "type", event.type == SDL_FINGERUP
-		// 		? "fingerUp"
-		// 		: "fingerDown");
-		// 	packed.Set("touch_id", event.tfinger.touchId);
-		// 	packed.Set("finger_id", event.tfinger.fingerId);
-		// 	packed.Set("pressure", event.tfinger.pressure);
-		// 	packed.Set("x", event.tfinger.x);
-		// 	packed.Set("y", event.tfinger.y);
-		// 	break;
-		// }
-		// case SDL_FINGERMOTION: {
-		// 	SET_STRING(object, "type", "fingerMotion");
-		// 	packed.Set("touch_id", event.tfinger.touchId);
-		// 	packed.Set("finger_id", event.tfinger.fingerId);
-		// 	packed.Set("pressure", event.tfinger.pressure);
-		// 	packed.Set("x", event.tfinger.x);
-		// 	packed.Set("y", event.tfinger.y);
-		// 	packed.Set("dx", event.tfinger.dx);
-		// 	packed.Set("dy", event.tfinger.dy);
-		// 	break;
-		// }
 	}
 
 	poll_callback->Call(poll_env->Global(), { packed });

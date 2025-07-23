@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::window", (t) => {
+T.test("sdl::window", (t) => {
 	t.ok(Array.isArray(sdl.video.windows))
 	t.equal(sdl.video.windows.length, 0)
 	t.equal(sdl.video.focused, null)

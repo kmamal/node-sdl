@@ -1,14 +1,13 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::audio", async (t) => {
+T.test("sdl::audio", async (t) => {
 	t.timeout(3e3)
 
 	t.equal(sdl.audio.bytesPerSample('f32lsb'), 4)
 	t.equal(sdl.audio.minSampleValue('f32lsb'), -1)
 	t.equal(sdl.audio.maxSampleValue('f32lsb'), 1)
 	t.equal(sdl.audio.zeroSampleValue('f32lsb'), 0)
-
 
 	t.ok(Array.isArray(sdl.audio.devices))
 

@@ -169,6 +169,9 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
     - [Event: 'mouseButtonUp'](#event-mousebuttonup)
     - [Event: 'mouseMove'](#event-mousemove)
     - [Event: 'mouseWheel'](#event-mousewheel)
+    - [Event: 'fingerDown'](#event-fingerdown)
+    - [Event: 'fingerUp'](#event-fingerup)
+    - [Event: 'fingerMove'](#event-fingermove)
     - [Event: 'dropBegin'](#event-dropbegin)
     - [Event: 'dropText'](#event-droptext)
     - [Event: 'dropFile'](#event-dropfile)
@@ -803,6 +806,41 @@ Fired when the mouse moves.
 - `flipped: <boolean>` Is `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
 
 Fired when the mouse wheel is scrolled.
+
+### Event: 'fingerDown'
+
+- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `fingerId: <number>` The id of the finger that coused the event.
+- `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
+- `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
+- `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
+- `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+
+Fired when a finger is presed to the touch surface.
+
+### Event: 'fingerUp'
+
+- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `fingerId: <number>` The id of the finger that coused the event.
+- `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
+- `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
+- `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
+- `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+
+Fired when a finger is lifted from the touch surface.
+
+### Event: 'fingerMove'
+
+- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `fingerId: <number>` The id of the finger that coused the event.
+- `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
+- `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
+- `dx: <number>` The finger's x position when the event happened, normalized in the range from `-1` to `1`.
+- `dy: <number>` The finger's y position when the event happened, normalized in the range from `-1` to `1`.
+- `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
+- `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+
+Fired when a finger moves on the touch surface.
 
 ### Event: 'dropBegin'
 
@@ -1578,6 +1616,30 @@ When the mouse has been captured you will continue receiving mouse events even i
 
 Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
+## sdl.touch
+
+### sdl.touch.devices
+
+- `<object>[]`
+  - `id: <number>` The unique id for the device.
+  - `name: <string>|<null>` The name of the device, or `null` if it can't be determined.
+  - `type: <TouchDeviceType>|<null>` The type of the device, or `null` if it can't be determined.
+
+A list of all the detected touch devices.
+On some platforms SDL only sees the touch device after it has actually been used.
+Therefore the returned list might be empty, although devices are available.
+After using all devices at least once the number will be correct.
+
+Possible values for `type` are `null` if it is unknown, or one of:
+
+| Value                | Corresponding `SDL_TouchDeviceType`  |
+| ---                  | ---                                  |
+| `'direct'`           | `SDL_TOUCH_DEVICE_DIRECT`            |
+| `'indirectAbsolute'` | `SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE` |
+| `'indirectRelative'` | `SDL_TOUCH_DEVICE_INDIRECT_RELATIVE` |
+
+// TODO Sample output
+
 ## sdl.joystick
 
 ### Hat positions
@@ -1632,7 +1694,7 @@ When this event is emitted, all instances that were opened from the removed devi
 
 - `<object>[]`
   - `id: <number>` The unique id for the device.
-  - `name: <string>` The name of the device.
+  - `name: <string>|<null>` The name of the device.
   - `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
   - `type: <JoystickType>|<null>` The type of the device, or `null` if it can't be determined.
   - `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
@@ -1765,7 +1827,7 @@ The joystick's serial number, or `null` if it is not available.
 - `<number>[]`
 
 An array of values, each corresponding to the position of one of the joystick's axes.
-The values are normalized from `-1` to `+1`.
+The values are normalized in the range from `-1` to `+1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
 ### joystickInstance.balls
@@ -1922,7 +1984,7 @@ This may cause already opened controller instances to be [remapped](#event-remap
 
 - `<object>[]`
   - `id: <number>` The unique id for the device.
-  - `name: <string>` The name of the device.
+  - `name: <string>|<null>` The name of the device.
   - `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
   - `type: <string>|<null>` The type of the device, or `null` if it can't be determined.
   - `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
@@ -2070,7 +2132,7 @@ The `Buffer` contains an `InputHandle_t` for the controller that can be used wit
   - `rightTrigger: <number>` Right trigger position
 
 An object mapping each axis of the controller's axes to its position.
-The values are normalized from `-1` to `+1`.
+The values are normalized in the range from `-1` to `+1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
 ### controllerInstance.buttons

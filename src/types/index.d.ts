@@ -82,6 +82,26 @@ export namespace Events {
 			readonly flipped: boolean
 		}
 
+		export interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
+
+		interface FingerEvent extends WindowEvent {
+			readonly device: Sdl.Touch.Device
+			readonly fingerId: number
+			readonly mouse: boolean
+			readonly x: number
+			readonly y: number
+			readonly pressure: number
+		}
+
+		export interface FingerDown extends FingerEvent { readonly type: 'fingerDown' }
+		export interface FingerUp extends FingerEvent { readonly type: 'fingerUp' }
+
+		export interface FingerMove extends FingerEvent {
+			readonly type: 'fingerMove'
+			readonly dx: number
+			readonly dy: number
+		}
+
 		export interface Show extends WindowEvent { readonly type: 'show' }
 		export interface Hide extends WindowEvent { readonly type: 'hide' }
 		export interface Expose extends WindowEvent { readonly type: 'expose' }
@@ -133,6 +153,9 @@ export namespace Events {
 			| MouseButtonDown
 			| MouseButtonUp
 			| MouseWheel
+			| FingerDown
+			| FingerUp
+			| FingerMove
 			| Show
 			| Hide
 			| Expose
@@ -223,7 +246,9 @@ export namespace Events {
 		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
 		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		export type Any = Add | Remove
+		export type Any
+			= Add
+			| Remove
 
 	}
 
@@ -294,7 +319,9 @@ export namespace Events {
 		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
 		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		export type Any = Add | Remove
+		export type Any
+			= Add
+			| Remove
 
 	}
 
@@ -304,7 +331,8 @@ export namespace Events {
 
 		export interface Close extends AudioEvent { readonly type: 'close' }
 
-		export type Any = Close
+		export type Any
+			= Close
 
 	}
 
@@ -317,7 +345,9 @@ export namespace Events {
 		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
 		export interface Remove extends DeviceEvent { readonly type: 'deviceRemove' }
 
-		export type Any = Add | Remove
+		export type Any
+			= Add
+			| Remove
 
 	}
 
@@ -325,7 +355,8 @@ export namespace Events {
 
 		export interface Update extends BaseEvent { readonly type: 'update' }
 
-		export type Any = Update
+		export type Any
+			= Update
 
 	}
 
@@ -358,12 +389,12 @@ export namespace Sdl {
 			}
 		}
 		readonly initialized: {
-			video: boolean
-			audio: boolean
-			joystick: boolean
-			controller: boolean
-			haptic: boolean
-			sensor: boolean
+			readonly video: boolean
+			readonly audio: boolean
+			readonly joystick: boolean
+			readonly controller: boolean
+			readonly haptic: boolean
+			readonly sensor: boolean
 		}
 	}
 
@@ -465,6 +496,9 @@ export namespace Sdl {
 			on (event: 'mouseButtonUp', listener: (event: Events.Window.MouseButtonUp) => void): this
 			on (event: 'mouseMove', listener: (event: Events.Window.MouseMove) => void): this
 			on (event: 'mouseWheel', listener: (event: Events.Window.MouseWheel) => void): this
+			on (event: 'fingerDown', listener: (event: Events.Window.FingerDown) => void): this
+			on (event: 'fingerUp', listener: (event: Events.Window.FingerUp) => void): this
+			on (event: 'fingerMove', listener: (event: Events.Window.FingerMove) => void): this
 			on (event: 'dropBegin', listener: (event: Events.Window.DropBegin) => void): this
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
@@ -901,11 +935,30 @@ export namespace Sdl {
 
 	}
 
+	export namespace Touch {
+
+		export type DeviceType
+			= 'direct'
+			| 'indirectAbsolute'
+			| 'indirectRelative'
+
+		export interface Device {
+			readonly id: number
+			readonly name: string | null
+			readonly type: DeviceType | null
+		}
+
+		interface Module {
+			readonly devices: Device[]
+		}
+
+	}
+
 	export namespace Joystick {
 
 		export interface BallPosition {
-			x: number
-			y: number
+			readonly x: number
+			readonly y: number
 		}
 
 		export type JoystickType
@@ -1264,10 +1317,10 @@ export namespace Sdl {
 		}
 
 		export interface AudioOptions {
-			channels?: 1 | 2 | 4 | 6
-			frequency?: number
-			format?: Format
-			buffered?: number
+			readonly channels?: 1 | 2 | 4 | 6
+			readonly frequency?: number
+			readonly format?: Format
+			readonly buffered?: number
 		}
 
 		interface Module {
@@ -1310,9 +1363,9 @@ export namespace Sdl {
 			| 'charged'
 
 		export interface PowerInfo {
-			state: PowerState | null
-			seconds: number | null
-			percent: number | null
+			readonly state: PowerState | null
+			readonly seconds: number | null
+			readonly percent: number | null
 		}
 
 		interface Module {
@@ -1327,6 +1380,7 @@ export const info: Sdl.Info
 export const video: Sdl.Video.Module
 export const keyboard: Sdl.Keyboard.Module
 export const mouse: Sdl.Mouse.Module
+export const touch: Sdl.Touch.Module
 export const joystick: Sdl.Joystick.Module
 export const controller: Sdl.Controller.Module
 export const sensor: Sdl.Sensor.Module

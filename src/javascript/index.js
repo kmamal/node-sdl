@@ -8,6 +8,7 @@ const info = Bindings.global_initialize()
 const { video } = require('./video')
 const { keyboard } = require('./keyboard')
 const { mouse } = require('./mouse')
+const { touch } = require('./touch')
 const { joystick } = require('./joystick')
 const { controller } = require('./controller')
 const { sensor } = require('./sensor')
@@ -23,6 +24,7 @@ module.exports = {
 	video,
 	keyboard,
 	mouse,
+	touch,
 	joystick,
 	controller,
 	sensor,

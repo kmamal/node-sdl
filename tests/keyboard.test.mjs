@@ -1,7 +1,7 @@
-const { test } = require('@kmamal/testing')
-const sdl = require('../src/javascript/index.js')
+import T from '@kmamal/testing'
+import sdl from '../src/javascript/index.js'
 
-test("sdl::keyboard", (t) => {
+T.test("sdl::keyboard", (t) => {
 	const scancodes1 = Object.entries(sdl.keyboard.SCANCODE).map(([ , v ]) => v)
 	t.ok(scancodes1.length > 200)
 	const scancodeSet1 = new Set(scancodes1)

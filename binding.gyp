@@ -10,6 +10,7 @@
 			'src/native/window.cpp',
 			'src/native/keyboard.cpp',
 			'src/native/mouse.cpp',
+			'src/native/touch.cpp',
 			'src/native/joystick.cpp',
 			'src/native/controller.cpp',
 			'src/native/sensor.cpp',
