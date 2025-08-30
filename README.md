@@ -1058,7 +1058,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 ### window.native
 
 - `<object>`
-  - `handle : <Buffer>` The platform-specific handle of the window.
+  - `handle : <Buffer>|<null>` The platform-specific handle of the window, or `null` if it can't be determined.
 
 The native type of `handle` is HWND on Windows, NSView* on macOS, and Window (unsigned long) on Linux.
 It should work exactly like the [`win.getNativeWindowHandle()`](https://www.electronjs.org/docs/latest/api/browser-window#wingetnativewindowhandle) electron method.

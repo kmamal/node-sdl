@@ -177,26 +177,41 @@ window::create (const Napi::CallbackInfo &info)
 
 	Napi::Object native = Napi::Object::New(env);
 
+	bool has_wm_info;
+	std::string message_of_failed_wm_info;
 	SDL_SysWMinfo sys_wm_info;
 	SDL_VERSION(&(sys_wm_info.version));
-	if (SDL_GetWindowWMInfo(window, &sys_wm_info) == SDL_FALSE) {
-		std::ostringstream message;
-		message << "SDL_GetWindowWMInfo(" << window_id << ") error: " << SDL_GetError();
+	has_wm_info = SDL_GetWindowWMInfo(window, &sys_wm_info) == SDL_TRUE;
+	if (!has_wm_info) {
+		message_of_failed_wm_info = SDL_GetError();
 		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
 	}
 
-	NativeWindowHandle native_handle;
-	#if defined(__LINUX__)
-		native_handle = sys_wm_info.info.x11.window;
-	#elif defined(__WIN32__)
-		native_handle = sys_wm_info.info.win.window;
-	#elif defined(__MACOSX__)
-		native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
-	#endif
-	native.Set("handle", Napi::Buffer<NativeWindowHandle>::Copy(env, &native_handle, 1));
+	Napi::Value native_handle;
+	if (has_wm_info) {
+		NativeWindowHandle _native_handle;
+		#if defined(__LINUX__)
+			_native_handle = sys_wm_info.info.x11.window;
+		#elif defined(__WIN32__)
+			_native_handle = sys_wm_info.info.win.window;
+		#elif defined(__MACOSX__)
+			_native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
+		#endif
+		native_handle = Napi::Buffer<NativeWindowHandle>::Copy(env, &_native_handle, 1);
+	}
+	else {
+		native_handle = env.Null();
+	}
+	native.Set("handle", native_handle);
 
 	if (is_opengl) {
+		if (!has_wm_info) {
+			std::ostringstream message;
+			message << "Window has set { opengl: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
 		GL_NativeWindow native_gl;
 		#if defined(__LINUX__)
 			native_gl = sys_wm_info.info.x11.window;
@@ -208,6 +223,13 @@ window::create (const Napi::CallbackInfo &info)
 		native.Set("gl", Napi::Buffer<GL_NativeWindow>::Copy(env, &native_gl, 1));
 	}
 	else if (is_webgpu) {
+		if (!has_wm_info) {
+			std::ostringstream message;
+			message << "Window has set { webgpu: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
 		GPU_NativeData native_gpu;
 		#if defined(__LINUX__)
 			native_gpu.display = sys_wm_info.info.x11.display;

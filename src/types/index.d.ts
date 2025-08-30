@@ -547,7 +547,7 @@ export namespace Sdl {
 
 			readonly opengl: boolean
 			readonly webgpu: boolean
-			readonly native: { handle: Buffer }
+			readonly native: { handle: Buffer | null }
 
 			readonly maximized: boolean
 			maximize (): void
