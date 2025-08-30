@@ -13,11 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { name: 'Linux (x64)'   ,os: ubuntu-22.04              }
-          - { name: 'Linux (arm64)' ,os: ubuntu-22.04-arm          }
-          - { name: 'Windows (x64)' ,os: windows-2022              }
-          - { name: 'Mac (x64)'     ,os: macos-14     ,arch: x64   }
-          - { name: 'Mac (arm64)'   ,os: macos-14     ,arch: arm64 }
+          - { name: 'Linux (x64)'     ,os: ubuntu-22.04              }
+          - { name: 'Linux (arm64)'   ,os: ubuntu-22.04-arm          }
+          - { name: 'Windows (x64)'   ,os: windows-2022              }
+          - { name: 'Windows (arm64)' ,os: windows-11-arm            }
+          - { name: 'Mac (x64)'       ,os: macos-15     ,arch: x64   }
+          - { name: 'Mac (arm64)'     ,os: macos-15     ,arch: arm64 }
 
     runs-on: ${{ matrix.platform.os }}
 
