@@ -2,36 +2,10 @@ name: Build and upload
 
 on: workflow_dispatch
 
-permissions:
-  contents: write
-
 jobs:
-  build:
-    name: ${{ matrix.platform.name }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          # - { name: 'Linux (x64)'     ,os: ubuntu-22.04              }
-          # - { name: 'Linux (arm64)'   ,os: ubuntu-22.04-arm          }
-          # - { name: 'Windows (x64)'   ,os: windows-2022              }
-          - { name: 'Windows (arm64)' ,os: windows-11-arm            }
-          # - { name: 'Mac (x64)'       ,os: macos-15     ,arch: x64   }
-          # - { name: 'Mac (arm64)'     ,os: macos-15     ,arch: arm64 }
-
-    runs-on: ${{ matrix.platform.os }}
-
+  empty:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - run: 'echo "empty"'
 
-      - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
-        run: brew update && ./scripts/install-deps-mac.sh
-
-      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
-        run: sudo apt-get update && sudo ./scripts/install-deps-ubuntu.sh
-
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}
-        run: npm run release
+# This file is empty on the master branch. Releases are made from the 'workflow' branch.
