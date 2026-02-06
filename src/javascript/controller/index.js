@@ -13,7 +13,7 @@ const controller = new class extends EventsViaPoll {
 		return Globals.controllerDevices
 	}
 
-	openDevice (device) { return new ControllerInstance(device) }
+	openDevice (device, options = {}) { return new ControllerInstance(device, options) }
 
 	addMappings (mappings) {
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }

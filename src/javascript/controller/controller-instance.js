@@ -13,12 +13,13 @@ const validEvents = [
 ]
 
 class ControllerInstance extends EventsViaPoll {
-	constructor (device) {
+	constructor (device, options = {}) {
 		super(validEvents)
 
 		if (!Globals.controllerDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
-		const result = Bindings.controller_open(device._index)
+		const { rawAxisMode = false } = options
+		const result = Bindings.controller_open(device._index, rawAxisMode)
 
 		this._firmwareVersion = result.firmwareVersion
 		this._serialNumber = result.serialNumber
