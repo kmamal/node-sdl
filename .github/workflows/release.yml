@@ -59,6 +59,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev
+
       - name: Install dependencies
         run: npm ci
 
