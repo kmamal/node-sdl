@@ -10,65 +10,32 @@ permissions:
   contents: write
 
 jobs:
-  ensure-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Resolve release tag
-        id: release-tag
-        shell: bash
-        run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Ensure release exists
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          tag="${{ steps.release-tag.outputs.tag }}"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            echo "release ${tag} already exists"
-          else
-            gh release create "$tag" --title "$tag" --prerelease
-          fi
-
-  build-and-upload:
-    needs: ensure-release
+  build:
+    name: ${{ matrix.platform.name }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - runner: macos-15-intel
-          - runner: macos-15
-          - runner: ubuntu-latest
-          - runner: ubuntu-24.04-arm
-          - runner: windows-latest
-    runs-on: ${{ matrix.runner }}
+        platform:
+          - { name: 'Linux (x64)', os: ubuntu-latest }
+          - { name: 'Linux (arm64)', os: ubuntu-24.04-arm }
+          - { name: 'Windows (x64)', os: windows-latest }
+          - { name: 'Mac (x64)', os: macos-15-intel }
+          - { name: 'Mac (arm64)', os: macos-15 }
+    runs-on: ${{ matrix.platform.os }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
-      - name: Install Linux build dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libx11-dev
+      - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
+        run: brew update && ./scripts/install-deps-mac.sh
 
-      - name: Install dependencies
-        run: npm ci
+      - if: ${{ startsWith(matrix.platform.os, 'ubuntu-') }}
+        run: sudo apt-get update && sudo ./scripts/install-deps-ubuntu.sh
 
-      - name: Build and upload release asset
-        env:
+      - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROSS_COMPILE_ARCH: ${{ matrix.platform.arch }}
         run: npm run release
