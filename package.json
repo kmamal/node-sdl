@@ -1,5 +1,5 @@
 {
-  "version": "0.11.13",
+  "version": "0.12.0",
   "name": "@kmamal/sdl",
   "description": "SDL bindings for Node.js",
   "keywords": [
@@ -77,7 +77,7 @@
     "sdl": {
       "owner": "kmamal",
       "repo": "build-sdl",
-      "version": "2.32.8"
+      "version": "2.32.70"
     }
   }
 }

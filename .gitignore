@@ -3,3 +3,5 @@ sdl
 build
 dist
 publish
+.idea
+.vscode
