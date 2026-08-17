@@ -77,8 +77,7 @@ while (!window.destroyed) {
 		}
 		ctx.restore()
 
-		const pixelBuffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
-		window.render(width, height, width * 4, 'bgra32', pixelBuffer)
+		window.render(width, height, width * 4, 'bgra32', canvas.data())
 	}
 
 	await setTimeout(0)

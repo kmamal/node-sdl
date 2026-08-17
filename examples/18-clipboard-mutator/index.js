@@ -23,8 +23,7 @@ const render = () => {
 
 	ctx.fillText(text, 0, 0)
 
-	const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data)
-	window.render(width, height, stride, 'rgba32', buffer)
+	window.render(width, height, stride, 'rgba32', canvas.data())
 }
 
 const update = () => {

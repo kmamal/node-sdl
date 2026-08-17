@@ -101,8 +101,7 @@ const doRender = () => {
 		window.setSizeInPixels(maxX, maxY)
 	}
 	else {
-		const buffer = Buffer.from(ctx.getImageData(0, 0, W, H).data)
-		window.render(W, H, W * 4, 'rgba32', buffer)
+		window.render(W, H, W * 4, 'rgba32', canvas.data())
 	}
 }
 

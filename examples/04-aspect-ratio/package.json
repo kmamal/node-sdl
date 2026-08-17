@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@kmamal/sdl": "*",
-    "pngjs": "^7.0.0"
+    "pngjs": "7.0.0"
   },
   "trustedDependencies": [
     "@kmamal/sdl"
