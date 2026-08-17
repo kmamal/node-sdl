@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - if: ${{ startsWith(matrix.platform.os, 'macos-') }}
         run: brew update && ./scripts/install-deps-mac.sh
