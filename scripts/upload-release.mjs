@@ -1,7 +1,6 @@
 import Fs from 'node:fs'
 import Path from 'node:path'
 import C from './util/common.js'
-import { fetch } from './util/fetch.js'
 import * as Tar from 'tar'
 
 const commonHeaders = {
@@ -15,16 +14,15 @@ let response
 getRelease: {
 	console.log("get release", C.version)
 
-	try {
-		response = await fetch(
-			`https://api.github.com/repos/${C.owner}/${C.repo}/releases/tags/v${C.version}`,
-			{ headers: commonHeaders },
-		)
+	response = await fetch(
+		`https://api.github.com/repos/${C.owner}/${C.repo}/releases/tags/v${C.version}`,
+		{ headers: commonHeaders },
+	)
+	if (response.ok) {
 		console.log("release exists", C.version)
 		break getRelease
-	} catch (error) {
-		console.log(error.message)
 	}
+	console.log(`bad status code ${response.status}`)
 
 	console.log("create release", C.version)
 
@@ -41,6 +39,7 @@ getRelease: {
 			}),
 		},
 	)
+	if (!response.ok) { throw new Error(`bad status code ${response.status}`) }
 }
 const releaseId = (await response.json()).id
 
@@ -60,22 +59,24 @@ response = await fetch(
 	`https://api.github.com/repos/${C.owner}/${C.repo}/releases/${releaseId}/assets`,
 	{ headers: commonHeaders },
 )
+if (!response.ok) { throw new Error(`bad status code ${response.status}`) }
 
 const list = await response.json()
 const asset = list.find((x) => x.name === C.assetName)
 if (asset) {
 	console.log("delete asset", C.assetName)
-	await fetch(
+	response = await fetch(
 		`https://api.github.com/repos/${C.owner}/${C.repo}/releases/assets/${asset.id}`,
 		{
 			method: 'DELETE',
 			headers: commonHeaders,
 		},
 	)
+	if (!response.ok) { throw new Error(`bad status code ${response.status}`) }
 }
 
 console.log("upload", C.assetName)
-await fetch(
+response = await fetch(
 	`https://uploads.github.com/repos/${C.owner}/${C.repo}/releases/${releaseId}/assets?name=${C.assetName}`,
 	{
 		method: 'POST',
@@ -86,3 +87,4 @@ await fetch(
 		body: buffer,
 	},
 )
+if (!response.ok) { throw new Error(`bad status code ${response.status}`) }
