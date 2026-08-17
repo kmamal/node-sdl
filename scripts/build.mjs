@@ -54,6 +54,11 @@ await Promise.all([
 			)
 		}))
 	})(),
+	// Include SDL's license (older build-sdl assets don't ship it)
+	Fs.promises.cp(
+		Path.join(C.dir.sdl, 'LICENSE.txt'),
+		Path.join(C.dir.dist, 'LICENSE.SDL.txt'),
+	).catch(() => {}),
 ])
 
 // Strip binaries on linux
