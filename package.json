@@ -64,14 +64,14 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "dependencies": {
-    "tar": "^7.4.3"
+    "tar": "7.5.22"
   },
   "devDependencies": {
-    "@kmamal/evdev": "^0.0.6",
-    "@kmamal/testing": "^0.0.33",
-    "@types/node": "^24.1.0",
-    "node-addon-api": "^8.5.0",
-    "node-gyp": "^11.2.0"
+    "@kmamal/evdev": "0.0.8",
+    "@kmamal/testing": "0.0.33",
+    "@types/node": "26.2.0",
+    "node-addon-api": "8.9.2",
+    "node-gyp": "13.0.1"
   },
   "config": {
     "sdl": {
@@ -79,5 +79,8 @@
       "repo": "build-sdl",
       "version": "2.32.8"
     }
+  },
+  "allowScripts": {
+    "@kmamal/evdev@0.0.8": true
   }
 }
