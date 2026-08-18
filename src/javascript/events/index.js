@@ -177,10 +177,10 @@ const handleEvent = (event) => {
 			const { touchId } = event
 			delete event.touchId
 
-			let device = Globals.touchState.devices.find(({ id }) => id === touchId)
+			let device = Globals.touchDevices.find(({ id }) => id === touchId)
 			if (device === undefined) {
 				Globals.touchDevices = Bindings.touch_getDevices()
-				device = Globals.touchState.devices.find(({ id }) => id === touchId)
+				device = Globals.touchDevices.find(({ id }) => id === touchId)
 			}
 
 			const { windowId } = event
