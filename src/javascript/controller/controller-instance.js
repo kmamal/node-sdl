@@ -160,9 +160,11 @@ class ControllerInstance extends EventsViaPoll {
 		const collection = Globals.controllerInstances.byId.get(this._device.id)
 		collection.delete(this)
 		if (collection.size === 0) {
-			Bindings.controller_close(this._device.id)
 			Globals.controllerInstances.byId.delete(this._device.id)
 		}
+
+		// SDL open/close calls are reference-counted per instance
+		Bindings.controller_close(this._device.id)
 	}
 }
 

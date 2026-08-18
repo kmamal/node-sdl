@@ -44,9 +44,11 @@ class SensorInstance extends EventsViaPoll {
 		const collection = Globals.sensorInstances.byId.get(this._device.id)
 		collection.delete(this)
 		if (collection.size === 0) {
-			Bindings.sensor_close(this._device.id)
 			Globals.sensorInstances.byId.delete(this._device.id)
 		}
+
+		// SDL open/close calls are reference-counted per instance
+		Bindings.sensor_close(this._device.id)
 	}
 }
 

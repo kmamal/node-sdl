@@ -170,9 +170,11 @@ class JoystickInstance extends EventsViaPoll {
 		const collection = Globals.joystickInstances.byId.get(this._device.id)
 		collection.delete(this)
 		if (collection.size === 0) {
-			Bindings.joystick_close(this._device.id)
 			Globals.joystickInstances.byId.delete(this._device.id)
 		}
+
+		// SDL open/close calls are reference-counted per instance
+		Bindings.joystick_close(this._device.id)
 	}
 }
 
