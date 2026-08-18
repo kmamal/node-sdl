@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
+const FormatHelpers = require('./format-helpers')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
 const validEvents = [
@@ -382,10 +383,12 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
+		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (stride < width * bytesPerPixel) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 		if (scaling !== undefined && typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
 
 		if (dstRect !== null) {
@@ -415,10 +418,12 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (stride < width) { throw Object.assign(new Error("invalid stride"), { stride, width }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
+		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (stride < width * bytesPerPixel) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < stride * height) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height }) }
+		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 
 		const _format = Enums.pixelFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
