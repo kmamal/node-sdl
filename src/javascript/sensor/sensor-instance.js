@@ -36,7 +36,7 @@ class SensorInstance extends EventsViaPoll {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		this.emit('close')
+		this.emit('close', { type: 'close' })
 		this.removeAllListeners()
 		this._closed = true
 

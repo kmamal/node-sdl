@@ -1,3 +1,4 @@
+const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { SensorInstance } = require('./sensor-instance')
 
@@ -10,14 +11,15 @@ const sensor = {
 		for (const sensorDevice of devices) {
 			const { type } = sensorDevice
 			sensorDevice.type
-				= type.startsWith('accelerometer') ? 'accelerometer'
-				: type.startsWith('gyroscope') ? 'gyroscope'
-				: 'unknown'
+				= type?.startsWith('accelerometer') ? 'accelerometer'
+				: type?.startsWith('gyroscope') ? 'gyroscope'
+				: null
 			sensorDevice.side
-				= type.endsWith('Left') ? 'left'
-				: type.endsWith('Right') ? 'right'
+				= type?.endsWith('Left') ? 'left'
+				: type?.endsWith('Right') ? 'right'
 				: null
 		}
+		Globals.sensorDevices = devices
 		return devices
 	},
 

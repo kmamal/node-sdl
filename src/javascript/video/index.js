@@ -7,7 +7,7 @@ const { Window } = require('./window')
 Globals.displays = Bindings.video_getDisplays()
 
 
-const validEvents = [ 'displayAdd', 'displayRemove', 'displayOrient' ]
+const validEvents = [ 'displayAdd', 'displayRemove', 'displayOrient', 'displayMove' ]
 
 const video = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }

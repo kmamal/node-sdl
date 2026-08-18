@@ -8,25 +8,21 @@ export namespace Events {
 	export namespace Display {
 
 		interface DisplayEvent extends BaseEvent {
-			readonly display: Sdl.Video.Display
+			readonly device: Sdl.Video.Display
 		}
 
 		export interface Add extends DisplayEvent {
-			readonly type: 'deviceAdd'
-			readonly device: Sdl.Video.Display
+			readonly type: 'displayAdd'
 		}
 		export interface Remove extends DisplayEvent {
-			readonly type: 'deviceRemove'
-			readonly device: Sdl.Video.Display
+			readonly type: 'displayRemove'
 		}
 		export interface Orient extends DisplayEvent {
-			readonly type: 'deviceOrient'
-			readonly device: Sdl.Video.Display
+			readonly type: 'displayOrient'
 			readonly orientation: Sdl.Video.Orientation
 		}
 		export interface Move extends DisplayEvent {
-			readonly type: 'deviceMove'
-			readonly device: Sdl.Video.Display
+			readonly type: 'displayMove'
 		}
 
 		export type Any = Add | Remove | Orient | Move
@@ -40,18 +36,18 @@ export namespace Events {
 		interface KeyEvent extends WindowEvent {
 			readonly scancode: Sdl.Keyboard.Scancode
 			readonly key: Sdl.Keyboard.Key | null
-			readonly shift: number
-			readonly ctrl: number
-			readonly alt: number
-			readonly super: number
-			readonly altgr: number
-			readonly capslock: number
-			readonly numlock: number
+			readonly shift: boolean
+			readonly ctrl: boolean
+			readonly alt: boolean
+			readonly super: boolean
+			readonly altgr: boolean
+			readonly capslock: boolean
+			readonly numlock: boolean
 		}
 
 		export interface KeyDown extends KeyEvent {
 			readonly type: 'keyDown'
-			readonly repeat: number
+			readonly repeat: boolean
 		}
 		export interface KeyUp extends KeyEvent { readonly type: 'keyUp' }
 
@@ -81,8 +77,6 @@ export namespace Events {
 			readonly dy: number
 			readonly flipped: boolean
 		}
-
-		export interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
 
 		interface FingerEvent extends WindowEvent {
 			readonly device: Sdl.Touch.Device
@@ -381,11 +375,11 @@ export namespace Sdl {
 		readonly drivers: {
 			readonly video: {
 				readonly all: string[]
-				readonly current: string
+				readonly current: string | null
 			}
 			readonly audio: {
 				readonly all: string[]
-				readonly current: string
+				readonly current: string | null
 			}
 		}
 		readonly initialized: {
@@ -597,8 +591,8 @@ export namespace Sdl {
 			readonly displays: Display[]
 
 			readonly windows: Window[]
-			readonly focused: Window
-			readonly hovered: Window
+			readonly focused: Window | null
+			readonly hovered: Window | null
 
 			createWindow (options?: {
 				title?: string
@@ -878,6 +872,7 @@ export namespace Sdl {
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
 
 			on (event: 'keymapChange', listener: (event: Events.Keyboard.KeymapChange) => void): this
+			on (event: '*', listener: (type: string, event: Events.Keyboard.Any) => void): this
 
 			getKey (scancode: Scancode): Key | null
 			getScancode (key: Key): Scancode | null
@@ -923,13 +918,13 @@ export namespace Sdl {
 
 			setCursor (cursor: Cursor): void
 			resetCursor (): void
-			setCursorImage (width: number, height: number, stride: number, format: Video.Format, buffer: Buffer): void
+			setCursorImage (width: number, height: number, stride: number, format: Video.Format, buffer: Buffer, x: number, y: number): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void
 			redrawCursor (): void
 
-			capture (): void
+			capture (capture?: boolean): void
 			uncapture (): void
 		}
 
@@ -1015,8 +1010,8 @@ export namespace Sdl {
 			on (event: '*', listener: (type: string, event: Events.Joystick.Any) => void): this
 
 			readonly device: Device
-			readonly firmwareVersion: number
-			readonly serialNumber: string
+			readonly firmwareVersion: number | null
+			readonly serialNumber: string | null
 
 			readonly axes: number[]
 			readonly balls: BallPosition[]
@@ -1032,11 +1027,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble: number, highFreqRumble: number, duration: number): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble: number, rightRumble: number, duration: number): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1104,7 +1099,7 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly id: number
-			readonly name: string
+			readonly name: string | null
 			readonly path: string | null
 			readonly type: ControllerType | null
 			readonly guid: string | null
@@ -1126,8 +1121,8 @@ export namespace Sdl {
 			on (event: '*', listener: (type: string, event: Events.Controller.Any) => void): this
 
 			readonly device: Device
-			readonly firmwareVersion: number
-			readonly serialNumber: string
+			readonly firmwareVersion: number | null
+			readonly serialNumber: string | null
 			readonly steamHandle: Buffer | null
 
 			readonly axes: {
@@ -1161,7 +1156,7 @@ export namespace Sdl {
 				readonly paddle4: boolean
 			}
 
-			readonly power: Joystick.PowerLevel
+			readonly power: Joystick.PowerLevel | null
 
 			setPlayer (index: number): void
 			resetPlayer (): void
@@ -1170,11 +1165,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble: number, highFreqRumble: number, duration: number): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble: number, rightRumble: number, duration: number): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1198,8 +1193,7 @@ export namespace Sdl {
 	export namespace Sensor {
 
 		export type Type
-			= 'unknown'
-			| 'accelerometer'
+			= 'accelerometer'
 			| 'gyroscope'
 
 		export type Side
@@ -1267,7 +1261,7 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly type: "recording"|"playback"
-			readonly name?: string
+			readonly name?: string | null
 		}
 
 		export interface PlaybackDevice extends Device {
@@ -1284,6 +1278,7 @@ export namespace Sdl {
 
 			readonly id: number
 			readonly device: Device
+			readonly name: string | null
 
 			readonly channels: number
 			readonly frequency: number
@@ -1328,7 +1323,7 @@ export namespace Sdl {
 			on (event: 'deviceRemove', listener: (event: Events.AudioDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.AudioDevice.Any) => void): this
 
-			readonly devices: Device[]
+			readonly devices: Array<PlaybackDevice | RecordingDevice>
 
 			openDevice (device: PlaybackDevice, options?: AudioOptions): AudioPlaybackInstance
 			openDevice (device: RecordingDevice, options?: AudioOptions): AudioRecordingInstance

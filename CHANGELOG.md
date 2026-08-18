@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- The `displayMove` event is now emitted instead of throwing "invalid event".
+- The `displayOrient` and `displayMove` events now carry the documented `device` property.
+- The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
+- `sdl.sensor.openDevice()` no longer throws a `TypeError`, and `sdl.sensor.devices` no longer throws for sensors of unknown type (their `type` is `null`).
+- Many fixes to the TypeScript declarations to match the implementation.
+
 ## [v0.11.13] - 2025-08-30
 
 ### Fixed

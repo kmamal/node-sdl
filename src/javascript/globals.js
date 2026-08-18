@@ -17,6 +17,7 @@ module.exports = {
 		all: new Set(),
 		byId: new Map(),
 	},
+	sensorDevices: [],
 	sensorInstances: {
 		all: new Set(),
 		byId: new Map(),

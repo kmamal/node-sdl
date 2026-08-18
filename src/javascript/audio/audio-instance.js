@@ -36,7 +36,7 @@ class AudioInstance extends EventsViaPoll {
 		this._id = Bindings.audio_open(name ?? null, type === 'recording', frequency, _format, channels, buffered)
 
 		this._device = device
-		this._name = name
+		this._name = name ?? null
 		this._buffered = buffered
 		this._channels = channels
 		this._format = format
@@ -110,7 +110,7 @@ class AudioInstance extends EventsViaPoll {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
-		this.emit('close')
+		this.emit('close', { type: 'close' })
 		this.removeAllListeners()
 		this._closed = true
 

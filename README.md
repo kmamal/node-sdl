@@ -245,6 +245,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   - [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
   - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   - [sdl.mouse.uncapture()](#sdlmouseuncapture)
+- [sdl.touch](#sdltouch)
+  - [sdl.touch.devices](#sdltouchdevices)
 - [sdl.joystick](#sdljoystick)
   - [Hat positions](#hat-positions)
   - [Power levels](#power-levels)
@@ -319,6 +321,7 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   - [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
   - [class SensorInstance](#class-sensorinstance)
     - [Event: 'update'](#sensor-instance-event-update)
+    - [Event: 'close'](#sensor-instance-event-close)
     - [sensorInstance.device](#sensorinstancedevice)
     - [sensorInstance.data](#sensorinstancedata)
     - [sensorInstance.closed](#sensorinstanceclosed)
@@ -339,6 +342,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   - [class AudioInstance](#class-audioinstance)
     - [Event: 'close'](#audio-instance-event-close)
     - [audioInstance.id](#audioinstanceid)
+    - [audioInstance.device](#audioinstancedevice)
+    - [audioInstance.name](#audioinstancename)
     - [audioInstance.channels](#audioinstancechannels)
     - [audioInstance.frequency](#audioinstancefrequency)
     - [audioInstance.format](#audioinstanceformat)
@@ -622,7 +627,7 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
 
 - `options: <object>`
   - `title: <string>` Appears in the window's title bar. Default: `''`
-  - `display: <number>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays). Default: `sdl.video.displays[0]`
+  - `display: <object>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays). Default: `sdl.video.displays[0]`
   - `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
   - `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
   - `width: <number>` The width of the window. Default: `640`
@@ -835,8 +840,8 @@ Fired when a finger is lifted from the touch surface.
 - `fingerId: <number>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
-- `dx: <number>` The finger's x position when the event happened, normalized in the range from `-1` to `1`.
-- `dy: <number>` The finger's y position when the event happened, normalized in the range from `-1` to `1`.
+- `dx: <number>` The finger's x movement, relative to its last position, normalized in the range from `-1` to `1`.
+- `dy: <number>` The finger's y movement, relative to its last position, normalized in the range from `-1` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
 
@@ -1495,7 +1500,7 @@ Values are based on the [USB usage page standard](https://www.usb.org/sites/defa
 
 Fired when the keymap changes due to a system event such as an input language or keyboard layout change.
 After this event, the correspondance between physical and logical keys might have changed.
-You should assume that any previous result you have gotten from [`getKey()`](#sdlkeyboardgetkeyscancode) or [`getScancode()`](#sdlkeyboardgetscancodekey) are not invalid.
+You should assume that any previous results you have gotten from [`getKey()`](#sdlkeyboardgetkeyscancode) or [`getScancode()`](#sdlkeyboardgetscancodekey) are no longer valid.
 
 ### sdl.keyboard.getKey(scancode)
 
@@ -1843,7 +1848,7 @@ An array of values, each corresponding to the position of one of the joystick's 
 - `<boolean>[]`
 
 An array of values, each corresponding to the state of one of the joystick's buttons.
-Each value in the object isarray is either `true` if the corresponding button is pressed, or `false` otherwise.
+Each value in the array is either `true` if the corresponding button is pressed, or `false` otherwise.
 
 ### joystickInstance.hats
 
@@ -2066,7 +2071,7 @@ Fired when one of the controller's buttons is pressed.
 
 ### Event: 'buttonUp'
 
-- `button: <number>` The index of the button that was released.
+- `button:`[`<Button>`](#controllerinstancebuttons) The button that was released.
 
 Fired when one of the controller's buttons is released.
 
@@ -2104,9 +2109,9 @@ The [device](#sdlcontrollerdevices) from which the instance was opened.
 
 ### controllerInstance.firmwareVersion
 
-- `<number>`
+- `<number>|<null>`
 
-The controller's firmware version.
+The controller's firmware version, or `null` if it is not available.
 
 ### controllerInstance.serialNumber
 
@@ -2583,6 +2588,12 @@ A unique identifier for the instance.
 
 The device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when the `audioInstance` was opened.
 
+### audioInstance.name
+
+- `<string>|<null>`
+
+The `name` of the device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when the `audioInstance` was opened, or `null` if the instance was opened without specifying a device name.
+
 ### audioInstance.channels
 
 - `<number>`
@@ -2658,7 +2669,7 @@ Is `true` if the instance is currently playing.
 
 ### audioInstance.play([play])
 
-- `show: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
+- `play: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
 
 Starts or stops the instance.
 

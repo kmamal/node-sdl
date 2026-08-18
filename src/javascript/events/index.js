@@ -42,6 +42,7 @@ const handleEvent = (event) => {
 				case 'displayOrient': {
 					const display = Globals.displays[displayIndex]
 					display.orientation = event.orientation
+					event.device = display
 				} break
 
 				case 'displayMove': {
@@ -56,6 +57,7 @@ const handleEvent = (event) => {
 					display.geometry.y = geometryY
 					display.usable.x = usableX
 					display.usable.y = usableY
+					event.device = display
 				} break
 
 				// No default
