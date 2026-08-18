@@ -1,7 +1,8 @@
 import Fs from 'node:fs'
+import Zlib from 'node:zlib'
 import Stream from 'node:stream'
 import C from './util/common.js'
-import * as Tar from 'tar'
+import { unpackTar } from 'modern-tar/fs'
 
 const url = `https://github.com/${C.owner}/${C.repo}/releases/download/v${C.version}/${C.assetName}`
 
@@ -14,5 +15,6 @@ await Fs.promises.rm(C.dir.dist, { recursive: true }).catch(() => {})
 await Fs.promises.mkdir(C.dir.dist, { recursive: true })
 await Stream.promises.pipeline(
 	Stream.Readable.fromWeb(response.body),
-	Tar.extract({ preservePaths: true, gzip: true, C: C.dir.dist }),
+	Zlib.createGunzip(),
+	unpackTar(C.dir.dist),
 )
