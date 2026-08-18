@@ -99,7 +99,7 @@ class ControllerInstance extends EventsViaPoll {
 		if (lowFreqRumble < 0 || lowFreqRumble > 1) { throw Object.assign(new Error("lowFreqRumble must be between 0 and 1"), { lowFreqRumble }) }
 		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
-		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
+		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
@@ -125,7 +125,7 @@ class ControllerInstance extends EventsViaPoll {
 		if (leftRumble < 0 || leftRumble > 1) { throw Object.assign(new Error("leftRumble must be between 0 and 1"), { leftRumble }) }
 		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
-		if (!Number.isFinite(duration)) { throw Object.assign(new Error("duration must be a number"), { duration }) }
+		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
