@@ -63,9 +63,6 @@
     "release": "cd scripts && node release.mjs",
     "clean": "cd scripts && node clean.mjs"
   },
-  "dependencies": {
-    "tar": "7.5.22"
-  },
   "devDependencies": {
     "@kmamal/evdev": "0.0.8",
     "@kmamal/testing": "0.0.33",
@@ -77,10 +74,13 @@
     "sdl": {
       "owner": "kmamal",
       "repo": "build-sdl",
-      "version": "2.32.8"
+      "version": "2.32.10"
     }
   },
   "allowScripts": {
-    "@kmamal/evdev@0.0.8": true
+    "@kmamal/evdev": true
+  },
+  "dependencies": {
+    "modern-tar": "0.8.4"
   }
 }
