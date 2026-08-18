@@ -399,7 +399,7 @@ events::dispatchEvent(const SDL_Event &event)
 
 		case SDL_CONTROLLERSTEAMHANDLEUPDATED: {
 			packed.Set("family", events::families::CONTROLLER);
-			packed.Set("type", events::types::REMAP);
+			packed.Set("type", events::types::STEAM_HANDLE_UPDATE);
 
 			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
