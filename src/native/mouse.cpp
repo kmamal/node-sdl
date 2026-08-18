@@ -59,11 +59,6 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 
 	int cursor_id = info[0].As<Napi::Number>().Int32Value();
 
-	if (allocated_cursor != nullptr) {
-		SDL_FreeCursor(allocated_cursor);
-		allocated_cursor = nullptr;
-	}
-
 	SDL_Cursor *cursor = SDL_CreateSystemCursor((SDL_SystemCursor) cursor_id);
 	if (cursor == nullptr) {
 		std::ostringstream message;
@@ -74,6 +69,9 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 
 	SDL_SetCursor(cursor);
 
+	if (allocated_cursor != nullptr) { SDL_FreeCursor(allocated_cursor); }
+	allocated_cursor = cursor;
+
 	return env.Undefined();
 }
 
@@ -81,11 +79,6 @@ Napi::Value
 mouse::resetCursor(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
-
-	if (allocated_cursor != nullptr) {
-		SDL_FreeCursor(allocated_cursor);
-		allocated_cursor = nullptr;
-	}
 
 	SDL_Cursor *cursor = SDL_GetDefaultCursor();
 	if (cursor == nullptr) {
@@ -96,6 +89,11 @@ mouse::resetCursor(const Napi::CallbackInfo &info)
 	}
 
 	SDL_SetCursor(cursor);
+
+	if (allocated_cursor != nullptr) {
+		SDL_FreeCursor(allocated_cursor);
+		allocated_cursor = nullptr;
+	}
 
 	return env.Undefined();
 }
@@ -121,13 +119,8 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (allocated_cursor != nullptr) {
-		SDL_FreeCursor(allocated_cursor);
-		allocated_cursor = nullptr;
-	}
-
-	allocated_cursor = SDL_CreateColorCursor(surface, x, y);
-	if (allocated_cursor == nullptr) {
+	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, x, y);
+	if (cursor == nullptr) {
 		SDL_FreeSurface(surface);
 
 		std::ostringstream message;
@@ -136,7 +129,10 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_SetCursor(allocated_cursor);
+	SDL_SetCursor(cursor);
+
+	if (allocated_cursor != nullptr) { SDL_FreeCursor(allocated_cursor); }
+	allocated_cursor = cursor;
 
 	SDL_FreeSurface(surface);
 	return env.Undefined();
