@@ -109,6 +109,8 @@ class ControllerInstance extends EventsViaPoll {
 	}
 
 	stopRumble () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		clearTimeout(this._rumbleTimeout)
 		this._rumbleTimeout = null
 		Bindings.joystick_rumble(this._device.id, 0, 0, 0)
@@ -133,6 +135,8 @@ class ControllerInstance extends EventsViaPoll {
 	}
 
 	stopRumbleTriggers () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		clearTimeout(this._rumbleTriggersTimeout)
 		this._rumbleTriggersTimeout = null
 		Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0)
@@ -142,6 +146,11 @@ class ControllerInstance extends EventsViaPoll {
 	get closed () { return this._closed }
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		clearTimeout(this._rumbleTimeout)
+		this._rumbleTimeout = null
+		clearTimeout(this._rumbleTriggersTimeout)
+		this._rumbleTriggersTimeout = null
 
 		this.emit('close', { type: 'close' })
 		this.removeAllListeners()
