@@ -139,7 +139,7 @@ class JoystickInstance extends EventsViaPoll {
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 		clearTimeout(this._rumbleTriggersTimeout)
-		this._rumbleTriggersTimeout = setTimeout(() => { this.stopRumble() }, duration)
+		this._rumbleTriggersTimeout = setTimeout(() => { this.stopRumbleTriggers() }, duration)
 	}
 
 	stopRumbleTriggers () {
