@@ -201,6 +201,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", is_file ? events::types::DROP_FILE : events::types::DROP_TEXT);
 			packed.Set("windowId", event.drop.windowID);
 			packed.Set(is_file ? "file" : "text", event.drop.file);
+			SDL_free(event.drop.file);
 			break;
 		}
 
