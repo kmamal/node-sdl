@@ -22,7 +22,8 @@ process.on('beforeExit', (code) => {
 
 		const { channels, frequency, buffered, bytesPerSample } = instance
 		const bytesPerSecond = channels * frequency * bytesPerSample
-		duration = Math.max(duration, (queued + buffered) / bytesPerSecond)
+		const bufferedBytes = buffered * channels * bytesPerSample
+		duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)
 	}
 
 	if (duration) {
