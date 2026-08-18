@@ -163,6 +163,7 @@ window::create (const Napi::CallbackInfo &info)
 	is_utility = actual_flags & SDL_WINDOW_UTILITY;
 
 	SDL_GetWindowPosition(window, &x, &y);
+	SDL_GetWindowSize(window, &width, &height);
 
 	int pixel_width, pixel_height;
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
