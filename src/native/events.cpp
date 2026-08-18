@@ -293,7 +293,7 @@ events::dispatchEvent(const SDL_Event &event)
 
 			packed.Set("dx", event.wheel.x);
 			packed.Set("dy", event.wheel.y);
-			packed.Set("flipped", event.wheel.direction);
+			packed.Set("flipped", event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
 			break;
 		}
 
