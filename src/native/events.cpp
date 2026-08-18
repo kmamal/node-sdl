@@ -513,8 +513,15 @@ events::poll (const Napi::CallbackInfo &info)
 	poll_env = &env;
 	poll_callback = &callback;
 
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) { events::dispatchEvent(event); }
+	try {
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) { events::dispatchEvent(event); }
+	}
+	catch (...) {
+		poll_env = nullptr;
+		poll_callback = nullptr;
+		throw;
+	}
 
 	poll_env = nullptr;
 	poll_callback = nullptr;
