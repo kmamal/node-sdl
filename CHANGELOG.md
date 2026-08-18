@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
 - `sdl.sensor.openDevice()` no longer throws a `TypeError`, and `sdl.sensor.devices` no longer throws for sensors of unknown type (their `type` is `null`).
 - Many fixes to the TypeScript declarations to match the implementation.
+- Touch events no longer crash event handling.
+- An exception thrown in an event listener no longer permanently stops event delivery.
+- The `steamHandleUpdate` event is now emitted correctly instead of a spurious `remap` event.
+- `rumbleTriggers()` no longer stops the main rumble motors when its duration elapses, and pending rumble timeouts are cleared on close.
+- Opening the same joystick, controller, or sensor multiple times no longer leaks the SDL handle.
+- Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
+- `move` and `resize` events are no longer delivered twice.
+- Fixed a use-after-free when destroying a window, and memory leaks in `mouse.setCursor()` and in file drop events.
+- Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code.
+- Sensor device objects now remain valid across reads of `sdl.sensor.devices`.
+- `mouseWheel`'s `flipped` property is now a boolean.
+- Smaller fixes: `mouse.getButton()` accepts the correct button range, `setSizeInPixels()` reports the right error, the audio keep-alive duration uses correct units, and rumble durations are validated consistently.
 
 ## [v0.11.13] - 2025-08-30
 
