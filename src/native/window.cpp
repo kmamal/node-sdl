@@ -751,11 +751,11 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
 	if (renderer != nullptr) {
-		SDL_DestroyRenderer(renderer);
-
 		CachedTexture &cached = cachedTextures[window];
 		if (cached.texture != nullptr) { SDL_DestroyTexture(cached.texture); }
 		cachedTextures.erase(window);
+
+		SDL_DestroyRenderer(renderer);
 	}
 
 	SDL_DestroyWindow(window);
