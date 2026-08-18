@@ -7,7 +7,7 @@ const mouse = {
 
 	getButton (button) {
 		if (!Number.isInteger(button)) { throw Object.assign(new Error("button must be an integer"), { button }) }
-		if (button < 0 || button >= 32) { throw Object.assign(new Error("invalid button"), { button }) }
+		if (button < 1 || button > 32) { throw Object.assign(new Error("invalid button"), { button }) }
 
 		return Bindings.mouse_getButton(button)
 	},
