@@ -76,10 +76,10 @@ std::string events::types::UPDATE;
 static Napi::Env *poll_env = nullptr;
 static Napi::Function *poll_callback = nullptr;
 
-void
+bool
 events::dispatchEvent(const SDL_Event &event)
 {
-	if (poll_env == nullptr) { return; }
+	if (poll_env == nullptr) { return false; }
 	Napi::Env &env = *poll_env;
 
 	Napi::Object packed = Napi::Object::New(env);
@@ -152,7 +152,7 @@ events::dispatchEvent(const SDL_Event &event)
 					SDL_Window *window = SDL_GetWindowFromID(event.window.windowID);
 					if (window == nullptr) {
 						const char *error = SDL_GetError();
-						if (error == global::no_error) { return; }
+						if (error == global::no_error) { return false; }
 
 						std::ostringstream message;
 						message << "SDL_GetWindowFromID() error: " << SDL_GetError();
@@ -502,6 +502,8 @@ events::dispatchEvent(const SDL_Event &event)
 	}
 
 	poll_callback->Call(poll_env->Global(), { packed });
+
+	return true;
 }
 
 Napi::Value

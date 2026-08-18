@@ -28,7 +28,11 @@ int filterEvents(void*, SDL_Event *event) {
 			|| event->window.event == SDL_WINDOWEVENT_MOVED
 			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
 		)
-	) { events::dispatchEvent(*event); }
+	) {
+		// If the event was dispatched, drop it from the queue so it doesn't
+		// get dispatched a second time when polled
+		if (events::dispatchEvent(*event)) { return 0; }
+	}
 
 	return 1;
 }

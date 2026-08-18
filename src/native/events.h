@@ -73,7 +73,7 @@ namespace events {
 		extern std::string UPDATE;
 	};
 
-	void dispatchEvent(const SDL_Event &event);
+	bool dispatchEvent(const SDL_Event &event);
 
 	Napi::Value poll(const Napi::CallbackInfo &info);
 
