@@ -4,6 +4,7 @@
 #include <napi.h>
 #include <SDL.h>
 #include <map>
+#include <set>
 #include <string>
 
 namespace joystick {
@@ -12,6 +13,7 @@ namespace joystick {
 	extern std::map<Uint8, std::string> hat_positions;
 	extern std::map<SDL_JoystickPowerLevel, std::string> power_levels;
 	extern SDL_JoystickGUID zero_guid;
+	extern std::set<int> rawAxisModeDevices;
 
 	double mapAxis (SDL_Joystick *joystick, int axis);
 	double mapAxisValue (SDL_Joystick *joystick, int axis, int value);

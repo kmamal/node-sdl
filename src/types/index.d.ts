@@ -956,6 +956,15 @@ export namespace Sdl {
 
 	export namespace Joystick {
 
+		export interface OpenOptions {
+			/**
+			 * When true, axis values are normalized without SDL's initial state calibration.
+			 * This avoids incorrect zero-point calibration when joysticks aren't centered at startup.
+			 * @default false
+			 */
+			rawAxisMode?: boolean
+		}
+
 		export interface BallPosition {
 			readonly x: number
 			readonly y: number
@@ -1050,12 +1059,21 @@ export namespace Sdl {
 
 			readonly devices: Device[]
 
-			openDevice (device: Device): JoystickInstance
+			openDevice (device: Device, options?: OpenOptions): JoystickInstance
 		}
 
 	}
 
 	export namespace Controller {
+
+		export interface OpenOptions {
+			/**
+			 * When true, axis values are normalized without SDL's initial state calibration.
+			 * This avoids incorrect zero-point calibration when controllers aren't centered at startup.
+			 * @default false
+			 */
+			rawAxisMode?: boolean
+		}
 
 		export type ControllerType
 			= null
@@ -1190,7 +1208,7 @@ export namespace Sdl {
 
 			readonly devices: Device[]
 
-			openDevice (device: Device): ControllerInstance
+			openDevice (device: Device, options?: OpenOptions): ControllerInstance
 		}
 
 	}

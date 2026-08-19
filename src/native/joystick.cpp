@@ -5,12 +5,14 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <set>
 
 
 std::map<Uint8, std::string> joystick::hat_positions;
 std::map<SDL_JoystickType, std::string> joystick::types;
 std::map<SDL_JoystickPowerLevel, std::string> joystick::power_levels;
 SDL_JoystickGUID joystick::zero_guid;
+std::set<int> joystick::rawAxisModeDevices;
 
 double
 joystick::mapAxis (SDL_Joystick *joystick, int axis) {
@@ -19,12 +21,20 @@ joystick::mapAxis (SDL_Joystick *joystick, int axis) {
 
 double
 joystick::mapAxisValue (SDL_Joystick *joystick, int axis, int value) {
-	Sint16 initial;
-	if (!SDL_JoystickGetAxisInitialState(joystick, axis, &initial)) { initial = 0; }
-	double range = value < initial
-		? initial - SDL_JOYSTICK_AXIS_MIN
-		: SDL_JOYSTICK_AXIS_MAX - initial;
-	return (value - initial) / range;
+	int joystick_id = SDL_JoystickInstanceID(joystick);
+	bool rawMode = rawAxisModeDevices.count(joystick_id) > 0;
+
+	if (!rawMode) {
+		Sint16 initial;
+		if (!SDL_JoystickGetAxisInitialState(joystick, axis, &initial)) { initial = 0; }
+		double range = value < initial
+			? initial - SDL_JOYSTICK_AXIS_MIN
+			: SDL_JOYSTICK_AXIS_MAX - initial;
+		return (value - initial) / range;
+	}
+
+	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
+	return value / range;
 }
 
 Napi::Array
@@ -176,6 +186,7 @@ joystick::open (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int index = info[0].As<Napi::Number>().Int32Value();
+	bool rawAxisMode = info.Length() > 1 && info[1].As<Napi::Boolean>().Value();
 
 	SDL_Joystick *joystick = SDL_JoystickOpen(index);
 	if (joystick == nullptr) {
@@ -183,6 +194,11 @@ joystick::open (const Napi::CallbackInfo &info)
 		message << "SDL_JoystickOpen(" << index << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
+	}
+
+	int joystick_id = SDL_JoystickInstanceID(joystick);
+	if (rawAxisMode) {
+		rawAxisModeDevices.insert(joystick_id);
 	}
 
 	// SDL_JoystickOpen produces errors even though it succeeds
@@ -419,6 +435,7 @@ joystick::close (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	rawAxisModeDevices.erase(joystick_id);
 	SDL_JoystickClose(joystick);
 
 	return env.Undefined();

@@ -13,12 +13,13 @@ const validEvents = [
 ]
 
 class JoystickInstance extends EventsViaPoll {
-	constructor (device) {
+	constructor (device, options = {}) {
 		super(validEvents)
 
 		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
-		const result = Bindings.joystick_open(device._index)
+		const { rawAxisMode = false } = options
+		const result = Bindings.joystick_open(device._index, rawAxisMode)
 
 		this._firmwareVersion = result.firmwareVersion
 		this._serialNumber = result.serialNumber

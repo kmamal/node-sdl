@@ -124,6 +124,7 @@ controller::open (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int index = info[0].As<Napi::Number>().Int32Value();
+	bool rawAxisMode = info.Length() > 1 && info[1].As<Napi::Boolean>().Value();
 
 	SDL_GameController *controller = SDL_GameControllerOpen(index);
 	if (controller == nullptr) {
@@ -131,6 +132,12 @@ controller::open (const Napi::CallbackInfo &info)
 		message << "SDL_GameControllerOpen(" << index << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
+	}
+
+	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
+	int joystick_id = SDL_JoystickInstanceID(joystick);
+	if (rawAxisMode) {
+		joystick::rawAxisModeDevices.insert(joystick_id);
 	}
 
 	// SDL_GameControllerOpen produces errors even though it succeeds
@@ -154,7 +161,6 @@ controller::open (const Napi::CallbackInfo &info)
 
 	Napi::Value steam_handle = getSteamHandle(env, controller);
 
-	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
 	Napi::Value power = joystick::getPowerLevel(env, joystick);
 
 	Napi::Object result = Napi::Object::New(env);
@@ -185,6 +191,10 @@ controller::close (const Napi::CallbackInfo &info)
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+
+	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
+	int joystick_id = SDL_JoystickInstanceID(joystick);
+	joystick::rawAxisModeDevices.erase(joystick_id);
 
 	SDL_GameControllerClose(controller);
 
