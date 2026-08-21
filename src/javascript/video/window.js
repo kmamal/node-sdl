@@ -231,8 +231,8 @@ class Window extends EventsViaPoll {
 		const width = pixelWidth * xRatio
 		const height = pixelHeight * yRatio
 
-		if (!Number.isInteger(width)) { throw Object.assign(new Error(`pixelWidth must be a multiple of ${xRatio}`), { pixelWidth }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error(`pixelHeight must be a multiple of ${yRatio}`), { pixelHeight }) }
+		if (!Number.isInteger(width)) { throw Object.assign(new Error(`pixelWidth must be a multiple of ${1 / xRatio}`), { pixelWidth }) }
+		if (!Number.isInteger(height)) { throw Object.assign(new Error(`pixelHeight must be a multiple of ${1 / yRatio}`), { pixelHeight }) }
 
 		const result = Bindings.window_setSize(this._id, width, height)
 		this._width = width
