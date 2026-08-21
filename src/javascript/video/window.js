@@ -91,10 +91,14 @@ class Window extends EventsViaPoll {
 
 		let displayIndex = 0
 		if (display) {
-			const { name } = display
+			// Identical monitors share a name, so also match on position
+			const { name, geometry } = display
 			const displays = Bindings.video_getDisplays()
-			const index = displays.findIndex((a) => a.name === name)
-			displayIndex = Math.max(0, index)
+			const index = displays.findIndex((a) => a.name === name
+				&& a.geometry.x === geometry?.x
+				&& a.geometry.y === geometry?.y)
+			if (index === -1) { throw Object.assign(new Error("display not found"), { display }) }
+			displayIndex = index
 		}
 
 		const result = Bindings.window_create(
