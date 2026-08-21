@@ -41,6 +41,7 @@ const handleEvent = (event) => {
 
 				case 'displayOrient': {
 					const display = Globals.displays[displayIndex]
+					if (!display) { return }
 					display.orientation = event.orientation
 					event.device = display
 				} break
@@ -53,6 +54,7 @@ const handleEvent = (event) => {
 					delete event.usableY
 
 					const display = Globals.displays[displayIndex]
+					if (!display) { return }
 					display.geometry.x = geometryX
 					display.geometry.y = geometryY
 					display.usable.x = usableX

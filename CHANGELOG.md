@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
 - `sdl.sensor.devices` now reports `side` for left/right sensors (such as Joy-Con pairs) instead of always `null`.
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
+- Orientation or move events for a display disconnected in the same batch no longer crash the process.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
