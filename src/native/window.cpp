@@ -14,6 +14,20 @@ struct CachedTexture {
 
 std::map<SDL_Window*, CachedTexture> cachedTextures;
 
+// SDL_GetWindowFromID doesn't set an SDL error on failure, so don't report
+// whatever stale error text an earlier call might have left behind
+static SDL_Window *
+getWindow (Napi::Env &env, int window_id)
+{
+	SDL_Window *window = SDL_GetWindowFromID(window_id);
+	if (window == nullptr) {
+		std::ostringstream message;
+		message << "SDL_GetWindowFromID(" << window_id << ") error: invalid window id";
+		throw Napi::Error::New(env, message.str());
+	}
+	return window;
+}
+
 #if defined(__LINUX__)
 	#define NativeWindowHandle Window
 	#define GL_NativeWindow Window
@@ -291,13 +305,7 @@ window::setTitle (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	std:: string title = info[1].As<Napi::String>().Utf8Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_SetWindowTitle(window, title.c_str());
 
@@ -313,13 +321,7 @@ window::setPosition (const Napi::CallbackInfo &info)
 	int x = info[1].As<Napi::Number>().Int32Value();
 	int y = info[2].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_SetWindowPosition(window, x, y);
 
@@ -335,13 +337,7 @@ window::setSize (const Napi::CallbackInfo &info)
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_SetWindowSize(window, width, height);
 
@@ -363,13 +359,7 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	int is_fullscreen = info[1].As<Napi::Boolean>().Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	if (SDL_SetWindowFullscreen(window, is_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) < 0) {
 		std::ostringstream message;
@@ -392,13 +382,7 @@ window::setResizable (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	bool is_resizable = info[1].As<Napi::Boolean>().Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_SetWindowResizable(window, is_resizable ? SDL_TRUE : SDL_FALSE);
 
@@ -416,13 +400,7 @@ window::setBorderless (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	bool is_borderless = info[1].As<Napi::Boolean>().Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_SetWindowBordered(window, is_borderless ? SDL_FALSE : SDL_TRUE);
 
@@ -441,13 +419,7 @@ window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 	bool is_accelerated = info[1].As<Napi::Boolean>().Value();
 	bool is_vsync = info[2].As<Napi::Boolean>().Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	updateRenderer(env, window, &is_accelerated, &is_vsync);
 
@@ -465,13 +437,7 @@ window::focus (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_RaiseWindow(window);
 
@@ -485,13 +451,7 @@ window::show (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_ShowWindow(window);
 
@@ -505,13 +465,7 @@ window::hide (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_HideWindow(window);
 
@@ -525,13 +479,7 @@ window::maximize (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_MaximizeWindow(window);
 
@@ -545,13 +493,7 @@ window::minimize (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_MinimizeWindow(window);
 
@@ -565,13 +507,7 @@ window::restore (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_RestoreWindow(window);
 
@@ -601,13 +537,7 @@ window::render (const Napi::CallbackInfo &info)
 		rect.h = dstRect.Get("height").As<Napi::Number>().Int32Value();
 	}
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
 	if (renderer == nullptr) {
@@ -697,13 +627,7 @@ window::setIcon (const Napi::CallbackInfo &info)
 	unsigned int format = info[4].As<Napi::Number>().Int32Value();
 	void *pixels = info[5].As<Napi::Buffer<char>>().Data();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
 	if (surface == nullptr) {
@@ -728,13 +652,7 @@ window::flash (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	int type = info[1].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	SDL_FlashOperation op;
 	switch (type) {
@@ -760,13 +678,7 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Window *window = getWindow(env, window_id);
 
 	// The window can have a cache entry but no renderer, if rebuilding the
 	// renderer failed after destroying the old one

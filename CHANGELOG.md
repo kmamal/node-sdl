@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- Window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale SDL error text an earlier unrelated call had left behind.
 - Enum values this build of the library doesn't know (a joystick or controller type, sensor type, power state, display orientation, touch device type, or hat position introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
 - A display disappearing while its hot-plug or move event is being processed no longer crashes the process: display enumeration now skips displays that vanish mid-query, and `displayMove` events for already-removed displays are dropped.
 - `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
