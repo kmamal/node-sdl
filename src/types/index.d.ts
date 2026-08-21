@@ -62,7 +62,11 @@ export namespace Events {
 			readonly touch: boolean
 		}
 
-		export interface MouseMove extends MouseEvent { readonly type: 'mouseMove' }
+		export interface MouseMove extends MouseEvent {
+			readonly type: 'mouseMove'
+			readonly dx: number
+			readonly dy: number
+		}
 
 		interface MouseButtonEvent extends MouseEvent {
 			readonly button: number

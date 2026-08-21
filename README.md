@@ -797,6 +797,8 @@ Fired when a mouse button is released.
 
 - `x: <number>` The mouse's x position when the event happened, relative to the window.
 - `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `dx: <number>` The mouse's x movement, relative to its last position.
+- `dy: <number>` The mouse's y movement, relative to its last position.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
 
 Fired when the mouse moves.

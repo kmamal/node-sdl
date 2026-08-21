@@ -262,6 +262,8 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("touch", event.motion.which == SDL_TOUCH_MOUSEID);
 			packed.Set("x", event.motion.x);
 			packed.Set("y", event.motion.y);
+			packed.Set("dx", event.motion.xrel);
+			packed.Set("dy", event.motion.yrel);
 			break;
 		}
 		case SDL_MOUSEBUTTONDOWN:
