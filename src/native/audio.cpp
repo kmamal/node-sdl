@@ -114,7 +114,7 @@ audio::getQueueSize (const Napi::CallbackInfo &info)
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 
-	int size = SDL_GetQueuedAudioSize(audio_id);
+	Uint32 size = SDL_GetQueuedAudioSize(audio_id);
 
 	return Napi::Number::New(env, size);
 }
