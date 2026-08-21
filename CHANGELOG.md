@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Declared support for Node.js >= 22 in `package.json`, and pinned the native addon to the matching Node-API version 9.
+
 ### Added
 
 - Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()` and `sdl.mouse.relativeMode`.
