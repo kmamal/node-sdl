@@ -375,10 +375,11 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
-		const {
-			scaling = 'nearest',
+		let {
+			scaling = null,
 			dstRect = null,
 		} = options
+		scaling ??= 'nearest'
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }

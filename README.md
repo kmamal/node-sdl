@@ -1154,7 +1154,7 @@ Such a window is always treated as a utility window.
 
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
 - `options: <object>`
-  - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
+  - `scaling: <string>|<null>` How to scale the image to match the window size, or `null` for the default. Default: `'nearest'`
   - `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
     - `x, y, width, height: <rect>` The components of the rectangle.
 

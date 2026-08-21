@@ -566,7 +566,7 @@ export namespace Sdl {
 			readonly utility: boolean
 
 			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, options?: {
-				scaling?: Scaling,
+				scaling?: Scaling | null,
 				dstRect?: {
 					x: number,
 					y: number,
