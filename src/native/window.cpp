@@ -144,134 +144,143 @@ window::create (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	int window_id = SDL_GetWindowID(window);
-	if (window_id == 0) {
-		std::ostringstream message;
-		message << "SDL_GetWindowID() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	int actual_flags = SDL_GetWindowFlags(window);
-	is_fullscreen = actual_flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
-	is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
-	is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
-	is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
-	should_skip_taskbar = actual_flags & SDL_WINDOW_SKIP_TASKBAR;
-	is_popup_menu = actual_flags & SDL_WINDOW_POPUP_MENU;
-	is_tooltip = actual_flags & SDL_WINDOW_TOOLTIP;
-	is_utility = actual_flags & SDL_WINDOW_UTILITY;
-
-	SDL_GetWindowPosition(window, &x, &y);
-	SDL_GetWindowSize(window, &width, &height);
-
-	int pixel_width, pixel_height;
-	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
-
-	display = SDL_GetWindowDisplayIndex(window);
-	if (display < 0) {
-		std::ostringstream message;
-		message << "SDL_GetWindowDisplayIndex(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	Napi::Object native = Napi::Object::New(env);
-
-	bool has_wm_info;
-	std::string message_of_failed_wm_info;
-	SDL_SysWMinfo sys_wm_info;
-	SDL_VERSION(&(sys_wm_info.version));
-	has_wm_info = SDL_GetWindowWMInfo(window, &sys_wm_info) == SDL_TRUE;
-	if (!has_wm_info) {
-		message_of_failed_wm_info = SDL_GetError();
-		SDL_ClearError();
-	}
-
-	Napi::Value native_handle;
-	if (has_wm_info) {
-		NativeWindowHandle _native_handle;
-		#if defined(__LINUX__)
-			_native_handle = sys_wm_info.info.x11.window;
-		#elif defined(__WIN32__)
-			_native_handle = sys_wm_info.info.win.window;
-		#elif defined(__MACOSX__)
-			_native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
-		#endif
-		native_handle = Napi::Buffer<NativeWindowHandle>::Copy(env, &_native_handle, 1);
-	}
-	else {
-		native_handle = env.Null();
-	}
-	native.Set("handle", native_handle);
-
-	if (is_opengl) {
-		if (!has_wm_info) {
+	try {
+		int window_id = SDL_GetWindowID(window);
+		if (window_id == 0) {
 			std::ostringstream message;
-			message << "Window has set { opengl: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+			message << "SDL_GetWindowID() error: " << SDL_GetError();
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}
 
-		GL_NativeWindow native_gl;
-		#if defined(__LINUX__)
-			native_gl = sys_wm_info.info.x11.window;
-		#elif defined(__WIN32__)
-			native_gl = sys_wm_info.info.win.window;
-		#elif defined(__MACOSX__)
-			native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
-		#endif
-		native.Set("gl", Napi::Buffer<GL_NativeWindow>::Copy(env, &native_gl, 1));
-	}
-	else if (is_webgpu) {
-		if (!has_wm_info) {
+		int actual_flags = SDL_GetWindowFlags(window);
+		is_fullscreen = actual_flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
+		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
+		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
+		should_skip_taskbar = actual_flags & SDL_WINDOW_SKIP_TASKBAR;
+		is_popup_menu = actual_flags & SDL_WINDOW_POPUP_MENU;
+		is_tooltip = actual_flags & SDL_WINDOW_TOOLTIP;
+		is_utility = actual_flags & SDL_WINDOW_UTILITY;
+
+		SDL_GetWindowPosition(window, &x, &y);
+		SDL_GetWindowSize(window, &width, &height);
+
+		int pixel_width, pixel_height;
+		SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+
+		display = SDL_GetWindowDisplayIndex(window);
+		if (display < 0) {
 			std::ostringstream message;
-			message << "Window has set { webgpu: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+			message << "SDL_GetWindowDisplayIndex(" << window_id << ") error: " << SDL_GetError();
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}
 
-		GPU_NativeData native_gpu;
-		#if defined(__LINUX__)
-			native_gpu.display = sys_wm_info.info.x11.display;
-			native_gpu.window = sys_wm_info.info.x11.window;
-		#elif defined(__WIN32__)
-			native_gpu.hwnd = sys_wm_info.info.win.window;
-			native_gpu.hinstance = sys_wm_info.info.win.hinstance;
-		#elif defined(__MACOSX__)
-			native_gpu.layer = getCocoaGpuView(sys_wm_info.info.cocoa.window);
-		#endif
-		native.Set("gpu", Napi::Buffer<GPU_NativeData>::Copy(env, &native_gpu, 1));
+		Napi::Object native = Napi::Object::New(env);
+
+		bool has_wm_info;
+		std::string message_of_failed_wm_info;
+		SDL_SysWMinfo sys_wm_info;
+		SDL_VERSION(&(sys_wm_info.version));
+		has_wm_info = SDL_GetWindowWMInfo(window, &sys_wm_info) == SDL_TRUE;
+		if (!has_wm_info) {
+			message_of_failed_wm_info = SDL_GetError();
+			SDL_ClearError();
+		}
+
+		Napi::Value native_handle;
+		if (has_wm_info) {
+			NativeWindowHandle _native_handle;
+			#if defined(__LINUX__)
+				_native_handle = sys_wm_info.info.x11.window;
+			#elif defined(__WIN32__)
+				_native_handle = sys_wm_info.info.win.window;
+			#elif defined(__MACOSX__)
+				_native_handle = getCocoaWindowHandle(sys_wm_info.info.cocoa.window);
+			#endif
+			native_handle = Napi::Buffer<NativeWindowHandle>::Copy(env, &_native_handle, 1);
+		}
+		else {
+			native_handle = env.Null();
+		}
+		native.Set("handle", native_handle);
+
+		if (is_opengl) {
+			if (!has_wm_info) {
+				std::ostringstream message;
+				message << "Window has set { opengl: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
+
+			GL_NativeWindow native_gl;
+			#if defined(__LINUX__)
+				native_gl = sys_wm_info.info.x11.window;
+			#elif defined(__WIN32__)
+				native_gl = sys_wm_info.info.win.window;
+			#elif defined(__MACOSX__)
+				native_gl = getCocoaGlView(sys_wm_info.info.cocoa.window);
+			#endif
+			native.Set("gl", Napi::Buffer<GL_NativeWindow>::Copy(env, &native_gl, 1));
+		}
+		else if (is_webgpu) {
+			if (!has_wm_info) {
+				std::ostringstream message;
+				message << "Window has set { webgpu: true } but SDL_GetWindowWMInfo failed with: " << message_of_failed_wm_info;
+				SDL_ClearError();
+				throw Napi::Error::New(env, message.str());
+			}
+
+			GPU_NativeData native_gpu;
+			#if defined(__LINUX__)
+				native_gpu.display = sys_wm_info.info.x11.display;
+				native_gpu.window = sys_wm_info.info.x11.window;
+			#elif defined(__WIN32__)
+				native_gpu.hwnd = sys_wm_info.info.win.window;
+				native_gpu.hinstance = sys_wm_info.info.win.hinstance;
+			#elif defined(__MACOSX__)
+				native_gpu.layer = getCocoaGpuView(sys_wm_info.info.cocoa.window);
+			#endif
+			native.Set("gpu", Napi::Buffer<GPU_NativeData>::Copy(env, &native_gpu, 1));
+		}
+		else {
+			cachedTextures[window] = {};
+			updateRenderer(env, window, &is_accelerated, &is_vsync);
+		}
+
+		if (is_visible) { SDL_ShowWindow(window); }
+
+		Napi::Object result = Napi::Object::New(env);
+		result.Set("id", window_id);
+		result.Set("x", x);
+		result.Set("y", y);
+		result.Set("width", width);
+		result.Set("height", height);
+		result.Set("pixelWidth", pixel_width);
+		result.Set("pixelHeight", pixel_height);
+		result.Set("displayIndex", display);
+		result.Set("fullscreen", is_fullscreen);
+		result.Set("resizable", is_resizable);
+		result.Set("borderless", is_borderless);
+		result.Set("alwaysOnTop", is_always_on_top);
+		result.Set("accelerated", is_accelerated);
+		result.Set("vsync", is_vsync);
+		result.Set("native", native);
+		result.Set("skipTaskbar", should_skip_taskbar);
+		result.Set("popupMenu", is_popup_menu);
+		result.Set("tooltip", is_tooltip);
+		result.Set("utility", is_utility);
+
+		return result;
 	}
-	else {
-		cachedTextures[window] = {};
-		updateRenderer(env, window, &is_accelerated, &is_vsync);
+	catch (...) {
+		SDL_Renderer *renderer = SDL_GetRenderer(window);
+		if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
+		cachedTextures.erase(window);
+		SDL_DestroyWindow(window);
+		throw;
 	}
-
-	if (is_visible) { SDL_ShowWindow(window); }
-
-	Napi::Object result = Napi::Object::New(env);
-	result.Set("id", window_id);
-	result.Set("x", x);
-	result.Set("y", y);
-	result.Set("width", width);
-	result.Set("height", height);
-	result.Set("pixelWidth", pixel_width);
-	result.Set("pixelHeight", pixel_height);
-	result.Set("displayIndex", display);
-	result.Set("fullscreen", is_fullscreen);
-	result.Set("resizable", is_resizable);
-	result.Set("borderless", is_borderless);
-	result.Set("alwaysOnTop", is_always_on_top);
-	result.Set("accelerated", is_accelerated);
-	result.Set("vsync", is_vsync);
-	result.Set("native", native);
-	result.Set("skipTaskbar", should_skip_taskbar);
-	result.Set("popupMenu", is_popup_menu);
-	result.Set("tooltip", is_tooltip);
-	result.Set("utility", is_utility);
-
-	return result;
 }
 
 Napi::Value
