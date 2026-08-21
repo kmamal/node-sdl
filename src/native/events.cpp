@@ -520,6 +520,10 @@ events::dispatchEvent(const SDL_Event &event)
 		}
 	}
 
+	// Event types without a case above (controller touchpad events, text
+	// editing, ...) would otherwise cross into JS as empty objects
+	if (!packed.Has("type")) { return false; }
+
 	poll_callback->Call(poll_env->Global(), { packed });
 
 	return true;

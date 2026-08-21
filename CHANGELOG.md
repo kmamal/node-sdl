@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
 - Passing `null` to `audio.openDevice()` now fails validation with the intended error instead of an unrelated `TypeError`.
 - The standalone audio format helpers (`audio.bytesPerSample()`, `audio.readSample()`, and the rest) now treat names of inherited `Object` members (such as `'constructor'`) as invalid formats like every other lookup table in the library, instead of silently returning `undefined` or failing with a confusing error.
+- SDL event types the library doesn't handle (such as controller touchpad events) no longer make a wasted native-to-JS call per event.
 - Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer.
 - Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
 - An exception stashed by the window drag/resize filter no longer risks undefined behavior at process teardown when no further poll runs to consume it.
