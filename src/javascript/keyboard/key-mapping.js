@@ -222,6 +222,21 @@ for (const [ key, value ] of Object.entries(mapping)) {
 	reverseMapping[value] = key
 }
 
+// Single-character keys are also valid SDL key names themselves. Prefer the
+// bare key when it has a lower scancode than the table entry, so that e.g.
+// ',' resolves to the main comma key instead of 'Keypad ,'.
+for (const [ value, key ] of Object.entries(reverseMapping)) {
+	if (value.length !== 1) { continue }
+
+	const valueScancode = Bindings.keyboard_getScancode(value)
+	if (valueScancode === null) { continue }
+
+	const keyScancode = Bindings.keyboard_getScancode(key)
+	if (keyScancode === null || valueScancode < keyScancode) {
+		delete reverseMapping[value]
+	}
+}
+
 module.exports = {
 	mapping,
 	reverseMapping,
