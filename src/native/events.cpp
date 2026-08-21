@@ -298,13 +298,11 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("windowId", event.wheel.windowID);
 			packed.Set("touch", event.wheel.which == SDL_TOUCH_MOUSEID);
 
-			int x, y;
-			SDL_GetMouseState(&x, &y);
-			packed.Set("x", x);
-			packed.Set("y", y);
+			packed.Set("x", event.wheel.mouseX);
+			packed.Set("y", event.wheel.mouseY);
 
-			packed.Set("dx", event.wheel.x);
-			packed.Set("dy", event.wheel.y);
+			packed.Set("dx", event.wheel.preciseX);
+			packed.Set("dy", event.wheel.preciseY);
 			packed.Set("flipped", event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
 			break;
 		}
