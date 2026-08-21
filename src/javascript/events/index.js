@@ -259,10 +259,15 @@ const handleEvent = (event) => {
 				} break
 
 				case 'ballMotion': {
+					// SDL reports relative motion, but the documented payload is a position
+					const dx = event.x
+					const dy = event.y
 					for (const joystickInstance of collection) {
 						const ball = joystickInstance._balls[event.ball]
-						ball.x = event.x
-						ball.y = event.y
+						ball.x += dx
+						ball.y += dy
+						event.x = ball.x
+						event.y = ball.y
 						joystickInstance.emit(type, event)
 					}
 				} break
