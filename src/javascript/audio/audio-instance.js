@@ -29,6 +29,8 @@ class AudioInstance extends EventsViaPoll {
 		if (!Number.isInteger(buffered)) { throw Object.assign(new Error("buffered must be an integer"), { buffered }) }
 		if (buffered <= 0) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
+		// SDL stores the buffer size in a 16-bit field
+		if (buffered > 2 ** 15) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }

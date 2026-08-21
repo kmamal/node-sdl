@@ -2557,7 +2557,7 @@ const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
   - `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
-  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`. Default: `4096`
+  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
 - Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
 
 Initializes an audio device for playback/recording and returns a corresponding instance.
