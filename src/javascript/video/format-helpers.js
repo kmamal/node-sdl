@@ -40,15 +40,20 @@ const bytesPerPixel = {
 	nv21: 1,
 }
 
-// The planar YUV formats store extra chroma planes after the Y plane
-const heightFactor = {
-	yv12: 1.5,
-	iyuv: 1.5,
-	nv12: 1.5,
-	nv21: 1.5,
+// The planar YUV formats store extra chroma planes after the Y plane. The
+// chroma pitches and row counts are rounded up for odd dimensions.
+const isPlanarYuv = {
+	yv12: true,
+	iyuv: true,
+	nv12: true,
+	nv21: true,
 }
 
-const minBufferSize = (format, stride, height) => Math.ceil(stride * height * (heightFactor[format] ?? 1))
+const minBufferSize = (format, stride, height) => {
+	const luma = stride * height
+	if (!isPlanarYuv[format]) { return luma }
+	return luma + 2 * Math.ceil(stride / 2) * Math.ceil(height / 2)
+}
 
 module.exports = {
 	bytesPerPixel,
