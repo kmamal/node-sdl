@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `mouseWheel` events now report the mouse position at the time of the event, and carry precise fractional `dx`/`dy` values so high-resolution trackpad scrolls no longer arrive as `0`.
 - Buffer size validation for the planar YUV formats now accounts for SDL rounding the chroma planes up, preventing an out-of-bounds read for odd dimensions.
 - `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
+- A failure while opening a joystick or controller no longer leaks the SDL handle.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.

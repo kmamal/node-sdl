@@ -141,37 +141,43 @@ controller::open (const Napi::CallbackInfo &info)
 	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
 	SDL_ClearError();
 
-	int _firmware_version = SDL_GameControllerGetFirmwareVersion(controller);
-	Napi::Value firmware_version = _firmware_version != 0
-		? Napi::Number::New(env, _firmware_version)
-		: env.Null();
+	try {
+		int _firmware_version = SDL_GameControllerGetFirmwareVersion(controller);
+		Napi::Value firmware_version = _firmware_version != 0
+			? Napi::Number::New(env, _firmware_version)
+			: env.Null();
 
-	const char *_serial_number = SDL_GameControllerGetSerial(controller);
-	Napi::Value serial_number = _serial_number != nullptr
-		? Napi::String::New(env, _serial_number)
-		: env.Null();
+		const char *_serial_number = SDL_GameControllerGetSerial(controller);
+		Napi::Value serial_number = _serial_number != nullptr
+			? Napi::String::New(env, _serial_number)
+			: env.Null();
 
-	bool has_led = SDL_GameControllerHasLED(controller);
-	bool has_rumble = SDL_GameControllerHasRumble(controller);
-	bool has_rumble_triggers = SDL_GameControllerHasRumbleTriggers(controller);
+		bool has_led = SDL_GameControllerHasLED(controller);
+		bool has_rumble = SDL_GameControllerHasRumble(controller);
+		bool has_rumble_triggers = SDL_GameControllerHasRumbleTriggers(controller);
 
-	Napi::Value steam_handle = getSteamHandle(env, controller);
+		Napi::Value steam_handle = getSteamHandle(env, controller);
 
-	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
-	Napi::Value power = joystick::getPowerLevel(env, joystick);
+		SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
+		Napi::Value power = joystick::getPowerLevel(env, joystick);
 
-	Napi::Object result = Napi::Object::New(env);
-	result.Set("firmwareVersion", firmware_version);
-	result.Set("serialNumber", serial_number);
-	result.Set("hasLed", has_led);
-	result.Set("hasRumble", has_rumble);
-	result.Set("hasRumbleTriggers", has_rumble_triggers);
-	result.Set("steamHandle", steam_handle);
-	result.Set("power", power);
+		Napi::Object result = Napi::Object::New(env);
+		result.Set("firmwareVersion", firmware_version);
+		result.Set("serialNumber", serial_number);
+		result.Set("hasLed", has_led);
+		result.Set("hasRumble", has_rumble);
+		result.Set("hasRumbleTriggers", has_rumble_triggers);
+		result.Set("steamHandle", steam_handle);
+		result.Set("power", power);
 
-	controller::getState(env, controller, result);
+		controller::getState(env, controller, result);
 
-	return result;
+		return result;
+	}
+	catch (...) {
+		SDL_GameControllerClose(controller);
+		throw;
+	}
 }
 
 Napi::Value
