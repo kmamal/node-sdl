@@ -560,7 +560,7 @@ Fired when a display changes position.
 
 - `<object>[]`
   - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
-  - `format: `[`<PixelFormat>`](#pixel-formats) The pixel format of the display.
+  - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
   - `frequency: <number>` The refresh rate of the display.
   - `geometry: <object>` The desktop region represented by the display.
     - `x, y, width, height: <Rect>` The position and size of the display's geometry.

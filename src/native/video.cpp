@@ -81,10 +81,15 @@ video::_getDisplays(Napi::Env &env)
 			? Napi::String::New(env, video::orientations[_orientation])
 			: env.Null();
 
+		auto format_entry = video::formats.find((SDL_PixelFormatEnum) mode.format);
+		Napi::Value format = format_entry != video::formats.end()
+			? Napi::String::New(env, format_entry->second)
+			: env.Null();
+
 		Napi::Object display = Napi::Object::New(env);
 		display.Set("_index", i);
 		display.Set("name", name);
-		display.Set("format", video::formats[(SDL_PixelFormatEnum) mode.format]);
+		display.Set("format", format);
 		display.Set("frequency", mode.refresh_rate);
 		display.Set("geometry", geometry);
 		display.Set("usable", usable);

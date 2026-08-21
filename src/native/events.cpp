@@ -458,8 +458,13 @@ events::dispatchEvent(const SDL_Event &event)
 			}
 			SDL_GameControllerAxis axis = (SDL_GameControllerAxis) event.caxis.axis;
 
+			auto axis_entry = controller::axes.find(axis);
+			Napi::Value axis_name = axis_entry != controller::axes.end()
+				? Napi::String::New(env, axis_entry->second)
+				: env.Null();
+
 			packed.Set("controllerId", controller_id);
-			packed.Set("axis", controller::axes[axis]);
+			packed.Set("axis", axis_name);
 			packed.Set("value", controller::mapAxisValue(controller, axis, event.caxis.value));
 			break;
 		}
@@ -472,8 +477,13 @@ events::dispatchEvent(const SDL_Event &event)
 					? events::types::BUTTON_DOWN
 					: events::types::BUTTON_UP
 			);
+			auto button_entry = controller::buttons.find((SDL_GameControllerButton) event.cbutton.button);
+			Napi::Value button_name = button_entry != controller::buttons.end()
+				? Napi::String::New(env, button_entry->second)
+				: env.Null();
+
 			packed.Set("controllerId", event.cbutton.which);
-			packed.Set("button", controller::buttons[(SDL_GameControllerButton) event.cbutton.button]);
+			packed.Set("button", button_name);
 			break;
 		}
 

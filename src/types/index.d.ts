@@ -449,7 +449,7 @@ export namespace Sdl {
 
 		export interface Display {
 			readonly name: string | null
-			readonly format: Format
+			readonly format: Format | null
 			readonly frequency: number
 			readonly geometry: {
 				readonly x: number
