@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
 - The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
 - `displayOrient` events with an unknown orientation report `null` instead of an empty string.
+- `sdl.clipboard.text` now throws instead of crashing if SDL fails to allocate the clipboard string.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.

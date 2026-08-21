@@ -17,6 +17,12 @@ clipboard::getText (const Napi::CallbackInfo &info)
 	SDL_ClearError();
 
 	char *text = SDL_GetClipboardText();
+	if (text == nullptr) {
+		std::ostringstream message;
+		message << "SDL_GetClipboardText() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 	if (text[0] == '\0') {
 		SDL_free(text);
 
