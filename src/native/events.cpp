@@ -542,6 +542,19 @@ events::dispatchEventFromFilter(const SDL_Event &event)
 	catch (const Napi::Error &error) {
 		pending_filter_error = error;
 		has_pending_filter_error = true;
+
+		// The stash holds a persistent reference. If no poll ever runs again,
+		// it must still be released before the environment is torn down, or
+		// its destructor runs against a destroyed environment.
+		static bool cleanup_hook_added = false;
+		if (!cleanup_hook_added) {
+			cleanup_hook_added = true;
+			pending_filter_error.Env().AddCleanupHook([]() {
+				has_pending_filter_error = false;
+				pending_filter_error.Reset();
+			});
+		}
+
 		return true;
 	}
 }
