@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <cmath>
 
 
 std::map<Uint8, std::string> joystick::hat_positions;
@@ -332,7 +333,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (SDL_JoystickRumble(joystick, low_freq_rumble * 0xFFFF, high_freq_rumble * 0xFFFF, duration) == -1) {
+	if (SDL_JoystickRumble(joystick, std::lround(low_freq_rumble * 0xFFFF), std::lround(high_freq_rumble * 0xFFFF), duration) == -1) {
 		std::ostringstream message;
 		message << "SDL_JoystickRumble(" << joystick_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -360,7 +361,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (SDL_JoystickSetLED(joystick, red * 0xFF, green * 0xFF, blue * 0xFF) == -1) {
+	if (SDL_JoystickSetLED(joystick, std::lround(red * 0xFF), std::lround(green * 0xFF), std::lround(blue * 0xFF)) == -1) {
 		std::ostringstream message;
 		message << "SDL_JoystickSetLED(" << joystick_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -409,7 +410,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (SDL_JoystickRumbleTriggers(joystick, left_rumble * 0xFFFF, right_rumble * 0xFFFF, duration) == -1) {
+	if (SDL_JoystickRumbleTriggers(joystick, std::lround(left_rumble * 0xFFFF), std::lround(right_rumble * 0xFFFF), duration) == -1) {
 		std::ostringstream message;
 		message << "SDL_JoystickRumbleTriggers(" << joystick_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
