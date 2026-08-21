@@ -59,8 +59,6 @@ audio::getDevices(const Napi::CallbackInfo &info)
 	return audio::_getDevices(env, is_capture);
 }
 
-#include <iostream>
-
 Napi::Value
 audio::open (const Napi::CallbackInfo &info)
 {
