@@ -1,3 +1,4 @@
+const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const FormatHelpers = require('../video/format-helpers')
@@ -11,6 +12,8 @@ const mouse = {
 		if (!Number.isInteger(button)) { throw Object.assign(new Error("button must be an integer"), { button }) }
 		if (button < 1 || button > 32) { throw Object.assign(new Error("invalid button"), { button }) }
 
+		// SDL only refreshes mouse button state inside the event pump
+		Globals.events.poll()
 		return Bindings.mouse_getButton(button)
 	},
 
