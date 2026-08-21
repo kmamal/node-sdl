@@ -159,9 +159,9 @@ class ControllerInstance extends EventsViaPoll {
 		clearTimeout(this._rumbleTriggersTimeout)
 		this._rumbleTriggersTimeout = null
 
+		this._closed = true
 		this.emit('close', { type: 'close' })
 		this.removeAllListeners()
-		this._closed = true
 
 		Globals.controllerInstances.all.delete(this)
 		const collection = Globals.controllerInstances.byId.get(this._device.id)

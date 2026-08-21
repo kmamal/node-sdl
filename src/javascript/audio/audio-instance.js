@@ -112,9 +112,9 @@ class AudioInstance extends EventsViaPoll {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
+		this._closed = true
 		this.emit('close', { type: 'close' })
 		this.removeAllListeners()
-		this._closed = true
 
 		Bindings.audio_close(this._id)
 

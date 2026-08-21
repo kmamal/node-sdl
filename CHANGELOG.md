@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Instances now report `closed` as `true` while their `close` event is being emitted, so a listener that calls `close()` again no longer recurses forever.
 - Connecting or disconnecting a display no longer crashes the process.
 - Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
