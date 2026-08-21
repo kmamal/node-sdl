@@ -45,8 +45,6 @@ class SensorInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		this._closed = true
-		this.emit('close', { type: 'close' })
-		this.removeAllListeners()
 
 		Globals.sensorInstances.all.delete(this)
 		const collection = Globals.sensorInstances.byId.get(this._device.id)
@@ -57,6 +55,10 @@ class SensorInstance extends EventsViaPoll {
 
 		// SDL open/close calls are reference-counted per instance
 		Bindings.sensor_close(this._device.id)
+
+		// Emitted last so a throwing listener can't leave the teardown half-done
+		this.emit('close', { type: 'close' })
+		this.removeAllListeners()
 	}
 }
 

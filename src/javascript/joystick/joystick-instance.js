@@ -180,8 +180,6 @@ class JoystickInstance extends EventsViaPoll {
 		this._rumbleTriggersTimeout = null
 
 		this._closed = true
-		this.emit('close', { type: 'close' })
-		this.removeAllListeners()
 
 		Globals.joystickInstances.all.delete(this)
 		const collection = Globals.joystickInstances.byId.get(this._device.id)
@@ -192,6 +190,10 @@ class JoystickInstance extends EventsViaPoll {
 
 		// SDL open/close calls are reference-counted per instance
 		Bindings.joystick_close(this._device.id)
+
+		// Emitted last so a throwing listener can't leave the teardown half-done
+		this.emit('close', { type: 'close' })
+		this.removeAllListeners()
 	}
 }
 

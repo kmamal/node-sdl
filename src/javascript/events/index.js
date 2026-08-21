@@ -203,6 +203,9 @@ const handleEvent = (event) => {
 		} break
 
 		case 'joystickDevice': {
+			// The removal handling must finish even if a close listener throws
+			let closeError = null
+
 			if (type === 'deviceRemove') {
 				const { joystickId } = event
 				delete event.joystickId
@@ -211,7 +214,8 @@ const handleEvent = (event) => {
 					const collection = Globals.joystickInstances.byId.get(joystickId)
 					if (!collection) { break closeJoysticks }
 					for (const joystickInstance of collection.values()) {
-						joystickInstance.close()
+						try { joystickInstance.close() }
+						catch (error) { closeError ??= error }
 					}
 				}
 
@@ -219,7 +223,8 @@ const handleEvent = (event) => {
 					const collection = Globals.controllerInstances.byId.get(joystickId)
 					if (!collection) { break closeControllers }
 					for (const controllerInstance of collection.values()) {
-						controllerInstance.close()
+						try { controllerInstance.close() }
+						catch (error) { closeError ??= error }
 					}
 				}
 			}
@@ -228,6 +233,8 @@ const handleEvent = (event) => {
 			delete event.devices
 
 			reconcileJoystickAndControllerDevices(devices)
+
+			if (closeError) { throw closeError }
 		} break
 
 		case 'joystick': {
@@ -377,18 +384,26 @@ const handleEvent = (event) => {
 			const { audioDeviceType } = event
 			delete event.audioDeviceType
 
+			// The removal handling must finish even if a close listener throws
+			let closeError = null
+
 			if (type === 'deviceRemove') {
 				const { audioId } = event
 				delete event.audioId
 
 				const audioInstance = Globals.audioInstances.get(audioId)
-				if (audioInstance) { audioInstance.close() }
+				if (audioInstance) {
+					try { audioInstance.close() }
+					catch (error) { closeError = error }
+				}
 			}
 
 			const { devices } = event
 			delete event.devices
 
 			reconcileAudioDevices(devices, audioDeviceType)
+
+			if (closeError) { throw closeError }
 		} break
 
 		case 'clipboard': {

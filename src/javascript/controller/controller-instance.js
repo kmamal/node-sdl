@@ -172,8 +172,6 @@ class ControllerInstance extends EventsViaPoll {
 		this._rumbleTriggersTimeout = null
 
 		this._closed = true
-		this.emit('close', { type: 'close' })
-		this.removeAllListeners()
 
 		Globals.controllerInstances.all.delete(this)
 		const collection = Globals.controllerInstances.byId.get(this._device.id)
@@ -184,6 +182,10 @@ class ControllerInstance extends EventsViaPoll {
 
 		// SDL open/close calls are reference-counted per instance
 		Bindings.controller_close(this._device.id)
+
+		// Emitted last so a throwing listener can't leave the teardown half-done
+		this.emit('close', { type: 'close' })
+		this.removeAllListeners()
 	}
 }
 
