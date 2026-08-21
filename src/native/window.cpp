@@ -768,14 +768,16 @@ window::destroy (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_Renderer *renderer = SDL_GetRenderer(window);
-	if (renderer != nullptr) {
-		CachedTexture &cached = cachedTextures[window];
-		if (cached.texture != nullptr) { SDL_DestroyTexture(cached.texture); }
-		cachedTextures.erase(window);
-
-		SDL_DestroyRenderer(renderer);
+	// The window can have a cache entry but no renderer, if rebuilding the
+	// renderer failed after destroying the old one
+	auto cached_entry = cachedTextures.find(window);
+	if (cached_entry != cachedTextures.end()) {
+		if (cached_entry->second.texture != nullptr) { SDL_DestroyTexture(cached_entry->second.texture); }
+		cachedTextures.erase(cached_entry);
 	}
+
+	SDL_Renderer *renderer = SDL_GetRenderer(window);
+	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 
 	SDL_DestroyWindow(window);
 

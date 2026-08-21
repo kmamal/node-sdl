@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
 - Touch events whose device disappeared before they were polled are now dropped instead of being emitted with an `undefined` `device`.
 - Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer.
+- Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
 - Connecting or disconnecting a display no longer crashes the process.
 - Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
