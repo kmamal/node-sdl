@@ -176,7 +176,7 @@ const mapping = {
 	'Return': 'return',
 	'Right Alt': 'alt',
 	'Right Ctrl': 'ctrl',
-	'Right GUI': 'gUI',
+	'Right GUI': 'gui',
 	'Right Shift': 'shift',
 	'Right': 'right',
 	'S': 's',
