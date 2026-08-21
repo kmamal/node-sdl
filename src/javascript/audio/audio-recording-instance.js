@@ -2,10 +2,11 @@ const Bindings = require('../bindings')
 const { AudioInstance } = require('./audio-instance')
 
 class AudioRecordingInstance extends AudioInstance {
-	dequeue (buffer, numBytes = buffer.length) {
+	dequeue (buffer, numBytes = null) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		numBytes ??= buffer.length
 		if (!Number.isInteger(numBytes)) { throw Object.assign(new Error("numBytes must be an integer"), { numBytes }) }
 		if (numBytes <= 0 || numBytes > 2 ** 31 - 1) { throw Object.assign(new Error("invalid numBytes"), { numBytes }) }
 		if (buffer.length < numBytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, numBytes }) }

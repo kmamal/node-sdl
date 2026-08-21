@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- Passing a non-object as `options` to `createWindow()` or `audio.openDevice()`, or calling `enqueue()`/`dequeue()` without a buffer, now fails with the intended validation error instead of a raw `TypeError`. A non-object `options` used to be silently ignored by `createWindow()`.
 - The audio format helpers (`bytesPerSample()`, `readSample()`, and the rest, on both `sdl.audio` and `@kmamal/sdl/helpers`) now reject an invalid `format` with the library's standard "invalid format" error instead of a raw `TypeError`.
 - Integer arguments are now validated to fit in 32 bits everywhere the native layer reads them as such (window positions and sizes, image dimensions and strides, mouse position, rumble durations, player indices, audio frequency, `numBytes`). Larger values used to silently wrap — `setSize(2 ** 32 + 100, 100)` set width 100, `rumble` durations above 2³¹−1 broke the auto-stop timer, and `setPlayer(2 ** 31)` silently behaved like `resetPlayer()`.
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.

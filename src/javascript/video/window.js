@@ -40,6 +40,8 @@ class Window extends EventsViaPoll {
 	constructor (options = {}) {
 		super(validEvents)
 
+		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+
 		const {
 			title = "",
 			display = null,

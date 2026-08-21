@@ -12,6 +12,8 @@ class AudioInstance extends EventsViaPoll {
 
 		const { name, type } = device
 
+		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+
 		const {
 			channels = 1,
 			frequency = 48000,
