@@ -24,7 +24,7 @@ class AudioInstance extends EventsViaPoll {
 		if (!Number.isInteger(channels)) { throw Object.assign(new Error("channels must be an integer"), { channels }) }
 		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
 		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }
-		if (frequency <= 0) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
+		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!Number.isInteger(buffered)) { throw Object.assign(new Error("buffered must be an integer"), { buffered }) }
 		if (buffered <= 0) { throw Object.assign(new Error("invalid buffered"), { buffered }) }

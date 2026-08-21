@@ -63,14 +63,16 @@ class Window extends EventsViaPoll {
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
 		if (display !== null && typeof display !== 'object') { throw Object.assign(new Error("display must be an object"), { display }) }
 		if (x !== null && !Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
+		if (x !== null && (x < -(2 ** 31) || x > 2 ** 31 - 1)) { throw Object.assign(new Error("invalid x"), { x }) }
 		if (y !== null && !Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
+		if (y !== null && (y < -(2 ** 31) || y > 2 ** 31 - 1)) { throw Object.assign(new Error("invalid y"), { y }) }
 		if (width !== null) {
 			if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-			if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+			if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }
 		}
 		if (height !== null) {
 			if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-			if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+			if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		}
 		if (typeof visible !== 'boolean') { throw Object.assign(new Error("visible must be a boolean"), { visible }) }
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
@@ -188,7 +190,9 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
+		if (x < -(2 ** 31) || x > 2 ** 31 - 1) { throw Object.assign(new Error("invalid x"), { x }) }
 		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
+		if (y < -(2 ** 31) || y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid y"), { y }) }
 
 		Bindings.window_setPosition(this._id, x, y)
 		this._x = x
@@ -201,9 +205,9 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 
 		const { pixelWidth, pixelHeight } = Bindings.window_setSize(this._id, width, height)
 		this._width = Math.floor(width)
@@ -216,9 +220,9 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (!Number.isInteger(pixelWidth)) { throw Object.assign(new Error("pixelWidth must be an integer"), { pixelWidth }) }
-		if (pixelWidth <= 0) { throw Object.assign(new Error("invalid pixelWidth"), { pixelWidth }) }
+		if (pixelWidth <= 0 || pixelWidth > 2 ** 31 - 1) { throw Object.assign(new Error("invalid pixelWidth"), { pixelWidth }) }
 		if (!Number.isInteger(pixelHeight)) { throw Object.assign(new Error("pixelHeight must be an integer"), { pixelHeight }) }
-		if (pixelHeight <= 0) { throw Object.assign(new Error("invalid pixelHeight"), { pixelHeight }) }
+		if (pixelHeight <= 0 || pixelHeight > 2 ** 31 - 1) { throw Object.assign(new Error("invalid pixelHeight"), { pixelHeight }) }
 
 		// Multiply before dividing to keep the math exact for valid multiples
 		const width = pixelWidth * this._width / this._pixelWidth
@@ -373,14 +377,14 @@ class Window extends EventsViaPoll {
 		} = options
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
 		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (stride < width * bytesPerPixel) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
+		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 		if (scaling !== undefined && typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
@@ -388,11 +392,13 @@ class Window extends EventsViaPoll {
 		if (dstRect !== null) {
 			if (typeof dstRect !== 'object') { throw Object.assign(new Error("dstRect must be an object"), { dstRect }) }
 			if (!Number.isInteger(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be an integer"), { dstRect }) }
+			if (dstRect.x < -(2 ** 31) || dstRect.x > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.x"), { dstRect }) }
 			if (!Number.isInteger(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be an integer"), { dstRect }) }
+			if (dstRect.y < -(2 ** 31) || dstRect.y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.y"), { dstRect }) }
 			if (!Number.isInteger(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be an integer"), { dstRect }) }
-			if (dstRect.width <= 0) { throw Object.assign(new Error("invalid dstRect.width"), { dstRect }) }
+			if (dstRect.width <= 0 || dstRect.width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.width"), { dstRect }) }
 			if (!Number.isInteger(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be an integer"), { dstRect }) }
-			if (dstRect.height <= 0) { throw Object.assign(new Error("invalid dstRect.height"), { dstRect }) }
+			if (dstRect.height <= 0 || dstRect.height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.height"), { dstRect }) }
 		}
 
 		const _format = Enums.pixelFormat[format]
@@ -408,14 +414,14 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0) { throw Object.assign(new Error("invalid width"), { width }) }
+		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
 		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (stride < width * bytesPerPixel) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
+		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 

@@ -8,7 +8,7 @@ class AudioPlaybackInstance extends AudioInstance {
 
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (!Number.isInteger(numBytes)) { throw Object.assign(new Error("numBytes must be an integer"), { numBytes }) }
-		if (numBytes <= 0) { throw Object.assign(new Error("invalid numBytes"), { numBytes }) }
+		if (numBytes <= 0 || numBytes > 2 ** 31 - 1) { throw Object.assign(new Error("invalid numBytes"), { numBytes }) }
 		if (buffer.length < numBytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, numBytes }) }
 
 		Bindings.audio_enqueue(this._id, buffer, numBytes)

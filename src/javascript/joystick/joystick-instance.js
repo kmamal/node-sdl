@@ -79,7 +79,7 @@ class JoystickInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
-		if (player < 0) { throw Object.assign(new Error("invalid player"), { player }) }
+		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("invalid player"), { player }) }
 
 		Bindings.joystick_setPlayer(this._device.id, player)
 	}
@@ -113,7 +113,7 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
@@ -140,7 +140,7 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)

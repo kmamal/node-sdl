@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- Integer arguments are now validated to fit in 32 bits everywhere the native layer reads them as such (window positions and sizes, image dimensions and strides, mouse position, rumble durations, player indices, audio frequency, `numBytes`). Larger values used to silently wrap — `setSize(2 ** 32 + 100, 100)` set width 100, `rumble` durations above 2³¹−1 broke the auto-stop timer, and `setPlayer(2 ** 31)` silently behaved like `resetPlayer()`.
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
 - Window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale SDL error text an earlier unrelated call had left behind.
 - Enum values this build of the library doesn't know (a joystick or controller type, sensor type, power state, display orientation, touch device type, or hat position introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
