@@ -28,7 +28,7 @@ const audio = new class extends EventsViaPoll {
 	}
 
 	openDevice (device, options = {}) {
-		if (typeof device !== 'object') { throw Object.assign(new Error("device must be an object"), { device }) }
+		if (typeof device !== 'object' || device === null) { throw Object.assign(new Error("device must be an object"), { device }) }
 		if (typeof device.type !== 'string') { throw Object.assign(new Error("device.type must be a string"), { device }) }
 		if (![ 'playback', 'recording' ].includes(device.type)) { throw Object.assign(new Error("invalid device.type"), { device }) }
 
