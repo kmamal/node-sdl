@@ -24,6 +24,8 @@ joystick::mapAxisValue (SDL_Joystick *joystick, int axis, int value) {
 	double range = value < initial
 		? initial - SDL_JOYSTICK_AXIS_MIN
 		: SDL_JOYSTICK_AXIS_MAX - initial;
+	// Axes can rest at the maximum (e.g. pedals), making the range 0
+	if (range == 0) { return 0; }
 	return (value - initial) / range;
 }
 
