@@ -48,7 +48,11 @@ class ControllerInstance extends EventsViaPoll {
 	get device () { return this._device }
 	get firmwareVersion () { return this._firmwareVersion }
 	get serialNumber () { return this._serialNumber }
-	get steamHandle () { return this._steamHandle }
+
+	get steamHandle () {
+		Globals.events.poll()
+		return this._steamHandle
+	}
 
 	get axes () {
 		Globals.events.poll()
@@ -60,7 +64,10 @@ class ControllerInstance extends EventsViaPoll {
 		return this._buttons
 	}
 
-	get power () { return this._power }
+	get power () {
+		Globals.events.poll()
+		return this._power
+	}
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }

@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
 - Orientation or move events for a display disconnected in the same batch no longer crash the process.
 - Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
+- The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.

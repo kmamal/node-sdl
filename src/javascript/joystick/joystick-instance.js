@@ -70,7 +70,10 @@ class JoystickInstance extends EventsViaPoll {
 		return this._hats
 	}
 
-	get power () { return this._power }
+	get power () {
+		Globals.events.poll()
+		return this._power
+	}
 
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
