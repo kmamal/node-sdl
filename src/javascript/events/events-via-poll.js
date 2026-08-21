@@ -21,6 +21,10 @@ class EventsViaPoll extends EventEmitter {
 				throw Object.assign(new Error("invalid event"), { type })
 			}
 
+			// Emitter-internal events need no polling, and removeAllListeners
+			// skips them, so counting them could keep fast polling on forever
+			if (type === 'newListener' || type === 'removeListener') { return }
+
 			count--
 			if (count !== 0) { return }
 
@@ -34,6 +38,8 @@ class EventsViaPoll extends EventEmitter {
 			if (!commonEvents.includes(type) && !validEvents.includes(type)) {
 				throw Object.assign(new Error("invalid event"), { type })
 			}
+
+			if (type === 'newListener' || type === 'removeListener') { return }
 
 			count++
 			if (count !== 1) { return }
