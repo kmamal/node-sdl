@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()` and `sdl.mouse.relativeMode`.
 - `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
+- Prebuilt binaries for Windows on arm64.
 
 ### Fixed
 
