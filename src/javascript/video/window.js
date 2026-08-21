@@ -165,6 +165,7 @@ class Window extends EventsViaPoll {
 
 		// Manually emit an initial resize event for convenience
 		process.nextTick(() => {
+			if (this._destroyed) { return }
 			this.emit('resize', {
 				width: this._width,
 				height: this._height,
