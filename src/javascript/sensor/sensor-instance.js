@@ -31,10 +31,12 @@ class SensorInstance extends EventsViaPoll {
 	get device () { return this._device }
 
 	get data () {
+		// SDL only refreshes sensor values inside the event pump. The closed
+		// check runs after polling, since the poll can process an event whose
+		// handler closes this instance
+		Globals.events.poll()
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		// SDL only refreshes sensor values inside the event pump
-		Globals.events.poll()
 		return Bindings.sensor_getData(this._device.id)
 	}
 
