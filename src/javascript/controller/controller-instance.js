@@ -50,21 +50,29 @@ class ControllerInstance extends EventsViaPoll {
 	get serialNumber () { return this._serialNumber }
 
 	get steamHandle () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._steamHandle
 	}
 
 	get axes () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._axes
 	}
 
 	get buttons () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._buttons
 	}
 
 	get power () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._power
 	}

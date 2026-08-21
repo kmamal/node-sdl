@@ -51,26 +51,36 @@ class JoystickInstance extends EventsViaPoll {
 	get serialNumber () { return this._serialNumber }
 
 	get axes () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._axes
 	}
 
 	get balls () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._balls
 	}
 
 	get buttons () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._buttons
 	}
 
 	get hats () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._hats
 	}
 
 	get power () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
 		Globals.events.poll()
 		return this._power
 	}
