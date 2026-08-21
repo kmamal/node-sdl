@@ -53,6 +53,19 @@ const isPlanarYuv = {
 	nv21: true,
 }
 
+// SDL can render YUV textures but can't create surfaces (icons, cursors)
+// from FOURCC formats
+const isYuv = {
+	__proto__: null,
+	yv12: true,
+	iyuv: true,
+	yuy2: true,
+	uyvy: true,
+	yvyu: true,
+	nv12: true,
+	nv21: true,
+}
+
 const minBufferSize = (format, stride, height) => {
 	const luma = stride * height
 	if (!isPlanarYuv[format]) { return luma }
@@ -61,5 +74,6 @@ const minBufferSize = (format, stride, height) => {
 
 module.exports = {
 	bytesPerPixel,
+	isYuv,
 	minBufferSize,
 }

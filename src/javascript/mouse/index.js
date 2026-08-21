@@ -48,6 +48,7 @@ const mouse = {
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
 		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (FormatHelpers.isYuv[format]) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
 		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
