@@ -74,6 +74,7 @@ namespace events {
 	};
 
 	bool dispatchEvent(const SDL_Event &event);
+	bool dispatchEventFromFilter(const SDL_Event &event);
 
 	Napi::Value poll(const Napi::CallbackInfo &info);
 

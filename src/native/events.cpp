@@ -518,6 +518,26 @@ events::dispatchEvent(const SDL_Event &event)
 	return true;
 }
 
+static bool has_pending_filter_error = false;
+static Napi::Error pending_filter_error;
+
+// Exceptions must not unwind through SDL's event pump, which called the
+// filter. Stash them and rethrow once poll() is back on the JS stack.
+bool
+events::dispatchEventFromFilter(const SDL_Event &event)
+{
+	if (has_pending_filter_error) { return false; }
+
+	try {
+		return events::dispatchEvent(event);
+	}
+	catch (const Napi::Error &error) {
+		pending_filter_error = error;
+		has_pending_filter_error = true;
+		return true;
+	}
+}
+
 Napi::Value
 events::poll (const Napi::CallbackInfo &info)
 {
@@ -531,6 +551,11 @@ events::poll (const Napi::CallbackInfo &info)
 	try {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) { events::dispatchEvent(event); }
+
+		if (has_pending_filter_error) {
+			has_pending_filter_error = false;
+			throw Napi::Error(std::move(pending_filter_error));
+		}
 	}
 	catch (...) {
 		poll_env = nullptr;

@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
+- An exception thrown from a `move` or `resize` listener while the window is being dragged no longer crashes the process. It surfaces as a normal exception instead.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.

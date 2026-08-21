@@ -31,7 +31,7 @@ int filterEvents(void*, SDL_Event *event) {
 	) {
 		// If the event was dispatched, drop it from the queue so it doesn't
 		// get dispatched a second time when polled
-		if (events::dispatchEvent(*event)) { return 0; }
+		if (events::dispatchEventFromFilter(*event)) { return 0; }
 	}
 
 	return 1;
