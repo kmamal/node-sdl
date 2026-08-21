@@ -625,7 +625,10 @@ window::render (const Napi::CallbackInfo &info)
 		|| cached.height != height
 		|| cached.format != format
 	) {
-		if (texture != nullptr) { SDL_DestroyTexture(texture); }
+		if (texture != nullptr) {
+			SDL_DestroyTexture(texture);
+			cached.texture = nullptr;
+		}
 
 		texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
 		if (texture == nullptr) {
@@ -639,6 +642,7 @@ window::render (const Napi::CallbackInfo &info)
 			std::ostringstream message;
 			message << "SDL_SetTextureBlendMode(" << window_id << ") error: " << SDL_GetError();
 			SDL_ClearError();
+			SDL_DestroyTexture(texture);
 			throw Napi::Error::New(env, message.str());
 		}
 
