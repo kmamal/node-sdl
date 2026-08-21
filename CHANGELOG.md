@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
 - An exception stashed by the window drag/resize filter no longer risks undefined behavior at process teardown when no further poll runs to consume it.
 - SDL errors are now detected by checking the error message contents instead of comparing `SDL_GetError()` pointers, which silently missed all errors when linked against an SDL build that returns a single static buffer.
+- Calling `window.destroy()` from a `move` or `resize` listener that fires while the window is being dragged or resized no longer risks a crash. The window reports `destroyed` immediately, and the native window is destroyed once it is safe to do so.
 - Connecting or disconnecting a display no longer crashes the process.
 - Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.

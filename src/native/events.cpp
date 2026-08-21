@@ -528,6 +528,19 @@ events::dispatchEvent(const SDL_Event &event)
 static bool has_pending_filter_error = false;
 static Napi::Error pending_filter_error;
 
+static bool dispatching_from_filter = false;
+
+// Lets the JS side defer SDL calls that are unsafe while the pump that
+// called the filter still holds pointers into the video driver's state,
+// such as destroying the window being dragged or resized
+Napi::Value
+events::isDispatchingFromFilter (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	return Napi::Boolean::New(env, dispatching_from_filter);
+}
+
 // Exceptions must not unwind through SDL's event pump, which called the
 // filter. Stash them and rethrow once poll() is back on the JS stack.
 bool
@@ -535,10 +548,15 @@ events::dispatchEventFromFilter(const SDL_Event &event)
 {
 	if (has_pending_filter_error) { return false; }
 
+	dispatching_from_filter = true;
+
 	try {
-		return events::dispatchEvent(event);
+		bool dispatched = events::dispatchEvent(event);
+		dispatching_from_filter = false;
+		return dispatched;
 	}
 	catch (const Napi::Error &error) {
+		dispatching_from_filter = false;
 		pending_filter_error = error;
 		has_pending_filter_error = true;
 

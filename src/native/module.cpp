@@ -25,6 +25,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("global_cleanup", Napi::Function::New<global::cleanup>(env));
 
 	exports.Set("events_poll", Napi::Function::New<events::poll>(env));
+	exports.Set("events_isDispatchingFromFilter", Napi::Function::New<events::isDispatchingFromFilter>(env));
 
 	exports.Set("video_getDisplays", Napi::Function::New<video::getDisplays>(env));
 

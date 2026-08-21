@@ -443,7 +443,15 @@ class Window extends EventsViaPoll {
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
 
-		Bindings.window_destroy(this._id)
+		// A move/resize listener runs from inside SDL's event pump, which
+		// still holds pointers into the window's driver data. Defer the
+		// native destruction until the pump has unwound.
+		if (Bindings.events_isDispatchingFromFilter()) {
+			process.nextTick(() => { Bindings.window_destroy(this._id) })
+		}
+		else {
+			Bindings.window_destroy(this._id)
+		}
 		this._destroyed = true
 
 		Globals.windows.all.delete(this._id)
