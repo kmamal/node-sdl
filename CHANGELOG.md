@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reading a sensor instance's `data` now pumps events first, so it returns current readings instead of values up to a second old, and throws the documented error if the instance is closed.
 - Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
 - Passing `null` to `audio.openDevice()` now fails validation with the intended error instead of an unrelated `TypeError`.
+- The standalone audio format helpers (`audio.bytesPerSample()`, `audio.readSample()`, and the rest) now treat names of inherited `Object` members (such as `'constructor'`) as invalid formats like every other lookup table in the library, instead of silently returning `undefined` or failing with a confusing error.
 - Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer.
 - Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
 - An exception stashed by the window drag/resize filter no longer risks undefined behavior at process teardown when no further poll runs to consume it.

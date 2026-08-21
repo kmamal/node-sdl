@@ -22,7 +22,10 @@ const floatLimits = {
 	maxSampleValue: 1,
 }
 
+// Null prototype so that formats like 'constructor' can't match inherited
+// Object members and leak through as valid entries.
 const AudioFormatHelpers = {
+	__proto__: null,
 	s8: {
 		reader: Buffer.prototype.readInt8,
 		writer: Buffer.prototype.writeInt8,
