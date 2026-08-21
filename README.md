@@ -377,6 +377,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
 
 ## sdl
 
+Unless noted otherwise, wherever the API expects a whole-number quantity (positions, sizes, strides, indices, durations), the value must be an integer that fits in 32 bits.
+
 ### sdl.info
 
 - `<object>`
@@ -1545,7 +1547,7 @@ A mouse can have many buttons, but the values for the three most common ones are
 
 ### sdl.mouse.getButton(button)
 
-- `button: <number>` The index of the button.
+- `button: <number>` The index of the button, from `1` to `32`. Indices `1` to `3` correspond to the left, middle, and right buttons, and `4` and `5` to the X1 and X2 buttons.
 - Returns: `<boolean>` Is `true` if the button is pressed.
 
 Queries the state of a single mouse button.
@@ -1766,7 +1768,7 @@ Sample output:
 
 ### sdl.joystick.openDevice(device)
 
-- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that is to be opened.
+- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) that is to be opened. Must be the actual object from that list, not a copy.
 - Returns: [`<joystickInstance>`](#class-joystickinstance) an object representing the opened joystick device instance.
 
 Initializes a joystick device and returns a corresponding instance.
@@ -1886,7 +1888,7 @@ The current power level of the joystick device, or `null` if it is unknown.
 
 ### joystickInstance.setPlayer(index)
 
-- `index: <number>` The player index to assign to the joystick.
+- `index: <number>` The player index to assign to the joystick. Must be a non-negative integer.
 
 Sets the player index of the joystick.
 
@@ -2006,6 +2008,7 @@ When this event is emitted, all instances that were opened from the removed devi
 
 Registers new mappings for controllers.
 This may cause already opened controller instances to be [remapped](#event-remap).
+If one of the mappings is invalid, the mappings before it in the array remain registered.
 
 ### sdl.controller.devices
 
@@ -2062,7 +2065,7 @@ Sample output:
 
 ### sdl.controller.openDevice(device)
 
-- `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that is to be opened.
+- `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that is to be opened. Must be the actual object from that list, not a copy.
 - Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
 
 Initializes an controller device and returns a corresponding instance.
@@ -2196,7 +2199,7 @@ The current power level of the joystick device, or `null` if it is unknown.
 
 ### controllerInstance.setPlayer(index)
 
-- `index: <number>` The player index to assign to the controller.
+- `index: <number>` The player index to assign to the controller. Must be a non-negative integer.
 
 Sets the player index of the controller.
 
@@ -2298,7 +2301,7 @@ Sample output:
 
 ### sdl.sensor.openDevice(device)
 
-- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) that is to be opened.
+- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) that is to be opened. Must be the actual object from that list, not a copy.
 - Returns: [`<SensorInstance>`](#class-sensorinstance) an object representing the opened sensor device instance.
 
 Initializes a sensor device and returns a corresponding instance.
