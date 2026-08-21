@@ -315,8 +315,8 @@ events::dispatchEvent(const SDL_Event &event)
 				: events::types::FINGER_DOWN);
 			packed.Set("windowId", event.tfinger.windowID);
 			packed.Set("mouse", event.tfinger.touchId == SDL_MOUSE_TOUCHID);
-			packed.Set("touchId", event.tfinger.touchId);
-			packed.Set("fingerId", event.tfinger.fingerId);
+			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchId));
+			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerId));
 			packed.Set("x", event.tfinger.x);
 			packed.Set("y", event.tfinger.y);
 			packed.Set("pressure", event.tfinger.pressure);
@@ -327,8 +327,8 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::FINGER_MOVE);
 			packed.Set("windowId", event.tfinger.windowID);
 			packed.Set("mouse", event.tfinger.touchId == SDL_MOUSE_TOUCHID);
-			packed.Set("touchId", event.tfinger.touchId);
-			packed.Set("fingerId", event.tfinger.fingerId);
+			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchId));
+			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerId));
 			packed.Set("x", event.tfinger.x);
 			packed.Set("y", event.tfinger.y);
 			packed.Set("dx", event.tfinger.dx);

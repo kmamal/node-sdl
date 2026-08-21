@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** Touch device `id`s and the `fingerId` on touch events are now `bigint`s. They are 64-bit values in SDL, which a JS `number` can't always represent exactly.
 - Declared support for Node.js >= 22 in `package.json`, and pinned the native addon to the matching Node-API version 9.
 
 ### Added

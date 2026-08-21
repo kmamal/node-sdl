@@ -819,7 +819,7 @@ Fired when the mouse wheel is scrolled.
 ### Event: 'fingerDown'
 
 - `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
-- `fingerId: <number>` The id of the finger that coused the event.
+- `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
@@ -830,7 +830,7 @@ Fired when a finger is presed to the touch surface.
 ### Event: 'fingerUp'
 
 - `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
-- `fingerId: <number>` The id of the finger that coused the event.
+- `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
@@ -841,7 +841,7 @@ Fired when a finger is lifted from the touch surface.
 ### Event: 'fingerMove'
 
 - `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
-- `fingerId: <number>` The id of the finger that coused the event.
+- `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `dx: <number>` The finger's x movement, relative to its last position, normalized in the range from `-1` to `1`.
@@ -1648,7 +1648,7 @@ This function may fail on platforms that don't support raw mouse input.
 ### sdl.touch.devices
 
 - `<object>[]`
-  - `id: <number>` The unique id for the device.
+  - `id: <bigint>` The unique id for the device.
   - `name: <string>|<null>` The name of the device, or `null` if it can't be determined.
   - `type: <TouchDeviceType>|<null>` The type of the device, or `null` if it can't be determined.
 

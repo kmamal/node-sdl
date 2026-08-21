@@ -36,7 +36,7 @@ touch::getDevices(const Napi::CallbackInfo &info)
 			: env.Null();
 
 		Napi::Object device = Napi::Object::New(env);
-		device.Set("id", id);
+		device.Set("id", Napi::BigInt::New(env, id));
 		device.Set("name", name);
 		device.Set("type", type);
 
