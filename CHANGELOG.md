@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it.
 - Instances now report `closed` as `true` while their `close` event is being emitted, so a listener that calls `close()` again no longer recurses forever.
 - Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
 - Touch events whose device disappeared before they were polled are now dropped instead of being emitted with an `undefined` `device`.
