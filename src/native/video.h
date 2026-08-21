@@ -10,6 +10,8 @@ namespace video {
 	extern std::map<SDL_DisplayOrientation, std::string> orientations;
 	extern std::map<SDL_PixelFormatEnum, std::string> formats;
 
+	Napi::Array _getDisplays (Napi::Env &env);
+
 	Napi::Value getDisplays(const Napi::CallbackInfo &info);
 
 }; // namespace video

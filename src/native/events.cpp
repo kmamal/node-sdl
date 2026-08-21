@@ -98,8 +98,16 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("displayIndex", display_index);
 
 			switch (event.display.event) {
-				case SDL_DISPLAYEVENT_CONNECTED: { packed.Set("type", events::types::DISPLAY_ADD); break; }
-				case SDL_DISPLAYEVENT_DISCONNECTED: { packed.Set("type", events::types::DISPLAY_REMOVE); break; }
+				case SDL_DISPLAYEVENT_CONNECTED: {
+					packed.Set("type", events::types::DISPLAY_ADD);
+					packed.Set("displays", video::_getDisplays(env));
+					break;
+				}
+				case SDL_DISPLAYEVENT_DISCONNECTED: {
+					packed.Set("type", events::types::DISPLAY_REMOVE);
+					packed.Set("displays", video::_getDisplays(env));
+					break;
+				}
 				case SDL_DISPLAYEVENT_ORIENTATION: {
 					packed.Set("type", events::types::DISPLAY_ORIENT);
 					packed.Set("orientation", video::orientations[(SDL_DisplayOrientation) event.display.data1]);

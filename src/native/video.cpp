@@ -9,11 +9,9 @@ std::map<SDL_DisplayOrientation, std::string> video::orientations;
 std::map<SDL_PixelFormatEnum, std::string> video::formats;
 
 
-Napi::Value
-video::getDisplays(const Napi::CallbackInfo &info)
+Napi::Array
+video::_getDisplays(Napi::Env &env)
 {
-	Napi::Env env = info.Env();
-
 	int num_displays = SDL_GetNumVideoDisplays();
 	if (num_displays < 0) {
 		std::ostringstream message;
@@ -97,4 +95,12 @@ video::getDisplays(const Napi::CallbackInfo &info)
 	}
 
 	return displays;
+}
+
+Napi::Value
+video::getDisplays(const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	return video::_getDisplays(env);
 }
