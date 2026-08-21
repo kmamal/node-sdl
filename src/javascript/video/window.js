@@ -212,8 +212,8 @@ class Window extends EventsViaPoll {
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 
 		const { pixelWidth, pixelHeight } = Bindings.window_setSize(this._id, width, height)
-		this._width = Math.floor(width)
-		this._height = Math.floor(height)
+		this._width = width
+		this._height = height
 		this._pixelWidth = pixelWidth
 		this._pixelHeight = pixelHeight
 	}
@@ -389,7 +389,7 @@ class Window extends EventsViaPoll {
 		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
-		if (scaling !== undefined && typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
+		if (typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
 
 		if (dstRect !== null) {
 			if (typeof dstRect !== 'object') { throw Object.assign(new Error("dstRect must be an object"), { dstRect }) }
