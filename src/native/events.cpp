@@ -1,6 +1,5 @@
 #include "events.h"
 #include "enums.h"
-#include "global.h"
 #include "video.h"
 #include "joystick.h"
 #include "controller.h"
@@ -166,7 +165,7 @@ events::dispatchEvent(const SDL_Event &event)
 					SDL_Window *window = SDL_GetWindowFromID(event.window.windowID);
 					if (window == nullptr) {
 						const char *error = SDL_GetError();
-						if (error == global::no_error) { return false; }
+						if (error[0] == '\0') { return false; }
 
 						std::ostringstream message;
 						message << "SDL_GetWindowFromID() error: " << SDL_GetError();

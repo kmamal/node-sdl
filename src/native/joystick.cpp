@@ -1,6 +1,5 @@
 #include "joystick.h"
 #include "controller.h"
-#include "global.h"
 #include <SDL.h>
 #include <string>
 #include <sstream>
@@ -189,7 +188,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 	// SDL_JoystickOpen produces errors even though it succeeds
 	const char *error = SDL_GetError();
-	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	if (error[0] != '\0') { fprintf(stderr, "SDL silent error: %s\n", error); }
 	SDL_ClearError();
 
 	try {
@@ -222,7 +221,7 @@ joystick::open (const Napi::CallbackInfo &info)
 			SDL_ClearError();
 			double value = joystick::mapAxis(joystick, i);
 			error = SDL_GetError();
-			if (error != global::no_error) {
+			if (error[0] != '\0') {
 				std::ostringstream message;
 				message << "SDL_JoystickGetAxis(" << index << ", " << i << ") error: " << error;
 				SDL_ClearError();

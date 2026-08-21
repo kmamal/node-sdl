@@ -38,9 +38,6 @@ int filterEvents(void*, SDL_Event *event) {
 }
 
 
-const char *global::no_error = nullptr;
-
-
 Napi::Value
 global::initialize(const Napi::CallbackInfo &info)
 {
@@ -378,8 +375,9 @@ global::initialize(const Napi::CallbackInfo &info)
 	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
 	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR) == 0);
 
+	// Drop errors from optional subsystems that failed to initialize, since
+	// failures elsewhere are detected via the error state
 	SDL_ClearError();
-	global::no_error = SDL_GetError();
 
 	mainThreadId = SDL_ThreadID();
 	SDL_SetEventFilter(filterEvents, nullptr);

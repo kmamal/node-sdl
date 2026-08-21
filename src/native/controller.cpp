@@ -1,6 +1,5 @@
 #include "controller.h"
 #include "joystick.h"
-#include "global.h"
 #include <SDL.h>
 #include <map>
 #include <string>
@@ -51,7 +50,7 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	const char *error;
 
 	error = SDL_GetError();
-	if (error != global::no_error) {
+	if (error[0] != '\0') {
 		std::ostringstream message;
 		message << "SDL_GameControllerGetAxis() error: " << error;
 		SDL_ClearError();
@@ -80,7 +79,7 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	buttons.Set("paddle4", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE4));
 
 	error = SDL_GetError();
-	if (error != global::no_error) {
+	if (error[0] != '\0') {
 		std::ostringstream message;
 		message << "SDL_GameControllerGetButton() error: " << error;
 		SDL_ClearError();
@@ -110,7 +109,7 @@ controller::addMappings (const Napi::CallbackInfo &info)
 
 		// SDL_GameControllerAddMapping produces errors even though it succeeds
 		const char *error = SDL_GetError();
-		if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+		if (error[0] != '\0') { fprintf(stderr, "SDL silent error: %s\n", error); }
 		SDL_ClearError();
 	}
 
@@ -134,7 +133,7 @@ controller::open (const Napi::CallbackInfo &info)
 
 	// SDL_GameControllerOpen produces errors even though it succeeds
 	const char *error = SDL_GetError();
-	if (error != global::no_error) { fprintf(stderr, "SDL silent error: %s\n", error); }
+	if (error[0] != '\0') { fprintf(stderr, "SDL silent error: %s\n", error); }
 	SDL_ClearError();
 
 	try {

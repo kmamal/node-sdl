@@ -1,5 +1,4 @@
 #include "audio.h"
-#include "global.h"
 #include <SDL.h>
 #include <string>
 #include <sstream>
@@ -17,7 +16,7 @@ audio::_getDevices(Napi::Env &env, bool is_capture)
 	if (num_devices == -1) {
 		// SDL_GetNumAudioDevices can return -1 even if there is no error
 		const char *error = SDL_GetError();
-		if (error != global::no_error) {
+		if (error[0] != '\0') {
 			std::ostringstream message;
 			message << "SDL_GetNumAudioDevices(" << is_capture << ") error: " << error;
 			SDL_ClearError();
@@ -163,7 +162,7 @@ audio::dequeue (const Napi::CallbackInfo &info)
 	SDL_ClearError();
 	int num = SDL_DequeueAudio(audio_id, dst, size);
 	const char *error = SDL_GetError();
-	if (error != global::no_error) {
+	if (error[0] != '\0') {
 		std::ostringstream message;
 		message << "SDL_DequeueAudio(" << audio_id << ") error: " << error;
 		SDL_ClearError();

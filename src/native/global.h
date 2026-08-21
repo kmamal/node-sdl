@@ -5,8 +5,6 @@
 
 namespace global {
 
-	extern const char *no_error;
-
 	Napi::Value initialize(const Napi::CallbackInfo &info);
 	Napi::Value cleanup(const Napi::CallbackInfo &info);
 
