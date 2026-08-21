@@ -465,7 +465,7 @@ events::dispatchEvent(const SDL_Event &event)
 
 			packed.Set("controllerId", controller_id);
 			packed.Set("axis", axis_name);
-			packed.Set("value", controller::mapAxisValue(controller, axis, event.caxis.value));
+			packed.Set("value", controller::mapAxisValue(event.caxis.value));
 			break;
 		}
 		case SDL_CONTROLLERBUTTONDOWN:

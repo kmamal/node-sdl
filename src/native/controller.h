@@ -13,7 +13,7 @@ namespace controller {
 	extern std::map<SDL_GameControllerButton, std::string> buttons;
 
 	double mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis);
-	double mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis axis, int value);
+	double mapAxisValue (int value);
 	void getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst);
 	Napi::Value getSteamHandle(Napi::Env &env, SDL_GameController *controller);
 

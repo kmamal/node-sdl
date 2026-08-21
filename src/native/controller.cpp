@@ -14,17 +14,13 @@ std::map<SDL_GameControllerButton, std::string> controller::buttons;
 
 double
 controller::mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis) {
-	return mapAxisValue(controller, axis, SDL_GameControllerGetAxis(controller, axis));
+	return mapAxisValue(SDL_GameControllerGetAxis(controller, axis));
 }
 
+// Values are already in the fixed scale SDL maps controller axes to:
+// sticks rest at 0 in -32768..32767, triggers at 0 in 0..32767
 double
-controller::mapAxisValue (SDL_GameController *controller, SDL_GameControllerAxis axis, int value) {
-	SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForAxis(controller, axis);
-	if (bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
-		SDL_Joystick *joystick = SDL_GameControllerGetJoystick(controller);
-		return joystick::mapAxisValue(joystick, bind.value.axis, value);
-	}
-
+controller::mapAxisValue (int value) {
 	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
 	return value / range;
 }
