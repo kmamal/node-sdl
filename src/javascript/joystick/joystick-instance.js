@@ -118,7 +118,8 @@ class JoystickInstance extends EventsViaPoll {
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
 		clearTimeout(this._rumbleTimeout)
-		this._rumbleTimeout = setTimeout(() => { this.stopRumble() }, duration)
+		// The device may be gone by the time the timer fires
+		this._rumbleTimeout = setTimeout(() => { try { this.stopRumble() } catch (_) {} }, duration)
 	}
 
 	stopRumble () {
@@ -144,7 +145,8 @@ class JoystickInstance extends EventsViaPoll {
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 		clearTimeout(this._rumbleTriggersTimeout)
-		this._rumbleTriggersTimeout = setTimeout(() => { this.stopRumbleTriggers() }, duration)
+		// The device may be gone by the time the timer fires
+		this._rumbleTriggersTimeout = setTimeout(() => { try { this.stopRumbleTriggers() } catch (_) {} }, duration)
 	}
 
 	stopRumbleTriggers () {
