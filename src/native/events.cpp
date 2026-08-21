@@ -121,20 +121,17 @@ events::dispatchEvent(const SDL_Event &event)
 
 					SDL_Rect rect;
 
+					// The display was removed with events for it still in the queue
 					if(SDL_GetDisplayBounds(display_index, &rect) < 0) {
-						std::ostringstream message;
-						message << "SDL_GetDisplayBounds(" << display_index << ") error: " << SDL_GetError();
 						SDL_ClearError();
-						throw Napi::Error::New(env, message.str());
+						return false;
 					}
 					packed.Set("geometryX", rect.x);
 					packed.Set("geometryY", rect.y);
 
 					if(SDL_GetDisplayUsableBounds(display_index, &rect) < 0) {
-						std::ostringstream message;
-						message << "SDL_GetDisplayUsableBounds(" << display_index << ") error: " << SDL_GetError();
 						SDL_ClearError();
-						throw Napi::Error::New(env, message.str());
+						return false;
 					}
 					packed.Set("usableX", rect.x);
 					packed.Set("usableY", rect.y);

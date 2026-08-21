@@ -20,28 +20,27 @@ video::_getDisplays(Napi::Env &env)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	Napi::Array displays = Napi::Array::New(env, num_displays);
+	Napi::Array displays = Napi::Array::New(env);
 
+	int num_returned = 0;
 	for (int i = 0; i < num_displays; i++) {
 		const char *_name = SDL_GetDisplayName(i);
 		Napi::Value name = _name != nullptr
 			? Napi::String::New(env, _name)
 			: env.Null();
 
+		// A display can be removed mid-enumeration, failing the queries below
+
 		SDL_DisplayMode mode;
 		if (SDL_GetCurrentDisplayMode(i, &mode) < 0) {
-			std::ostringstream message;
-			message << "SDL_GetCurrentDisplayMode(" << i << ") error: " << SDL_GetError();
 			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			continue;
 		}
 
 		SDL_Rect rect;
 		if(SDL_GetDisplayBounds(i, &rect) < 0) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayBounds(" << i << ") error: " << SDL_GetError();
 			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			continue;
 		}
 
 		Napi::Object geometry = Napi::Object::New(env);
@@ -51,10 +50,8 @@ video::_getDisplays(Napi::Env &env)
 		geometry.Set("height", rect.h);
 
 		if(SDL_GetDisplayUsableBounds(i, &rect) < 0) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayUsableBounds(" << i << ") error: " << SDL_GetError();
 			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			continue;
 		}
 
 		Napi::Object usable = Napi::Object::New(env);
@@ -96,7 +93,7 @@ video::_getDisplays(Napi::Env &env)
 		display.Set("dpi", dpi);
 		display.Set("orientation", orientation);
 
-		displays.Set(i, display);
+		displays.Set(num_returned++, display);
 	}
 
 	return displays;

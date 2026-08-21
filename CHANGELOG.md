@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- A display disappearing while its hot-plug or move event is being processed no longer crashes the process: display enumeration now skips displays that vanish mid-query, and `displayMove` events for already-removed displays are dropped.
 - `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
 - `createWindow()` now matches the `display` option on both name and position, so it can tell identical monitors apart, and throws if the display is not found instead of silently falling back to the first display.
 - `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it.
