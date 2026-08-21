@@ -930,6 +930,9 @@ export namespace Sdl {
 
 			capture (capture?: boolean): void
 			uncapture (): void
+
+			readonly relativeMode: boolean
+			setRelativeMode (relative: boolean): void
 		}
 
 	}

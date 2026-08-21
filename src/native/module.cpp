@@ -60,6 +60,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("mouse_setCursorImage", Napi::Function::New<mouse::setCursorImage>(env));
 	exports.Set("mouse_showCursor", Napi::Function::New<mouse::showCursor>(env));
 	exports.Set("mouse_redrawCursor", Napi::Function::New<mouse::redrawCursor>(env));
+	exports.Set("mouse_setRelativeMode", Napi::Function::New<mouse::setRelativeMode>(env));
 
 	exports.Set("touch_getDevices", Napi::Function::New<touch::getDevices>(env));
 

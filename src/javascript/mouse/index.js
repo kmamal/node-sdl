@@ -2,6 +2,8 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const FormatHelpers = require('../video/format-helpers')
 
+let relativeMode = false
+
 const mouse = {
 	get BUTTON () { return Enums.mouseButtons },
 
@@ -72,6 +74,15 @@ const mouse = {
 	},
 
 	uncapture () { mouse.capture(false) },
+
+	get relativeMode () { return relativeMode },
+
+	setRelativeMode (relative) {
+		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
+
+		Bindings.mouse_setRelativeMode(relative)
+		relativeMode = relative
+	},
 }
 
 module.exports = { mouse }

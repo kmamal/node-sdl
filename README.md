@@ -245,6 +245,8 @@ Check the [`examples/`](https://github.com/kmamal/node-sdl/tree/master/examples#
   - [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
   - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   - [sdl.mouse.uncapture()](#sdlmouseuncapture)
+  - [sdl.mouse.relativeMode](#sdlmouserelativemode)
+  - [sdl.mouse.setRelativeMode(relative)](#sdlmousesetrelativemoderelative)
 - [sdl.touch](#sdltouch)
   - [sdl.touch.devices](#sdltouchdevices)
 - [sdl.joystick](#sdljoystick)
@@ -1618,10 +1620,28 @@ Forces a cursor redraw.
 - `capture: <boolean>` If `true` the mouse is to be captured by the current window. Default: `true`
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
+This is meant for short-lived operations such as dragging.
+If instead you want to lock the cursor to the window for FPS-style camera controls, use [`sdl.mouse.setRelativeMode()`](#sdlmousesetrelativemoderelative).
 
 ### sdl.mouse.uncapture()
 
 Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
+
+### sdl.mouse.relativeMode
+
+- `<boolean>`
+
+Is `true` if the mouse is in relative mode.
+
+### sdl.mouse.setRelativeMode(relative)
+
+- `relative: <boolean>` The new value of the property.
+
+Enables or disables relative mouse mode.
+In relative mode the cursor is hidden, locked inside the focused window, and the mouse reports movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
+Use this for FPS-style camera controls.
+The `x` and `y` positions reported by mouse events are not meaningful while in relative mode.
+This function may fail on platforms that don't support raw mouse input.
 
 ## sdl.touch
 

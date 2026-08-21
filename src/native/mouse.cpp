@@ -166,6 +166,23 @@ mouse::redrawCursor (const Napi::CallbackInfo &info)
 }
 
 Napi::Value
+mouse::setRelativeMode (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	bool relative = info[0].As<Napi::Boolean>().Value();
+
+	if (SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE) < 0) {
+		std::ostringstream message;
+		message << "SDL_SetRelativeMouseMode(" << relative << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	return env.Undefined();
+}
+
+Napi::Value
 mouse::capture (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
