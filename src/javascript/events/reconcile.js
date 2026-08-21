@@ -1,60 +1,63 @@
 
+// Pairs cached devices with a fresh snapshot by identity, not list position.
+// `keys` holds key functions ordered most-specific-first: devices one key
+// leaves unmatched fall through to the next, and devices with equal keys are
+// paired in list order. Matched cached objects are updated in place (apps may
+// hold references to them), and the cached list ends up in snapshot order.
 const reconcileDevices = (
 	emitter,
 	mainList,
 	currList,
-	compare,
+	keys,
 	prefix = 'device',
 ) => {
-	const addEventType = `${prefix}Add`
-	const removeEventType = `${prefix}Remove`
+	const pairs = new Map()
+	let unmatchedMain = [ ...mainList ]
+	let unmatchedCurr = [ ...currList ]
 
-	currList.sort(compare)
+	for (const key of keys) {
+		if (unmatchedMain.length === 0 || unmatchedCurr.length === 0) { break }
 
-	let mainIndex = 0
-	let currIndex = 0
-	let mainDevice = mainList[mainIndex]
-	let currDevice = currList[currIndex]
-	while (mainIndex < mainList.length && currIndex < currList.length) {
-		const cmp = compare(mainDevice, currDevice)
-		if (cmp === 0) {
-			Object.assign(mainList[mainIndex], currList[currIndex])
-			mainDevice = mainList[++mainIndex]
-			currDevice = currList[++currIndex]
+		const candidates = new Map()
+		for (const mainDevice of unmatchedMain) {
+			const k = key(mainDevice)
+			let list = candidates.get(k)
+			if (!list) {
+				list = []
+				candidates.set(k, list)
+			}
+			list.push(mainDevice)
 		}
-		else if (cmp < 0) {
-			mainList.splice(mainIndex, 1)
-			const type = removeEventType
-			const event = { type, device: mainDevice }
-			emitter.emit(type, event)
-			mainDevice = mainList[mainIndex]
-		}
-		else {
-			mainList.splice(mainIndex, 0, currDevice)
-			mainDevice = mainList[++mainIndex]
-			const type = addEventType
-			const event = { type, device: currDevice }
-			emitter.emit(type, event)
-			currDevice = currList[++currIndex]
-		}
+
+		const matched = new Set()
+		unmatchedCurr = unmatchedCurr.filter((currDevice) => {
+			const list = candidates.get(key(currDevice))
+			if (!list || list.length === 0) { return true }
+			const mainDevice = list.shift()
+			pairs.set(currDevice, mainDevice)
+			matched.add(mainDevice)
+			return false
+		})
+		unmatchedMain = unmatchedMain.filter((mainDevice) => !matched.has(mainDevice))
 	}
 
-	if (mainIndex < mainList.length) {
-		while (mainIndex < mainList.length) {
-			[ mainDevice ] = mainList.splice(mainIndex, 1)
-			const type = removeEventType
-			const event = { type, device: mainDevice }
-			emitter.emit(type, event)
-		}
+	const newList = currList.map((currDevice) => {
+		const mainDevice = pairs.get(currDevice)
+		if (!mainDevice) { return currDevice }
+		Object.assign(mainDevice, currDevice)
+		return mainDevice
+	})
+	mainList.splice(0, mainList.length, ...newList)
+
+	for (const device of unmatchedMain) {
+		const type = `${prefix}Remove`
+		const event = { type, device }
+		emitter.emit(type, event)
 	}
-	else {
-		while (currIndex < currList.length) {
-			mainList.push(currDevice)
-			const type = addEventType
-			const event = { type, device: currDevice }
-			emitter.emit(type, event)
-			currDevice = currList[++currIndex]
-		}
+	for (const device of unmatchedCurr) {
+		const type = `${prefix}Add`
+		const event = { type, device }
+		emitter.emit(type, event)
 	}
 }
 

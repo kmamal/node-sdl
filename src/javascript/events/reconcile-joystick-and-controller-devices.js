@@ -4,13 +4,13 @@ const { reconcileDevices } = require('./reconcile')
 const { joystick: joystickModule } = require('../joystick')
 const {
 	make: makeJoystickDevice,
-	compare: compareJoystickDevice,
+	keys: joystickDeviceKeys,
 } = require('../joystick/device')
 
 const { controller: controllerModule } = require('../controller')
 const {
 	make: makeControllerDevice,
-	compare: compareControllerDevice,
+	keys: controllerDeviceKeys,
 	filter: filterControllerDevice,
 } = require('../controller/device')
 
@@ -26,14 +26,14 @@ const reconcileJoystickAndControllerDevices = (devices) => {
 		joystickModule,
 		Globals.joystickDevices,
 		joystickDevices,
-		compareJoystickDevice,
+		joystickDeviceKeys,
 	)
 
 	reconcileDevices(
 		controllerModule,
 		Globals.controllerDevices,
 		controllerDevices,
-		compareControllerDevice,
+		controllerDeviceKeys,
 	)
 }
 

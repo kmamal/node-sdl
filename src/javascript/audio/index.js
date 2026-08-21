@@ -4,13 +4,11 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackInstance } = require('./audio-playback-instance')
 const { AudioRecordingInstance } = require('./audio-recording-instance')
 const { getFormatHelpers } = require('./format-helpers')
-const { compare } = require('./device')
 
 
-// Reconciliation on device changes assumes these lists are sorted
 if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback = Bindings.audio_getDevices(false).sort(compare)
-	Globals.audioDevices.recording = Bindings.audio_getDevices(true).sort(compare)
+	Globals.audioDevices.playback = Bindings.audio_getDevices(false)
+	Globals.audioDevices.recording = Bindings.audio_getDevices(true)
 }
 
 

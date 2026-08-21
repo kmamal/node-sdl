@@ -1,9 +1,8 @@
 
-const compare = (a, b) => {
-	const { name: aName } = a
-	const { name: bName } = b
-	if (aName === bName) { return 0 }
-	return a.name < b.name ? -1 : 1
-}
+// SDL2 identifies audio devices only by name; identical devices get equal
+// names and are told apart by list order in reconciliation.
+const keys = [
+	(device) => device.name,
+]
 
-module.exports = { compare }
+module.exports = { keys }

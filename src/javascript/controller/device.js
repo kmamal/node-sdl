@@ -15,12 +15,14 @@ const make = (device) => {
 	}
 }
 
-const compare = (a, b) => a._index - b._index
+const keys = [
+	(device) => device.id,
+]
 
 const filter = (device) => device.isController
 
 module.exports = {
 	make,
-	compare,
+	keys,
 	filter,
 }

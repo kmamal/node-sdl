@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Unplugging a device no longer mis-identifies the remaining ones. Device reconciliation used to match devices by list position (or by name for audio), so removing a non-last joystick, controller, or display made cached device objects silently morph into other devices and made `deviceRemove`/`displayRemove` events report the wrong device. Joysticks and controllers are now matched by their stable SDL instance id; displays by name and geometry; audio devices with identical names by their relative order. As a side effect, `sdl.audio.devices` is no longer sorted by name — devices now stay in SDL's enumeration order, like every other device list.
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
 - `enqueue()` and `dequeue()` now accept empty buffers as no-ops, as the README already implied, instead of throwing "invalid numBytes" on the zero-length chunks streaming pipelines naturally produce.
 - `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
