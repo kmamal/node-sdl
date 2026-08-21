@@ -72,8 +72,9 @@ joystick::_getDevices (Napi::Env &env)
 		}
 
 		SDL_JoystickType _type = SDL_JoystickGetDeviceType(i);
-		Napi::Value type = _type != SDL_JOYSTICK_TYPE_UNKNOWN
-			? Napi::String::New(env, joystick::types[_type])
+		auto type_entry = joystick::types.find(_type);
+		Napi::Value type = type_entry != joystick::types.end()
+			? Napi::String::New(env, type_entry->second)
 			: env.Null();
 
 		int _vendor = SDL_JoystickGetDeviceVendor(i);
@@ -115,8 +116,9 @@ joystick::_getDevices (Napi::Env &env)
 				: env.Null();
 
 			SDL_GameControllerType _controller_type = SDL_GameControllerTypeForIndex(i);
-			controller_type = _controller_type != SDL_CONTROLLER_TYPE_UNKNOWN
-				? Napi::String::New(env, controller::types[_controller_type])
+			auto controller_type_entry = controller::types.find(_controller_type);
+			controller_type = controller_type_entry != controller::types.end()
+				? Napi::String::New(env, controller_type_entry->second)
 				: env.Null();
 		}
 		else {
@@ -283,7 +285,11 @@ joystick::open (const Napi::CallbackInfo &info)
 
 		for (int i = 0; i < num_hats; i++) {
 			int hat_position = SDL_JoystickGetHat(joystick, i);
-			hats.Set(i, joystick::hat_positions[hat_position]);
+			auto hat_position_entry = joystick::hat_positions.find(hat_position);
+			Napi::Value hat_position_name = hat_position_entry != joystick::hat_positions.end()
+				? Napi::String::New(env, hat_position_entry->second)
+				: env.Null();
+			hats.Set(i, hat_position_name);
 		}
 
 		Napi::Value power = getPowerLevel(env, joystick);

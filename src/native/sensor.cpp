@@ -34,15 +34,13 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 		}
 
 		SDL_SensorType _type = SDL_SensorGetDeviceType(i);
-		Napi::Value type = _type != SDL_SENSOR_UNKNOWN
-			? Napi::String::New(env, sensor::types[_type])
+		auto type_entry = sensor::types.find(_type);
+		Napi::Value type = type_entry != sensor::types.end()
+			? Napi::String::New(env, type_entry->second)
 			: env.Null();
-		Napi::Value side = (
-			_type != SDL_SENSOR_UNKNOWN &&
-			_type != SDL_SENSOR_ACCEL &&
-			_type != SDL_SENSOR_GYRO
-		)
-			? Napi::String::New(env, sensor::sides[_type])
+		auto side_entry = sensor::sides.find(_type);
+		Napi::Value side = side_entry != sensor::sides.end()
+			? Napi::String::New(env, side_entry->second)
 			: env.Null();
 
 		const char *_name = SDL_SensorGetDeviceName(i);

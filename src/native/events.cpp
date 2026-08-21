@@ -395,7 +395,11 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::HAT_MOTION);
 			packed.Set("joystickId", event.jhat.which);
 			packed.Set("hat", event.jhat.hat);
-			packed.Set("value", joystick::hat_positions[event.jhat.value]);
+			auto hat_position_entry = joystick::hat_positions.find(event.jhat.value);
+			Napi::Value hat_position = hat_position_entry != joystick::hat_positions.end()
+				? Napi::String::New(env, hat_position_entry->second)
+				: env.Null();
+			packed.Set("value", hat_position);
 			break;
 		}
 

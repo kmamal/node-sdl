@@ -74,8 +74,9 @@ video::_getDisplays(Napi::Env &env)
 		}
 
 		SDL_DisplayOrientation _orientation = SDL_GetDisplayOrientation(i);
-		Napi::Value orientation = _orientation != SDL_ORIENTATION_UNKNOWN
-			? Napi::String::New(env, video::orientations[_orientation])
+		auto orientation_entry = video::orientations.find(_orientation);
+		Napi::Value orientation = orientation_entry != video::orientations.end()
+			? Napi::String::New(env, orientation_entry->second)
 			: env.Null();
 
 		auto format_entry = video::formats.find((SDL_PixelFormatEnum) mode.format);

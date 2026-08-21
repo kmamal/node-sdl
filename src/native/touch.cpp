@@ -30,8 +30,9 @@ touch::getDevices(const Napi::CallbackInfo &info)
 			: env.Null();
 
 		SDL_TouchDeviceType _type = SDL_GetTouchDeviceType(id);
-		Napi::Value type = _type != SDL_TOUCH_DEVICE_INVALID
-			? Napi::String::New(env, device_types[_type])
+		auto type_entry = device_types.find(_type);
+		Napi::Value type = type_entry != device_types.end()
+			? Napi::String::New(env, type_entry->second)
 			: env.Null();
 
 		Napi::Object device = Napi::Object::New(env);
