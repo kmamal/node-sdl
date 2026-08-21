@@ -16,6 +16,8 @@ class ControllerInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		// Flush pending removals so a stale device or _index isn't used
+		Globals.events.poll()
 		if (!Globals.controllerDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
 		const result = Bindings.controller_open(device._index)

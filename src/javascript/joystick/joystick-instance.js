@@ -16,6 +16,8 @@ class JoystickInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		// Flush pending removals so a stale device or _index isn't used
+		Globals.events.poll()
 		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
 		const result = Bindings.joystick_open(device._index)

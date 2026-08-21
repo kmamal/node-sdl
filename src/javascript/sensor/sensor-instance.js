@@ -1,5 +1,6 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
+const { refreshDevices } = require('./devices')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
 const validEvents = [
@@ -11,6 +12,8 @@ class SensorInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
+		// Refetch so a stale device or _index isn't used
+		refreshDevices()
 		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
 		Bindings.sensor_open(device._index)
