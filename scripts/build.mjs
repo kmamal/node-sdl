@@ -12,8 +12,8 @@ await Promise.all([
 }))
 
 console.log("build in", C.dir.build)
-const SDL_INC = Path.join(C.dir.sdl, 'include')
-const SDL_LIB = Path.join(C.dir.sdl, 'lib')
+const SDL_INC = process.env.SDL_INC || Path.join(C.dir.sdl, 'include')
+const SDL_LIB = process.env.SDL_LIB || Path.join(C.dir.sdl, 'lib')
 
 let archFlag = ''
 if (process.env.CROSS_COMPILE_ARCH) {
