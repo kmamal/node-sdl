@@ -11,7 +11,6 @@ const { clipboard: clipboardModule } = require('../clipboard')
 
 const handleEvent = (event) => {
 	const { family, type } = event
-	if (family === undefined || type === undefined) { return }
 	delete event.family
 
 	switch (family) {

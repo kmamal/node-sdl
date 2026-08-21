@@ -16,11 +16,9 @@ class EventsViaPoll extends EventEmitter {
 		let count = 0
 
 		// NOTE: this needs to be first, otherwise it will emit for 'newListener'
+		// Invalid types can't reach here: the newListener hook rejects them
+		// before they are ever registered
 		this.on('removeListener', (type) => {
-			if (!commonEvents.includes(type) && !validEvents.includes(type)) {
-				throw Object.assign(new Error("invalid event"), { type })
-			}
-
 			// Emitter-internal events need no polling, and removeAllListeners
 			// skips them, so counting them could keep fast polling on forever
 			if (type === 'newListener' || type === 'removeListener') { return }
