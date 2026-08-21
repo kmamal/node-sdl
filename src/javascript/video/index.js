@@ -4,7 +4,9 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
 
 
-Globals.displays = Bindings.video_getDisplays()
+Globals.displays = Globals.info.initialized.video
+	? Bindings.video_getDisplays()
+	: []
 
 
 const validEvents = [ 'displayAdd', 'displayRemove', 'displayOrient', 'displayMove' ]

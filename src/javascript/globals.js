@@ -1,5 +1,7 @@
 
 module.exports = {
+	info: null, // Set early from index.js
+
 	displays: [],
 	windows: {
 		all: new Map(),

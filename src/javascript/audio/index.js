@@ -6,8 +6,10 @@ const { AudioRecordingInstance } = require('./audio-recording-instance')
 const { AudioFormatHelpers } = require('./format-helpers')
 
 
-Globals.audioDevices.playback = Bindings.audio_getDevices(false)
-Globals.audioDevices.recording = Bindings.audio_getDevices(true)
+if (Globals.info.initialized.audio) {
+	Globals.audioDevices.playback = Bindings.audio_getDevices(false)
+	Globals.audioDevices.recording = Bindings.audio_getDevices(true)
+}
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
