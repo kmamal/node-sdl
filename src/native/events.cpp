@@ -533,7 +533,10 @@ events::dispatchEvent(const SDL_Event &event)
 static bool has_pending_filter_error = false;
 static Napi::Error pending_filter_error;
 
-static bool dispatching_from_filter = false;
+// A depth, not a flag: a handler can trigger a nested synchronous dispatch
+// (e.g. setSize() from a resize listener), and its return must not make the
+// outer dispatch look finished
+static int dispatching_from_filter = 0;
 
 // Lets the JS side defer SDL calls that are unsafe while the pump that
 // called the filter still holds pointers into the video driver's state,
@@ -543,7 +546,7 @@ events::isDispatchingFromFilter (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	return Napi::Boolean::New(env, dispatching_from_filter);
+	return Napi::Boolean::New(env, dispatching_from_filter > 0);
 }
 
 // Exceptions must not unwind through SDL's event pump, which called the
@@ -553,15 +556,15 @@ events::dispatchEventFromFilter(const SDL_Event &event)
 {
 	if (has_pending_filter_error) { return false; }
 
-	dispatching_from_filter = true;
+	dispatching_from_filter++;
 
 	try {
 		bool dispatched = events::dispatchEvent(event);
-		dispatching_from_filter = false;
+		dispatching_from_filter--;
 		return dispatched;
 	}
 	catch (const Napi::Error &error) {
-		dispatching_from_filter = false;
+		dispatching_from_filter--;
 		pending_filter_error = error;
 		has_pending_filter_error = true;
 
