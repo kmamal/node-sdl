@@ -25,24 +25,26 @@ audio::_getDevices(Napi::Env &env, bool is_capture)
 		return Napi::Array::New(env);
 	}
 
-	Napi::Array devices = Napi::Array::New(env, num_devices);
+	Napi::Array devices = Napi::Array::New(env);
 
 	std::string device_type = audio::device_types[is_capture];
 
+	int num_returned = 0;
 	for (int i = 0; i < num_devices; i++) {
 		const char *name = SDL_GetAudioDeviceName(i, is_capture);
+
+		// A device can be removed mid-enumeration by the backend's
+		// notification thread, failing the query
 		if (name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetAudioDeviceName(" << i << ", " << is_capture << ") error: " << SDL_GetError();
 			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			continue;
 		}
 
 		Napi::Object device = Napi::Object::New(env);
 		device.Set("name", name);
 		device.Set("type", device_type);
 
-		devices.Set(i, device);
+		devices.Set(num_returned++, device);
 	}
 
 	return devices;
