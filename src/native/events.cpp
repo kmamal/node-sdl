@@ -566,6 +566,13 @@ events::poll (const Napi::CallbackInfo &info)
 		}
 	}
 	catch (...) {
+		// Drop any stashed filter error so it isn't thrown against a later
+		// poll, or left holding a reference past environment teardown
+		if (has_pending_filter_error) {
+			has_pending_filter_error = false;
+			pending_filter_error.Reset();
+		}
+
 		poll_env = nullptr;
 		poll_callback = nullptr;
 		throw;
