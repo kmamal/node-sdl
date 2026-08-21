@@ -8,17 +8,6 @@ const sensor = {
 
 	get devices () {
 		const devices = Bindings.sensor_getDevices()
-		for (const sensorDevice of devices) {
-			const { type } = sensorDevice
-			sensorDevice.type
-				= type?.startsWith('accelerometer') ? 'accelerometer'
-				: type?.startsWith('gyroscope') ? 'gyroscope'
-				: null
-			sensorDevice.side
-				= type?.endsWith('Left') ? 'left'
-				: type?.endsWith('Right') ? 'right'
-				: null
-		}
 
 		// Keep returning the same objects so that devices obtained from
 		// earlier reads remain valid arguments to openDevice()
