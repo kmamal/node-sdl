@@ -157,6 +157,8 @@ events::dispatchEvent(const SDL_Event &event)
 					break;
 				}
 				case SDL_WINDOWEVENT_SIZE_CHANGED: {
+					// Clear any stale error, since failure is detected via the error state
+					SDL_ClearError();
 					SDL_Window *window = SDL_GetWindowFromID(event.window.windowID);
 					if (window == nullptr) {
 						const char *error = SDL_GetError();

@@ -11,6 +11,8 @@ std::map<bool, std::string> audio::device_types;
 Napi::Array
 audio::_getDevices(Napi::Env &env, bool is_capture)
 {
+	// Clear any stale error, since failure is detected via the error state
+	SDL_ClearError();
 	int num_devices = SDL_GetNumAudioDevices(is_capture ? 1 : 0);
 	if (num_devices == -1) {
 		// SDL_GetNumAudioDevices can return -1 even if there is no error
@@ -157,6 +159,8 @@ audio::dequeue (const Napi::CallbackInfo &info)
 	void *dst = info[1].As<Napi::Buffer<char>>().Data();
 	int size = info[2].As<Napi::Number>().Int32Value();
 
+	// Clear any stale error, since failure is detected via the error state
+	SDL_ClearError();
 	int num = SDL_DequeueAudio(audio_id, dst, size);
 	const char *error = SDL_GetError();
 	if (error != global::no_error) {

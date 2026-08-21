@@ -41,6 +41,9 @@ controller::getSteamHandle (Napi::Env &env, SDL_GameController *controller)
 void
 controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Object dst)
 {
+	// Clear any stale error, since failure is detected via the error state
+	SDL_ClearError();
+
 	Napi::Object axes = Napi::Object::New(env);
 	axes.Set("leftStickX", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTX));
 	axes.Set("leftStickY", controller::mapAxis(controller, SDL_CONTROLLER_AXIS_LEFTY));

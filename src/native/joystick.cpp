@@ -215,6 +215,8 @@ joystick::open (const Napi::CallbackInfo &info)
 	Napi::Array axes = Napi::Array::New(env, num_axes);
 
 	for (int i = 0; i < num_axes; i++) {
+		// Clear any stale error, since failure is detected via the error state
+		SDL_ClearError();
 		double value = joystick::mapAxis(joystick, i);
 		error = SDL_GetError();
 		if (error != global::no_error) {
