@@ -26,5 +26,10 @@ process.on('exit', (code) => {
 		controller.close()
 	}
 
+	// Close all sensors
+	for (const sensor of Globals.sensorInstances.all.values()) {
+		sensor.close()
+	}
+
 	Bindings.global_cleanup()
 })
