@@ -1,7 +1,10 @@
 
 // Bytes per pixel for each pixel format. For the planar YUV formats the
 // value refers to the Y plane, whose pitch is the stride.
+// Null prototypes so that formats like 'constructor' can't match inherited
+// Object members and leak through as valid entries.
 const bytesPerPixel = {
+	__proto__: null,
 	rgb332: 1,
 	rgb444: 2,
 	rgb555: 2,
@@ -43,6 +46,7 @@ const bytesPerPixel = {
 // The planar YUV formats store extra chroma planes after the Y plane. The
 // chroma pitches and row counts are rounded up for odd dimensions.
 const isPlanarYuv = {
+	__proto__: null,
 	yv12: true,
 	iyuv: true,
 	nv12: true,

@@ -1,6 +1,9 @@
 const Bindings = require('../bindings')
 
+// Null prototypes so that keys like 'constructor' can't match inherited
+// Object members and leak through as valid entries
 const mapping = {
+	__proto__: null,
 	'A': 'a',
 	'AC Back': 'back',
 	'AC Bookmarks': 'bookmarks',
@@ -203,7 +206,7 @@ const mapping = {
 	'Z': 'z',
 }
 
-const reverseMapping = {}
+const reverseMapping = { __proto__: null }
 
 for (const [ key, value ] of Object.entries(mapping)) {
 	maybeSkip: {
