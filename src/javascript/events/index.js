@@ -228,6 +228,26 @@ const handleEvent = (event) => {
 			delete event.joystickId
 
 			const collection = Globals.joystickInstances.byId.get(joystickId)
+
+			// Battery updates arrive as joystick events but also concern controllers
+			if (type === 'powerUpdate') {
+				if (collection) {
+					for (const joystickInstance of collection) {
+						joystickInstance._power = event.power
+						joystickInstance.emit(type, event)
+					}
+				}
+
+				const otherCollection = Globals.controllerInstances.byId.get(joystickId)
+				if (!otherCollection) { return }
+
+				for (const controllerInstance of otherCollection) {
+					controllerInstance._power = event.power
+					controllerInstance.emit(type, event)
+				}
+				return
+			}
+
 			if (!collection) { return }
 
 			switch (type) {
@@ -264,21 +284,6 @@ const handleEvent = (event) => {
 					for (const joystickInstance of collection) {
 						joystickInstance._hats[event.hat] = event.value
 						joystickInstance.emit(type, event)
-					}
-				} break
-
-				case 'powerUpdate': {
-					for (const joystickInstance of collection) {
-						joystickInstance._power = event.power
-						joystickInstance.emit(type, event)
-					}
-
-					const otherCollection = Globals.controllerInstances.byId.get(joystickId)
-					if (!otherCollection) { break }
-
-					for (const controllerInstance of otherCollection) {
-						controllerInstance._power = event.power
-						controllerInstance.emit(type, event)
 					}
 				} break
 

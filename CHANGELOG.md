@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Connecting or disconnecting a display no longer crashes the process.
 - Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
+- Controller instances now receive `powerUpdate` events even when the device is not also open as a joystick.
 - Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/controller opening.
 - Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
