@@ -45,8 +45,10 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			? Napi::String::New(env, sensor::sides[_type])
 			: env.Null();
 
-		// This function can only error if the index is invalid.
-		const char *name = SDL_SensorGetDeviceName(i);
+		const char *_name = SDL_SensorGetDeviceName(i);
+		Napi::Value name = _name != nullptr
+			? Napi::String::New(env, _name)
+			: env.Null();
 
 		Napi::Object device = Napi::Object::New(env);
 		device.Set("_index", i);

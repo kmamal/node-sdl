@@ -2283,7 +2283,7 @@ Use the `sdl.sensor.STANDARD_GRAVITY` constant to correct for gravitational acce
 
 - `<object>[]`
   - `id: <number>` The unique id of the device.
-  - `name: <string>` The name of the device.
+  - `name: <string>|<null>` The name of the device. Is `null` if it can't be determined.
   - `type: <string>|<null>` Either `'accelerometer'` or `'gyroscope'`. Is `null` if it can't be determined.
   - `side: <string>|<null>` Either `'left'` or `'right'`. Is `null` if the sensor does not have a side, or the value can't be determined.
 

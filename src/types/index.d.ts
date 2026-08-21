@@ -1209,7 +1209,7 @@ export namespace Sdl {
 
 		export interface Device {
 			readonly id: number
-			readonly name: string
+			readonly name: string | null
 			readonly type: Type | null
 			readonly side: Side | null
 		}
