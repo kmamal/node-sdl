@@ -160,8 +160,9 @@ joystick::getPowerLevel (Napi::Env &env, SDL_Joystick *joystick)
 Napi::Value
 joystick::mapPowerLevel (Napi::Env &env, SDL_JoystickPowerLevel power)
 {
-	return power != SDL_JOYSTICK_POWER_UNKNOWN
-		? Napi::String::New(env, joystick::power_levels[power])
+	auto power_level_entry = joystick::power_levels.find(power);
+	return power_level_entry != joystick::power_levels.end()
+		? Napi::String::New(env, power_level_entry->second)
 		: env.Null();
 }
 
