@@ -123,14 +123,14 @@ const handleEvent = (event) => {
 					Globals.windows.focused = window
 				} break
 				case 'blur': {
-					Globals.windows.focused = null
+					if (Globals.windows.focused === window) { Globals.windows.focused = null }
 				} break
 
 				case 'hover': {
 					Globals.windows.hovered = window
 				} break
 				case 'leave': {
-					Globals.windows.hovered = null
+					if (Globals.windows.hovered === window) { Globals.windows.hovered = null }
 				} break
 
 				case 'close': {
