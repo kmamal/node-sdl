@@ -29,7 +29,8 @@
 			"<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
 		],
 		'defines': [
-			'NAPI_VERSION=<(napi_build_version)',
+			# Node-API version of the oldest supported Node.js (v22.0.0)
+			'NAPI_VERSION=9',
 			'NODE_ADDON_API_DISABLE_DEPRECATED',
 		],
 		'cflags': [ '-Werror', '-Wall', '-Wextra' ],
