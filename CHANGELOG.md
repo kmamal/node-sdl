@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renderer error messages now include the flag values instead of pointer addresses.
 - `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
 - A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls.
+- Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
