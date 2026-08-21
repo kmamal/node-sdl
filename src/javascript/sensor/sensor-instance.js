@@ -30,7 +30,13 @@ class SensorInstance extends EventsViaPoll {
 
 	get device () { return this._device }
 
-	get data () { return Bindings.sensor_getData(this._device.id) }
+	get data () {
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		// SDL only refreshes sensor values inside the event pump
+		Globals.events.poll()
+		return Bindings.sensor_getData(this._device.id)
+	}
 
 	get closed () { return this._closed }
 	close () {

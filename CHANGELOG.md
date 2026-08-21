@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
 - Touch events whose device disappeared before they were polled are now dropped instead of being emitted with an `undefined` `device`.
 - Touch events synthesized from the mouse are now delivered with a `null` `device` instead of being silently dropped (and no longer trigger a native device refetch on every mouse movement).
+- Reading a sensor instance's `data` now pumps events first, so it returns current readings instead of values up to a second old, and throws the documented error if the instance is closed.
 - Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer.
 - Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
 - An exception stashed by the window drag/resize filter no longer risks undefined behavior at process teardown when no further poll runs to consume it.
