@@ -45,6 +45,16 @@ class EventsViaPoll extends EventEmitter {
 		})
 	}
 
+	removeAllListeners (type) {
+		// Removing the bookkeeping listeners above would corrupt the count
+		const types = type !== undefined ? [ type ] : this.eventNames()
+		for (const eventType of types) {
+			if (eventType === 'newListener' || eventType === 'removeListener') { continue }
+			super.removeAllListeners(eventType)
+		}
+		return this
+	}
+
 	emit (type, ...args) {
 		const isCommon = commonEvents.includes(type)
 		const isValid = this._validEvents.includes(type)

@@ -150,18 +150,8 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
-		// This also keeps Node.js alive while windows are open
-		this.on('close', () => {
-			if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
-			if (Globals.windows.focused === this) { Globals.windows.focused = null }
-
-			Bindings.window_destroy(this._id)
-			this._destroyed = true
-
-			Globals.windows.all.delete(this._id)
-
-			process.nextTick(() => { this.removeAllListeners() })
-		})
+		// Keeps Node.js alive while windows are open
+		this.on('close', () => {})
 
 		// Manually emit an initial resize event for convenience
 		process.nextTick(() => {
@@ -450,7 +440,16 @@ class Window extends EventsViaPoll {
 	destroy () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
+		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
+		if (Globals.windows.focused === this) { Globals.windows.focused = null }
+
+		Bindings.window_destroy(this._id)
+		this._destroyed = true
+
+		Globals.windows.all.delete(this._id)
+
 		this.emit('close', { type: 'close' })
+		process.nextTick(() => { this.removeAllListeners() })
 	}
 
 	destroyGently () {

@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
 - Controller instances now receive `powerUpdate` events even when the device is not also open as a joystick.
 - Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion.
+- Calling `removeAllListeners()` on a window or instance no longer breaks event polling, and no longer turns `window.destroy()` into a silent no-op.
 - Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/controller opening.
 - Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
