@@ -404,7 +404,6 @@ class Window extends EventsViaPoll {
 		}
 
 		const _format = Enums.pixelFormat[format]
-		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		const _scaling = Enums.scaleMode[scaling]
 		if (_scaling === undefined) { throw Object.assign(new Error("invalid scaling"), { scaling }) }
@@ -429,7 +428,6 @@ class Window extends EventsViaPoll {
 		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 
 		const _format = Enums.pixelFormat[format]
-		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		Bindings.window_setIcon(this._id, width, height, stride, _format, buffer)
 	}

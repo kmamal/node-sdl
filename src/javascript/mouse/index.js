@@ -58,7 +58,6 @@ const mouse = {
 		if (y < 0 || y >= height) { throw Object.assign(new Error("invalid y"), { y }) }
 
 		const _format = Enums.pixelFormat[format]
-		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
 		Bindings.mouse_setCursorImage(width, height, stride, _format, buffer, x, y)
 	},
