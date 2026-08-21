@@ -18,6 +18,19 @@ class AudioPlaybackInstance extends AudioInstance {
 		super.clearQueue()
 		resetTimeout()
 	}
+
+	// Cancelling the drain timeout is safe even with other instances still
+	// playing: emptying the event loop reruns the 'beforeExit' handler, which
+	// recomputes the remaining drain duration from scratch
+	play (play = true) {
+		super.play(play)
+		if (!play) { resetTimeout() }
+	}
+
+	close () {
+		super.close()
+		resetTimeout()
+	}
 }
 
 module.exports = { AudioPlaybackInstance }
