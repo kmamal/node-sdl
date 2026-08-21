@@ -18,7 +18,7 @@ const controller = new class extends EventsViaPoll {
 	addMappings (mappings) {
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }
 		for (const mapping of mappings) {
-			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mappings }) }
+			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mapping }) }
 		}
 
 		Bindings.controller_addMappings(mappings)
