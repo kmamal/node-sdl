@@ -29,9 +29,10 @@ int filterEvents(void*, SDL_Event *event) {
 			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
 		)
 	) {
-		// If the event was dispatched, drop it from the queue so it doesn't
-		// get dispatched a second time when polled
-		if (events::dispatchEventFromFilter(*event)) { return 0; }
+		// Dispatched in real time since a modal drag/resize blocks poll(),
+		// but kept in the queue so SDL's own event watchers (the renderer's
+		// resize handling) still see it. poll() skips the duplicate.
+		events::dispatchEventFromFilter(*event);
 	}
 
 	return 1;

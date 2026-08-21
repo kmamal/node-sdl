@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <string>
 #include <sstream>
+#include <vector>
 
 
 std::string events::families::APP;
@@ -530,6 +531,60 @@ events::dispatchEvent(const SDL_Event &event)
 	return true;
 }
 
+// Window events the filter already dispatched stay in the queue, so that
+// SDL's own event watchers (the renderer's resize handling) still see them.
+// Their identities are recorded here and poll() skips the duplicates.
+struct FilterDispatchedEvent {
+	Uint32 timestamp;
+	Uint32 window_id;
+	Uint8 window_event;
+	Sint32 data1;
+	Sint32 data2;
+};
+
+static std::vector<FilterDispatchedEvent> filter_dispatched_events;
+
+static void
+recordFilterDispatched (const SDL_Event &event)
+{
+	// SDL removes pending events of the same type for the same window from
+	// the queue before pushing a new one, so their records are stale
+	for (auto it = filter_dispatched_events.begin(); it != filter_dispatched_events.end();) {
+		it = it->window_id == event.window.windowID && it->window_event == event.window.event
+			? filter_dispatched_events.erase(it)
+			: it + 1;
+	}
+
+	filter_dispatched_events.push_back({
+		event.common.timestamp,
+		event.window.windowID,
+		event.window.event,
+		event.window.data1,
+		event.window.data2,
+	});
+}
+
+static bool
+wasDispatchedFromFilter (const SDL_Event &event)
+{
+	if (event.type != SDL_WINDOWEVENT) { return false; }
+
+	for (auto it = filter_dispatched_events.begin(); it != filter_dispatched_events.end(); ++it) {
+		if (true
+			&& it->timestamp == event.common.timestamp
+			&& it->window_id == event.window.windowID
+			&& it->window_event == event.window.event
+			&& it->data1 == event.window.data1
+			&& it->data2 == event.window.data2
+		) {
+			filter_dispatched_events.erase(it);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 static bool has_pending_filter_error = false;
 static Napi::Error pending_filter_error;
 
@@ -561,10 +616,13 @@ events::dispatchEventFromFilter(const SDL_Event &event)
 	try {
 		bool dispatched = events::dispatchEvent(event);
 		dispatching_from_filter--;
+		if (dispatched) { recordFilterDispatched(event); }
 		return dispatched;
 	}
 	catch (const Napi::Error &error) {
 		dispatching_from_filter--;
+		// Record even on error so the half-dispatched event isn't repeated
+		recordFilterDispatched(event);
 		pending_filter_error = error;
 		has_pending_filter_error = true;
 
@@ -596,7 +654,10 @@ events::poll (const Napi::CallbackInfo &info)
 
 	try {
 		SDL_Event event;
-		while (SDL_PollEvent(&event)) { events::dispatchEvent(event); }
+		while (SDL_PollEvent(&event)) {
+			if (wasDispatchedFromFilter(event)) { continue; }
+			events::dispatchEvent(event);
+		}
 
 		if (has_pending_filter_error) {
 			has_pending_filter_error = false;
