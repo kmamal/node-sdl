@@ -655,7 +655,12 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_UpdateTexture(texture, nullptr, pixels, stride);
+	if (SDL_UpdateTexture(texture, nullptr, pixels, stride) < 0) {
+		std::ostringstream message;
+		message << "SDL_UpdateTexture(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	if (SDL_RenderClear(renderer) < 0) {
 		std::ostringstream message;
