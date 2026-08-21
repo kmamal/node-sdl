@@ -110,7 +110,11 @@ events::dispatchEvent(const SDL_Event &event)
 				}
 				case SDL_DISPLAYEVENT_ORIENTATION: {
 					packed.Set("type", events::types::DISPLAY_ORIENT);
-					packed.Set("orientation", video::orientations[(SDL_DisplayOrientation) event.display.data1]);
+					auto orientation_entry = video::orientations.find((SDL_DisplayOrientation) event.display.data1);
+					Napi::Value orientation = orientation_entry != video::orientations.end()
+						? Napi::String::New(env, orientation_entry->second)
+						: env.Null();
+					packed.Set("orientation", orientation);
 					break;
 				}
 				case SDL_DISPLAYEVENT_MOVED: {
