@@ -183,6 +183,9 @@ const handleEvent = (event) => {
 			if (device === undefined) {
 				Globals.touchDevices = Bindings.touch_getDevices()
 				device = Globals.touchDevices.find(({ id }) => id === touchId)
+
+				// The device was disconnected with events for it still in the queue
+				if (device === undefined) { return }
 			}
 
 			const { windowId } = event
