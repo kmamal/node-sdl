@@ -68,11 +68,13 @@ class EventsViaPoll extends EventEmitter {
 			throw Object.assign(new Error("invalid event"), { type })
 		}
 
-		super.emit(type, ...args)
+		let hadListeners = super.emit(type, ...args)
 
 		if (!isCommon) {
-			super.emit("*", type, ...args)
+			hadListeners = super.emit("*", type, ...args) || hadListeners
 		}
+
+		return hadListeners
 	}
 }
 
