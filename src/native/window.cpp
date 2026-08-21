@@ -79,7 +79,7 @@ updateRenderer(
 
 	if (renderer == nullptr) {
 		std::ostringstream message;
-		message << "SDL_CreateRenderer(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
+		message << "SDL_CreateRenderer(" << window_id << ", " << *is_accelerated << ", " << *is_vsync << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
@@ -87,7 +87,7 @@ updateRenderer(
 	SDL_RendererInfo info;
 	if (SDL_GetRendererInfo(renderer, &info) < 0) {
 		std::ostringstream message;
-		message << "SDL_GetRendererInfo(" << window_id << ", " << is_accelerated << ", " << is_vsync << ") error: " << SDL_GetError();
+		message << "SDL_GetRendererInfo(" << window_id << ", " << *is_accelerated << ", " << *is_vsync << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}

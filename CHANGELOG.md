@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `window.setSizeInPixels()` now reports the actual resulting pixel size instead of assuming the requested one was applied.
 - Displays with a pixel format that has no exposed name report `format: null` instead of an empty string. The same applies to unknown controller axis and button names in events.
 - `sdl.mouse.getButton(32)` no longer relies on undefined behavior.
+- Renderer error messages now include the flag values instead of pointer addresses.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
