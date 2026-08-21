@@ -1,4 +1,5 @@
 #include "clipboard.h"
+#include "global.h"
 #include <SDL.h>
 #include <string>
 #include <sstream>
@@ -12,11 +13,21 @@ clipboard::getText (const Napi::CallbackInfo &info)
 		return Napi::String::New(env, "");
 	}
 
+	// Clear any stale error, since an empty result is otherwise ambiguous
+	SDL_ClearError();
+
 	char *text = SDL_GetClipboardText();
 	if (text[0] == '\0') {
 		SDL_free(text);
+
+		// The clipboard may have been legitimately emptied since the check above
+		const char *error = SDL_GetError();
+		if (error == global::no_error) {
+			return Napi::String::New(env, "");
+		}
+
 		std::ostringstream message;
-		message << "SDL_GetClipboardText() error: " << SDL_GetError();
+		message << "SDL_GetClipboardText() error: " << error;
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}

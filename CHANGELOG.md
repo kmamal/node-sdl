@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A failure while opening a joystick or controller no longer leaks the SDL handle.
 - A failure while creating a window (such as renderer creation failing) no longer leaks the SDL window.
 - `sdl.sensor.devices` no longer crashes when a sensor disappears while the list is being read. Its `name` is `null` instead.
+- `sdl.clipboard.text` no longer throws when another application empties the clipboard mid-read.
 - The `displayMove` event is now emitted instead of throwing "invalid event".
 - The `displayOrient` and `displayMove` events now carry the documented `device` property.
 - The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
