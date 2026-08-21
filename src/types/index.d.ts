@@ -83,7 +83,7 @@ export namespace Events {
 		}
 
 		interface FingerEvent extends WindowEvent {
-			readonly device: Sdl.Touch.Device
+			readonly device: Sdl.Touch.Device | null
 			readonly fingerId: number
 			readonly mouse: boolean
 			readonly x: number

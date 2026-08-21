@@ -818,7 +818,7 @@ Fired when the mouse wheel is scrolled.
 
 ### Event: 'fingerDown'
 
-- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
 - `fingerId: <number>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
@@ -829,7 +829,7 @@ Fired when a finger is presed to the touch surface.
 
 ### Event: 'fingerUp'
 
-- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
 - `fingerId: <number>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
@@ -840,7 +840,7 @@ Fired when a finger is lifted from the touch surface.
 
 ### Event: 'fingerMove'
 
-- `device: <object>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
 - `fingerId: <number>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.

@@ -179,13 +179,17 @@ const handleEvent = (event) => {
 			const { touchId } = event
 			delete event.touchId
 
-			let device = Globals.touchDevices.find(({ id }) => id === touchId)
-			if (device === undefined) {
-				Globals.touchDevices = Bindings.touch_getDevices()
+			// Events synthesized from the mouse have no touch device
+			let device = null
+			if (!event.mouse) {
 				device = Globals.touchDevices.find(({ id }) => id === touchId)
+				if (device === undefined) {
+					Globals.touchDevices = Bindings.touch_getDevices()
+					device = Globals.touchDevices.find(({ id }) => id === touchId)
 
-				// The device was disconnected with events for it still in the queue
-				if (device === undefined) { return }
+					// The device was disconnected with events for it still in the queue
+					if (device === undefined) { return }
+				}
 			}
 
 			const { windowId } = event
