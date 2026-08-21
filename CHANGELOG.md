@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion.
 - Calling `removeAllListeners()` on a window or instance no longer breaks event polling, and no longer turns `window.destroy()` into a silent no-op.
 - An exception stashed by the window drag/resize filter is no longer re-thrown against a later poll when another listener also throws.
+- `zeroSampleValue` for the unsigned audio formats now matches SDL's silence value (`128` for `u8`, `32768` for `u16`) instead of being one below it.
 - Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/controller opening.
 - Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.

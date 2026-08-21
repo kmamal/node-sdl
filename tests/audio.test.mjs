@@ -60,7 +60,7 @@ T.test("sdl::audio", async (t) => {
 		t.equal(instance2.maxSampleValue, 65535)
 
 		t.equal(instance1.zeroSampleValue, 0)
-		t.equal(instance2.zeroSampleValue, 32767)
+		t.equal(instance2.zeroSampleValue, 32768)
 
 		t.equal(instance1.buffered, 4096)
 		t.equal(instance2.buffered, 1024)
@@ -149,7 +149,7 @@ T.test("sdl::audio", async (t) => {
 		t.equal(instance2.maxSampleValue, 65535)
 
 		t.equal(instance1.zeroSampleValue, 0)
-		t.equal(instance2.zeroSampleValue, 32767)
+		t.equal(instance2.zeroSampleValue, 32768)
 
 		t.equal(instance1.buffered, 4096)
 		t.equal(instance2.buffered, 1024)

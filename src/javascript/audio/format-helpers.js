@@ -10,7 +10,8 @@ const signedLimits = (bits) => ({
 const unsignedLimits = (bits) => ({
 	bytesPerSample: bits / 8,
 	minSampleValue: 0,
-	zeroSampleValue: (2 ** (bits - 1)) - 1,
+	// Matches SDL's silence value for unsigned formats
+	zeroSampleValue: 2 ** (bits - 1),
 	maxSampleValue: (2 ** bits) - 1,
 })
 
