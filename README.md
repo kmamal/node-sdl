@@ -711,7 +711,7 @@ Fired when the window changes size.
 
 ### Event: 'displayChange'
 
-- `display: <object>` An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the window's new display.
+- `display: <object>|<null>` An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the window's new display, or `null` if that display has been removed.
 
 Fired when the window moves from one display to another.
 
@@ -953,9 +953,9 @@ This function only behaves differently from [`window.setSize()`](#windowsetsizew
 
 ### window.display
 
-- `<object>`
+- `<object>|<null>`
 
-An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display the window belongs to.
+An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display the window belongs to, or `null` if that display has been removed.
 If the window spans multiple displays, then the display that contains the center of the window is returned.
 
 ### window.visible

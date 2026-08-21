@@ -102,7 +102,8 @@ class Window extends EventsViaPoll {
 				&& a.geometry.x === geometry?.x
 				&& a.geometry.y === geometry?.y)
 			if (index === -1) { throw Object.assign(new Error("display not found"), { display }) }
-			displayIndex = index
+			// SDL indexes can skip positions when a display vanishes mid-enumeration
+			displayIndex = displays[index]._index
 		}
 
 		const result = Bindings.window_create(
@@ -244,7 +245,7 @@ class Window extends EventsViaPoll {
 	get pixelHeight () { return this._pixelHeight }
 
 	get display () {
-		return Globals.displays[this._displayIndex]
+		return Globals.displays.find((a) => a._index === this._displayIndex) ?? null
 	}
 
 	get visible () { return this._visible }

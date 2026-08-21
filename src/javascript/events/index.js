@@ -39,7 +39,8 @@ const handleEvent = (event) => {
 				}
 
 				case 'displayOrient': {
-					const display = Globals.displays[displayIndex]
+					// SDL indexes can skip positions when a display vanishes mid-enumeration
+					const display = Globals.displays.find((a) => a._index === displayIndex)
 					if (!display) { return }
 					display.orientation = event.orientation
 					event.device = display
@@ -52,7 +53,7 @@ const handleEvent = (event) => {
 					delete event.usableX
 					delete event.usableY
 
-					const display = Globals.displays[displayIndex]
+					const display = Globals.displays.find((a) => a._index === displayIndex)
 					if (!display) { return }
 					display.geometry.x = geometryX
 					display.geometry.y = geometryY

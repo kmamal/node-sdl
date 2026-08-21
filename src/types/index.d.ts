@@ -120,7 +120,7 @@ export namespace Events {
 		}
 		export interface DisplayChange extends WindowEvent {
 			readonly type: 'displayChange'
-			readonly display: Sdl.Video.Display
+			readonly display: Sdl.Video.Display | null
 		}
 		export interface Focus extends WindowEvent { readonly type: 'focus' }
 		export interface Blur extends WindowEvent { readonly type: 'blur' }
@@ -520,7 +520,7 @@ export namespace Sdl {
 			readonly pixelHeight: number
 			setSizeInPixels (pixelWidth: number, pixelHeight: number): void
 
-			readonly display: Display
+			readonly display: Display | null
 
 			readonly visible: boolean
 			show (show?: boolean): void
