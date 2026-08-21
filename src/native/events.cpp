@@ -362,10 +362,9 @@ events::dispatchEvent(const SDL_Event &event)
 			int joystick_id = event.jaxis.which;
 			SDL_Joystick *joystick = SDL_JoystickFromInstanceID(joystick_id);
 			if (joystick == nullptr) {
-				std::ostringstream message;
-				message << "SDL_JoystickFromInstanceID(" << joystick_id << ") error: " << SDL_GetError();
+				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
+				return false;
 			}
 
 			packed.Set("joystickId", joystick_id);
@@ -419,10 +418,9 @@ events::dispatchEvent(const SDL_Event &event)
 			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				std::ostringstream message;
-				message << "SDL_GameControllerFromInstanceID(" << controller_id << ") error: " << SDL_GetError();
+				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
+				return false;
 			}
 
 			packed.Set("controllerId", controller_id);
@@ -437,10 +435,9 @@ events::dispatchEvent(const SDL_Event &event)
 			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				std::ostringstream message;
-				message << "SDL_GameControllerFromInstanceID(" << controller_id << ") error: " << SDL_GetError();
+				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
+				return false;
 			}
 
 			packed.Set("controllerId", controller_id);
@@ -455,10 +452,9 @@ events::dispatchEvent(const SDL_Event &event)
 			int controller_id = event.caxis.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				std::ostringstream message;
-				message << "SDL_GameControllerFromInstanceID(" << controller_id << ") error: " << SDL_GetError();
+				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
+				return false;
 			}
 			SDL_GameControllerAxis axis = (SDL_GameControllerAxis) event.caxis.axis;
 
