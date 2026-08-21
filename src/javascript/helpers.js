@@ -1,18 +1,18 @@
-const { AudioFormatHelpers } = require('./audio/format-helpers')
+const { getFormatHelpers } = require('./audio/format-helpers')
 
 module.exports = {
 	audio: {
-		bytesPerSample (format) { return AudioFormatHelpers[format].bytesPerSample },
-		minSampleValue (format) { return AudioFormatHelpers[format].minSampleValue },
-		maxSampleValue (format) { return AudioFormatHelpers[format].maxSampleValue },
-		zeroSampleValue (format) { return AudioFormatHelpers[format].zeroSampleValue },
+		bytesPerSample (format) { return getFormatHelpers(format).bytesPerSample },
+		minSampleValue (format) { return getFormatHelpers(format).minSampleValue },
+		maxSampleValue (format) { return getFormatHelpers(format).maxSampleValue },
+		zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue },
 
 		readSample (format, buffer, offset) {
-			return AudioFormatHelpers[format].reader.call(buffer, offset)
+			return getFormatHelpers(format).reader.call(buffer, offset)
 		},
 
 		writeSample (format, buffer, value, offset) {
-			return AudioFormatHelpers[format].writer.call(buffer, value, offset)
+			return getFormatHelpers(format).writer.call(buffer, value, offset)
 		},
 	},
 }

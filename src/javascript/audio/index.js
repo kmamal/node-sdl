@@ -3,7 +3,7 @@ const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackInstance } = require('./audio-playback-instance')
 const { AudioRecordingInstance } = require('./audio-recording-instance')
-const { AudioFormatHelpers } = require('./format-helpers')
+const { getFormatHelpers } = require('./format-helpers')
 const { compare } = require('./device')
 
 
@@ -37,17 +37,17 @@ const audio = new class extends EventsViaPoll {
 			: new AudioPlaybackInstance(device, options)
 	}
 
-	bytesPerSample (format) { return AudioFormatHelpers[format].bytesPerSample }
-	minSampleValue (format) { return AudioFormatHelpers[format].minSampleValue }
-	maxSampleValue (format) { return AudioFormatHelpers[format].maxSampleValue }
-	zeroSampleValue (format) { return AudioFormatHelpers[format].zeroSampleValue }
+	bytesPerSample (format) { return getFormatHelpers(format).bytesPerSample }
+	minSampleValue (format) { return getFormatHelpers(format).minSampleValue }
+	maxSampleValue (format) { return getFormatHelpers(format).maxSampleValue }
+	zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue }
 
 	readSample (format, buffer, offset) {
-		return AudioFormatHelpers[format].reader.call(buffer, offset)
+		return getFormatHelpers(format).reader.call(buffer, offset)
 	}
 
 	writeSample (format, buffer, value, offset) {
-		return AudioFormatHelpers[format].writer.call(buffer, value, offset)
+		return getFormatHelpers(format).writer.call(buffer, value, offset)
 	}
 }()
 

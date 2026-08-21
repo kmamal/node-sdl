@@ -95,4 +95,10 @@ if (Os.endianness() === 'LE') {
 	AudioFormatHelpers.f32sys = AudioFormatHelpers.f32msb
 }
 
-module.exports = { AudioFormatHelpers }
+const getFormatHelpers = (format) => {
+	const helpers = AudioFormatHelpers[format]
+	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+	return helpers
+}
+
+module.exports = { AudioFormatHelpers, getFormatHelpers }
