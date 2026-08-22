@@ -484,6 +484,9 @@ class Window extends EventsViaPoll {
 		})
 		if (shouldPrevent) { return }
 
+		// A listener may have already destroyed the window
+		if (this._destroyed) { return }
+
 		this.destroy()
 	}
 }
