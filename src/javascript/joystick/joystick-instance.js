@@ -178,6 +178,12 @@ class JoystickInstance extends EventsViaPoll {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
+		// Other instances may keep the device (and an active effect) alive
+		// past this close, so stop what this instance started; the device
+		// itself may already be gone
+		if (this._rumbleTimeout) { try { Bindings.joystick_rumble(this._device.id, 0, 0, 0) } catch (_) {} }
+		if (this._rumbleTriggersTimeout) { try { Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0) } catch (_) {} }
+
 		clearTimeout(this._rumbleTimeout)
 		this._rumbleTimeout = null
 		clearTimeout(this._rumbleTriggersTimeout)
