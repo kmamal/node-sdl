@@ -159,8 +159,14 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
-		// Keeps Node.js alive while windows are open
-		this.on('close', () => {})
+		// Keeps Node.js alive while windows are open. Re-added on removal
+		// ('removeListener' also fires for removeAllListeners), so only
+		// destroy() can take it away.
+		const keepAlive = () => {}
+		this.on('close', keepAlive)
+		this.on('removeListener', (type, listener) => {
+			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
+		})
 
 		// Manually emit an initial resize event for convenience
 		process.nextTick(() => {
@@ -490,17 +496,6 @@ class Window extends EventsViaPoll {
 		this.destroy()
 	}
 
-	removeAllListeners (type) {
-		super.removeAllListeners(type)
-
-		// Removing the keep-alive listener must not let the process exit
-		// while the window is still open
-		if (!this._destroyed && this.listenerCount('close') === 0) {
-			this.on('close', () => {})
-		}
-
-		return this
-	}
 }
 
 module.exports = { Window }
