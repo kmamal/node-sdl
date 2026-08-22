@@ -12,6 +12,9 @@ class AudioPlaybackInstance extends AudioInstance {
 		// The queue drains into a device buffer that keeps sounding after
 		// `queued` reaches 0; this tracks when the last byte actually finishes
 		this._drainedAt = 0
+
+		// Devices start paused
+		this._pausedAt = Date.now()
 	}
 
 	enqueue (buffer, numBytes = null) {
@@ -41,8 +44,17 @@ class AudioPlaybackInstance extends AudioInstance {
 	// playing: emptying the event loop reruns the 'beforeExit' handler, which
 	// recomputes the remaining drain duration from scratch
 	play (play = true) {
+		const wasPlaying = this._playing
 		super.play(play)
-		if (!play) { resetTimeout() }
+		if (!play) {
+			if (wasPlaying) { this._pausedAt = Date.now() }
+			resetTimeout()
+		}
+		else if (!wasPlaying && this._pausedAt !== null) {
+			// Nothing drained while paused, so the deadline shifts with it
+			this._drainedAt += Date.now() - this._pausedAt
+			this._pausedAt = null
+		}
 	}
 
 	close () {

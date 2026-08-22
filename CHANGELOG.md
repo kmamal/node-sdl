@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Pausing and resuming playback around the moment the queue empties no longer lets the process exit before the device buffer's tail has finished sounding. The exit-drain deadline now shifts forward by the time spent paused.
 - Closing a joystick or controller instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
 - Reading `sdl.clipboard.text` no longer leaks the SDL-side copy of the text if creating the JS string fails (e.g. clipboard content beyond the JS string size limit).
 - Exiting no longer truncates the last device-buffer's worth of playing audio (up to ~680ms at the maximum `buffered` setting). The exit-drain logic used to only wait for the queue, which empties while the device buffer is still sounding.
