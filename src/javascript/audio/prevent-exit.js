@@ -35,6 +35,7 @@ process.on('beforeExit', (code) => {
 
 	if (duration) {
 		resetTimeout()
+		// Deliberately ref'd: keeps the process alive until playback finishes
 		timeout = setTimeout(() => { timeout = null }, duration * 1e3)
 	}
 })

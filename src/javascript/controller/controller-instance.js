@@ -124,6 +124,7 @@ class ControllerInstance extends EventsViaPoll {
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
 		clearTimeout(this._rumbleTimeout)
+		// Deliberately ref'd: keeps the process alive until the rumble finishes.
 		// The device may be gone by the time the timer fires
 		this._rumbleTimeout = setTimeout(() => { try { this.stopRumble() } catch (_) {} }, duration)
 	}
@@ -151,6 +152,7 @@ class ControllerInstance extends EventsViaPoll {
 		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 		clearTimeout(this._rumbleTriggersTimeout)
+		// Deliberately ref'd: keeps the process alive until the rumble finishes.
 		// The device may be gone by the time the timer fires
 		this._rumbleTriggersTimeout = setTimeout(() => { try { this.stopRumbleTriggers() } catch (_) {} }, duration)
 	}
