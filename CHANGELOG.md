@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `window.removeAllListeners()` no longer lets the process exit while the window is still open. It used to also remove the internal keep-alive listener, dropping event polling to the slow un-ref'd interval.
 - Calling `window.destroy()` from a `beforeClose` listener no longer crashes the process. `destroyGently()` used to call `destroy()` afterwards anyway, and the resulting "window is destroyed" error propagated out of the event poll loop as an uncaught exception.
 - `window.render()` no longer draws through a stale viewport after the user drag-resizes the window. The `move`/`resize` events dispatched from inside SDL's event pump used to be filtered out of the queue in a way that also hid them from SDL's internal event watchers, so the renderer never processed the size change.
 - Calling `window.destroy()` from a `move` or `resize` listener no longer risks a crash when the listener also called a window method (like `setSize()`) that delivered a nested `move`/`resize` event: the nested dispatch used to clear the "inside SDL's event pump" flag, so the destroy ran immediately inside the pump instead of being deferred.

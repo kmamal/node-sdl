@@ -489,6 +489,18 @@ class Window extends EventsViaPoll {
 
 		this.destroy()
 	}
+
+	removeAllListeners (type) {
+		super.removeAllListeners(type)
+
+		// Removing the keep-alive listener must not let the process exit
+		// while the window is still open
+		if (!this._destroyed && this.listenerCount('close') === 0) {
+			this.on('close', () => {})
+		}
+
+		return this
+	}
 }
 
 module.exports = { Window }
