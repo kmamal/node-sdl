@@ -1,11 +1,13 @@
 
-if (!process.env.NODE_SDL_FROM_SOURCE) {
+const fromSource = ![ undefined, '', '0', 'false' ].includes(process.env.NODE_SDL_FROM_SOURCE)
+
+if (!fromSource) {
 	try {
 		await import('./download-release.mjs')
 		process.exit(0)
 	}
-	catch (_) {
-		console.log("failed to download release")
+	catch (error) {
+		console.log("failed to download release:", error.cause?.message ?? error.message)
 	}
 }
 else {
@@ -15,8 +17,8 @@ else {
 try {
 	await import('./download-sdl.mjs')
 }
-catch (_) {
-	console.log("failed to download sdl")
+catch (error) {
+	console.log("failed to download sdl:", error.cause?.message ?? error.message)
 	await import('./build-sdl.mjs')
 }
 
