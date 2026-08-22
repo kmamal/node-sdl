@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Exiting no longer truncates the last device-buffer's worth of playing audio (up to ~680ms at the maximum `buffered` setting). The exit-drain logic used to only wait for the queue, which empties while the device buffer is still sounding.
 - Calling `setSize()` (or another method that synchronously re-enters SDL's event pump) from a `move`/`resize` listener no longer makes the listener fire a second time for the same event. The record that marks the nested event as already-delivered used to be erased before the queue was drained.
 - `window.removeAllListeners()` no longer lets the process exit while the window is still open. It used to also remove the internal keep-alive listener, dropping event polling to the slow un-ref'd interval.
 - Calling `window.destroy()` from a `beforeClose` listener no longer crashes the process. `destroyGently()` used to call `destroy()` afterwards anyway, and the resulting "window is destroyed" error propagated out of the event poll loop as an uncaught exception.

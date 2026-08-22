@@ -18,12 +18,19 @@ process.on('beforeExit', (code) => {
 		if (instance.device.type === 'recording') { continue }
 
 		const { queued, playing } = instance
-		if (!queued || !playing) { continue }
+		if (!playing) { continue }
 
-		const { channels, frequency, buffered, bytesPerSample } = instance
-		const bytesPerSecond = channels * frequency * bytesPerSample
-		const bufferedBytes = buffered * channels * bytesPerSample
-		duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)
+		if (queued) {
+			const { channels, frequency, buffered, bytesPerSample } = instance
+			const bytesPerSecond = channels * frequency * bytesPerSample
+			const bufferedBytes = buffered * channels * bytesPerSample
+			duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)
+		}
+		else {
+			// The queue empties while the device buffer is still sounding
+			const remaining = instance._drainedAt - Date.now()
+			if (remaining > 0) { duration = Math.max(duration, remaining / 1e3) }
+		}
 	}
 
 	if (duration) {
