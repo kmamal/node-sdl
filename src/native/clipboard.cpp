@@ -37,7 +37,13 @@ clipboard::getText (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	Napi::String result = Napi::String::New(env, text);
+	// The text is SDL-allocated and String::New can throw
+	Napi::String result;
+	try { result = Napi::String::New(env, text); }
+	catch (...) {
+		SDL_free(text);
+		throw;
+	}
 	SDL_free(text);
 
 	return result;
