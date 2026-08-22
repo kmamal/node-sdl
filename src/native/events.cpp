@@ -547,14 +547,11 @@ static std::vector<FilterDispatchedEvent> filter_dispatched_events;
 static void
 recordFilterDispatched (const SDL_Event &event)
 {
-	// SDL removes pending events of the same type for the same window from
-	// the queue before pushing a new one, so their records are stale
-	for (auto it = filter_dispatched_events.begin(); it != filter_dispatched_events.end();) {
-		it = it->window_id == event.window.windowID && it->window_event == event.window.event
-			? filter_dispatched_events.erase(it)
-			: it + 1;
-	}
-
+	// A record may already exist for this window and event type (a nested
+	// dispatch, or SDL coalescing away the queued event it belonged to).
+	// Never remove it here: if its event is still in the queue, erasing the
+	// record would make poll() deliver that event a second time. Stale
+	// records are dropped in poll() once the queue is drained.
 	filter_dispatched_events.push_back({
 		event.common.timestamp,
 		event.window.windowID,
@@ -658,6 +655,10 @@ events::poll (const Napi::CallbackInfo &info)
 			if (wasDispatchedFromFilter(event)) { continue; }
 			events::dispatchEvent(event);
 		}
+
+		// The queue is now empty, so any unmatched records belong to events
+		// SDL coalesced away and could only shadow future events
+		filter_dispatched_events.clear();
 
 		if (has_pending_filter_error) {
 			has_pending_filter_error = false;
