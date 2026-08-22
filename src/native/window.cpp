@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <cstdint>
 
 struct CachedTexture {
 	SDL_Texture *texture;
@@ -29,12 +30,17 @@ getWindow (Napi::Env &env, int window_id)
 }
 
 #if defined(__LINUX__)
-	#define NativeWindowHandle Window
-	#define GL_NativeWindow Window
-	struct GPU_NativeData {
-		Display *display;
-		Window window;
+	// ABI contract with @kmamal/gl and @kmamal/gpu (documented in README's
+	// window.native section): the same layout is compiled into all three addons,
+	// and consumers branch on subsystem at runtime.
+	struct LinuxNativeData {
+		uint64_t subsystem; // 1 = x11, 2 = wayland
+		void *display;      // Display*   | wl_display*
+		uintptr_t window;   // Window XID | wl_surface* / wl_egl_window*
 	};
+	#define NativeWindowHandle LinuxNativeData
+	#define GL_NativeWindow LinuxNativeData
+	#define GPU_NativeData LinuxNativeData
 	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
 #elif defined(__WIN32__)
 	#define NativeWindowHandle HWND
@@ -203,11 +209,34 @@ window::create (const Napi::CallbackInfo &info)
 			SDL_ClearError();
 		}
 
+		#if defined(__LINUX__)
+			if (has_wm_info
+			 && sys_wm_info.subsystem != SDL_SYSWM_X11
+			 && sys_wm_info.subsystem != SDL_SYSWM_WAYLAND
+			) {
+				has_wm_info = false;
+				message_of_failed_wm_info = "native handles are only supported under the x11 and wayland video drivers";
+			}
+			bool is_x11 = has_wm_info && sys_wm_info.subsystem == SDL_SYSWM_X11;
+
+			if (has_wm_info) {
+				native.Set("subsystem", Napi::String::New(env, is_x11 ? "x11" : "wayland"));
+			}
+			else {
+				native.Set("subsystem", env.Null());
+			}
+		#endif
+
 		Napi::Value native_handle;
 		if (has_wm_info) {
 			NativeWindowHandle _native_handle;
 			#if defined(__LINUX__)
-				_native_handle = sys_wm_info.info.x11.window;
+				if (is_x11) {
+					_native_handle = { 1, sys_wm_info.info.x11.display, sys_wm_info.info.x11.window };
+				}
+				else {
+					_native_handle = { 2, sys_wm_info.info.wl.display, (uintptr_t) sys_wm_info.info.wl.surface };
+				}
 			#elif defined(__WIN32__)
 				_native_handle = sys_wm_info.info.win.window;
 			#elif defined(__MACOSX__)
@@ -230,7 +259,13 @@ window::create (const Napi::CallbackInfo &info)
 
 			GL_NativeWindow native_gl;
 			#if defined(__LINUX__)
-				native_gl = sys_wm_info.info.x11.window;
+				if (is_x11) {
+					native_gl = { 1, sys_wm_info.info.x11.display, sys_wm_info.info.x11.window };
+				}
+				else {
+					// SDL creates and resizes the wl_egl_window itself
+					native_gl = { 2, sys_wm_info.info.wl.display, (uintptr_t) sys_wm_info.info.wl.egl_window };
+				}
 			#elif defined(__WIN32__)
 				native_gl = sys_wm_info.info.win.window;
 			#elif defined(__MACOSX__)
@@ -248,8 +283,12 @@ window::create (const Napi::CallbackInfo &info)
 
 			GPU_NativeData native_gpu;
 			#if defined(__LINUX__)
-				native_gpu.display = sys_wm_info.info.x11.display;
-				native_gpu.window = sys_wm_info.info.x11.window;
+				if (is_x11) {
+					native_gpu = { 1, sys_wm_info.info.x11.display, sys_wm_info.info.x11.window };
+				}
+				else {
+					native_gpu = { 2, sys_wm_info.info.wl.display, (uintptr_t) sys_wm_info.info.wl.surface };
+				}
 			#elif defined(__WIN32__)
 				native_gpu.hwnd = sys_wm_info.info.win.window;
 				native_gpu.hinstance = sys_wm_info.info.win.hinstance;

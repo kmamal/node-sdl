@@ -1070,13 +1070,26 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 - `<object>`
   - `handle : <Buffer>|<null>` The platform-specific handle of the window, or `null` if it can't be determined.
+  - `subsystem : <string>|<null>` Linux only. Either `'x11'` or `'wayland'`, depending on the video driver SDL is running under, or `null` if it's some other driver.
 
-The native type of `handle` is HWND on Windows, NSView* on macOS, and Window (unsigned long) on Linux.
-It should work exactly like the [`win.getNativeWindowHandle()`](https://www.electronjs.org/docs/latest/api/browser-window#wingetnativewindowhandle) electron method.
+The native type of `handle` is HWND on Windows and NSView* on macOS.
+
+On Linux, `handle` holds a struct with the following layout, filled according to the video driver SDL is running under (check `subsystem` to see which one you're holding):
+
+```c
+struct LinuxNativeData {
+	uint64_t subsystem;   // 1 = x11, 2 = wayland
+	void *display;        // Display*   | wl_display*
+	uintptr_t window;     // Window XID | wl_surface*
+};
+```
+
+Under any other Linux video driver (e.g. kmsdrm), `handle` and `subsystem` are `null`, and windows created with `{ opengl: true }` or `{ webgpu: true }` fail with an error.
 
 The `window.native` object might also sometimes include extra fields other than the ones documented here.
 Please ignore and do not use these.
 They are used internally for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme) and can change at any time.
+(For maintainers: those internal fields reuse the `LinuxNativeData` layout above on Linux, with `window` holding the `wl_egl_window*` / `wl_surface*` under Wayland. The layout is an ABI contract compiled into all three packages, so changing it requires coordinated releases of `@kmamal/sdl`, `@kmamal/gl`, and `@kmamal/gpu`.)
 
 ### window.maximized
 
