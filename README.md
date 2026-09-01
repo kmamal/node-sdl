@@ -2845,8 +2845,6 @@ There are some npm scripts in `package.json` that could be of use to you:
 
 The SDL headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
 
-Rebuilds that invoke `node-gyp` directly, such as `electron-rebuild` or `electron-builder install-app-deps`, also work: the SDL headers and libraries are downloaded automatically if they are missing, and the rebuilt binary replaces the one in `dist/`.
-
 The way I normally work is I run `npm run clean` to start fresh, then run `NODE_SDL_FROM_SOURCE=1 npm i` once to prepare everything, then as I make changes I run `npm run build` to re-build the package.
 
 Have fun!

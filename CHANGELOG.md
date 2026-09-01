@@ -125,7 +125,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smaller fixes: `mouse.getButton()` accepts the correct button range, `setSizeInPixels()` reports the right error, the audio keep-alive duration uses correct units, and rumble durations are validated consistently.
 - The `npm run build` script now honors pre-set `SDL_INC`/`SDL_LIB` environment variables, so it can build against a system or custom SDL.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
-- Rebuilds that invoke `node-gyp` directly (such as `electron-rebuild`) now work: the SDL paths are resolved at configure time, SDL is downloaded automatically if missing, and the rebuilt addon is copied to `dist/` where the library loads it from.
 
 ## [v0.11.13] - 2025-08-30
 
