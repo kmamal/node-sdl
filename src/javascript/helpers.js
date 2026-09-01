@@ -1,18 +1,38 @@
-const { getFormatHelpers } = require('./audio/format-helpers')
+const Enums = require('./enums')
+const { getFormatHelpers: getAudioFormatHelpers } = require('./audio/format-helpers')
+const { getFormatHelpers: getVideoFormatHelpers } = require('./video/format-helpers')
 
 module.exports = {
+	video: {
+		bytesPerPixel (format) { return getVideoFormatHelpers(format).bytesPerPixel },
+		isYuv (format) { return getVideoFormatHelpers(format).isYuv },
+		isPlanarYuv (format) { return getVideoFormatHelpers(format).isPlanarYuv },
+
+		minBufferSize (format, stride, height) {
+			return getVideoFormatHelpers(format).minBufferSize(stride, height)
+		},
+	},
+	keyboard: {
+		get SCANCODES () { return Enums.scancodes },
+	},
+	mouse: {
+		get BUTTON () { return Enums.mouseButtons },
+	},
+	sensors: {
+		STANDARD_GRAVITY: 9.80665,
+	},
 	audio: {
-		bytesPerSample (format) { return getFormatHelpers(format).bytesPerSample },
-		minSampleValue (format) { return getFormatHelpers(format).minSampleValue },
-		maxSampleValue (format) { return getFormatHelpers(format).maxSampleValue },
-		zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue },
+		bytesPerSample (format) { return getAudioFormatHelpers(format).bytesPerSample },
+		minSampleValue (format) { return getAudioFormatHelpers(format).minSampleValue },
+		maxSampleValue (format) { return getAudioFormatHelpers(format).maxSampleValue },
+		zeroSampleValue (format) { return getAudioFormatHelpers(format).zeroSampleValue },
 
 		readSample (format, buffer, offset) {
-			return getFormatHelpers(format).reader.call(buffer, offset)
+			return getAudioFormatHelpers(format).reader.call(buffer, offset)
 		},
 
 		writeSample (format, buffer, value, offset) {
-			return getFormatHelpers(format).writer.call(buffer, value, offset)
+			return getAudioFormatHelpers(format).writer.call(buffer, value, offset)
 		},
 	},
 }

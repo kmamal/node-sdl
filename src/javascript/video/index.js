@@ -2,6 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
+const { getFormatHelpers } = require('./format-helpers')
 
 
 Globals.displays = Globals.info.initialized.video
@@ -24,6 +25,14 @@ const video = new class extends EventsViaPoll {
 	get hovered () { return Globals.windows.hovered }
 
 	createWindow (options) { return new Window(options) }
+
+	bytesPerPixel (format) { return getFormatHelpers(format).bytesPerPixel }
+	isYuv (format) { return getFormatHelpers(format).isYuv }
+	isPlanarYuv (format) { return getFormatHelpers(format).isPlanarYuv }
+
+	minBufferSize (format, stride, height) {
+		return getFormatHelpers(format).minBufferSize(stride, height)
+	}
 }()
 
 module.exports = { video }

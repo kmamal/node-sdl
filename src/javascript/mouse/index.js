@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
-const FormatHelpers = require('../video/format-helpers')
+const { VideoFormatHelpers } = require('../video/format-helpers')
 
 let relativeMode = false
 
@@ -12,7 +12,6 @@ const mouse = {
 		if (!Number.isInteger(button)) { throw Object.assign(new Error("button must be an integer"), { button }) }
 		if (button < 1 || button > 32) { throw Object.assign(new Error("invalid button"), { button }) }
 
-		// SDL only refreshes mouse button state inside the event pump
 		Globals.events.poll()
 		return Bindings.mouse_getButton(button)
 	},
@@ -46,12 +45,12 @@ const mouse = {
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
-		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (FormatHelpers.isYuv[format]) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
-		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
+		const helpers = VideoFormatHelpers[format]
+		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (helpers.isYuv) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
+		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
+		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
 		if (x < 0 || x >= width) { throw Object.assign(new Error("invalid x"), { x }) }
 		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }

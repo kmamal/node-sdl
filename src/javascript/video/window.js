@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
-const FormatHelpers = require('./format-helpers')
+const { VideoFormatHelpers } = require('./format-helpers')
 const { EventsViaPoll } = require('../events/events-via-poll')
 
 const validEvents = [
@@ -159,9 +159,7 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
-		// Keeps Node.js alive while windows are open. Re-added on removal
-		// ('removeListener' also fires for removeAllListeners), so only
-		// destroy() can take it away.
+		// Keeps Node.js alive while windows are open
 		const keepAlive = () => {}
 		this.on('close', keepAlive)
 		this.on('removeListener', (type, listener) => {
@@ -233,7 +231,7 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(pixelHeight)) { throw Object.assign(new Error("pixelHeight must be an integer"), { pixelHeight }) }
 		if (pixelHeight <= 0 || pixelHeight > 2 ** 31 - 1) { throw Object.assign(new Error("invalid pixelHeight"), { pixelHeight }) }
 
-		// Multiply before dividing to keep the math exact for valid multiples
+		// Multiply before dividing to keep the math exact
 		const width = pixelWidth * this._width / this._pixelWidth
 		const height = pixelHeight * this._height / this._pixelHeight
 
@@ -382,11 +380,10 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
-		let {
-			scaling = null,
+		const {
+			scaling = 'nearest',
 			dstRect = null,
 		} = options
-		scaling ??= 'nearest'
 
 		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
 		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid width"), { width }) }
@@ -394,11 +391,11 @@ class Window extends EventsViaPoll {
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
-		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
+		const helpers = VideoFormatHelpers[format]
+		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
+		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 		if (typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
 
 		if (dstRect !== null) {
@@ -430,12 +427,12 @@ class Window extends EventsViaPoll {
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const bytesPerPixel = FormatHelpers.bytesPerPixel[format]
-		if (bytesPerPixel === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (FormatHelpers.isYuv[format]) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
-		if (stride < width * bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel }) }
+		const helpers = VideoFormatHelpers[format]
+		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (helpers.isYuv) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
+		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < FormatHelpers.minBufferSize(format, stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
+		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 
 		const _format = Enums.pixelFormat[format]
 
@@ -495,7 +492,6 @@ class Window extends EventsViaPoll {
 
 		this.destroy()
 	}
-
 }
 
 module.exports = { Window }
