@@ -16,7 +16,6 @@ class JoystickInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
-		// Flush pending removals so a stale device or _index isn't used
 		Globals.events.poll()
 		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
@@ -53,8 +52,6 @@ class JoystickInstance extends EventsViaPoll {
 	get serialNumber () { return this._serialNumber }
 
 	get axes () {
-		// Checked after polling, since the poll can process the removal
-		// event that closes this instance
 		Globals.events.poll()
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
@@ -129,12 +126,14 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
+
+		// Keeps Node.js alive while rumbling
 		clearTimeout(this._rumbleTimeout)
-		// Deliberately ref'd: keeps the process alive until the rumble finishes.
-		// The device may be gone by the time the timer fires
-		this._rumbleTimeout = setTimeout(() => { try { this.stopRumble() } catch (_) {} }, duration)
+		this._rumbleTimeout = setTimeout(() => {
+			try { this.stopRumble() }
+			catch (_) {}
+		}, duration)
 	}
 
 	stopRumble () {
@@ -157,12 +156,14 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		// Globals.events.poll() // Errors if it hasn't been called at least once
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
+
+		// Keeps Node.js alive while rumbling
 		clearTimeout(this._rumbleTriggersTimeout)
-		// Deliberately ref'd: keeps the process alive until the rumble finishes.
-		// The device may be gone by the time the timer fires
-		this._rumbleTriggersTimeout = setTimeout(() => { try { this.stopRumbleTriggers() } catch (_) {} }, duration)
+		this._rumbleTriggersTimeout = setTimeout(() => {
+			try { this.stopRumbleTriggers() }
+			catch (_) {}
+		}, duration)
 	}
 
 	stopRumbleTriggers () {
@@ -178,25 +179,27 @@ class JoystickInstance extends EventsViaPoll {
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		// Other instances may keep the device (and an active effect) alive
-		// past this close, so stop what this instance started; the device
-		// itself may already be gone
-		if (this._rumbleTimeout) { try { Bindings.joystick_rumble(this._device.id, 0, 0, 0) } catch (_) {} }
-		if (this._rumbleTriggersTimeout) { try { Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0) } catch (_) {} }
-
-		clearTimeout(this._rumbleTimeout)
-		this._rumbleTimeout = null
-		clearTimeout(this._rumbleTriggersTimeout)
-		this._rumbleTriggersTimeout = null
+		if (this._rumbleTimeout) {
+			// This call will throw if the device is gone
+			try { Bindings.joystick_rumble(this._device.id, 0, 0, 0) }
+			catch (_) {}
+			clearTimeout(this._rumbleTimeout)
+			this._rumbleTimeout = null
+		}
+		if (this._rumbleTriggersTimeout) {
+			// This call will throw if the device is gone
+			try { Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0) }
+			catch (_) {}
+			clearTimeout(this._rumbleTriggersTimeout)
+			this._rumbleTriggersTimeout = null
+		}
 
 		this._closed = true
 
 		Globals.joystickInstances.all.delete(this)
 		const collection = Globals.joystickInstances.byId.get(this._device.id)
 		collection.delete(this)
-		if (collection.size === 0) {
-			Globals.joystickInstances.byId.delete(this._device.id)
-		}
+		if (collection.size === 0) { Globals.joystickInstances.byId.delete(this._device.id) }
 
 		// SDL open/close calls are reference-counted per instance
 		Bindings.joystick_close(this._device.id)
