@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { VideoFormatHelpers } = require('../video/format-helpers')
 
+let captured = false
 let relativeMode = false
 
 const mouse = {
@@ -71,22 +72,27 @@ const mouse = {
 
 	redrawCursor () { Bindings.mouse_redrawCursor() },
 
+	get captured () { return captured },
+
 	capture (capture = true) {
 		if (typeof capture !== 'boolean') { throw Object.assign(new Error("capture must be a boolean"), { capture }) }
 
 		Bindings.mouse_capture(capture)
+		captured = capture
 	},
 
 	uncapture () { mouse.capture(false) },
 
 	get relativeMode () { return relativeMode },
 
-	setRelativeMode (relative) {
+	setRelativeMode (relative = true) {
 		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
 
 		Bindings.mouse_setRelativeMode(relative)
 		relativeMode = relative
 	},
+
+	unsetRelativeMode () { mouse.setRelativeMode(false) },
 }
 
 module.exports = { mouse }
