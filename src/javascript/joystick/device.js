@@ -10,9 +10,7 @@ const make = (device) => {
 	return rest
 }
 
-const keys = [
-	(device) => device.id,
-]
+const keys = [ (device) => device.id ]
 
 module.exports = {
 	make,

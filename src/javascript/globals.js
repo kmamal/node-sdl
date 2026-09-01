@@ -1,6 +1,6 @@
 
 module.exports = {
-	info: null, // Set early from index.js
+	info: null,
 
 	displays: [],
 	windows: {
@@ -30,5 +30,5 @@ module.exports = {
 	},
 	audioInstances: new Map(),
 
-	events: null, // Set later from events/index.js
+	events: null,
 }

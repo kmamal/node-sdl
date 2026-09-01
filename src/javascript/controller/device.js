@@ -15,9 +15,7 @@ const make = (device) => {
 	}
 }
 
-const keys = [
-	(device) => device.id,
-]
+const keys = [ (device) => device.id ]
 
 const filter = (device) => device.isController
 

@@ -1,5 +1,5 @@
 const Globals = require('../globals')
-const { EventEmitter } = require('events')
+const { EventEmitter } = require('node:events')
 
 let _ID = 0
 const activeEmitters = new Set()
@@ -16,11 +16,7 @@ class EventsViaPoll extends EventEmitter {
 		let count = 0
 
 		// NOTE: this needs to be first, otherwise it will emit for 'newListener'
-		// Invalid types can't reach here: the newListener hook rejects them
-		// before they are ever registered
 		this.on('removeListener', (type) => {
-			// Emitter-internal events need no polling, and removeAllListeners
-			// skips them, so counting them could keep fast polling on forever
 			if (type === 'newListener' || type === 'removeListener') { return }
 
 			count--
@@ -50,7 +46,6 @@ class EventsViaPoll extends EventEmitter {
 	}
 
 	removeAllListeners (type) {
-		// Removing the bookkeeping listeners above would corrupt the count
 		const types = type !== undefined ? [ type ] : this.eventNames()
 		for (const eventType of types) {
 			if (eventType === 'newListener' || eventType === 'removeListener') { continue }

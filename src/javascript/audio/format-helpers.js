@@ -1,4 +1,4 @@
-const Os = require('os')
+const Os = require('node:os')
 
 const signedLimits = (bits) => ({
 	bytesPerSample: bits / 8,
@@ -10,7 +10,6 @@ const signedLimits = (bits) => ({
 const unsignedLimits = (bits) => ({
 	bytesPerSample: bits / 8,
 	minSampleValue: 0,
-	// Matches SDL's silence value for unsigned formats
 	zeroSampleValue: 2 ** (bits - 1),
 	maxSampleValue: (2 ** bits) - 1,
 })
@@ -22,10 +21,7 @@ const floatLimits = {
 	maxSampleValue: 1,
 }
 
-// Null prototype so that formats like 'constructor' can't match inherited
-// Object members and leak through as valid entries.
-const AudioFormatHelpers = {
-	__proto__: null,
+const AudioFormatHelpers = Object.assign(Object.create(null), {
 	s8: {
 		reader: Buffer.prototype.readInt8,
 		writer: Buffer.prototype.writeInt8,
@@ -76,7 +72,7 @@ const AudioFormatHelpers = {
 		writer: Buffer.prototype.writeFloatBE,
 		...floatLimits,
 	},
-}
+})
 
 AudioFormatHelpers.s16 = AudioFormatHelpers.s16lsb
 AudioFormatHelpers.u16 = AudioFormatHelpers.u16lsb
@@ -88,7 +84,8 @@ if (Os.endianness() === 'LE') {
 	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16lsb
 	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32lsb
 	AudioFormatHelpers.f32sys = AudioFormatHelpers.f32lsb
-} else {
+}
+else {
 	AudioFormatHelpers.s16sys = AudioFormatHelpers.s16msb
 	AudioFormatHelpers.u16sys = AudioFormatHelpers.u16msb
 	AudioFormatHelpers.s32sys = AudioFormatHelpers.s32msb

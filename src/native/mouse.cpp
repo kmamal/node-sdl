@@ -14,7 +14,6 @@ mouse::getButton (const Napi::CallbackInfo &info)
 	int button = info[0].As<Napi::Number>().Int32Value();
 
 	Uint32 buttons = SDL_GetMouseState(nullptr, nullptr);
-	// SDL_BUTTON shifts a signed 1, which is undefined behavior for button 32
 	bool state = buttons & (Uint32(1) << (button - 1));
 
 	return Napi::Boolean::New(env, state);

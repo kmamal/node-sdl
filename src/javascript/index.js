@@ -1,4 +1,4 @@
-const { isMainThread } = require('worker_threads')
+const { isMainThread } = require('node:worker_threads')
 if (!isMainThread) { throw new Error('@kmamal/sdl can only be used in the main thread') }
 
 const Bindings = require('./bindings')

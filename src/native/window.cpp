@@ -15,8 +15,6 @@ struct CachedTexture {
 
 std::map<SDL_Window*, CachedTexture> cachedTextures;
 
-// SDL_GetWindowFromID doesn't set an SDL error on failure, so don't report
-// whatever stale error text an earlier call might have left behind
 static SDL_Window *
 getWindow (Napi::Env &env, int window_id)
 {
@@ -30,9 +28,6 @@ getWindow (Napi::Env &env, int window_id)
 }
 
 #if defined(__LINUX__)
-	// ABI contract with @kmamal/gl and @kmamal/gpu (documented in README's
-	// window.native section): the same layout is compiled into all three addons,
-	// and consumers branch on subsystem at runtime.
 	struct LinuxNativeData {
 		uint64_t subsystem; // 1 = x11, 2 = wayland
 		void *display;      // Display*   | wl_display*
@@ -719,8 +714,6 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	// The window can have a cache entry but no renderer, if rebuilding the
-	// renderer failed after destroying the old one
 	auto cached_entry = cachedTextures.find(window);
 	if (cached_entry != cachedTextures.end()) {
 		if (cached_entry->second.texture != nullptr) { SDL_DestroyTexture(cached_entry->second.texture); }

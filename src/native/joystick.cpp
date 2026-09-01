@@ -101,7 +101,6 @@ joystick::_getDevices (Napi::Env &env)
 		if (is_controller) {
 			char *_controller_mapping = SDL_GameControllerMappingForDeviceIndex(i);
 			if (_controller_mapping != nullptr) {
-				// The mapping is SDL-allocated and String::New can throw
 				try { controller_mapping = Napi::String::New(env, _controller_mapping); }
 				catch (...) {
 					SDL_free(_controller_mapping);

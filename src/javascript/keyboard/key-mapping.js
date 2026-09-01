@@ -1,9 +1,6 @@
 const Bindings = require('../bindings')
 
-// Null prototypes so that keys like 'constructor' can't match inherited
-// Object members and leak through as valid entries
-const mapping = {
-	__proto__: null,
+const mapping = Object.assign(Object.create(null), {
 	'A': 'a',
 	'AC Back': 'back',
 	'AC Bookmarks': 'bookmarks',
@@ -204,9 +201,9 @@ const mapping = {
 	'X': 'x',
 	'Y': 'y',
 	'Z': 'z',
-}
+})
 
-const reverseMapping = { __proto__: null }
+const reverseMapping = Object.create(null)
 
 for (const [ key, value ] of Object.entries(mapping)) {
 	maybeSkip: {
@@ -225,9 +222,8 @@ for (const [ key, value ] of Object.entries(mapping)) {
 	reverseMapping[value] = key
 }
 
-// Single-character keys are also valid SDL key names themselves. Prefer the
-// bare key when it has a lower scancode than the table entry, so that e.g.
-// ',' resolves to the main comma key instead of 'Keypad ,'.
+// Single-character keys are valid SDL key names.
+// Prefer bare key when it has a lower scancode.
 for (const [ value, key ] of Object.entries(reverseMapping)) {
 	if (value.length !== 1) { continue }
 
