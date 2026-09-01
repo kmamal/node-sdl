@@ -29,12 +29,8 @@ int filterEvents(void*, SDL_Event *event) {
 			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
 		)
 	) {
-		// Dispatched in real time since a modal drag/resize blocks poll(),
-		// but kept in the queue so SDL's own event watchers (the renderer's
-		// resize handling) still see it. poll() skips the duplicate.
 		events::dispatchEventFromFilter(*event);
 	}
-
 	return 1;
 }
 
@@ -376,19 +372,19 @@ global::initialize(const Napi::CallbackInfo &info)
 	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
 	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR) == 0);
 
-	// Drop errors from optional subsystems that failed to initialize, since
-	// failures elsewhere are detected via the error state
+	// Drop errors from optional subsystems that failed to initialize
 	SDL_ClearError();
 
 	mainThreadId = SDL_ThreadID();
 	SDL_SetEventFilter(filterEvents, nullptr);
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
-	SDL_StartTextInput(); // TODO
+	SDL_StartTextInput();
 
 #if defined(__MACOSX__)
 	reenableInertialScrolling();
 #endif
+
 
 	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
 

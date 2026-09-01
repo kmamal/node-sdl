@@ -201,12 +201,14 @@ class JoystickInstance extends EventsViaPoll {
 		collection.delete(this)
 		if (collection.size === 0) { Globals.joystickInstances.byId.delete(this._device.id) }
 
-		// SDL open/close calls are reference-counted per instance
+		// TODO: Will this call throw if the device is gone?
 		Bindings.joystick_close(this._device.id)
 
-		// Emitted last so a throwing listener can't leave the teardown half-done
-		this.emit('close', { type: 'close' })
-		this.removeAllListeners()
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
+
+		// We might be inside an event listener
+		process.nextTick(() => { this.removeAllListeners() })
 	}
 }
 

@@ -12,7 +12,6 @@ class SensorInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
-		// Refetch so a stale device or _index isn't used
 		refreshDevices()
 		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
@@ -34,9 +33,6 @@ class SensorInstance extends EventsViaPoll {
 	get device () { return this._device }
 
 	get data () {
-		// SDL only refreshes sensor values inside the event pump. The closed
-		// check runs after polling, since the poll can process an event whose
-		// handler closes this instance
 		Globals.events.poll()
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
@@ -56,12 +52,13 @@ class SensorInstance extends EventsViaPoll {
 			Globals.sensorInstances.byId.delete(this._device.id)
 		}
 
-		// SDL open/close calls are reference-counted per instance
 		Bindings.sensor_close(this._device.id)
 
-		// Emitted last so a throwing listener can't leave the teardown half-done
-		this.emit('close', { type: 'close' })
-		this.removeAllListeners()
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
+
+		// We might be inside an event listener
+		process.nextTick(() => { this.removeAllListeners() })
 	}
 }
 

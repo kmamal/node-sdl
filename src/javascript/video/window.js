@@ -169,13 +169,16 @@ class Window extends EventsViaPoll {
 		// Manually emit an initial resize event for convenience
 		process.nextTick(() => {
 			if (this._destroyed) { return }
-			this.emit('resize', {
-				width: this._width,
-				height: this._height,
-				pixelWidth: this._pixelWidth,
-				pixelHeight: this._pixelHeight,
-				type: 'resize',
-			})
+			try {
+				this.emit('resize', {
+					width: this._width,
+					height: this._height,
+					pixelWidth: this._pixelWidth,
+					pixelHeight: this._pixelHeight,
+					type: 'resize',
+				})
+			}
+			catch (error) { this.emit('error', error) }
 		})
 	}
 
@@ -590,9 +593,7 @@ class Window extends EventsViaPoll {
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
 
-		// A move/resize listener runs from inside SDL's event pump, which
-		// still holds pointers into the window's driver data. Defer the
-		// native destruction until the pump has unwound.
+		// Defer the native destruction until the pump has unwound.
 		if (Bindings.events_isDispatchingFromFilter()) {
 			process.nextTick(() => { Bindings.window_destroy(this._id) })
 		}
@@ -603,7 +604,10 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.delete(this._id)
 
-		this.emit('close', { type: 'close' })
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
+
+		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
 	}
 
@@ -611,10 +615,13 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		let shouldPrevent = false
-		this.emit('beforeClose', {
-			type: 'beforeClose',
-			prevent: () => { shouldPrevent = true },
-		})
+		try {
+			this.emit('beforeClose', {
+				type: 'beforeClose',
+				prevent: () => { shouldPrevent = true },
+			})
+		}
+		catch (error) { this.emit('error', error) }
 		if (shouldPrevent) { return }
 
 		// A listener may have already destroyed the window

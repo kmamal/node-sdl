@@ -359,7 +359,6 @@ events::dispatchEvent(const SDL_Event &event)
 			int joystick_id = event.jaxis.which;
 			SDL_Joystick *joystick = SDL_JoystickFromInstanceID(joystick_id);
 			if (joystick == nullptr) {
-				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
 				return false;
 			}
@@ -419,7 +418,6 @@ events::dispatchEvent(const SDL_Event &event)
 			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
 				return false;
 			}
@@ -436,7 +434,6 @@ events::dispatchEvent(const SDL_Event &event)
 			SDL_JoystickID controller_id = event.cdevice.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
 				return false;
 			}
@@ -453,7 +450,6 @@ events::dispatchEvent(const SDL_Event &event)
 			int controller_id = event.caxis.which;
 			SDL_GameController *controller = SDL_GameControllerFromInstanceID(controller_id);
 			if (controller == nullptr) {
-				// The instance was closed with events for it still in the queue
 				SDL_ClearError();
 				return false;
 			}
@@ -522,8 +518,6 @@ events::dispatchEvent(const SDL_Event &event)
 		}
 	}
 
-	// Event types without a case above (controller touchpad events, text
-	// editing, ...) would otherwise cross into JS as empty objects
 	if (!packed.Has("type")) { return false; }
 
 	poll_callback->Call(poll_env->Global(), { packed });
@@ -533,7 +527,6 @@ events::dispatchEvent(const SDL_Event &event)
 
 // Window events the filter already dispatched stay in the queue, so that
 // SDL's own event watchers (the renderer's resize handling) still see them.
-// Their identities are recorded here and poll() skips the duplicates.
 struct FilterDispatchedEvent {
 	Uint32 timestamp;
 	Uint32 window_id;
@@ -543,23 +536,6 @@ struct FilterDispatchedEvent {
 };
 
 static std::vector<FilterDispatchedEvent> filter_dispatched_events;
-
-static void
-recordFilterDispatched (const SDL_Event &event)
-{
-	// A record may already exist for this window and event type (a nested
-	// dispatch, or SDL coalescing away the queued event it belonged to).
-	// Never remove it here: if its event is still in the queue, erasing the
-	// record would make poll() deliver that event a second time. Stale
-	// records are dropped in poll() once the queue is drained.
-	filter_dispatched_events.push_back({
-		event.common.timestamp,
-		event.window.windowID,
-		event.window.event,
-		event.window.data1,
-		event.window.data2,
-	});
-}
 
 static bool
 wasDispatchedFromFilter (const SDL_Event &event)
@@ -582,17 +558,8 @@ wasDispatchedFromFilter (const SDL_Event &event)
 	return false;
 }
 
-static bool has_pending_filter_error = false;
-static Napi::Error pending_filter_error;
-
-// A depth, not a flag: a handler can trigger a nested synchronous dispatch
-// (e.g. setSize() from a resize listener), and its return must not make the
-// outer dispatch look finished
 static int dispatching_from_filter = 0;
 
-// Lets the JS side defer SDL calls that are unsafe while the pump that
-// called the filter still holds pointers into the video driver's state,
-// such as destroying the window being dragged or resized
 Napi::Value
 events::isDispatchingFromFilter (const Napi::CallbackInfo &info)
 {
@@ -601,42 +568,24 @@ events::isDispatchingFromFilter (const Napi::CallbackInfo &info)
 	return Napi::Boolean::New(env, dispatching_from_filter > 0);
 }
 
-// Exceptions must not unwind through SDL's event pump, which called the
-// filter. Stash them and rethrow once poll() is back on the JS stack.
 bool
 events::dispatchEventFromFilter(const SDL_Event &event)
 {
-	if (has_pending_filter_error) { return false; }
-
 	dispatching_from_filter++;
+	bool dispatched = events::dispatchEvent(event);
+	dispatching_from_filter--;
 
-	try {
-		bool dispatched = events::dispatchEvent(event);
-		dispatching_from_filter--;
-		if (dispatched) { recordFilterDispatched(event); }
-		return dispatched;
+	if (dispatched) {
+		filter_dispatched_events.push_back({
+			event.common.timestamp,
+			event.window.windowID,
+			event.window.event,
+			event.window.data1,
+			event.window.data2,
+		});
 	}
-	catch (const Napi::Error &error) {
-		dispatching_from_filter--;
-		// Record even on error so the half-dispatched event isn't repeated
-		recordFilterDispatched(event);
-		pending_filter_error = error;
-		has_pending_filter_error = true;
 
-		// The stash holds a persistent reference. If no poll ever runs again,
-		// it must still be released before the environment is torn down, or
-		// its destructor runs against a destroyed environment.
-		static bool cleanup_hook_added = false;
-		if (!cleanup_hook_added) {
-			cleanup_hook_added = true;
-			pending_filter_error.Env().AddCleanupHook([]() {
-				has_pending_filter_error = false;
-				pending_filter_error.Reset();
-			});
-		}
-
-		return true;
-	}
+	return dispatched;
 }
 
 Napi::Value
@@ -656,28 +605,13 @@ events::poll (const Napi::CallbackInfo &info)
 			events::dispatchEvent(event);
 		}
 
-		// The queue is now empty, so any unmatched records belong to events
-		// SDL coalesced away and could only shadow future events
 		filter_dispatched_events.clear();
-
-		if (has_pending_filter_error) {
-			has_pending_filter_error = false;
-			throw Napi::Error(std::move(pending_filter_error));
-		}
 	}
 	catch (...) {
-		// Drop any stashed filter error so it isn't thrown against a later
-		// poll, or left holding a reference past environment teardown
-		if (has_pending_filter_error) {
-			has_pending_filter_error = false;
-			pending_filter_error.Reset();
-		}
-
 		poll_env = nullptr;
 		poll_callback = nullptr;
 		throw;
 	}
-
 	poll_env = nullptr;
 	poll_callback = nullptr;
 

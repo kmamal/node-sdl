@@ -22,7 +22,6 @@ const handleEvent = (event) => {
 			}
 		} break
 
-		// TODO: this also needs a reconcile function
 		case 'display': {
 			const { displayIndex } = event
 			delete event.displayIndex
@@ -42,6 +41,7 @@ const handleEvent = (event) => {
 					// SDL indexes can skip positions when a display vanishes mid-enumeration
 					const display = Globals.displays.find((a) => a._index === displayIndex)
 					if (!display) { return }
+
 					display.orientation = event.orientation
 					event.device = display
 				} break
@@ -53,8 +53,10 @@ const handleEvent = (event) => {
 					delete event.usableX
 					delete event.usableY
 
+					// SDL indexes can skip positions when a display vanishes mid-enumeration
 					const display = Globals.displays.find((a) => a._index === displayIndex)
 					if (!display) { return }
+
 					display.geometry.x = geometryX
 					display.geometry.y = geometryY
 					display.usable.x = usableX
@@ -65,7 +67,8 @@ const handleEvent = (event) => {
 				// No default
 			}
 
-			videoModule.emit(type, event)
+			try { videoModule.emit(type, event) }
+			catch (error) { videoModule.emit('error', error) }
 		} break
 
 		case 'window': {
@@ -143,11 +146,13 @@ const handleEvent = (event) => {
 				default: return
 			}
 
-			window.emit(type, event)
+			try { window.emit(type, event) }
+			catch (error) { window.emit('error', error) }
 		} break
 
 		case 'keymap': {
-			keyboardModule.emit(type, event)
+			try { keyboardModule.emit(type, event) }
+			catch (error) { keyboardModule.emit('error', error) }
 		} break
 
 		case 'keyboard': {
@@ -160,7 +165,8 @@ const handleEvent = (event) => {
 			const { key } = event
 			event.key = mapping[key] ?? (key?.length === 1 ? key : null)
 
-			window.emit(type, event)
+			try { window.emit(type, event) }
+			catch (error) { window.emit('error', error) }
 		} break
 
 		case 'mouse':
@@ -172,23 +178,22 @@ const handleEvent = (event) => {
 			const window = Globals.windows.all.get(windowId)
 			if (!window) { return }
 
-			window.emit(type, event)
+			try { window.emit(type, event) }
+			catch (error) { window.emit('error', error) }
 		} break
 
 		case 'touch': {
 			const { touchId } = event
 			delete event.touchId
 
-			// Events synthesized from the mouse have no touch device
+			// Events synthesized from the mouse have null touch device
 			let device = null
 			if (!event.mouse) {
 				device = Globals.touchDevices.find(({ id }) => id === touchId)
-				if (device === undefined) {
+				if (!device) {
 					Globals.touchDevices = Bindings.touch_getDevices()
 					device = Globals.touchDevices.find(({ id }) => id === touchId)
-
-					// The device was disconnected with events for it still in the queue
-					if (device === undefined) { return }
+					if (!device) { return }
 				}
 			}
 
@@ -199,7 +204,8 @@ const handleEvent = (event) => {
 			if (!window) { return }
 
 			event.device = device
-			window.emit(type, event)
+			try { window.emit(type, event) }
+			catch (error) { window.emit('error', error) }
 		} break
 
 		case 'joystickDevice': {
@@ -248,7 +254,8 @@ const handleEvent = (event) => {
 				if (collection) {
 					for (const joystickInstance of collection) {
 						joystickInstance._power = event.power
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				}
 
@@ -257,7 +264,8 @@ const handleEvent = (event) => {
 
 				for (const controllerInstance of otherCollection) {
 					controllerInstance._power = event.power
-					controllerInstance.emit(type, event)
+					try { controllerInstance.emit(type, event) }
+					catch (error) { controllerInstance.emit('error', error) }
 				}
 				return
 			}
@@ -268,12 +276,13 @@ const handleEvent = (event) => {
 				case 'axisMotion': {
 					for (const joystickInstance of collection) {
 						joystickInstance._axes[event.axis] = event.value
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				} break
 
 				case 'ballMotion': {
-					// SDL reports relative motion, but the documented payload is a position
+					// SDL reports relative motion for these
 					const dx = event.x
 					const dy = event.y
 					for (const joystickInstance of collection) {
@@ -282,27 +291,31 @@ const handleEvent = (event) => {
 						ball.y += dy
 						event.x = ball.x
 						event.y = ball.y
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				} break
 
 				case 'buttonDown': {
 					for (const joystickInstance of collection) {
 						joystickInstance._buttons[event.button] = true
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				} break
 				case 'buttonUp': {
 					for (const joystickInstance of collection) {
 						joystickInstance._buttons[event.button] = false
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				} break
 
 				case 'hatMotion': {
 					for (const joystickInstance of collection) {
 						joystickInstance._hats[event.hat] = event.value
-						joystickInstance.emit(type, event)
+						try { joystickInstance.emit(type, event) }
+						catch (error) { joystickInstance.emit('error', error) }
 					}
 				} break
 
@@ -321,28 +334,32 @@ const handleEvent = (event) => {
 				case 'axisMotion': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._axes[event.axis] = event.value
-						controllerInstance.emit(type, event)
+						try { controllerInstance.emit(type, event) }
+						catch (error) { controllerInstance.emit('error', error) }
 					}
 				} break
 
 				case 'buttonDown': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._buttons[event.button] = true
-						controllerInstance.emit(type, event)
+						try { controllerInstance.emit(type, event) }
+						catch (error) { controllerInstance.emit('error', error) }
 					}
 				} break
 
 				case 'buttonUp': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._buttons[event.button] = false
-						controllerInstance.emit(type, event)
+						try { controllerInstance.emit(type, event) }
+						catch (error) { controllerInstance.emit('error', error) }
 					}
 				} break
 
 				case 'steamHandleUpdate': {
 					for (const controllerInstance of collection.values()) {
 						controllerInstance._steamHandle = event.steamHandle
-						controllerInstance.emit(type, event)
+						try { controllerInstance.emit(type, event) }
+						catch (error) { controllerInstance.emit('error', error) }
 					}
 				} break
 
@@ -354,7 +371,8 @@ const handleEvent = (event) => {
 					for (const controllerInstance of collection.values()) {
 						Object.assign(controllerInstance._axes, axes)
 						Object.assign(controllerInstance._buttons, buttons)
-						controllerInstance.emit(type, event)
+						try { controllerInstance.emit(type, event) }
+						catch (error) { controllerInstance.emit('error', error) }
 					}
 				} break
 
@@ -372,7 +390,8 @@ const handleEvent = (event) => {
 			switch (type) {
 				case 'update': {
 					for (const sensorInstance of collection.values()) {
-						sensorInstance.emit(type, event)
+						try { sensorInstance.emit(type, event) }
+						catch (error) { sensorInstance.emit('error', error) }
 					}
 				} break
 
@@ -384,30 +403,23 @@ const handleEvent = (event) => {
 			const { audioDeviceType } = event
 			delete event.audioDeviceType
 
-			// The removal handling must finish even if a close listener throws
-			let closeError = null
-
 			if (type === 'deviceRemove') {
 				const { audioId } = event
 				delete event.audioId
 
 				const audioInstance = Globals.audioInstances.get(audioId)
-				if (audioInstance) {
-					try { audioInstance.close() }
-					catch (error) { closeError = error }
-				}
+				if (audioInstance) { audioInstance.close() }
 			}
 
 			const { devices } = event
 			delete event.devices
 
 			reconcileAudioDevices(devices, audioDeviceType)
-
-			if (closeError) { throw closeError }
 		} break
 
 		case 'clipboard': {
-			clipboardModule.emit(type, event)
+			try { clipboardModule.emit(type, event) }
+			catch (error) { clipboardModule.emit('error', error) }
 		} break
 
 		// No default
@@ -420,13 +432,8 @@ let polling = false
 const poll = () => {
 	if (polling) { return }
 	polling = true
-
-	try {
-		Bindings.events_poll(handleEvent)
-	}
-	finally {
-		polling = false
-	}
+	Bindings.events_poll(handleEvent)
+	polling = false
 }
 
 let pollInterval = null
