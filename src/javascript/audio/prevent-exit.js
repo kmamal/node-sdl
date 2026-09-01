@@ -15,27 +15,20 @@ process.on('beforeExit', (code) => {
 	let duration = 0
 
 	for (const instance of Globals.audioInstances.values()) {
-		if (instance.device.type === 'recording') { continue }
+		if (instance.device.type !== 'playback') { continue }
 
 		const { queued, playing } = instance
-		if (!playing) { continue }
+		if (!queued || !playing) { continue }
 
-		if (queued) {
-			const { channels, frequency, buffered, bytesPerSample } = instance
-			const bytesPerSecond = channels * frequency * bytesPerSample
-			const bufferedBytes = buffered * channels * bytesPerSample
-			duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)
-		}
-		else {
-			// The queue empties while the device buffer is still sounding
-			const remaining = instance._drainedAt - Date.now()
-			if (remaining > 0) { duration = Math.max(duration, remaining / 1e3) }
-		}
+		const { channels, frequency, buffered, bytesPerSample } = instance
+		const bytesPerSecond = channels * frequency * bytesPerSample
+		const bufferedBytes = buffered * channels * bytesPerSample
+		duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)
 	}
 
 	if (duration) {
+		// Keeps Node.js alive while audio is playing
 		resetTimeout()
-		// Deliberately ref'd: keeps the process alive until playback finishes
 		timeout = setTimeout(() => { timeout = null }, duration * 1e3)
 	}
 })

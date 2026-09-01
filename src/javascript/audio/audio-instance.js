@@ -22,7 +22,6 @@ class AudioInstance extends EventsViaPoll {
 		} = options
 
 		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("device.name must be a string"), { name }) }
-		// We already tested device.type in sdl.audio.openDevice()
 		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
 		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }
 		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
@@ -30,7 +29,6 @@ class AudioInstance extends EventsViaPoll {
 		if (!Number.isInteger(buffered)) { throw Object.assign(new Error("buffered must be an integer"), { buffered }) }
 		if (buffered <= 0) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
-		// SDL stores the buffer size in a 16-bit field
 		if (buffered > 2 ** 15) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
 
 		const _format = Enums.audioFormat[format]
@@ -98,6 +96,7 @@ class AudioInstance extends EventsViaPoll {
 	}
 
 	get queued () {
+		Globals.events.poll()
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
 
 		return Bindings.audio_getQueueSize(this._id)
