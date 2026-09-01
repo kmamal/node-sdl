@@ -37,7 +37,13 @@ npm install @kmamal/sdl
 
 You do __not__ have to manually install any other libs or DLLs to your system. A compatible version of SDL will be automatically downloaded by the install script and placed inside `node_modules` along with this lib's prebuilt binding binaries.
 
-(But if the install script fails, have a look at the instructions for [building the package manually](#building-from-source))
+In future versions of npm you will have to manually approve scripts before they can run. You can do this via:
+
+```bash
+npm install-scripts approve @kmamal/sdl
+```
+
+If the install script fails, have a look at the instructions for [building the package manually](#building-from-source)
 
 ## Examples
 
