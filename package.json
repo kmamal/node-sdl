@@ -69,9 +69,9 @@
   "devDependencies": {
     "@kmamal/evdev": "0.0.8",
     "@kmamal/testing": "0.0.33",
-    "@types/node": "26.2.0",
+    "@types/node": "26.3.0",
     "node-addon-api": "8.9.2",
-    "node-gyp": "13.0.1"
+    "node-gyp": "13.0.2"
   },
   "config": {
     "sdl": {
