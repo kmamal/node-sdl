@@ -191,8 +191,20 @@ class Window extends EventsViaPoll {
 		this._title = title
 	}
 
-	get x () { return this._x }
-	get y () { return this._y }
+	get x () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._x
+	}
+
+	get y () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._y
+	}
+
 	setPosition (x, y) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -206,8 +218,20 @@ class Window extends EventsViaPoll {
 		this._y = y
 	}
 
-	get width () { return this._width }
-	get height () { return this._height }
+	get width () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._width
+	}
+
+	get height () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._height
+	}
+
 	setSize (width, height) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -245,14 +269,34 @@ class Window extends EventsViaPoll {
 		this._pixelHeight = result.pixelHeight
 	}
 
-	get pixelWidth () { return this._pixelWidth }
-	get pixelHeight () { return this._pixelHeight }
+	get pixelWidth () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._pixelWidth
+	}
+
+	get pixelHeight () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._pixelHeight
+	}
 
 	get display () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
 		return Globals.displays.find((a) => a._index === this._displayIndex) ?? null
 	}
 
-	get visible () { return this._visible }
+	get visible () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._visible
+	}
+
 	show (show = true) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -264,7 +308,13 @@ class Window extends EventsViaPoll {
 
 	hide () { this.show(false) }
 
-	get fullscreen () { return this._fullscreen }
+	get fullscreen () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._fullscreen
+	}
+
 	setFullscreen (fullscreen) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -273,7 +323,12 @@ class Window extends EventsViaPoll {
 		this._fullscreen = Bindings.window_setFullscreen(this._id, fullscreen)
 	}
 
-	get resizable () { return this._resizable }
+	get resizable () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._resizable
+	}
+
 	setResizable (resizable) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -283,7 +338,12 @@ class Window extends EventsViaPoll {
 		this._resizable = Bindings.window_setResizable(this._id, resizable)
 	}
 
-	get borderless () { return this._borderless }
+	get borderless () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._borderless
+	}
+
 	setBorderless (borderless) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -293,9 +353,18 @@ class Window extends EventsViaPoll {
 		this._borderless = Bindings.window_setBorderless(this._id, borderless)
 	}
 
-	get alwaysOnTop () { return this._alwaysOnTop }
+	get alwaysOnTop () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-	get accelerated () { return this._accelerated }
+		return this._alwaysOnTop
+	}
+
+	get accelerated () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._accelerated
+	}
+
 	setAccelerated (accelerated) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -309,7 +378,12 @@ class Window extends EventsViaPoll {
 		this._vsync = result.vsync
 	}
 
-	get vsync () { return this._vsync }
+	get vsync () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._vsync
+	}
+
 	setVsync (vsync) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -323,11 +397,31 @@ class Window extends EventsViaPoll {
 		this._vsync = result.vsync
 	}
 
-	get opengl () { return this._opengl }
-	get webgpu () { return this._webgpu }
-	get native () { return this._native }
+	get opengl () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-	get minimized () { return this._minimized }
+		return this._opengl
+	}
+
+	get webgpu () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._webgpu
+	}
+
+	get native () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._native
+	}
+
+	get minimized () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._minimized
+	}
+
 	minimize () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -338,7 +432,13 @@ class Window extends EventsViaPoll {
 		this._fullscreen = false
 	}
 
-	get maximized () { return this._maximized }
+	get maximized () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._maximized
+	}
+
 	maximize () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -359,7 +459,13 @@ class Window extends EventsViaPoll {
 		this._fullscreen = false
 	}
 
-	get focused () { return Globals.windows.focused === this }
+	get focused () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return Globals.windows.focused === this
+	}
+
 	focus () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
@@ -367,12 +473,36 @@ class Window extends EventsViaPoll {
 		Globals.windows.focused = this
 	}
 
-	get hovered () { return Globals.windows.hovered === this }
+	get hovered () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-	get skipTaskbar () { return this._skipTaskbar }
-	get popupMenu () { return this._popupMenu }
-	get tooltip () { return this._tooltip }
-	get utility () { return this._utility }
+		return Globals.windows.hovered === this
+	}
+
+	get skipTaskbar () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._skipTaskbar
+	}
+
+	get popupMenu () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._popupMenu
+	}
+
+	get tooltip () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._tooltip
+	}
+
+	get utility () {
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return this._utility
+	}
 
 	render (width, height, stride, format, buffer, options = {}) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
