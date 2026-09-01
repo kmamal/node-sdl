@@ -16,8 +16,6 @@ controller::mapAxis (SDL_GameController *controller, SDL_GameControllerAxis axis
 	return mapAxisValue(SDL_GameControllerGetAxis(controller, axis));
 }
 
-// Values are already in the fixed scale SDL maps controller axes to:
-// sticks rest at 0 in -32768..32767, triggers at 0 in 0..32767
 double
 controller::mapAxisValue (int value) {
 	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
