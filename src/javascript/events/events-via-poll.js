@@ -4,7 +4,7 @@ const { EventEmitter } = require('node:events')
 let _ID = 0
 const activeEmitters = new Set()
 
-const commonEvents = [ 'newListener', 'removeListener', '*' ]
+const commonEvents = [ 'newListener', 'removeListener', 'error', '*' ]
 
 class EventsViaPoll extends EventEmitter {
 	constructor (validEvents) {

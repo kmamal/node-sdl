@@ -8,9 +8,8 @@
     "@napi-rs/canvas": "*",
     "ffmpeg-static": "*"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl",
-    "@napi-rs/canvas",
-    "ffmpeg-static"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true,
+    "ffmpeg-static": true
+  }
 }

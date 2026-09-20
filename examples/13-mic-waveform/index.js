@@ -1,6 +1,6 @@
 import sdl from '@kmamal/sdl'
 import Canvas from '@napi-rs/canvas'
-import { setTimeout } from 'timers/promises'
+import { setTimeout } from 'node:timers/promises'
 
 const window = sdl.video.createWindow()
 const { pixelWidth: width, pixelHeight: height } = window

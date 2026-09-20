@@ -25,6 +25,8 @@ buffer[offset++] = 0   // G
 buffer[offset++] = 0   // B
 
 const render = () => {
+	if (window.destroyed) { return }
+
 	window.render(width, height, stride, 'rgb24', buffer, 'linear')
 }
 

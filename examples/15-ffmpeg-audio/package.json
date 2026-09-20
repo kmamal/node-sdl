@@ -7,8 +7,8 @@
     "@kmamal/sdl": "*",
     "ffmpeg-static": "*"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl",
-    "ffmpeg-static"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true,
+    "ffmpeg-static": true
+  }
 }

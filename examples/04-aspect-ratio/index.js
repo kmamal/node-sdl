@@ -15,6 +15,8 @@ const viewport = {
 }
 
 const resize = () => {
+	if (window.destroyed) { return }
+
 	const factorX = Math.floor(window.width / image.width)
 	const factorY = Math.floor(window.height / image.height)
 	const factor = Math.min(factorX, factorY)
@@ -29,6 +31,8 @@ const resize = () => {
 }
 
 const render = () => {
+	if (window.destroyed) { return }
+
 	window.render(
 		image.width,
 		image.height,
@@ -39,5 +43,6 @@ const render = () => {
 	)
 }
 
-window.on('resize', resize)
-window.on('expose', render)
+window
+	.on('resize', resize)
+	.on('expose', render)

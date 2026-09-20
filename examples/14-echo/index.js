@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import { setTimeout } from 'timers/promises'
+import { setTimeout } from 'node:timers/promises'
 
 const buffered = 128
 const options = { buffered }

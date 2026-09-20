@@ -166,16 +166,24 @@ class Window extends EventsViaPoll {
 			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
 		})
 
-		// Manually emit an initial resize event for convenience
+		// Manually emit some initial events for convenience
 		process.nextTick(() => {
 			if (this._destroyed) { return }
 			try {
+				this.emit('move', {
+					x: this._x,
+					y: this._y,
+					type: 'move',
+				})
 				this.emit('resize', {
 					width: this._width,
 					height: this._height,
 					pixelWidth: this._pixelWidth,
 					pixelHeight: this._pixelHeight,
 					type: 'resize',
+				})
+				this.emit('expose', {
+					type: 'expose',
 				})
 			}
 			catch (error) { this.emit('error', error) }

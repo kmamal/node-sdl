@@ -47,11 +47,18 @@ let tic = Date.now()
 let toc
 let frames = 0
 
+const resize = ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
+	if (window.destroyed) { return }
+
+	ext.resize(pw, ph)
+	gl.viewport(0, 0, w, h)
+	gl.swap()
+
+	render()
+}
+
 const render = () => {
-	if (window.destroyed) {
-		clearInterval(interval)
-		return
-	}
+	if (window.destroyed) { return }
 
 	// Render
 	{
@@ -88,12 +95,8 @@ const render = () => {
 	}
 }
 
-window.on('resize', ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
-	ext.resize(pw, ph)
-	gl.viewport(0, 0, w, h)
-	gl.swap()
+window
+	.on('expose', render)
+	.on('resize', resize)
 
-	render()
-})
-
-const interval = setInterval(render, 1e3 / 30)
+setInterval(render, 1e3 / 30).unref()

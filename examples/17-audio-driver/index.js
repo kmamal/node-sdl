@@ -35,6 +35,10 @@ const restartAudioProcessWith = async (driver) => {
 }
 await restartAudioProcessWith(currentAudioDriver)
 
+const cleanup = () => {
+	audioProcess?.kill()
+}
+
 const buttons = [
 	{
 		text: "play",
@@ -64,13 +68,33 @@ const buttons = [
 	})),
 ]
 
+let processing = false
+
+const handleClick = async (event) => {
+	if (processing) { return }
+	processing = true
+
+	if (event.button !== 1) { return }
+
+	for (const button of buttons) {
+		const { rect: { x, y, w, h } } = button
+		if (x <= event.x && event.x <= x + w && y <= event.y && event.y <= y + h) {
+			console.log(`Clicked: ${button.text}`)
+			await button.fn()
+			render()
+			break
+		}
+	}
+
+	processing = false
+}
+
 const width = 230
 const height = 90 + audioDrivers.length * 30 + 10
 
 const window = sdl.video.createWindow({ width, height })
 const { pixelWidth, pixelHeight } = window
 
-Canvas.GlobalFonts.loadSystemFonts()
 const canvas = Canvas.createCanvas(pixelWidth, pixelHeight)
 const ctx = canvas.getContext('2d')
 
@@ -78,7 +102,7 @@ const scaleX = pixelWidth / width
 const scaleY = pixelHeight / height
 ctx.scale(scaleX, scaleY)
 
-ctx.font = '14px "DejaVu Sans Mono"'
+ctx.font = '14px "Courier New", "SF Mono", "DejaVu Sans Mono", "Noto Sans Mono"'
 ctx.strokeStyle = 'white'
 ctx.lineWidth = 2 * Math.min(scaleX, scaleY)
 ctx.textAlign = 'center'
@@ -104,26 +128,8 @@ const render = () => {
 	window.render(width, height, width * 4, 'rgba32', canvas.data())
 }
 
-render()
-
-let processing = false
-window.on('mouseButtonUp', async (event) => {
-	if (processing) { return }
-	processing = true
-
-	if (event.button !== 1) { return }
-
-	for (const button of buttons) {
-		const { rect: { x, y, w, h } } = button
-		if (x <= event.x && event.x <= x + w && y <= event.y && event.y <= y + h) {
-			console.log(`Clicked: ${button.text}`)
-			await button.fn()
-			render()
-			break
-		}
-	}
-
-	processing = false
-})
-
-window.on('close', () => { audioProcess?.kill() })
+window
+	.on('*', console.log)
+	.on('expose', render)
+	.on('mouseButtonUp', handleClick)
+	.on('close', cleanup)

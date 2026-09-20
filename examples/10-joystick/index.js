@@ -1,15 +1,22 @@
 import sdl from '@kmamal/sdl'
 import Canvas from '@napi-rs/canvas'
 
-const window = sdl.video.createWindow({ resizable: true })
+const window = sdl.video.createWindow()
 let canvas
 let ctx
 
-Canvas.GlobalFonts.loadSystemFonts()
-
 const instances = new Set()
 
-const doRender = () => {
+const resize = (event) => {
+	if (window.destroyed) { return }
+
+	canvas = Canvas.createCanvas(event.pixelWidth, event.pixelHeight)
+	ctx = canvas.getContext('2d')
+
+	render()
+}
+
+const render = () => {
 	if (window.destroyed) { return }
 
 	const {
@@ -22,7 +29,7 @@ const doRender = () => {
 	let maxX = 0
 	let maxY = 0
 
-	ctx.font = '12px "DejaVu Sans Mono"'
+	ctx.font = '12px "Courier New", "SF Mono", "DejaVu Sans Mono", "Noto Sans Mono"'
 	ctx.textAlign = 'left'
 	ctx.textBaseline = 'top'
 
@@ -130,26 +137,11 @@ const doRender = () => {
 
 	if (maxX !== W || maxY !== H) {
 		window.setSizeInPixels(maxX, maxY)
+		return
 	}
-	else {
-		window.render(W, H, W * 4, 'rgba32', canvas.data())
-	}
-}
 
-let nextRender = null
-const render = () => {
-	if (nextRender) { return }
-	nextRender = setTimeout(() => {
-		nextRender = null
-		doRender()
-	})
+	window.render(W, H, W * 4, 'rgba32', canvas.data())
 }
-
-window.on('expose', render)
-window.on('resize', (event) => {
-	canvas = Canvas.createCanvas(event.pixelWidth, event.pixelHeight)
-	ctx = canvas.getContext('2d')
-})
 
 const openJoystick = (device) => {
 	const instance = sdl.joystick.openDevice(device)
@@ -174,11 +166,16 @@ for (const device of sdl.joystick.devices) {
 	openJoystick(device)
 }
 
-window.on('close', () => {
+const cleanup = () => {
 	for (const instance of instances.values()) {
 		instance.close()
 	}
 
 	sdl.joystick.removeAllListeners('deviceAdd')
 	sdl.joystick.removeAllListeners('deviceRemove')
-})
+}
+
+window
+	.on('expose', render)
+	.on('resize', resize)
+	.on('close', cleanup)

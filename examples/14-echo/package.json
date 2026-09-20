@@ -6,7 +6,7 @@
   "dependencies": {
     "@kmamal/sdl": "*"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true
+  }
 }

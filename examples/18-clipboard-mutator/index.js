@@ -1,16 +1,15 @@
 import sdl from '@kmamal/sdl'
 import Canvas from '@napi-rs/canvas'
-import { setTimeout } from 'timers/promises'
+import { setTimeout } from 'node:timers/promises'
 
 const window = sdl.video.createWindow()
 const { pixelWidth: width, pixelHeight: height } = window
 const stride = width * 4
 
-Canvas.GlobalFonts.loadSystemFonts()
 const canvas = Canvas.createCanvas(width, height)
 const ctx = canvas.getContext('2d')
 
-ctx.font = '14px "DejaVu Sans Mono"'
+ctx.font = '14px "Courier New", "SF Mono", "DejaVu Sans Mono", "Noto Sans Mono"'
 ctx.textAlign = 'left'
 ctx.textBaseline = 'top'
 

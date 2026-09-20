@@ -71,21 +71,28 @@ gl.useProgram(program)
 
 gl.clearColor(0, 0, 0, 1)
 
+const resize = ({ pixelWidth: w, pixelHeight: h }) => {
+	if (window.destroyed) { return }
+
+	ext.resize(w, h)
+	gl.viewport(0, 0, w, h)
+
+	render()
+}
+
 const render = () => {
+	if (window.destroyed) { return }
+
 	gl.clear(gl.COLOR_BUFFER_BIT)
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 
 	const { pixelWidth: w, pixelHeight: h } = window
 	const buffer = new Uint8Array(w * h * 4)
 	gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buffer)
+
 	window.render(w, h, w * 4, 'rgba32', Buffer.from(buffer))
 }
 
-window.on('expose', render)
-
-window.on('resize', ({ pixelWidth: w, pixelHeight: h }) => {
-	ext.resize(w, h)
-	gl.viewport(0, 0, w, h)
-
-	render()
-})
+window
+	.on('resize', resize)
+	.on('expose', render)

@@ -1,5 +1,5 @@
 import sdl from '@kmamal/sdl'
-import { setTimeout } from 'timers/promises'
+import { setTimeout } from 'node:timers/promises'
 
 const window = sdl.video.createWindow()
 

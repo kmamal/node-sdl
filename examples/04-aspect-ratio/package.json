@@ -7,7 +7,7 @@
     "@kmamal/sdl": "*",
     "pngjs": "7.0.0"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true
+  }
 }

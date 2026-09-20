@@ -7,8 +7,7 @@
     "@kmamal/sdl": "*",
     "@napi-rs/canvas": "*"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl",
-    "@napi-rs/canvas"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true
+  }
 }

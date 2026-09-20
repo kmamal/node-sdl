@@ -7,8 +7,7 @@
     "@kmamal/sdl": "*",
     "gl": "*"
   },
-  "trustedDependencies": [
-    "@kmamal/sdl",
-    "gl"
-  ]
+  "allowScripts": {
+    "@kmamal/sdl": true
+  }
 }
