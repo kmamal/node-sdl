@@ -18,116 +18,116 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native window handles under the Wayland video driver (`SDL_VIDEODRIVER=wayland`). `window.native` now carries valid Wayland objects instead of garbage reinterpreted as X11 handles, and a new `window.native.subsystem` field (`'x11'` or `'wayland'`, Linux only) says which kind you're holding. Any other Linux video driver now yields `handle: null` and a clear error for `opengl`/`webgpu` windows.
 - Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()`, `sdl.mouse.unsetRelativeMode()`, and `sdl.mouse.relativeMode`.
 - `sdl.mouse.captured`, reporting whether `sdl.mouse.capture()` is currently in effect.
+- `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
 - Pixel-format helpers `sdl.video.bytesPerPixel()`, `sdl.video.isYuv()`, `sdl.video.isPlanarYuv()`, and `sdl.video.minBufferSize()`, mirroring the existing audio sample-format helpers.
 - `@kmamal/sdl/helpers` now also exposes the pixel-format helpers and the `keyboard.SCANCODE`, `mouse.BUTTON`, and `sensor.STANDARD_GRAVITY` constants, under the same paths as in the main module.
-- `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
 - Prebuilt binaries for Windows on arm64.
+- The `npm run build` script honors pre-set `SDL_INC`/`SDL_LIB` environment variables, so it can build against a system or custom SDL.
 
 ### Fixed
 
-- The TypeScript declarations now describe every event-emitting object as an `EventEmitter` (so `once()`, `off()`, `removeAllListeners()`, e.t.c. type-check), declare the `'error'` event, include the `sdl.video` pixel-format helpers and the new mouse members, and cover the whole `@kmamal/sdl/helpers` sub-module instead of only its `audio` part.
-- Pausing and resuming playback around the moment the queue empties no longer lets the process exit before the device buffer's tail has finished sounding. The exit-drain deadline now shifts forward by the time spent paused.
-- Closing a joystick or controller instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
-- Reading `sdl.clipboard.text` no longer leaks the SDL-side copy of the text if creating the JS string fails (e.g. clipboard content beyond the JS string size limit).
-- Exiting no longer truncates the last device-buffer's worth of playing audio (up to ~680ms at the maximum `buffered` setting). The exit-drain logic used to only wait for the queue, which empties while the device buffer is still sounding.
-- Calling `setSize()` (or another method that synchronously re-enters SDL's event pump) from a `move`/`resize` listener no longer makes the listener fire a second time for the same event. The record that marks the nested event as already-delivered used to be erased before the queue was drained.
-- Removing all of a window's listeners (whether via `removeAllListeners()` or `removeListener()`) no longer lets the process exit while the window is still open. It used to also remove the internal keep-alive listener, dropping event polling to the slow un-ref'd interval.
-- Calling `window.destroy()` from a `beforeClose` listener no longer crashes the process. `destroyGently()` used to call `destroy()` afterwards anyway, and the resulting "window is destroyed" error propagated out of the event poll loop as an uncaught exception.
-- `window.render()` no longer draws through a stale viewport after the user drag-resizes the window. The `move`/`resize` events dispatched from inside SDL's event pump used to be filtered out of the queue in a way that also hid them from SDL's internal event watchers, so the renderer never processed the size change.
-- Calling `window.destroy()` from a `move` or `resize` listener no longer risks a crash when the listener also called a window method (like `setSize()`) that delivered a nested `move`/`resize` event: the nested dispatch used to clear the "inside SDL's event pump" flag, so the destroy ran immediately inside the pump instead of being deferred.
-- Unplugging a device no longer mis-identifies the remaining ones. Device reconciliation used to match devices by list position (or by name for audio), so removing a non-last joystick, controller, or display made cached device objects silently morph into other devices and made `deviceRemove`/`displayRemove` events report the wrong device. Joysticks and controllers are now matched by their stable SDL instance id; displays by name and geometry; audio devices with identical names by their relative order. As a side effect, `sdl.audio.devices` is no longer sorted by name — devices now stay in SDL's enumeration order, like every other device list.
-- A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
-- `enqueue()` and `dequeue()` now accept empty buffers as no-ops, as the README already implied, instead of throwing "invalid numBytes" on the zero-length chunks streaming pipelines naturally produce.
-- `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
-- Reading `axes`, `balls`, `buttons`, `hats`, `power`, or `steamHandle` from a closed joystick or controller instance now throws "instance is closed", like every other member. They used to silently return stale state.
-- `window.setIcon()` and `mouse.setCursorImage()` now reject YUV pixel formats with a clear validation error. SDL cannot create surfaces from them, so they always failed — but with a cryptic native error.
-- Passing a non-object as `options` to `createWindow()` or `audio.openDevice()`, or calling `enqueue()`/`dequeue()` without a buffer, now fails with the intended validation error instead of a raw `TypeError`. A non-object `options` used to be silently ignored by `createWindow()`.
-- The audio format helpers (`bytesPerSample()`, `readSample()`, and the rest, on both `sdl.audio` and `@kmamal/sdl/helpers`) now reject an invalid `format` with the library's standard "invalid format" error instead of a raw `TypeError`.
-- Integer arguments are now validated to fit in 32 bits everywhere the native layer reads them as such (window positions and sizes, image dimensions and strides, mouse position, rumble durations, player indices, audio frequency, `numBytes`). Larger values used to silently wrap — `setSize(2 ** 32 + 100, 100)` set width 100, `rumble` durations above 2³¹−1 broke the auto-stop timer, and `setPlayer(2 ** 31)` silently behaved like `resetPlayer()`.
-- Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
-- Window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale SDL error text an earlier unrelated call had left behind.
-- Enum values this build of the library doesn't know (a joystick or controller type, sensor type, power state, joystick power level, display orientation, touch device type, or hat position introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
-- The virtual key `'clear/again'` is now included in the README's virtual-key list. It was the only key value the mapping could produce that the docs omitted.
-- `openDevice()` no longer risks opening the wrong physical device when another device's unplugging hasn't been processed yet. SDL compacts device indexes on removal, so opening through a stale index could silently target a different device (whose events would then route to the wrong instance) — joysticks and controllers now flush pending device events, and sensors refetch the device list, before validating and opening.
-- A `close` listener that throws no longer leaves the instance half-closed. Joystick, controller, sensor, and audio instances used to emit `close` before deregistering and releasing the SDL handle, so a throwing listener stranded a closed-but-still-registered instance: the handle leaked, the device lists were never reconciled after a removal, and the exit-time cleanup crashed trying to close the instance again. Teardown now completes first and `close` is emitted last, and a device removal now closes all of the device's instances and reconciles the device lists even when a listener throws (the first listener error is rethrown afterwards).
-- Reading joystick, controller, or sensor state on the very read that discovers the device's removal now throws "instance is closed" instead of returning stale state (or, for sensors, a raw native error). The getters used to check for closedness before pumping events, but the pump itself is what processes the removal that closes the instance.
-- Displays are now looked up by their SDL index instead of their position in `sdl.video.displays`, which diverge when a display vanishes mid-enumeration. `displayOrient`/`displayMove` events used to update and report the wrong display, `createWindow()` with the `display` option could open the window on the wrong display, and `window.display` could return the wrong one. `window.display` (and the `display` on `displayChange` events) is now `null` when the window's display has been removed.
-- The SDL-allocated controller mapping string no longer leaks when creating its JS counterpart fails during device enumeration.
-- An audio device disappearing while the device list is being enumerated no longer crashes the process. The audio backend's own notification thread can remove a device mid-enumeration; the resulting error used to escape the internal polling loop as an uncaught exception. Devices that vanish mid-query are now skipped, like displays already were.
-- A display disappearing while its hot-plug or move event is being processed no longer crashes the process: display enumeration now skips displays that vanish mid-query, and `displayMove` events for already-removed displays are dropped.
-- `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
-- `createWindow()` now matches the `display` option on both name and position, so it can tell identical monitors apart, and throws if the display is not found instead of silently falling back to the first display.
-- `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it.
-- Instances now report `closed` as `true` while their `close` event is being emitted, so a listener that calls `close()` again no longer recurses forever.
-- Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
-- Touch events whose device disappeared before they were polled are now dropped instead of being emitted with an `undefined` `device`.
-- Touch events synthesized from the mouse are now delivered with a `null` `device` instead of being silently dropped (and no longer trigger a native device refetch on every mouse movement).
-- Reading a sensor instance's `data` now pumps events first, so it returns current readings instead of values up to a second old, and throws the documented error if the instance is closed.
-- `mouse.getButton()` now pumps events first, so it returns the current button state instead of values up to a second old.
-- Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
-- Passing `null` to `audio.openDevice()` now fails validation with the intended error instead of an unrelated `TypeError`.
-- The standalone audio format helpers (`audio.bytesPerSample()`, `audio.readSample()`, and the rest) now treat names of inherited `Object` members (such as `'constructor'`) as invalid formats like every other lookup table in the library, instead of silently returning `undefined` or failing with a confusing error.
-- SDL event types the library doesn't handle (such as controller touchpad events) no longer make a wasted native-to-JS call per event.
-- Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer.
-- Destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
-- An exception stashed by the window drag/resize filter no longer risks undefined behavior at process teardown when no further poll runs to consume it.
-- SDL errors are now detected by checking the error message contents instead of comparing `SDL_GetError()` pointers, which silently missed all errors when linked against an SDL build that returns a single static buffer.
+Windows and events:
+
+- `move` and `resize` events are no longer delivered twice.
+- An exception thrown in an event listener no longer permanently stops event delivery.
+- An exception thrown from a `move` or `resize` listener while the window is being dragged no longer crashes the process. It surfaces as a normal exception instead.
 - Calling `window.destroy()` from a `move` or `resize` listener that fires while the window is being dragged or resized no longer risks a crash. The window reports `destroyed` immediately, and the native window is destroyed once it is safe to do so.
-- Connecting or disconnecting a display no longer crashes the process.
-- Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
-- Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
-- Controller instances now receive `powerUpdate` events even when the device is not also open as a joystick.
-- Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion.
-- Calling `removeAllListeners()` on a window or instance no longer breaks event polling, and no longer turns `window.destroy()` into a silent no-op.
-- An exception stashed by the window drag/resize filter is no longer re-thrown against a later poll when another listener also throws.
-- `zeroSampleValue` for the unsigned audio formats now matches SDL's silence value (`128` for `u8`, `32768` for `u16`) instead of being one below it.
-- Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/controller opening.
-- Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
+- Calling `window.destroy()` from a `beforeClose` listener no longer crashes the process. `destroyGently()` used to call `destroy()` afterwards anyway, and the resulting "window is destroyed" error propagated out of the event poll loop as an uncaught exception.
+- Removing all of a window's listeners (whether via `removeAllListeners()` or one `removeListener()` at a time) no longer breaks event polling, no longer lets the process exit while the window is still open, and no longer turns `window.destroy()` into a silent no-op. It used to also remove the internal keep-alive listener.
+- Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
+- `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
+- Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
+- The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.
+- `window.setSizeInPixels()` now reports the actual resulting pixel size instead of assuming the requested one was applied, and its error messages state the correct required multiple instead of its inverse.
+- `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
+- `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
+- A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls, and destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture cache entry.
+- Renderer error messages now include the flag values instead of pointer addresses.
+- Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code. For the planar YUV formats the check also accounts for SDL rounding the chroma planes up, so odd dimensions no longer read out of bounds either.
+- `window.setIcon()` and `mouse.setCursorImage()` now reject YUV pixel formats with a clear validation error. SDL cannot create surfaces from them, so they always failed — but with a cryptic native error.
+- A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
+
+Displays:
+
+- Connecting or disconnecting a display no longer crashes the process, including when the display disappears while its hot-plug, orientation, or move event is being processed.
+- Displays are now looked up by their SDL index instead of their position in `sdl.video.displays`, which diverge when a display vanishes mid-enumeration. `displayOrient`/`displayMove` events used to update and report the wrong display, `createWindow()` with the `display` option could open the window on the wrong display, and `window.display` could return the wrong one. `window.display` (and the `display` on `displayChange` events) is now `null` when the window's display has been removed.
+- `createWindow()` now matches the `display` option on both name and position, so it can tell identical monitors apart, and throws if the display is not found instead of silently falling back to the first display.
+- The `displayMove` event is now emitted instead of throwing "invalid event", and both `displayOrient` and `displayMove` events now carry the documented `device` property.
+
+Mouse and keyboard:
+
+- `mouseWheel` events now report the mouse position at the time of the event, carry precise fractional `dx`/`dy` values so high-resolution trackpad scrolls no longer arrive as `0`, and have a boolean `flipped` property.
+- `mouse.getButton()` now pumps events first, so it returns the current button state instead of values up to a second old. It also accepts the correct button range, and no longer relies on undefined behavior for button 32.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
-- An exception thrown from a `move` or `resize` listener while the window is being dragged no longer crashes the process. It surfaces as a normal exception instead.
-- `mouseWheel` events now report the mouse position at the time of the event, and carry precise fractional `dx`/`dy` values so high-resolution trackpad scrolls no longer arrive as `0`.
-- Buffer size validation for the planar YUV formats now accounts for SDL rounding the chroma planes up, preventing an out-of-bounds read for odd dimensions.
-- `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
-- A failure while opening a joystick or controller no longer leaks the SDL handle.
-- A failure while creating a window (such as renderer creation failing) no longer leaks the SDL window.
-- `sdl.sensor.devices` no longer crashes when a sensor disappears while the list is being read. Its `name` is `null` instead.
-- `sdl.clipboard.text` no longer throws when another application empties the clipboard mid-read.
-- `audioInstance.queued` no longer reports negative values for queues over 2 GiB.
-- `window.setSizeInPixels()` now reports the actual resulting pixel size instead of assuming the requested one was applied.
-- Displays with a pixel format that has no exposed name report `format: null` instead of an empty string. The same applies to unknown controller axis and button names in events.
-- `sdl.mouse.getButton(32)` no longer relies on undefined behavior.
-- Renderer error messages now include the flag values instead of pointer addresses.
-- `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
-- A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls.
-- Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
-- `sdl.sensor.devices` now reports `side` for left/right sensors (such as Joy-Con pairs) instead of always `null`.
-- A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
-- Orientation or move events for a display disconnected in the same batch no longer crash the process.
-- Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
-- The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
-- `displayOrient` events with an unknown orientation report `null` instead of an empty string.
-- `sdl.clipboard.text` now throws instead of crashing if SDL fails to allocate the clipboard string.
-- The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.
-- `setSizeInPixels()` error messages now state the correct required multiple instead of its inverse.
-- The `displayMove` event is now emitted instead of throwing "invalid event".
-- The `displayOrient` and `displayMove` events now carry the documented `device` property.
-- The `close` event of joystick, controller, sensor, and audio instances now passes the documented `{ type: 'close' }` event object.
-- `sdl.sensor.openDevice()` no longer throws a `TypeError`, and `sdl.sensor.devices` no longer throws for sensors of unknown type (their `type` is `null`).
-- Many fixes to the TypeScript declarations to match the implementation.
-- Touch events no longer crash event handling.
-- An exception thrown in an event listener no longer permanently stops event delivery.
+
+Touch:
+
+- Touch events no longer crash event handling. Events synthesized from the mouse arrive with a `null` `device`, and events for a device that disconnected before they were polled are dropped.
+- `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it.
+
+Joysticks and controllers:
+
+- Unplugging a device no longer mis-identifies the remaining ones. Device reconciliation used to match devices by list position (or by name for audio), so removing a non-last joystick, controller, or display made cached device objects silently morph into other devices and made `deviceRemove`/`displayRemove` events report the wrong device. Joysticks and controllers are now matched by their stable SDL instance id; displays by name and geometry; audio devices with identical names by their relative order. As a side effect, `sdl.audio.devices` is no longer sorted by name — devices now stay in SDL's enumeration order, like every other device list.
+- `openDevice()` no longer risks opening the wrong physical device when another device's unplugging hasn't been processed yet. SDL compacts device indexes on removal, so opening through a stale index could silently target a different device (whose events would then route to the wrong instance) — joysticks and controllers now flush pending device events, and sensors refetch the device list, before validating and opening.
+- Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
+- Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
+- Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
+- Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion.
+- Controller instances now receive `powerUpdate` events even when the device is not also open as a joystick.
 - The `steamHandleUpdate` event is now emitted correctly instead of a spurious `remap` event.
+- The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
 - `rumbleTriggers()` no longer stops the main rumble motors when its duration elapses, and pending rumble timeouts are cleared on close.
-- Opening the same joystick, controller, or sensor multiple times no longer leaks the SDL handle.
-- Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
-- `move` and `resize` events are no longer delivered twice.
-- Fixed a use-after-free when destroying a window, and memory leaks in `mouse.setCursor()` and in file drop events.
-- Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code.
-- Sensor device objects now remain valid across reads of `sdl.sensor.devices`.
-- `mouseWheel`'s `flipped` property is now a boolean.
-- Smaller fixes: `mouse.getButton()` accepts the correct button range, `setSizeInPixels()` reports the right error, the audio keep-alive duration uses correct units, and rumble durations are validated consistently.
-- The `npm run build` script now honors pre-set `SDL_INC`/`SDL_LIB` environment variables, so it can build against a system or custom SDL.
+- Closing a joystick or controller instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
+- A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
+- Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
+
+Instances (joystick, controller, sensor, and audio):
+
+- Reading state from a closed instance — including on the very read that discovers the device's removal — now throws "instance is closed" for every member (`axes`, `balls`, `buttons`, `hats`, `power`, `steamHandle`, sensor `data`), instead of returning stale state or, for sensors, a raw native error.
+- Closing is now robust against listeners: `closed` reports `true` while the `close` event is being emitted (so a listener that calls `close()` again no longer recurses forever), teardown completes before `close` is emitted (so a throwing listener no longer strands a closed-but-still-registered instance that leaks its handle and crashes the exit-time cleanup), and a device removal closes all of the device's instances and reconciles the device lists even when a listener throws (the first listener error is rethrown afterwards).
+- The `close` event now passes the documented `{ type: 'close' }` event object.
+- Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
+
+Sensors:
+
+- `sdl.sensor.devices` no longer crashes when a sensor disappears while the list is being read (its `name` is `null`), no longer throws for sensors of unknown type (their `type` is `null`), and its device objects now remain valid across reads. `sdl.sensor.openDevice()` no longer throws a `TypeError`.
+- `sdl.sensor.devices` now reports `side` for left/right sensors (such as Joy-Con pairs) instead of always `null`.
+- Reading a sensor instance's `data` now pumps events first, so it returns current readings instead of values up to a second old.
+
+Audio:
+
+- Exiting no longer truncates the last device-buffer's worth of playing audio (up to ~680ms at the maximum `buffered` setting). The exit-drain logic used to stop waiting as soon as the queue emptied, while the device buffer was still sounding, and miscalculated the buffer's duration.
+- Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
+- `enqueue()` and `dequeue()` now accept empty buffers as no-ops, as the README already implied, instead of throwing "invalid numBytes" on the zero-length chunks streaming pipelines naturally produce.
+- `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
+- `audioInstance.queued` no longer reports negative values for queues over 2 GiB.
+- `zeroSampleValue` for the unsigned audio formats now matches SDL's silence value (`128` for `u8`, `32768` for `u16`) instead of being one below it.
+- Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
+- An audio device disappearing while the device list is being enumerated no longer crashes the process. The audio backend's own notification thread can remove a device mid-enumeration; the resulting error used to escape the internal polling loop as an uncaught exception. Devices that vanish mid-query are now skipped, like displays already were.
+
+Clipboard:
+
+- `sdl.clipboard.text` no longer throws when another application empties the clipboard mid-read, throws instead of crashing if SDL fails to allocate the clipboard string, and no longer leaks the SDL-side copy of the text if creating the JS string fails (e.g. clipboard content beyond the JS string size limit).
+
+Validation and errors:
+
+- Passing a non-object (including `null`) as `options` to `createWindow()` or `audio.openDevice()`, or calling `enqueue()`/`dequeue()` without a buffer, now fails with the intended validation error instead of a raw `TypeError`. A non-object `options` used to be silently ignored by `createWindow()`.
+- Passing names of inherited `Object` members (such as `'constructor'` or `'toString'`) as keys, pixel formats, audio formats, cursors, or other enum values now fails validation with the intended error instead of leaking through to the native layer or, in the audio format helpers (on both `sdl.audio` and `@kmamal/sdl/helpers`), silently returning `undefined` or failing with a raw `TypeError`.
+- Integer arguments are now validated to fit in 32 bits everywhere the native layer reads them as such (window positions and sizes, image dimensions and strides, mouse position, rumble durations, player indices, audio frequency, `numBytes`). Larger values used to silently wrap — `setSize(2 ** 32 + 100, 100)` set width 100, `rumble` durations above 2³¹−1 broke the auto-stop timer, and `setPlayer(2 ** 31)` silently behaved like `resetPlayer()`.
+- Enum values this build of the library doesn't know (a joystick or controller type, sensor type, power state, joystick power level, display orientation, display pixel format, touch device type, hat position, or controller axis or button name introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
+- SDL errors are now detected by checking the error message contents instead of comparing `SDL_GetError()` pointers, which silently missed all errors when linked against an SDL build that returns a single static buffer. Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/controller opening, and window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale error text an earlier unrelated call had left behind.
+
+Native resource handling:
+
+- Fixed a use-after-free when destroying a window.
+- Fixed native leaks: opening the same joystick, controller, or sensor multiple times, a failure while opening a joystick or controller, a failure while creating a window (such as renderer creation failing), a failure to create the JS counterpart of a controller mapping string during device enumeration, `mouse.setCursor()`, and file drop events all used to leak the corresponding SDL resource.
+- SDL event types the library doesn't handle (such as controller touchpad events) no longer make a wasted native-to-JS call per event.
+
+Docs, types, and loading:
+
+- Many fixes to the TypeScript declarations to match the implementation. Every event-emitting object is now declared as an `EventEmitter` (so `once()`, `off()`, `removeAllListeners()`, e.t.c. type-check), the `'error'` event is declared, the `sdl.video` pixel-format helpers and the new mouse members are included, and the whole `@kmamal/sdl/helpers` sub-module is covered instead of only its `audio` part.
+- The virtual key `'clear/again'` is now included in the README's virtual-key list. It was the only key value the mapping could produce that the docs omitted.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
 
 ## [v0.11.13] - 2025-08-30
