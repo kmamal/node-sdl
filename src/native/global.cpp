@@ -133,10 +133,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::formats[SDL_PIXELFORMAT_ABGR8888] = "abgr8888";
 	video::formats[SDL_PIXELFORMAT_BGRA8888] = "bgra8888";
 	video::formats[SDL_PIXELFORMAT_ARGB2101010] = "argb2101010";
-	video::formats[SDL_PIXELFORMAT_RGBA32] = "rgba32";
-	video::formats[SDL_PIXELFORMAT_ARGB32] = "argb32";
-	video::formats[SDL_PIXELFORMAT_BGRA32] = "bgra32";
-	video::formats[SDL_PIXELFORMAT_ABGR32] = "abgr32";
 	video::formats[SDL_PIXELFORMAT_YV12] = "yv12";
 	video::formats[SDL_PIXELFORMAT_IYUV] = "iyuv";
 	video::formats[SDL_PIXELFORMAT_YUY2] = "yuy2";

@@ -6,30 +6,34 @@ process.on('exit', (code) => {
 
 	Globals.events.stopPolling()
 
-	// Close all windows
-	for (const window of Globals.windows.all.values()) {
-		window.destroy()
-	}
+	try {
+		// Close all windows
+		for (const window of Globals.windows.all.values()) {
+			window.destroy()
+		}
 
-	// Close all audio instances
-	for (const instance of Globals.audioInstances.values()) {
-		instance.close()
-	}
+		// Close all audio instances
+		for (const instance of Globals.audioInstances.values()) {
+			instance.close()
+		}
 
-	// Close all joysticks
-	for (const joystick of Globals.joystickInstances.all.values()) {
-		joystick.close()
-	}
+		// Close all joysticks
+		for (const joystick of Globals.joystickInstances.all.values()) {
+			joystick.close()
+		}
 
-	// Close all controllers
-	for (const controller of Globals.controllerInstances.all.values()) {
-		controller.close()
-	}
+		// Close all controllers
+		for (const controller of Globals.controllerInstances.all.values()) {
+			controller.close()
+		}
 
-	// Close all sensors
-	for (const sensor of Globals.sensorInstances.all.values()) {
-		sensor.close()
+		// Close all sensors
+		for (const sensor of Globals.sensorInstances.all.values()) {
+			sensor.close()
+		}
 	}
-
-	Bindings.global_cleanup()
+	finally {
+		// SDL must shut down even if a close listener throws
+		Bindings.global_cleanup()
+	}
 })

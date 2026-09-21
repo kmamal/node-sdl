@@ -184,7 +184,7 @@ const mapping = Object.assign(Object.create(null), {
 	'Select': 'select',
 	'Separator': 'separator',
 	'Sleep': 'sleep',
-	'Space': 'space',
+	'Space': ' ',
 	'Stop': 'stop',
 	'SysReq': 'sysReq',
 	'T': 't',

@@ -17,12 +17,20 @@ const video = new class extends EventsViaPoll {
 
 	get displays () {
 		Globals.events.poll()
-		return Globals.displays
+		return [ ...Globals.displays ]
 	}
 
 	get windows () { return [ ...Globals.windows.all.values() ] }
-	get focused () { return Globals.windows.focused }
-	get hovered () { return Globals.windows.hovered }
+
+	get focused () {
+		Globals.events.poll()
+		return Globals.windows.focused
+	}
+
+	get hovered () {
+		Globals.events.poll()
+		return Globals.windows.hovered
+	}
 
 	createWindow (options) { return new Window(options) }
 

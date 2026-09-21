@@ -41,10 +41,12 @@ const audio = new class extends EventsViaPoll {
 	zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue }
 
 	readSample (format, buffer, offset) {
+		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		return getFormatHelpers(format).reader.call(buffer, offset)
 	}
 
 	writeSample (format, buffer, value, offset) {
+		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		return getFormatHelpers(format).writer.call(buffer, value, offset)
 	}
 }()

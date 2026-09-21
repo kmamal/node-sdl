@@ -432,8 +432,8 @@ let polling = false
 const poll = () => {
 	if (polling) { return }
 	polling = true
-	Bindings.events_poll(handleEvent)
-	polling = false
+	try { Bindings.events_poll(handleEvent) }
+	finally { polling = false }
 }
 
 let pollInterval = null

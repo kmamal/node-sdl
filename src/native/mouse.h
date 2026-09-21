@@ -8,7 +8,6 @@ namespace mouse {
 	Napi::Value getButton(const Napi::CallbackInfo &info);
 	Napi::Value getPosition(const Napi::CallbackInfo &info);
 	Napi::Value setPosition(const Napi::CallbackInfo &info);
-	Napi::Value getCursor(const Napi::CallbackInfo &info);
 	Napi::Value setCursor(const Napi::CallbackInfo &info);
 	Napi::Value resetCursor(const Napi::CallbackInfo &info);
 	Napi::Value setCursorImage(const Napi::CallbackInfo &info);

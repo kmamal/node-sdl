@@ -28,10 +28,12 @@ module.exports = {
 		zeroSampleValue (format) { return getAudioFormatHelpers(format).zeroSampleValue },
 
 		readSample (format, buffer, offset) {
+			if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 			return getAudioFormatHelpers(format).reader.call(buffer, offset)
 		},
 
 		writeSample (format, buffer, value, offset) {
+			if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 			return getAudioFormatHelpers(format).writer.call(buffer, value, offset)
 		},
 	},

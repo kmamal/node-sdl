@@ -21,12 +21,14 @@ const controller = new class extends EventsViaPoll {
 			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mapping }) }
 		}
 
-		Bindings.controller_addMappings(mappings)
-		Globals.events.poll()
+		try { Bindings.controller_addMappings(mappings) }
+		finally {
+			Globals.events.poll()
 
-		const devices = Bindings.joystick_getDevices()
-		require('../events/reconcile-joystick-and-controller-devices')
-			.reconcileJoystickAndControllerDevices(devices)
+			const devices = Bindings.joystick_getDevices()
+			require('../events/reconcile-joystick-and-controller-devices')
+				.reconcileJoystickAndControllerDevices(devices)
+		}
 	}
 }()
 

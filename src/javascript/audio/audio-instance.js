@@ -71,10 +71,12 @@ class AudioInstance extends EventsViaPoll {
 	get zeroSampleValue () { return this._zeroSampleValue }
 
 	readSample (buffer, offset) {
+		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		return this._reader.call(buffer, offset)
 	}
 
 	writeSample (buffer, value, offset) {
+		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		return this._writer.call(buffer, value, offset)
 	}
 

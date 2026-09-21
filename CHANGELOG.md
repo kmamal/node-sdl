@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** Touch device `id`s and the `fingerId` on touch events are now `bigint`s. They are 64-bit values in SDL, which a JS `number` can't always represent exactly.
 - **Breaking (Linux):** `window.native.handle` now holds a tagged `{ subsystem, display, window }` struct instead of a bare X11 window id, and the internal payloads passed to `@kmamal/gl`/`@kmamal/gpu` changed the same way. Older versions of those packages can't consume the new payload — upgrade them together with this one.
 - Declared support for Node.js >= 22 in `package.json`, and pinned the native addon to the matching Node-API version 9.
+- **Breaking:** The space key is now reported as `' '`, like every other character-producing key, instead of `'space'`.
 
 ### Added
 
@@ -46,6 +47,7 @@ Windows and events:
 - Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code. For the planar YUV formats the check also accounts for SDL rounding the chroma planes up, so odd dimensions no longer read out of bounds either.
 - `window.setIcon()` and `mouse.setCursorImage()` now reject YUV pixel formats with a clear validation error. SDL cannot create surfaces from them, so they always failed — but with a cryptic native error.
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
+- `sdl.video.focused` and `sdl.video.hovered` now pump events first, like the per-window getters, instead of returning stale values.
 
 Displays:
 
@@ -53,6 +55,8 @@ Displays:
 - Displays are now looked up by their SDL index instead of their position in `sdl.video.displays`, which diverge when a display vanishes mid-enumeration. `displayOrient`/`displayMove` events used to update and report the wrong display, `createWindow()` with the `display` option could open the window on the wrong display, and `window.display` could return the wrong one. `window.display` (and the `display` on `displayChange` events) is now `null` when the window's display has been removed.
 - `createWindow()` now matches the `display` option on both name and position, so it can tell identical monitors apart, and throws if the display is not found instead of silently falling back to the first display.
 - The `displayMove` event is now emitted instead of throwing "invalid event", and both `displayOrient` and `displayMove` events now carry the documented `device` property.
+- `sdl.video.displays` now returns a copy of the display list, so modifying it no longer corrupts the library's internal state.
+- Display modes with a 32-bit RGBA pixel format now report it under its `*8888` name (such as `'argb8888'`) instead of the endianness-dependent `*32` alias (such as `'bgra32'`). The two are the same SDL format, but the `*8888` names were documented as possible values and could never actually appear.
 
 Mouse and keyboard:
 
@@ -81,6 +85,7 @@ Joysticks and controllers:
 - Closing a joystick or controller instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
 - A joystick or controller disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
+- `sdl.controller.addMappings()` now refreshes the device lists even when one of the mappings is invalid, so the devices made available by the mappings before it are reported.
 
 Instances (joystick, controller, sensor, and audio):
 
@@ -88,6 +93,7 @@ Instances (joystick, controller, sensor, and audio):
 - Closing is now robust against listeners: `closed` reports `true` while the `close` event is being emitted (so a listener that calls `close()` again no longer recurses forever), teardown completes before `close` is emitted (so a throwing listener no longer strands a closed-but-still-registered instance that leaks its handle and crashes the exit-time cleanup), and a device removal closes all of the device's instances and reconciles the device lists even when a listener throws (the first listener error is rethrown afterwards).
 - The `close` event now passes the documented `{ type: 'close' }` event object.
 - Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
+- SDL is now shut down on exit even if a `close` listener throws during the exit-time cleanup.
 
 Sensors:
 
@@ -97,11 +103,12 @@ Sensors:
 
 Audio:
 
-- Exiting no longer truncates the last device-buffer's worth of playing audio (up to ~680ms at the maximum `buffered` setting). The exit-drain logic used to stop waiting as soon as the queue emptied, while the device buffer was still sounding, and miscalculated the buffer's duration.
+- The keep-alive timer that lets queued audio finish playing before the process exits now computes the device buffer's duration correctly.
 - Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
 - `enqueue()` and `dequeue()` now accept empty buffers as no-ops, as the README already implied, instead of throwing "invalid numBytes" on the zero-length chunks streaming pipelines naturally produce.
 - `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
 - `audioInstance.queued` no longer reports negative values for queues over 2 GiB.
+- `readSample()` and `writeSample()` now reject non-`Buffer` arguments with a validation error instead of silently operating on array-likes.
 - `zeroSampleValue` for the unsigned audio formats now matches SDL's silence value (`128` for `u8`, `32768` for `u16`) instead of being one below it.
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
 - An audio device disappearing while the device list is being enumerated no longer crashes the process. The audio backend's own notification thread can remove a device mid-enumeration; the resulting error used to escape the internal polling loop as an uncaught exception. Devices that vanish mid-query are now skipped, like displays already were.
