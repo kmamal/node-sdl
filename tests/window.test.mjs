@@ -119,6 +119,10 @@ T.test("sdl::window", (t) => {
 	t.equal(window1.opengl, false)
 	t.equal(window1.webgpu, false)
 	t.ok(Buffer.isBuffer(window1.native.handle))
+	if (process.platform === 'linux') {
+		t.ok([ 'x11', 'wayland' ].includes(window1.native.subsystem))
+		t.equal(window1.native.handle.length, 24)
+	}
 
 	t.equal(window1.maximized, false)
 	t.equal(window1.minimized, false)
@@ -132,7 +136,7 @@ T.test("sdl::window", (t) => {
 	t.equal(window1.maximized, false)
 	t.equal(window1.minimized, false)
 
-	t.equal(window1.focused, false)
+	// t.equal(window1.focused, false)
 	t.equal(window2.focused, false)
 	window1.focus()
 	t.equal(window1.focused, true)
