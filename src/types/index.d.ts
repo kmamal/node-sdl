@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events'
 
 export namespace Events {
 
@@ -471,7 +472,7 @@ export namespace Sdl {
 			readonly orientation: Orientation | null
 		}
 
-		export class Window {
+		export class Window extends EventEmitter {
 			on (event: 'show', listener: (event: Events.Window.Show) => void): this
 			on (event: 'hide', listener: (event: Events.Window.Hide) => void): this
 			on (event: 'expose', listener: (event: Events.Window.Expose) => void): this
@@ -502,6 +503,7 @@ export namespace Sdl {
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this
 			on (event: 'dropComplete', listener: (event: Events.Window.DropComplete) => void): this
 			on (event: '*', listener: (type: string, event: Events.Window.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly id: number
 
@@ -588,12 +590,13 @@ export namespace Sdl {
 			destroyGently (): void
 		}
 
-		interface Module {
+		interface Module extends EventEmitter {
 			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
 			on (event: 'displayMove', listener: (event: Events.Display.Move) => void): this
 			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly displays: Display[]
 
@@ -622,6 +625,11 @@ export namespace Sdl {
 				tooltip?: boolean
 				utility?: boolean
 			}): Window
+
+			bytesPerPixel (format: Format): number
+			isYuv (format: Format): boolean
+			isPlanarYuv (format: Format): boolean
+			minBufferSize (format: Format, stride: number, height: number): number
 		}
 	}
 
@@ -875,11 +883,12 @@ export namespace Sdl {
 
 		export type Key = string
 
-		interface Module {
+		interface Module extends EventEmitter {
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
 
 			on (event: 'keymapChange', listener: (event: Events.Keyboard.KeymapChange) => void): this
 			on (event: '*', listener: (type: string, event: Events.Keyboard.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			getKey (scancode: Scancode): Key | null
 			getScancode (key: Key): Scancode | null
@@ -931,11 +940,13 @@ export namespace Sdl {
 			hideCursor (): void
 			redrawCursor (): void
 
+			readonly captured: boolean
 			capture (capture?: boolean): void
 			uncapture (): void
 
 			readonly relativeMode: boolean
-			setRelativeMode (relative: boolean): void
+			setRelativeMode (relative?: boolean): void
+			unsetRelativeMode (): void
 		}
 
 	}
@@ -967,8 +978,7 @@ export namespace Sdl {
 		}
 
 		export type JoystickType
-			= null
-			| 'gamecontroller'
+			= 'gamecontroller'
 			| 'wheel'
 			| 'arcadestick'
 			| 'flightstick'
@@ -1009,7 +1019,7 @@ export namespace Sdl {
 			readonly player: number | null
 		}
 
-		export class JoystickInstance {
+		export class JoystickInstance extends EventEmitter {
 			on (event: 'axisMotion', listener: (event: Events.Joystick.AxisMotion) => void): this
 			on (event: 'ballMotion', listener: (event: Events.Joystick.BallMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
@@ -1018,6 +1028,7 @@ export namespace Sdl {
 			on (event: 'powerUpdate', listener: (event: Events.Joystick.PowerUpdate) => void): this
 			on (event: 'close', listener: (event: Events.Joystick.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Joystick.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number | null
@@ -1048,10 +1059,11 @@ export namespace Sdl {
 			close (): void
 		}
 
-		interface Module {
+		interface Module extends EventEmitter {
 			on (event: 'deviceAdd', listener: (event: Events.JoystickDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.JoystickDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.JoystickDevice.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly devices: Device[]
 
@@ -1063,8 +1075,7 @@ export namespace Sdl {
 	export namespace Controller {
 
 		export type ControllerType
-			= null
-			| 'xbox360'
+			= 'xbox360'
 			| 'xboxOne'
 			| 'ps3'
 			| 'ps4'
@@ -1120,7 +1131,7 @@ export namespace Sdl {
 			readonly mapping: string | null
 		}
 
-		export class ControllerInstance {
+		export class ControllerInstance extends EventEmitter {
 			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
@@ -1129,6 +1140,7 @@ export namespace Sdl {
 			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
 			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Controller.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly device: Device
 			readonly firmwareVersion: number | null
@@ -1186,10 +1198,11 @@ export namespace Sdl {
 			close (): void
 		}
 
-		interface Module {
+		interface Module extends EventEmitter {
 			on (event: 'deviceAdd', listener: (event: Events.ControllerDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.ControllerDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.ControllerDevice.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			addMappings (mappings: string[]): void
 
@@ -1224,10 +1237,11 @@ export namespace Sdl {
 			readonly z: number
 		}
 
-		export class SensorInstance {
+		export class SensorInstance extends EventEmitter {
 			on (event: 'update', listener: (event: Events.Sensor.Update) => void): this
 			on (event: 'close', listener: (event: Events.Sensor.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Sensor.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly device: Device
 
@@ -1282,9 +1296,10 @@ export namespace Sdl {
 			readonly type: "recording"
 		}
 
-		export class AudioInstance {
+		export class AudioInstance extends EventEmitter {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly id: number
 			readonly device: Device
@@ -1328,10 +1343,11 @@ export namespace Sdl {
 			readonly buffered?: number
 		}
 
-		interface Module {
+		interface Module extends EventEmitter {
 			on (event: 'deviceAdd', listener: (event: Events.AudioDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.AudioDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.AudioDevice.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly devices: Array<PlaybackDevice | RecordingDevice>
 
@@ -1349,9 +1365,10 @@ export namespace Sdl {
 
 	export namespace Clipboard {
 
-		interface Module {
+		interface Module extends EventEmitter {
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
 			on (event: '*', listener: (type: string, event: Events.Clipboard.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly text: string
 			setText (text: string): void

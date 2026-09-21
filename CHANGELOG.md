@@ -16,12 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Native window handles under the Wayland video driver (`SDL_VIDEODRIVER=wayland`). `window.native` now carries valid Wayland objects instead of garbage reinterpreted as X11 handles, and a new `window.native.subsystem` field (`'x11'` or `'wayland'`, Linux only) says which kind you're holding. Any other Linux video driver now yields `handle: null` and a clear error for `opengl`/`webgpu` windows.
-- Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()` and `sdl.mouse.relativeMode`.
+- Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()`, `sdl.mouse.unsetRelativeMode()`, and `sdl.mouse.relativeMode`.
+- `sdl.mouse.captured`, reporting whether `sdl.mouse.capture()` is currently in effect.
+- Pixel-format helpers `sdl.video.bytesPerPixel()`, `sdl.video.isYuv()`, `sdl.video.isPlanarYuv()`, and `sdl.video.minBufferSize()`, mirroring the existing audio sample-format helpers.
+- `@kmamal/sdl/helpers` now also exposes the pixel-format helpers and the `keyboard.SCANCODE`, `mouse.BUTTON`, and `sensor.STANDARD_GRAVITY` constants, under the same paths as in the main module.
 - `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
 - Prebuilt binaries for Windows on arm64.
 
 ### Fixed
 
+- The TypeScript declarations now describe every event-emitting object as an `EventEmitter` (so `once()`, `off()`, `removeAllListeners()`, e.t.c. type-check), declare the `'error'` event, include the `sdl.video` pixel-format helpers and the new mouse members, and cover the whole `@kmamal/sdl/helpers` sub-module instead of only its `audio` part.
 - Pausing and resuming playback around the moment the queue empties no longer lets the process exit before the device buffer's tail has finished sounding. The exit-drain deadline now shifts forward by the time spent paused.
 - Closing a joystick or controller instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
 - Reading `sdl.clipboard.text` no longer leaks the SDL-side copy of the text if creating the JS string fails (e.g. clipboard content beyond the JS string size limit).

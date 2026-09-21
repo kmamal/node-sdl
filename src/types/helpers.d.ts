@@ -1,27 +1,48 @@
 
+import type { Sdl } from './index'
+
 export namespace SdlHelpers {
+
+	export namespace Video {
+
+		export type Format = Sdl.Video.Format
+
+		interface Module {
+			bytesPerPixel (format: Format): number
+			isYuv (format: Format): boolean
+			isPlanarYuv (format: Format): boolean
+			minBufferSize (format: Format, stride: number, height: number): number
+		}
+
+	}
+
+	export namespace Keyboard {
+
+		interface Module {
+			readonly SCANCODE: { [name in Sdl.Keyboard.ScancodeNames]: Sdl.Keyboard.Scancode }
+		}
+
+	}
+
+	export namespace Mouse {
+
+		interface Module {
+			readonly BUTTON: { [name in Sdl.Mouse.ButtonNames]: Sdl.Mouse.Button }
+		}
+
+	}
+
+	export namespace Sensor {
+
+		interface Module {
+			readonly STANDARD_GRAVITY: 9.80665
+		}
+
+	}
 
 	export namespace Audio {
 
-		export type Format
-			= 's8'
-			| 'u8'
-			| 's16lsb'
-			| 's16msb'
-			| 's16sys'
-			| 's16'
-			| 'u16lsb'
-			| 'u16msb'
-			| 'u16sys'
-			| 'u16'
-			| 's32lsb'
-			| 's32msb'
-			| 's32sys'
-			| 's32'
-			| 'f32lsb'
-			| 'f32msb'
-			| 'f32sys'
-			| 'f32'
+		export type Format = Sdl.Audio.Format
 
 		interface Module {
 			bytesPerSample (format: Format): number
@@ -36,4 +57,8 @@ export namespace SdlHelpers {
 
 }
 
+export const video: SdlHelpers.Video.Module
+export const keyboard: SdlHelpers.Keyboard.Module
+export const mouse: SdlHelpers.Mouse.Module
+export const sensor: SdlHelpers.Sensor.Module
 export const audio: SdlHelpers.Audio.Module

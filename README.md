@@ -23,9 +23,9 @@ Also allows using Canvas2D, WebGL, and WebGPU without a browser, through these l
 - __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). This is a fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) that I've modified to render directly to SDL windows.
 - __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). This is a fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) that I've modified to render directly to SDL windows.
 
-Officially supports Linux (x64, arm64), Mac (x64, arm64), and Windows (x64, arm64).
+Officially supports Linux (X11 & Wayland), Mac, and Windows.
 Should theoretically work on any system supported by both SDL and Node.js, but I haven't tried any others.
-Prebuilt binaries are available for the supported architectures.
+Prebuilt binaries are available for x64 & arm architectures, on all supported platforms.
 
 ## Installation
 

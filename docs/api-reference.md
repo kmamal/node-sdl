@@ -4,6 +4,7 @@
 
 - [sdl](#sdl)
   - [sdl.info](#sdlinfo)
+  - [Event emitters](#event-emitters)
 - [sdl.video](#sdlvideo)
   - [Image data](#image-data)
   - [High-DPI](#high-dpi)
@@ -12,6 +13,10 @@
   - [Event: 'displayRemove'](#event-displayremove)
   - [Event: 'displayOrient'](#event-displayorient)
   - [Event: 'displayMove'](#event-displaymove)
+  - [sdl.video.bytesPerPixel(format)](#sdlvideobytesperpixelformat)
+  - [sdl.video.isYuv(format)](#sdlvideoisyuvformat)
+  - [sdl.video.isPlanarYuv(format)](#sdlvideoisplanaryuvformat)
+  - [sdl.video.minBufferSize(format, stride, height)](#sdlvideominbuffersizeformat-stride-height)
   - [sdl.video.displays](#sdlvideodisplays)
   - [sdl.video.windows](#sdlvideowindows)
   - [sdl.video.focused](#sdlvideofocused)
@@ -114,10 +119,12 @@
   - [sdl.mouse.showCursor([show])](#sdlmouseshowcursorshow)
   - [sdl.mouse.hideCursor()](#sdlmousehidecursor)
   - [sdl.mouse.redrawCursor()](#sdlmouseredrawcursor)
+  - [sdl.mouse.captured](#sdlmousecaptured)
   - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   - [sdl.mouse.uncapture()](#sdlmouseuncapture)
   - [sdl.mouse.relativeMode](#sdlmouserelativemode)
-  - [sdl.mouse.setRelativeMode(relative)](#sdlmousesetrelativemoderelative)
+  - [sdl.mouse.setRelativeMode([relative])](#sdlmousesetrelativemoderelative)
+  - [sdl.mouse.unsetRelativeMode()](#sdlmouseunsetrelativemode)
 - [sdl.touch](#sdltouch)
   - [sdl.touch.devices](#sdltouchdevices)
 - [sdl.joystick](#sdljoystick)
@@ -312,6 +319,22 @@ Sample data for Ubuntu:
 }
 ```
 
+### Event Emitters
+
+Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.controller`, `sdl.audio`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, e.t.c. all work.
+Only the event names listed in this document are valid for each object.
+Attaching a listener for any other event name throws.
+
+Every emitter additionally supports the special `'*'` event.
+Listeners registered for `'*'` receive every event the object emits, with the event's name as an extra first argument:
+
+```js
+window.on('*', (type, event) => { console.log(type, event) })
+```
+
+If one of your listeners throws, the exception is caught and re-emitted as an `'error'` event on the same object.
+As with any `EventEmitter`, if there is no `'error'` listener the exception is rethrown, usually ending up as an uncaught exception.
+
 ## sdl.video
 
 ### Image data
@@ -329,6 +352,8 @@ All three of these functions accept the image as a series of arguments:
 - `stride: <number>` How many bytes each row of the image takes up in the buffer. Usually equal to `width * bytesPerPixel`, but may be larger if the rows of the buffer are padded to always be some multiple of bytes.
 - `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
 - `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
+
+The `stride` must be at least `width * `[`sdl.video.bytesPerPixel(format)`](#sdlvideobytesperpixelformat), and the `buffer` must be at least [`sdl.video.minBufferSize(format, stride, height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, otherwise the call throws.
 
 So, for example, to fill the window with a red+green gradient you could do:
 
@@ -429,6 +454,49 @@ Fired when a display changes orientation.
 
 Fired when a display changes position.
 
+### sdl.video.bytesPerPixel(format)
+
+- `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
+- Returns: `<number>` The number of bytes.
+
+Helper function which maps each pixel format to the number of bytes each of its pixels takes up.
+For planar YUV formats this refers to the Y plane, so it is `1`.
+
+This function is also available from `@kmamal/sdl/helpers`.
+
+### sdl.video.isYuv(format)
+
+- `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
+- Returns: `<boolean>` Is `true` if the format is one of the YUV formats.
+
+Helper function which tells RGB formats apart from YUV ones.
+Only RGB formats can be used with [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer) and [`sdl.mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y).
+
+This function is also available from `@kmamal/sdl/helpers`.
+
+### sdl.video.isPlanarYuv(format)
+
+- `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
+- Returns: `<boolean>` Is `true` if the format is a planar YUV format.
+
+Helper function which tells planar YUV formats (where the Y, U, and V components are stored in separate planes) apart from all others.
+
+This function is also available from `@kmamal/sdl/helpers`.
+
+### sdl.video.minBufferSize(format, stride, height)
+
+- `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
+- `stride: <number>` How many bytes each row of the image takes up.
+- `height: <number>` The height of the image in pixels.
+- Returns: `<number>` The minimum number of bytes.
+
+Helper function which computes the smallest buffer that can hold an image with the given format, stride, and height.
+For most formats this is just `stride * height`.
+For planar YUV formats it also accounts for the chroma planes.
+The functions that accept [image data](#image-data) throw if the buffer they are given is smaller than this.
+
+This function is also available from `@kmamal/sdl/helpers`.
+
 ### sdl.video.displays
 
 - `<object>[]`
@@ -468,6 +536,7 @@ Notice how the geometries don't overlap:
     geometry: { x: 0, y: 0, width: 1920, height: 1080 },
     usable: { x: 0, y: 27, width: 1920, height: 1053 },
     dpi: { horizontal: 141.76, vertical: 142.13, diagonal: 141.85 },
+    orientation: 'landscape',
   },
   {
     name: '1',
@@ -476,6 +545,7 @@ Notice how the geometries don't overlap:
     geometry: { x: 1920, y: 0, width: 1920, height: 1080 },
     usable: { x: 1920, y: 27, width: 1920, height: 1053 },
     dpi: { horizontal: 141.76, vertical: 142.13, diagonal: 141.85 },
+    orientation: 'landscape',
   },
 ]
 ```
@@ -821,6 +891,7 @@ Changes the size of the window.
 
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
+On such displays, `pixelWidth` and `pixelHeight` must be multiples of the window's pixel-to-point ratio (`pixelWidth / width`), otherwise the call throws.
 
 ### window.display
 
@@ -870,6 +941,7 @@ A resizable window can be resized by dragging its borders.
 - `resizable: <boolean>` The new value of the property.
 
 Changes the window's resizable property.
+Throws if the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
 
 ### window.borderless
 
@@ -883,6 +955,7 @@ A borderless window has no borders or title bar.
 - `borderless: <boolean>` The new value of the property.
 
 Changes the window's borderless property.
+Throws if the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
 
 ### window.alwaysOnTop
 
@@ -1066,6 +1139,7 @@ Calls to `render()` will fail.
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display as the icon of the window.
 
 Set's the window's icon, usually displayed in the title bar and the taskbar.
+Only RGB [pixel formats](#pixel-formats) are accepted; YUV formats throw.
 
 ### window.flash([untilFocused])
 
@@ -1134,6 +1208,8 @@ All others are represented by one of these values:
 Used to represent physical keys on the keyboard.
 The same key will always produce the same scancode.
 Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
+
+This enum is also available from `@kmamal/sdl/helpers`.
 
 <details>
 
@@ -1399,6 +1475,7 @@ You should assume that any previous results you have gotten from [`getKey()`](#s
 
 Maps a scancode to the corresponding key based on the current keyboard mapping.
 Retuns `null` if the scancode does not currespond to a key in the current mapping.
+Throws if `scancode` is not an integer from `0` to `511`.
 
 ### sdl.keyboard.getScancode(key)
 
@@ -1408,6 +1485,7 @@ Retuns `null` if the scancode does not currespond to a key in the current mappin
 Maps a key to the corresponding scancode based on the current keyboard mapping.
 Retuns `null` if the key does not currespond to a scancode in the current mapping.
 If multiple physical keys produce the same virtual key, then only the first one is returned.
+Throws if `key` is not a valid [`Key`](#virtual-keys).
 
 ### sdl.keyboard.getState()
 
@@ -1422,6 +1500,8 @@ Each value in the array is either `true` if the corresponding key is pressed, or
 
 Used to represent the buttons on a mouse.
 A mouse can have many buttons, but the values for the three most common ones are represented in this enum.
+
+This enum is also available from `@kmamal/sdl/helpers`.
 
 | Value                     | Corresponding `SDL_BUTTON_*` |
 | ---                       | ---                          |
@@ -1485,7 +1565,8 @@ Switched back to the default cursor.
 - `y: <number>` The y position of the cursor image's hotspot.
 
 Sets a image to be the mouse cursor.
-The hotspot represents the pixel that is considered to be under the mouse.
+The hotspot represents the pixel that is considered to be under the mouse, so `x` must be from `0` to `width - 1` and `y` from `0` to `height - 1`.
+Only RGB [pixel formats](#pixel-formats) are accepted; YUV formats throw.
 
 ### sdl.mouse.showCursor([show])
 
@@ -1500,6 +1581,12 @@ Equivalent to [`sdl.mouse.showCursor(false)`](#sdlmouseshowcursorshow).
 ### sdl.mouse.redrawCursor()
 
 Forces a cursor redraw.
+
+### sdl.mouse.captured
+
+- `<boolean>`
+
+Is `true` if the mouse is currently captured.
 
 ### sdl.mouse.capture([capture])
 
@@ -1519,15 +1606,19 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 Is `true` if the mouse is in relative mode.
 
-### sdl.mouse.setRelativeMode(relative)
+### sdl.mouse.setRelativeMode([relative])
 
-- `relative: <boolean>` The new value of the property.
+- `relative: <boolean>` The new value of the property. Default: `true`
 
 Enables or disables relative mouse mode.
 In relative mode the cursor is hidden, locked inside the focused window, and the mouse reports movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
 Use this for FPS-style camera controls.
 The `x` and `y` positions reported by mouse events are not meaningful while in relative mode.
 This function may fail on platforms that don't support raw mouse input.
+
+### sdl.mouse.unsetRelativeMode()
+
+Equivalent to [`sdl.mouse.setRelativeMode(false)`](#sdlmousesetrelativemoderelative).
 
 ## sdl.touch
 
@@ -1708,7 +1799,7 @@ Fired when one of the joystick's hats is moved.
 
 - `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
 
-Fired when the joystick's [power level](#controllerinstancepower) changes.
+Fired when the joystick's [power level](#joystickinstancepower) changes.
 
 <a id="joystick-instance-event-close"></a>
 
@@ -1990,7 +2081,7 @@ Fired when one of the controller's buttons is released.
 
 - `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
 
-Fired when the controller's [power level](#controllerinstancepowerlevel) changes.
+Fired when the controller's [power level](#controllerinstancepower) changes.
 
 ### Event: 'steamHandleUpdate'
 
@@ -2079,7 +2170,7 @@ Each value in the object is either `true` if the corresponding button is pressed
 
 - [`<PowerLevel>`](#power-levels)`|<null>`
 
-The current power level of the joystick device, or `null` if it is unknown.
+The current power level of the controller device, or `null` if it is unknown.
 
 ### controllerInstance.setPlayer(index)
 
@@ -2165,6 +2256,8 @@ Closes the instance.
 Accelerometers are affected by the force of gravity:
 even if the device is completely at rest, it will still indicata an acceleration with a magnitude of [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity) away from the center of the earth.
 Use the `sdl.sensor.STANDARD_GRAVITY` constant to correct for gravitational acceleration if your application requires it.
+
+This constant is also available from `@kmamal/sdl/helpers`.
 
 ### sdl.sensor.devices
 
@@ -2677,10 +2770,18 @@ One thing is missing: While the core of the library is not needed, it's nice to 
 
 Since these are just helpers and don't call any SLD code underneath it's safe to use them.
 They are made available through the `@kmamal/sdl/helpers` sub-module that does not load any of the native code.
-For an example of their use see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/12-audio-thread/audio-worker.js).
+For an example of their use see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/16-audio-thread/audio-worker.js).
 
-The functions included in `@kmamal/sdl/helpers` are:
+The members of `@kmamal/sdl/helpers` live under the same paths as in the main module (so `sdl.audio.readSample` becomes `require('@kmamal/sdl/helpers').audio.readSample`).
+They are:
 
+- [`sdl.video.bytesPerPixel`](#sdlvideobytesperpixelformat)
+- [`sdl.video.isYuv`](#sdlvideoisyuvformat)
+- [`sdl.video.isPlanarYuv`](#sdlvideoisplanaryuvformat)
+- [`sdl.video.minBufferSize`](#sdlvideominbuffersizeformat-stride-height)
+- [`sdl.keyboard.SCANCODE`](#enum-scancode)
+- [`sdl.mouse.BUTTON`](#enum-button)
+- [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity)
 - [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
 - [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
 - [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)

@@ -13,12 +13,12 @@ module.exports = {
 		},
 	},
 	keyboard: {
-		get SCANCODES () { return Enums.scancodes },
+		get SCANCODE () { return Enums.scancodes },
 	},
 	mouse: {
 		get BUTTON () { return Enums.mouseButtons },
 	},
-	sensors: {
+	sensor: {
 		STANDARD_GRAVITY: 9.80665,
 	},
 	audio: {
