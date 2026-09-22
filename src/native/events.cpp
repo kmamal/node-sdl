@@ -373,8 +373,8 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::BALL_MOTION);
 			packed.Set("joystickId", event.jball.which);
 			packed.Set("ball", event.jball.ball);
-			packed.Set("x", event.jball.xrel);
-			packed.Set("y", event.jball.yrel);
+			packed.Set("dx", event.jball.xrel);
+			packed.Set("dy", event.jball.yrel);
 			break;
 		}
 		case SDL_JOYBUTTONDOWN:

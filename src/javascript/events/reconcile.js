@@ -56,6 +56,11 @@ const reconcileDevices = (
 		try { emitter.emit(type, event) }
 		catch (error) { emitter.emit('error', error) }
 	}
+
+	return {
+		added: unmatchedCurr,
+		removed: unmatchedMain,
+	}
 }
 
 module.exports = { reconcileDevices }

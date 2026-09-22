@@ -175,6 +175,9 @@ class Window extends EventsViaPoll {
 					y: this._y,
 					type: 'move',
 				})
+			}
+			catch (error) { this.emit('error', error) }
+			try {
 				this.emit('resize', {
 					width: this._width,
 					height: this._height,
@@ -182,6 +185,9 @@ class Window extends EventsViaPoll {
 					pixelHeight: this._pixelHeight,
 					type: 'resize',
 				})
+			}
+			catch (error) { this.emit('error', error) }
+			try {
 				this.emit('expose', {
 					type: 'expose',
 				})
@@ -612,11 +618,11 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.delete(this._id)
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
-
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
+
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
 	}
 
 	destroyGently () {

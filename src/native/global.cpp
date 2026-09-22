@@ -163,7 +163,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	joystick::power_levels[SDL_JOYSTICK_POWER_MEDIUM] = "medium";
 	joystick::power_levels[SDL_JOYSTICK_POWER_FULL] = "full";
 	joystick::power_levels[SDL_JOYSTICK_POWER_WIRED] = "wired";
-	joystick::power_levels[SDL_JOYSTICK_POWER_MAX] = "max";
 
 	joystick::hat_positions[SDL_HAT_CENTERED] = "centered";
 	joystick::hat_positions[SDL_HAT_UP] = "up";
@@ -216,6 +215,8 @@ global::initialize(const Napi::CallbackInfo &info)
 	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE2] = "paddle2";
 	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE3] = "paddle3";
 	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE4] = "paddle4";
+	controller::buttons[SDL_CONTROLLER_BUTTON_MISC1] = "misc1";
+	controller::buttons[SDL_CONTROLLER_BUTTON_TOUCHPAD] = "touchpad";
 
 	// sensor::types[SDL_SENSOR_UNKNOWN] = nullptr;
 	sensor::types[SDL_SENSOR_ACCEL] = "accelerometer";
@@ -246,6 +247,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	Napi::Object initialized = Napi::Object::New(env);
 
 	SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
+	SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "0");
 
 	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0) {
 		std::ostringstream message;

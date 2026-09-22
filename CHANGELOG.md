@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking (Linux):** `window.native.handle` now holds a tagged `{ subsystem, display, window }` struct instead of a bare X11 window id, and the internal payloads passed to `@kmamal/gl`/`@kmamal/gpu` changed the same way. Older versions of those packages can't consume the new payload — upgrade them together with this one.
 - Declared support for Node.js >= 22 in `package.json`, and pinned the native addon to the matching Node-API version 9.
 - **Breaking:** The space key is now reported as `' '`, like every other character-producing key, instead of `'space'`.
+- **Breaking:** Joystick axes are now normalized relative to the axis's true center, like controller axes, instead of relative to whatever value the axis had when the device was opened. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
+- **Breaking:** `rumble()` and `rumbleTriggers()` now reject durations above `65535` ms, the maximum SDL supports. Longer durations used to be silently clamped by SDL while the process was still kept alive for the full requested time.
+- The `'max'` joystick power level was removed from the docs and types. It is SDL's count sentinel and can never actually be reported.
 
 ### Added
 
@@ -20,10 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Relative mouse mode for FPS-style camera controls, via `sdl.mouse.setRelativeMode()`, `sdl.mouse.unsetRelativeMode()`, and `sdl.mouse.relativeMode`.
 - `sdl.mouse.captured`, reporting whether `sdl.mouse.capture()` is currently in effect.
 - `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
+- `ballMotion` events now report the ball's relative movement through `dx` and `dy`, alongside the accumulated `x` and `y` position.
 - Pixel-format helpers `sdl.video.bytesPerPixel()`, `sdl.video.isYuv()`, `sdl.video.isPlanarYuv()`, and `sdl.video.minBufferSize()`, mirroring the existing audio sample-format helpers.
 - `@kmamal/sdl/helpers` now also exposes the pixel-format helpers and the `keyboard.SCANCODE`, `mouse.BUTTON`, and `sensor.STANDARD_GRAVITY` constants, under the same paths as in the main module.
 - Prebuilt binaries for Windows on arm64.
 - The `npm run build` script honors pre-set `SDL_INC`/`SDL_LIB` environment variables, so it can build against a system or custom SDL.
+- Controller buttons `misc1` (the Xbox Series X share button, PS5 microphone button, Switch Pro capture button, or Luna microphone button) and `touchpad` (PS4/PS5 touchpad click). They used to arrive as `buttonDown`/`buttonUp` events with `button: null` and pollute `controllerInstance.buttons` with a `null` key.
+- Scancodes `SOFTLEFT`, `SOFTRIGHT`, `CALL`, and `ENDCALL`, and the corresponding `'softLeft'`, `'softRight'`, `'call'`, and `'endCall'` keys.
 
 ### Fixed
 
@@ -37,6 +43,8 @@ Windows and events:
 - Removing all of a window's listeners (whether via `removeAllListeners()` or one `removeListener()` at a time) no longer breaks event polling, no longer lets the process exit while the window is still open, and no longer turns `window.destroy()` into a silent no-op. It used to also remove the internal keep-alive listener.
 - Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
 - `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
+- A `close` listener that throws (with no `error` listener to catch it) no longer leaves the destroyed window's or closed instance's listeners registered, which kept event polling engaged and the process alive forever.
+- Closing the last window via its close button no longer fires `beforeClose` twice. SDL used to follow the window's close event with a quit event, and the quit handling asked the same window to close again, so a listener that called `prevent()` was bypassed on the second round.
 - Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
 - The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.
 - `window.setSizeInPixels()` now reports the actual resulting pixel size instead of assuming the requested one was applied, and its error messages state the correct required multiple instead of its inverse.
@@ -76,8 +84,9 @@ Joysticks and controllers:
 - `openDevice()` no longer risks opening the wrong physical device when another device's unplugging hasn't been processed yet. SDL compacts device indexes on removal, so opening through a stale index could silently target a different device (whose events would then route to the wrong instance) — joysticks and controllers now flush pending device events, and sensors refetch the device list, before validating and opening.
 - Closing a joystick or controller instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
 - Controller trigger axes now correctly report `0` when released instead of `0.5`, and inverted or half-axis mappings are no longer mis-scaled.
-- Joystick axes that rest at their maximum value (such as pedals) no longer report `NaN`.
-- Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion.
+- Trackball state and `ballMotion` events now report accumulated positions as documented, instead of the latest relative motion. Positions start at `0` when the instance is opened, instead of at whatever relative motion SDL happened to have accumulated since its last poll.
+- `sdl.joystick.devices` and `sdl.controller.devices` now return a copy of the device list, like `sdl.video.displays`, so modifying it no longer corrupts the library's internal state.
+- `rumble(0, 0)` and `rumbleTriggers(0, 0)` no longer schedule a keep-alive timer, so they no longer delay process exit while nothing is rumbling. `stopRumble()` and `stopRumbleTriggers()` are now truly equivalent to them, as documented.
 - Controller instances now receive `powerUpdate` events even when the device is not also open as a joystick.
 - The `steamHandleUpdate` event is now emitted correctly instead of a spurious `remap` event.
 - The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
@@ -90,7 +99,7 @@ Joysticks and controllers:
 Instances (joystick, controller, sensor, and audio):
 
 - Reading state from a closed instance — including on the very read that discovers the device's removal — now throws "instance is closed" for every member (`axes`, `balls`, `buttons`, `hats`, `power`, `steamHandle`, sensor `data`), instead of returning stale state or, for sensors, a raw native error.
-- Closing is now robust against listeners: `closed` reports `true` while the `close` event is being emitted (so a listener that calls `close()` again no longer recurses forever), teardown completes before `close` is emitted (so a throwing listener no longer strands a closed-but-still-registered instance that leaks its handle and crashes the exit-time cleanup), and a device removal closes all of the device's instances and reconciles the device lists even when a listener throws (the first listener error is rethrown afterwards).
+- Closing is now robust against listeners: `closed` reports `true` while the `close` event is being emitted (so a listener that calls `close()` again no longer recurses forever), teardown completes before `close` is emitted (so a throwing listener no longer strands a closed-but-still-registered instance that leaks its handle and crashes the exit-time cleanup), and a device removal closes all of the device's instances and reconciles the device lists even when a listener throws.
 - The `close` event now passes the documented `{ type: 'close' }` event object.
 - Sensor instances left open on exit are now closed (and emit `close`) like all other instance types.
 - SDL is now shut down on exit even if a `close` listener throws during the exit-time cleanup.
@@ -105,12 +114,14 @@ Audio:
 
 - The keep-alive timer that lets queued audio finish playing before the process exits now computes the device buffer's duration correctly.
 - Closing or pausing a playback instance while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
+- The exit-time check for queued audio no longer throws when the device of a playing instance was unplugged just before the process would exit.
 - `enqueue()` and `dequeue()` now accept empty buffers as no-ops, as the README already implied, instead of throwing "invalid numBytes" on the zero-length chunks streaming pipelines naturally produce.
 - `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
 - `audioInstance.queued` no longer reports negative values for queues over 2 GiB.
 - `readSample()` and `writeSample()` now reject non-`Buffer` arguments with a validation error instead of silently operating on array-likes.
 - `zeroSampleValue` for the unsigned audio formats now matches SDL's silence value (`128` for `u8`, `32768` for `u16`) instead of being one below it.
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
+- Unplugging an audio device now closes every instance opened from it, as documented, instead of only the first one SDL reports, and the device list is reconciled even when a `close` listener throws.
 - An audio device disappearing while the device list is being enumerated no longer crashes the process. The audio backend's own notification thread can remove a device mid-enumeration; the resulting error used to escape the internal polling loop as an uncaught exception. Devices that vanish mid-query are now skipped, like displays already were.
 
 Clipboard:
@@ -135,6 +146,9 @@ Docs, types, and loading:
 
 - Many fixes to the TypeScript declarations to match the implementation. Every event-emitting object is now declared as an `EventEmitter` (so `once()`, `off()`, `removeAllListeners()`, e.t.c. type-check), the `'error'` event is declared, the `sdl.video` pixel-format helpers and the new mouse members are included, and the whole `@kmamal/sdl/helpers` sub-module is covered instead of only its `audio` part.
 - The virtual key `'clear/again'` is now included in the README's virtual-key list. It was the only key value the mapping could produce that the docs omitted.
+- `window.native.subsystem` is now `null` on Windows and macOS instead of absent, and is no longer optional in the types.
+- Type fixes: `createWindow()`'s `x` and `y` options accept `null`, and the `orientation` on `displayOrient` events is nullable, both matching the implementation and docs.
+- The docs now state the constraints the API enforces on rumble `duration`, audio `frequency`, and the `bytes` argument of `enqueue()`/`dequeue()`.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
 
 ## [v0.11.13] - 2025-08-30

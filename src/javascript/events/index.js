@@ -209,9 +209,6 @@ const handleEvent = (event) => {
 		} break
 
 		case 'joystickDevice': {
-			// The removal handling must finish even if a close listener throws
-			let closeError = null
-
 			if (type === 'deviceRemove') {
 				const { joystickId } = event
 				delete event.joystickId
@@ -221,7 +218,7 @@ const handleEvent = (event) => {
 					if (!collection) { break closeJoysticks }
 					for (const joystickInstance of collection.values()) {
 						try { joystickInstance.close() }
-						catch (error) { closeError ??= error }
+						catch (_) {}
 					}
 				}
 
@@ -230,7 +227,7 @@ const handleEvent = (event) => {
 					if (!collection) { break closeControllers }
 					for (const controllerInstance of collection.values()) {
 						try { controllerInstance.close() }
-						catch (error) { closeError ??= error }
+						catch (_) {}
 					}
 				}
 			}
@@ -239,8 +236,6 @@ const handleEvent = (event) => {
 			delete event.devices
 
 			reconcileJoystickAndControllerDevices(devices)
-
-			if (closeError) { throw closeError }
 		} break
 
 		case 'joystick': {
@@ -282,13 +277,10 @@ const handleEvent = (event) => {
 				} break
 
 				case 'ballMotion': {
-					// SDL reports relative motion for these
-					const dx = event.x
-					const dy = event.y
 					for (const joystickInstance of collection) {
 						const ball = joystickInstance._balls[event.ball]
-						ball.x += dx
-						ball.y += dy
+						ball.x += event.dx
+						ball.y += event.dy
 						event.x = ball.x
 						event.y = ball.y
 						try { joystickInstance.emit(type, event) }
@@ -408,13 +400,22 @@ const handleEvent = (event) => {
 				delete event.audioId
 
 				const audioInstance = Globals.audioInstances.get(audioId)
-				if (audioInstance) { audioInstance.close() }
+				if (audioInstance) {
+					try { audioInstance.close() }
+					catch (_) {}
+				}
 			}
 
 			const { devices } = event
 			delete event.devices
 
-			reconcileAudioDevices(devices, audioDeviceType)
+			const { removed } = reconcileAudioDevices(devices, audioDeviceType)
+			for (const audioInstance of [ ...Globals.audioInstances.values() ]) {
+				if (removed.includes(audioInstance.device)) {
+					try { audioInstance.close() }
+					catch (_) {}
+				}
+			}
 		} break
 
 		case 'clipboard': {

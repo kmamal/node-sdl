@@ -10,7 +10,7 @@ const controller = new class extends EventsViaPoll {
 
 	get devices () {
 		Globals.events.poll()
-		return Globals.controllerDevices
+		return [ ...Globals.controllerDevices ]
 	}
 
 	openDevice (device) { return new ControllerInstance(device) }

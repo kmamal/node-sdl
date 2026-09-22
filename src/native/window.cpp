@@ -220,6 +220,8 @@ window::create (const Napi::CallbackInfo &info)
 			else {
 				native.Set("subsystem", env.Null());
 			}
+		#else
+			native.Set("subsystem", env.Null());
 		#endif
 
 		Napi::Value native_handle;

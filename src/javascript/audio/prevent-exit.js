@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const Bindings = require('../bindings')
 
 let timeout
 
@@ -14,11 +15,13 @@ process.on('beforeExit', (code) => {
 
 	let duration = 0
 
+	Globals.events.poll()
 	for (const instance of Globals.audioInstances.values()) {
 		if (instance.device.type !== 'playback') { continue }
+		if (!instance.playing) { continue }
 
-		const { queued, playing } = instance
-		if (!queued || !playing) { continue }
+		const queued = Bindings.audio_getQueueSize(instance.id)
+		if (!queued) { continue }
 
 		const { channels, frequency, buffered, bytesPerSample } = instance
 		const bytesPerSecond = channels * frequency * bytesPerSample

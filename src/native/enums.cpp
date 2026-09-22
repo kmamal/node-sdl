@@ -313,6 +313,10 @@ enums::get(const Napi::CallbackInfo &info)
 	scancodes.Set("APP2", (int) SDL_SCANCODE_APP2);
 	scancodes.Set("AUDIOREWIND", (int) SDL_SCANCODE_AUDIOREWIND);
 	scancodes.Set("AUDIOFASTFORWARD", (int) SDL_SCANCODE_AUDIOFASTFORWARD);
+	scancodes.Set("SOFTLEFT", (int) SDL_SCANCODE_SOFTLEFT);
+	scancodes.Set("SOFTRIGHT", (int) SDL_SCANCODE_SOFTRIGHT);
+	scancodes.Set("CALL", (int) SDL_SCANCODE_CALL);
+	scancodes.Set("ENDCALL", (int) SDL_SCANCODE_ENDCALL);
 
 	Napi::Object mouse_buttons = Napi::Object::New(env);
 	mouse_buttons.Set("LEFT", (int) SDL_BUTTON_LEFT);

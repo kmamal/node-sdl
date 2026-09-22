@@ -103,7 +103,7 @@ const render = () => {
 
 				for (let i = 0; i < balls.length; i++) {
 					const ball = balls[i]
-					ctx.fillText(`[${i}]: ${ball.x.toFixed(2)}, ${ball.y.toFixed(2)}`, x, y)
+					ctx.fillText(`[${i}]: ${ball.x}, ${ball.y}`, x, y)
 					y += 20
 				}
 

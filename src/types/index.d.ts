@@ -20,7 +20,7 @@ export namespace Events {
 		}
 		export interface Orient extends DisplayEvent {
 			readonly type: 'displayOrient'
-			readonly orientation: Sdl.Video.Orientation
+			readonly orientation: Sdl.Video.Orientation | null
 		}
 		export interface Move extends DisplayEvent {
 			readonly type: 'displayMove'
@@ -203,6 +203,8 @@ export namespace Events {
 			readonly ball: number
 			readonly x: number
 			readonly y: number
+			readonly dx: number
+			readonly dy: number
 		}
 
 		interface ButtonEvent extends JoystickEvent {
@@ -549,7 +551,7 @@ export namespace Sdl {
 			readonly webgpu: boolean
 			readonly native: {
 				handle: Buffer | null,
-				subsystem?: 'x11' | 'wayland' | null,
+				subsystem: 'x11' | 'wayland' | null,
 			}
 
 			readonly maximized: boolean
@@ -607,8 +609,8 @@ export namespace Sdl {
 			createWindow (options?: {
 				title?: string
 				display?: Display
-				x?: number
-				y?: number
+				x?: number | null
+				y?: number | null
 				width?: number
 				height?: number
 				visible?: boolean
@@ -880,6 +882,10 @@ export namespace Sdl {
 			| 'APP2'
 			| 'AUDIOREWIND'
 			| 'AUDIOFASTFORWARD'
+			| 'SOFTLEFT'
+			| 'SOFTRIGHT'
+			| 'CALL'
+			| 'ENDCALL'
 
 		export type Key = string
 
@@ -1005,7 +1011,6 @@ export namespace Sdl {
 			| 'medium'
 			| 'full'
 			| 'wired'
-			| 'max'
 
 		export interface Device {
 			readonly id: number
@@ -1117,6 +1122,8 @@ export namespace Sdl {
 			| 'paddle2'
 			| 'paddle3'
 			| 'paddle4'
+			| 'misc1'
+			| 'touchpad'
 
 		export interface Device {
 			readonly id: number
@@ -1176,6 +1183,8 @@ export namespace Sdl {
 				readonly paddle2: boolean
 				readonly paddle3: boolean
 				readonly paddle4: boolean
+				readonly misc1: boolean
+				readonly touchpad: boolean
 			}
 
 			readonly power: Joystick.PowerLevel | null

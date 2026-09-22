@@ -84,6 +84,8 @@ T.test("sdl::controller", async (t) => {
 		paddle2: false,
 		paddle3: false,
 		paddle4: false,
+		misc1: false,
+		touchpad: false,
 	})
 
 	const newMapping = device.mapping.replace(device.name, 'foobar')

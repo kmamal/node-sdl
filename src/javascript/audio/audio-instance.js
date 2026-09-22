@@ -120,11 +120,11 @@ class AudioInstance extends EventsViaPoll {
 
 		Bindings.audio_close(this._id)
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
-
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
+
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
 	}
 }
 

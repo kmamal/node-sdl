@@ -25,7 +25,7 @@ const joystick = new class extends EventsViaPoll {
 
 	get devices () {
 		Globals.events.poll()
-		return Globals.joystickDevices
+		return [ ...Globals.joystickDevices ]
 	}
 
 	openDevice (device) { return new JoystickInstance(device) }

@@ -75,6 +75,8 @@ controller::getState (Napi::Env &env, SDL_GameController *controller, Napi::Obje
 	buttons.Set("paddle2", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE2));
 	buttons.Set("paddle3", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE3));
 	buttons.Set("paddle4", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_PADDLE4));
+	buttons.Set("misc1", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_MISC1));
+	buttons.Set("touchpad", !!SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_TOUCHPAD));
 
 	error = SDL_GetError();
 	if (error[0] != '\0') {

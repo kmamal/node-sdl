@@ -54,11 +54,11 @@ class SensorInstance extends EventsViaPoll {
 
 		Bindings.sensor_close(this._device.id)
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
-
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
+
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
 	}
 }
 

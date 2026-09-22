@@ -116,12 +116,17 @@ class ControllerInstance extends EventsViaPoll {
 		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
 
-		// Keeps Node.js alive while rumbling
 		clearTimeout(this._rumbleTimeout)
+		this._rumbleTimeout = null
+
+		// Zero intensity stops the effect, so there is nothing to wait for
+		if (lowFreqRumble === 0 && highFreqRumble === 0) { return }
+
+		// Keeps Node.js alive while rumbling
 		this._rumbleTimeout = setTimeout(() => {
 			try { this.stopRumble() }
 			catch (_) {}
@@ -146,12 +151,17 @@ class ControllerInstance extends EventsViaPoll {
 		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
 		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
 
-		// Keeps Node.js alive while rumbling
 		clearTimeout(this._rumbleTriggersTimeout)
+		this._rumbleTriggersTimeout = null
+
+		// Zero intensity stops the effect, so there is nothing to wait for
+		if (leftRumble === 0 && rightRumble === 0) { return }
+
+		// Keeps Node.js alive while rumbling
 		this._rumbleTriggersTimeout = setTimeout(() => {
 			try { this.stopRumbleTriggers() }
 			catch (_) {}
@@ -198,11 +208,11 @@ class ControllerInstance extends EventsViaPoll {
 		// TODO: Will this call throw if the device is gone?
 		Bindings.controller_close(this._device.id)
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
-
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
+
+		try { this.emit('close', { type: 'close' }) }
+		catch (error) { this.emit('error', error) }
 	}
 }
 

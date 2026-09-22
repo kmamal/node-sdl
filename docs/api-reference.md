@@ -444,7 +444,7 @@ Check [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 ### Event: 'displayOrient'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
-- `orientation: <string>`: The display's new orientation.
+- `orientation: <string>|<null>`: The display's new orientation, or `null` if it is unknown.
 
 Fired when a display changes orientation.
 
@@ -1014,7 +1014,7 @@ Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) wi
 
 - `<object>`
   - `handle : <Buffer>|<null>` The platform-specific handle of the window, or `null` if it can't be determined.
-  - `subsystem : <string>|<null>` Linux only. Either `'x11'` or `'wayland'`, depending on the video driver SDL is running under, or `null` if it's some other driver.
+  - `subsystem : <string>|<null>` On Linux, either `'x11'` or `'wayland'`, depending on the video driver SDL is running under, or `null` if it's some other driver. Always `null` on other platforms.
 
 The native type of `handle` is HWND on Windows and NSView* on macOS.
 
@@ -1201,7 +1201,7 @@ A Key can be either one of the values below __or__ any unicode character.
 Keys that produce characters are represented by that character.
 All others are represented by one of these values:
 
-`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clear/again'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
+`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'call'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clear/again'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'endCall'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'softLeft'`, `'softRight'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
 
 ### Enum: SCANCODE
 
@@ -1459,6 +1459,10 @@ This enum is also available from `@kmamal/sdl/helpers`.
   | `sdl.keyboard.SCANCODE.APP2`               | `SDL_SCANCODE_APP2`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AUDIOREWIND`        | `SDL_SCANCODE_AUDIOREWIND`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD`   | `SDL_SCANCODE_AUDIOFASTFORWARD`   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.SOFTLEFT`           | `SDL_SCANCODE_SOFTLEFT`           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.SOFTRIGHT`          | `SDL_SCANCODE_SOFTRIGHT`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.CALL`               | `SDL_SCANCODE_CALL`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.ENDCALL`            | `SDL_SCANCODE_ENDCALL`            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 </details>
 
@@ -1673,7 +1677,6 @@ String values used to represent the power level of a joystick or controller
 | `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM`            |
 | `'full'`   | `SDL_JOYSTICK_POWER_FULL`              |
 | `'wired'`  | `SDL_JOYSTICK_POWER_WIRED`             |
-| `'max'`    | `SDL_JOYSTICK_POWER_MAX`               |
 
 <a id="joystick-event-deviceadd"></a>
 
@@ -1765,10 +1768,13 @@ Fired when one of the joystick's axes moves.
 ### Event: 'ballMotion'
 
 - `ball: <number>` The index of the ball that moved.
-- `x: <number>` The new x-position of the ball.
-- `y: <number>` The new y-position of the ball.
+- `x: <number>` The new x position of the ball.
+- `y: <number>` The new y position of the ball.
+- `dx: <number>` The horizontal motion of the ball since the last event.
+- `dy: <number>` The vertical motion of the ball since the last event.
 
 Fired when one of the joystick's balls moves.
+Trackballs only report relative motion, so positions are the accumulated motion since the instance was opened.
 
 <a id="joystick-instance-event-buttondown"></a>
 
@@ -1841,6 +1847,7 @@ It may be necessary to impose certain tolerances on these values to account for 
   - `y: <number>` The vertical position of the joystick's ball.
 
 An array of values, each corresponding to the position of one of the joystick's balls.
+Trackballs only report relative motion, so positions start at `0` when the instance is opened and accumulate the motion reported since.
 
 ### joystickInstance.buttons
 
@@ -1895,10 +1902,11 @@ Is `true` if the joystick has rumble motors.
 
 - `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
+Passing `0` for both intensities stops the rumble.
 
 ### joystickInstance.stopRumble()
 
@@ -1915,10 +1923,11 @@ Is `true` if the joystick has rumble motors on the triggers.
 
 - `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
+Passing `0` for both intensities stops the rumble.
 
 ### joystickInstance.stopRumbleTriggers()
 
@@ -2162,6 +2171,8 @@ It may be necessary to impose certain tolerances on these values to account for 
   - `paddle2: <boolean>` Paddle 2 pressed
   - `paddle3: <boolean>` Paddle 3 pressed
   - `paddle4: <boolean>` Paddle 4 pressed
+  - `misc1: <boolean>` Miscellaneous button pressed (Xbox Series X share button, PS5 microphone button, Nintendo Switch Pro capture button, Amazon Luna microphone button)
+  - `touchpad: <boolean>` Touchpad pressed (PS4/PS5 controllers)
 
 An object mapping each of the controller's buttons to a boolean value.
 Each value in the object is either `true` if the corresponding button is pressed, or `false` otherwise.
@@ -2206,10 +2217,11 @@ Is `true` if the controller has rumble motors.
 
 - `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the controller rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
+Passing `0` for both intensities stops the rumble.
 
 ### controllerInstance.stopRumble()
 
@@ -2226,10 +2238,11 @@ Is `true` if the controller has rumble motors on the triggers.
 
 - `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Default: `1e3`
+- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the controller triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
+Passing `0` for both intensities stops the rumble.
 
 ### controllerInstance.stopRumbleTriggers()
 
@@ -2535,7 +2548,7 @@ const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
   - `name: <string>|<null>`: The name of the device. Optional.
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
-  - `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
+  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
 - Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
@@ -2708,7 +2721,7 @@ Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevic
 ### playbackInstance.enqueue(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to read data from.
-- `bytes: <number>` The number of bytes to read from the buffer. Default: `buffer.length`
+- `bytes: <number>` The number of bytes to read from the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
 
 Takes the audio data that you have written to the buffer, and writes it to the queue, from where it will be played back as audio.
 
@@ -2720,7 +2733,7 @@ Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevic
 ### recordingInstance.dequeue(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to write data to.
-- `bytes: <number>` The number of bytes to write to the buffer. Default: `buffer.length`
+- `bytes: <number>` The number of bytes to write to the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
 - Returns: `<number>` The actual number of bytes read.
 
 Takes recorded audio data that has is waiting on the queue, and writes it to the provided buffer.

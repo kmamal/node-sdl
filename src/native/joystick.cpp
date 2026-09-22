@@ -246,17 +246,10 @@ joystick::open (const Napi::CallbackInfo &info)
 		Napi::Array balls = Napi::Array::New(env, num_balls);
 
 		for (int i = 0; i < num_balls; i++) {
-			int dx, dy;
-			if (SDL_JoystickGetBall(joystick, i, &dx, &dy) == -1) {
-				std::ostringstream message;
-				message << "SDL_JoystickGetBall(" << index << ", " << i << ") error: " << SDL_GetError();
-				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
-			}
-
+			// Trackballs only report relative motion, so positions start at 0
 			Napi::Object ball = Napi::Object::New(env);
-			ball.Set("x", dx);
-			ball.Set("y", dy);
+			ball.Set("x", 0);
+			ball.Set("y", 0);
 
 			balls.Set(i, ball);
 		}
