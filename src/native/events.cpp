@@ -62,6 +62,7 @@ std::string events::types::KEYMAP_CHANGE;
 std::string events::types::FINGER_DOWN;
 std::string events::types::FINGER_UP;
 std::string events::types::FINGER_MOVE;
+std::string events::types::FINGER_CANCEL;
 std::string events::types::DEVICE_ADD;
 std::string events::types::DEVICE_REMOVE;
 std::string events::types::AXIS_MOTION;
@@ -338,12 +339,15 @@ events::dispatchEvent(const SDL_Event &event)
 		}
 
 		case SDL_EVENT_FINGER_UP:
-		case SDL_EVENT_FINGER_DOWN: {
+		case SDL_EVENT_FINGER_DOWN:
+		case SDL_EVENT_FINGER_CANCELED: {
 			packed.Set("target", events::targets::WINDOW);
 			packed.Set("targetId", event.tfinger.windowID);
 			packed.Set("type", event.type == SDL_EVENT_FINGER_UP
 				? events::types::FINGER_UP
-				: events::types::FINGER_DOWN);
+				: event.type == SDL_EVENT_FINGER_DOWN
+					? events::types::FINGER_DOWN
+					: events::types::FINGER_CANCEL);
 			packed.Set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
 			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchID));
 			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerID));

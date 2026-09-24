@@ -30,6 +30,7 @@ const validEvents = [
 	'fingerDown',
 	'fingerUp',
 	'fingerMove',
+	'fingerCancel',
 	'dropBegin',
 	'dropText',
 	'dropFile',

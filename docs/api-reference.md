@@ -51,6 +51,7 @@
     - [Event: 'fingerDown'](#event-fingerdown)
     - [Event: 'fingerUp'](#event-fingerup)
     - [Event: 'fingerMove'](#event-fingermove)
+    - [Event: 'fingerCancel'](#event-fingercancel)
     - [Event: 'dropBegin'](#event-dropbegin)
     - [Event: 'dropText'](#event-droptext)
     - [Event: 'dropFile'](#event-dropfile)
@@ -842,6 +843,18 @@ Fired when a finger is lifted from the touch surface.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
 
 Fired when a finger moves on the touch surface.
+
+### Event: 'fingerCancel'
+
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
+- `fingerId: <bigint>` The id of the finger that coused the event.
+- `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
+- `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
+- `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
+- `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+
+Fired when the system cancels a touch, for example when it takes over the gesture or the window loses touch focus.
+No `fingerUp` event follows, so treat this as the end of the finger's gesture.
 
 ### Event: 'dropBegin'
 

@@ -61,6 +61,7 @@ namespace events {
 		extern std::string FINGER_DOWN;
 		extern std::string FINGER_UP;
 		extern std::string FINGER_MOVE;
+		extern std::string FINGER_CANCEL;
 		extern std::string DEVICE_ADD;
 		extern std::string DEVICE_REMOVE;
 		extern std::string AXIS_MOTION;

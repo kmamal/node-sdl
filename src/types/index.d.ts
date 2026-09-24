@@ -107,6 +107,7 @@ export namespace Events {
 
 		export interface FingerDown extends FingerEvent { readonly type: 'fingerDown' }
 		export interface FingerUp extends FingerEvent { readonly type: 'fingerUp' }
+		export interface FingerCancel extends FingerEvent { readonly type: 'fingerCancel' }
 
 		export interface FingerMove extends FingerEvent {
 			readonly type: 'fingerMove'
@@ -168,6 +169,7 @@ export namespace Events {
 			| FingerDown
 			| FingerUp
 			| FingerMove
+			| FingerCancel
 			| Show
 			| Hide
 			| Expose
@@ -536,6 +538,7 @@ export namespace Sdl {
 			on (event: 'fingerDown', listener: (event: Events.Window.FingerDown) => void): this
 			on (event: 'fingerUp', listener: (event: Events.Window.FingerUp) => void): this
 			on (event: 'fingerMove', listener: (event: Events.Window.FingerMove) => void): this
+			on (event: 'fingerCancel', listener: (event: Events.Window.FingerCancel) => void): this
 			on (event: 'dropBegin', listener: (event: Events.Window.DropBegin) => void): this
 			on (event: 'dropText', listener: (event: Events.Window.DropText) => void): this
 			on (event: 'dropFile', listener: (event: Events.Window.DropFile) => void): this

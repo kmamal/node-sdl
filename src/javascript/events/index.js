@@ -200,7 +200,8 @@ const handleEvent = (event) => {
 
 				case 'fingerDown':
 				case 'fingerUp':
-				case 'fingerMove': {
+				case 'fingerMove':
+				case 'fingerCancel': {
 					const { touchId } = event
 					delete event.touchId
 

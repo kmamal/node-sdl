@@ -90,6 +90,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::FINGER_DOWN = "fingerDown";
 	events::types::FINGER_UP = "fingerUp";
 	events::types::FINGER_MOVE = "fingerMove";
+	events::types::FINGER_CANCEL = "fingerCancel";
 	events::types::DEVICE_ADD = "deviceAdd";
 	events::types::DEVICE_REMOVE = "deviceRemove";
 	events::types::AXIS_MOTION = "axisMotion";
