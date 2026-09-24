@@ -726,9 +726,14 @@ window::setIcon (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_SetWindowIcon(window, surface);
-
+	bool success = SDL_SetWindowIcon(window, surface);
 	SDL_DestroySurface(surface);
+	if (!success) {
+		std::ostringstream message;
+		message << "SDL_SetWindowIcon(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }

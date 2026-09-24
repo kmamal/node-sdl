@@ -1201,6 +1201,7 @@ Calls to `render()` will fail.
 
 Set's the window's icon, usually displayed in the title bar and the taskbar.
 Only RGB [pixel formats](#pixel-formats) are accepted; YUV formats throw.
+Throws if the windowing system does not support setting the icon.
 
 ### window.flash([untilFocused])
 
