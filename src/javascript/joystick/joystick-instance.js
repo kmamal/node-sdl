@@ -126,13 +126,15 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		Bindings.joystick_rumble(this._device.id, lowFreqRumble, highFreqRumble, duration)
+		const _lowFreqRumble = Math.round(lowFreqRumble * 0xFFFF)
+		const _highFreqRumble = Math.round(highFreqRumble * 0xFFFF)
+		Bindings.joystick_rumble(this._device.id, _lowFreqRumble, _highFreqRumble, duration)
 
 		clearTimeout(this._rumbleTimeout)
 		this._rumbleTimeout = null
 
 		// Zero intensity stops the effect, so there is nothing to wait for
-		if (lowFreqRumble === 0 && highFreqRumble === 0) { return }
+		if (_lowFreqRumble === 0 && _highFreqRumble === 0) { return }
 
 		// Keeps Node.js alive while rumbling
 		this._rumbleTimeout = setTimeout(() => {
@@ -161,13 +163,15 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		Bindings.joystick_rumbleTriggers(this._device.id, leftRumble, rightRumble, duration)
+		const _leftRumble = Math.round(leftRumble * 0xFFFF)
+		const _rightRumble = Math.round(rightRumble * 0xFFFF)
+		Bindings.joystick_rumbleTriggers(this._device.id, _leftRumble, _rightRumble, duration)
 
 		clearTimeout(this._rumbleTriggersTimeout)
 		this._rumbleTriggersTimeout = null
 
 		// Zero intensity stops the effect, so there is nothing to wait for
-		if (leftRumble === 0 && rightRumble === 0) { return }
+		if (_leftRumble === 0 && _rightRumble === 0) { return }
 
 		// Keeps Node.js alive while rumbling
 		this._rumbleTriggersTimeout = setTimeout(() => {

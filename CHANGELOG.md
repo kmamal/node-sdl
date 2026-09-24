@@ -127,6 +127,7 @@ Joysticks and gamepads:
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
 - `sdl.gamepad.addMappings()` now refreshes the device lists even when one of the mappings is invalid, so the devices made available by the mappings before it are reported.
 - `joystickInstance.setPlayer()`/`resetPlayer()` (and the gamepad equivalents) now update `player` on the device object, and throw if SDL refuses the assignment.
+- `rumble()` and `rumbleTriggers()` no longer keep the process alive for an effect SDL never started when the intensities round to zero.
 
 Instances (joystick, gamepad, sensor, and audio):
 

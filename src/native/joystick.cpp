@@ -342,8 +342,8 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int joystick_id = info[0].As<Napi::Number>().Int32Value();
-	double low_freq_rumble = info[1].As<Napi::Number>().DoubleValue();
-	double high_freq_rumble = info[2].As<Napi::Number>().DoubleValue();
+	int low_freq_rumble = info[1].As<Napi::Number>().Int32Value();
+	int high_freq_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
 
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
@@ -354,7 +354,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (!SDL_RumbleJoystick(joystick, std::lround(low_freq_rumble * 0xFFFF), std::lround(high_freq_rumble * 0xFFFF), duration)) {
+	if (!SDL_RumbleJoystick(joystick, low_freq_rumble, high_freq_rumble, duration)) {
 		std::ostringstream message;
 		message << "SDL_RumbleJoystick(" << joystick_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -427,8 +427,8 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int joystick_id = info[0].As<Napi::Number>().Int32Value();
-	double left_rumble = info[1].As<Napi::Number>().DoubleValue();
-	double right_rumble = info[2].As<Napi::Number>().DoubleValue();
+	int left_rumble = info[1].As<Napi::Number>().Int32Value();
+	int right_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
 
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
@@ -439,7 +439,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (!SDL_RumbleJoystickTriggers(joystick, std::lround(left_rumble * 0xFFFF), std::lround(right_rumble * 0xFFFF), duration)) {
+	if (!SDL_RumbleJoystickTriggers(joystick, left_rumble, right_rumble, duration)) {
 		std::ostringstream message;
 		message << "SDL_RumbleJoystickTriggers(" << joystick_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
