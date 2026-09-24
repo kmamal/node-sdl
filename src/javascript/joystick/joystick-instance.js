@@ -92,13 +92,13 @@ class JoystickInstance extends EventsViaPoll {
 		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
 		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("invalid player"), { player }) }
 
-		Bindings.joystick_setPlayer(this._device.id, player)
+		this._device.player = Bindings.joystick_setPlayer(this._device.id, player)
 	}
 
 	resetPlayer () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		Bindings.joystick_setPlayer(this._device.id, -1)
+		this._device.player = Bindings.joystick_setPlayer(this._device.id, -1)
 	}
 
 	get hasLed () { return this._hasLed }

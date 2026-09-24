@@ -1900,7 +1900,7 @@ The current power info of the joystick device.
 
 - `index: <number>` The player index to assign to the joystick. Must be a non-negative integer.
 
-Sets the player index of the joystick.
+Sets the player index of the joystick, and updates `player` on the device object.
 
 ### joystickInstance.resetPlayer()
 
@@ -2238,7 +2238,7 @@ Possible values are `null` if the label is unknown, or one of:
 
 - `index: <number>` The player index to assign to the gamepad. Must be a non-negative integer.
 
-Sets the player index of the gamepad.
+Sets the player index of the gamepad, and updates `player` on the device object.
 
 ### gamepadInstance.resetPlayer()
 
