@@ -33,7 +33,6 @@ _packDevice (Napi::Env &env, SDL_AudioDeviceID id, bool is_recording)
 	Napi::Object device = Napi::Object::New(env);
 	device.Set("id", id);
 	device.Set("name", name);
-	device.Set("type", audio::device_types[is_recording]);
 
 	return device;
 }
