@@ -16,7 +16,7 @@ const keyboard = new class extends EventsViaPoll {
 		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("invalid scancode"), { scancode }) }
 
 		const _key = Bindings.keyboard_getKey(scancode)
-		return mapping[_key] ?? (_key.length === 1 ? _key : null)
+		return mapping[_key] ?? (_key?.length === 1 ? _key : null)
 	}
 
 	getScancode (key) {

@@ -8,16 +8,33 @@ const bool *keyboard::keys;
 
 
 Napi::Value
+keyboard::packKey(Napi::Env &env, SDL_Keycode keycode)
+{
+	bool is_character = !(keycode & (SDLK_SCANCODE_MASK | SDLK_EXTENDED_MASK))
+		&& keycode >= 0x20
+		&& keycode != 0x7F;
+
+	if (is_character) {
+		char utf8[5];
+		char *end = SDL_UCS4ToUTF8(keycode, utf8);
+		*end = '\0';
+		return Napi::String::New(env, utf8);
+	}
+
+	const char *name = SDL_GetKeyName(keycode);
+	if (name[0] == '\0') { return env.Null(); }
+	return Napi::String::New(env, name);
+}
+
+Napi::Value
 keyboard::getKey(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
 	int scancode = info[0].As<Napi::Number>().Int32Value();
 
-	int keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode, SDL_KMOD_NONE, false);
-	const char *keyname = SDL_GetKeyName(keycode);
-
-	return Napi::String::New(env, keyname);
+	SDL_Keycode keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode, SDL_KMOD_NONE, false);
+	return packKey(env, keycode);
 }
 
 Napi::Value

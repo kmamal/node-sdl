@@ -1,6 +1,7 @@
 #include "events.h"
 #include "enums.h"
 #include "video.h"
+#include "keyboard.h"
 #include "joystick.h"
 #include "gamepad.h"
 #include "audio.h"
@@ -262,13 +263,7 @@ events::dispatchEvent(const SDL_Event &event)
 
 			packed.Set("scancode", (int) event.key.scancode);
 
-			const char *name = SDL_GetKeyName(event.key.key);
-			if (name[0] != '\0') {
-				packed.Set("key", name);
-			}
-			else {
-				packed.Set("key", env.Null());
-			}
+			packed.Set("key", keyboard::packKey(env, event.key.key));
 
 			if (event.type == SDL_EVENT_KEY_DOWN) {
 				packed.Set("repeat", event.key.repeat);

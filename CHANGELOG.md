@@ -94,6 +94,7 @@ Mouse and keyboard:
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
 - Keys whose SDL3 default name differs from the X11 one (`'+/-'`, `'modeSwitch'`, `'('`, `')'`, and the menu key) are recognized again on every platform. Their default names had been dropped from the key table during the migration, so they came out as `null` outside X11.
+- Character keys are now reported as the unshifted character SDL assigns to them. SDL3 names non-ASCII letters by their capital, so `ü` used to arrive as `'Ü'`, and `getKey(getScancode('ü'))` did not round-trip.
 
 Touch:
 

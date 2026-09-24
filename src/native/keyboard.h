@@ -9,6 +9,8 @@ namespace keyboard {
 	extern int num_keys;
 	extern const bool *keys;
 
+	Napi::Value packKey(Napi::Env &env, SDL_Keycode keycode);
+
 	Napi::Value getKey(const Napi::CallbackInfo &info);
 	Napi::Value getScancode(const Napi::CallbackInfo &info);
 	Napi::Value getState(const Napi::CallbackInfo &info);
