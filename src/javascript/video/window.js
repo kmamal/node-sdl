@@ -210,9 +210,9 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 		if (y < -(2 ** 31) || y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid y"), { y }) }
 
-		Bindings.window_setPosition(this._id, x, y)
-		this._x = x
-		this._y = y
+		const position = Bindings.window_setPosition(this._id, x, y)
+		this._x = position.x
+		this._y = position.y
 	}
 
 	get width () {
@@ -237,11 +237,11 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 
-		const { pixelWidth, pixelHeight } = Bindings.window_setSize(this._id, width, height)
-		this._width = width
-		this._height = height
-		this._pixelWidth = pixelWidth
-		this._pixelHeight = pixelHeight
+		const size = Bindings.window_setSize(this._id, width, height)
+		this._width = size.width
+		this._height = size.height
+		this._pixelWidth = size.pixelWidth
+		this._pixelHeight = size.pixelHeight
 	}
 
 	setSizeInPixels (pixelWidth, pixelHeight) {

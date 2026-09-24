@@ -370,7 +370,16 @@ window::setPosition (const Napi::CallbackInfo &info)
 
 	SDL_SetWindowPosition(window, x, y);
 
-	return env.Undefined();
+	int actual_x = x, actual_y = y;
+	if (SDL_GetWindowFlags(window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED)) {
+		SDL_GetWindowPosition(window, &actual_x, &actual_y);
+	}
+
+	Napi::Object result = Napi::Object::New(env);
+	result.Set("x", actual_x);
+	result.Set("y", actual_y);
+
+	return result;
 }
 
 Napi::Value
@@ -386,10 +395,16 @@ window::setSize (const Napi::CallbackInfo &info)
 
 	SDL_SetWindowSize(window, width, height);
 
+	int actual_width = width, actual_height = height;
+	if (SDL_GetWindowFlags(window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED)) {
+		SDL_GetWindowSize(window, &actual_width, &actual_height);
+	}
 	int pixel_width, pixel_height;
 	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
 	Napi::Object result = Napi::Object::New(env);
+	result.Set("width", actual_width);
+	result.Set("height", actual_height);
 	result.Set("pixelWidth", pixel_width);
 	result.Set("pixelHeight", pixel_height);
 
