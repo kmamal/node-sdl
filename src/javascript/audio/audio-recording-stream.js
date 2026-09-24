@@ -23,6 +23,8 @@ class AudioRecordingStream extends AudioStream {
 		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("invalid bytes"), { bytes }) }
 		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
 
+		if (bytes === 0) { return 0 }
+
 		return Bindings.audio_getData(this._id, buffer, bytes)
 	}
 }

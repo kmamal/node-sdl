@@ -140,7 +140,7 @@ Audio:
 - The keep-alive timer that lets queued audio finish playing before the process exits now computes the device buffer's duration correctly.
 - Closing or pausing a playback stream while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.
 - The exit-time check for queued audio no longer throws when the device of a playing stream was unplugged just before the process would exit.
-- `putData()` and `getData()` now accept empty buffers as no-ops, as the docs already implied, instead of throwing "invalid bytes" on the zero-length chunks streaming pipelines naturally produce.
+- `putData()` and `getData()` now accept empty buffers as no-ops, as the docs already implied, instead of throwing "invalid bytes" on the zero-length chunks streaming pipelines naturally produce. A zero-length `Buffer` with no backing memory (such as `Buffer.alloc(0)`) is also accepted; SDL used to reject its null pointer.
 - `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
 - `playbackStream.queued` no longer reports negative values for queues over 2 GiB.
 - `readSample()` and `writeSample()` now reject non-`Buffer` arguments with a validation error instead of silently operating on array-likes.
