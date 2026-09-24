@@ -2,7 +2,7 @@
 #define _SENSOR_H_
 
 #include <napi.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <map>
 #include <string>
 

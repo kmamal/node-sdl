@@ -4,7 +4,6 @@ const Enums = require('../enums')
 const { VideoFormatHelpers } = require('../video/format-helpers')
 
 let captured = false
-let relativeMode = false
 
 const mouse = {
 	get BUTTON () { return Enums.mouseButtons },
@@ -20,10 +19,8 @@ const mouse = {
 	get position () { return Bindings.mouse_getPosition() },
 
 	setPosition (x, y) {
-		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
-		if (x < -(2 ** 31) || x > 2 ** 31 - 1) { throw Object.assign(new Error("invalid x"), { x }) }
-		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
-		if (y < -(2 ** 31) || y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid y"), { y }) }
+		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
+		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
 
 		Bindings.mouse_setPosition(x, y)
 	},
@@ -82,17 +79,6 @@ const mouse = {
 	},
 
 	uncapture () { mouse.capture(false) },
-
-	get relativeMode () { return relativeMode },
-
-	setRelativeMode (relative = true) {
-		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
-
-		Bindings.mouse_setRelativeMode(relative)
-		relativeMode = relative
-	},
-
-	unsetRelativeMode () { mouse.setRelativeMode(false) },
 }
 
 module.exports = { mouse }

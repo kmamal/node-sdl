@@ -73,9 +73,9 @@ In this example we use FFmpeg (through the [`ffmpeg-static`](https://www.npmjs.c
 
 Opens all connected joystick devices and monitors their state.
 
-## [11. Controller monitor](https://github.com/kmamal/node-sdl/tree/master/examples/11-controller)
+## [11. Gamepad monitor](https://github.com/kmamal/node-sdl/tree/master/examples/11-gamepad)
 
-Opens all connected controller devices and monitors their state.
+Opens all connected gamepad devices and monitors their state.
 
 ## [12. Sine wave](https://github.com/kmamal/node-sdl/tree/master/examples/12-sine-wave)
 

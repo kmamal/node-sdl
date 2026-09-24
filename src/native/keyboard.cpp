@@ -1,10 +1,10 @@
 #include "keyboard.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 
 int keyboard::num_keys;
-const Uint8 *keyboard::keys;
+const bool *keyboard::keys;
 
 
 Napi::Value
@@ -14,7 +14,7 @@ keyboard::getKey(const Napi::CallbackInfo &info)
 
 	int scancode = info[0].As<Napi::Number>().Int32Value();
 
-	int keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode);
+	int keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode, SDL_KMOD_NONE, false);
 	const char *keyname = SDL_GetKeyName(keycode);
 
 	return Napi::String::New(env, keyname);
@@ -33,7 +33,7 @@ keyboard::getScancode(const Napi::CallbackInfo &info)
 		return env.Null();
 	}
 
-	int scancode = SDL_GetScancodeFromKey(keycode);
+	int scancode = SDL_GetScancodeFromKey(keycode, nullptr);
 	if (scancode == 0) {
 		SDL_ClearError();
 		return env.Null();
@@ -50,7 +50,7 @@ keyboard::getState(const Napi::CallbackInfo &info)
 	Napi::Array result = Napi::Array::New(env, keyboard::num_keys);
 
 	for (int i = 0; i < keyboard::num_keys; i++) {
-		result.Set(i, !!keyboard::keys[i]);
+		result.Set(i, keyboard::keys[i]);
 	}
 
 	return result;

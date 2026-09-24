@@ -1,5 +1,5 @@
 #include "clipboard.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 
@@ -8,7 +8,7 @@ clipboard::getText (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	if (SDL_HasClipboardText() == SDL_FALSE) {
+	if (!SDL_HasClipboardText()) {
 		return Napi::String::New(env, "");
 	}
 
@@ -16,12 +16,6 @@ clipboard::getText (const Napi::CallbackInfo &info)
 	SDL_ClearError();
 
 	char *text = SDL_GetClipboardText();
-	if (text == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetClipboardText() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
 	if (text[0] == '\0') {
 		SDL_free(text);
 
@@ -55,7 +49,7 @@ clipboard::setText (const Napi::CallbackInfo &info)
 
 	std::string text = info[0].As<Napi::String>().Utf8Value();
 
-	if (SDL_SetClipboardText(text.c_str()) < 0) {
+	if (!SDL_SetClipboardText(text.c_str())) {
 		std::ostringstream message;
 		message << "SDL_SetClipboardText() error: " << SDL_GetError();
 		SDL_ClearError();

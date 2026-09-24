@@ -25,8 +25,21 @@ export namespace Events {
 		export interface Move extends DisplayEvent {
 			readonly type: 'displayMove'
 		}
+		export interface Scale extends DisplayEvent {
+			readonly type: 'displayScaleChange'
+			readonly scale: number | null
+		}
+		export interface Mode extends DisplayEvent {
+			readonly type: 'displayModeChange'
+			readonly format: Sdl.Video.Format | null
+			readonly frequency: number
+			readonly geometry: Sdl.Video.Display['geometry']
+		}
+		export interface Usable extends DisplayEvent {
+			readonly type: 'displayUsableChange'
+		}
 
-		export type Any = Add | Remove | Orient | Move
+		export type Any = Add | Remove | Orient | Move | Scale | Mode | Usable
 
 	}
 
@@ -222,7 +235,7 @@ export namespace Events {
 
 		export interface PowerUpdate extends JoystickEvent {
 			readonly type: 'powerUpdate'
-			readonly power: Sdl.Joystick.PowerLevel | null
+			readonly power: Sdl.Joystick.PowerInfo
 		}
 
 		export interface Close extends JoystickEvent { readonly type: 'close' }
@@ -253,36 +266,36 @@ export namespace Events {
 
 	}
 
-	export namespace Controller {
+	export namespace Gamepad {
 
-		interface ControllerEvent extends BaseEvent {}
+		interface GamepadEvent extends BaseEvent {}
 
-		export interface AxisMotion extends ControllerEvent {
+		export interface AxisMotion extends GamepadEvent {
 			readonly type: 'axisMotion'
-			readonly axis: Sdl.Controller.Axis
+			readonly axis: Sdl.Gamepad.Axis
 			readonly value: number
 		}
 
-		interface ButtonEvent extends ControllerEvent {
-			readonly button: Sdl.Controller.Button
+		interface ButtonEvent extends GamepadEvent {
+			readonly button: Sdl.Gamepad.Button
 		}
 
 		export interface ButtonDown extends ButtonEvent { readonly type: 'buttonDown' }
 		export interface ButtonUp extends ButtonEvent { readonly type: 'buttonUp' }
 
-		export interface PowerUpdate extends ControllerEvent {
+		export interface PowerUpdate extends GamepadEvent {
 			readonly type: 'powerUpdate'
-			readonly power: Sdl.Joystick.PowerLevel | null
+			readonly power: Sdl.Joystick.PowerInfo
 		}
 
-		export interface SteamHandleUpdate extends ControllerEvent {
+		export interface SteamHandleUpdate extends GamepadEvent {
 			readonly type: 'steamHandleUpdate'
 			readonly steamHandle: Buffer | null
 		}
 
-		export interface Remap extends ControllerEvent { readonly type: 'remap' }
+		export interface Remap extends GamepadEvent { readonly type: 'remap' }
 
-		export interface Close extends ControllerEvent { readonly type: 'close' }
+		export interface Close extends GamepadEvent { readonly type: 'close' }
 
 		export type Any
 			= AxisMotion
@@ -311,10 +324,10 @@ export namespace Events {
 
 	}
 
-	export namespace ControllerDevice {
+	export namespace GamepadDevice {
 
 		interface DeviceEvent extends BaseEvent {
-			readonly device: Sdl.Controller.Device
+			readonly device: Sdl.Gamepad.Device
 		}
 
 		export interface Add extends DeviceEvent { readonly type: 'deviceAdd' }
@@ -393,7 +406,7 @@ export namespace Sdl {
 			readonly video: boolean
 			readonly audio: boolean
 			readonly joystick: boolean
-			readonly controller: boolean
+			readonly gamepad: boolean
 			readonly haptic: boolean
 			readonly sensor: boolean
 		}
@@ -409,9 +422,10 @@ export namespace Sdl {
 
 		export type Format
 			= 'rgb332'
-			| 'rgb444'
-			| 'rgb555'
-			| 'bgr555'
+			| 'xrgb4444'
+			| 'xbgr4444'
+			| 'xrgb1555'
+			| 'xbgr1555'
 			| 'argb4444'
 			| 'rgba4444'
 			| 'abgr4444'
@@ -424,19 +438,44 @@ export namespace Sdl {
 			| 'bgr565'
 			| 'rgb24'
 			| 'bgr24'
-			| 'rgb888'
+			| 'xrgb8888'
 			| 'rgbx8888'
-			| 'bgr888'
+			| 'xbgr8888'
 			| 'bgrx8888'
 			| 'argb8888'
 			| 'rgba8888'
 			| 'abgr8888'
 			| 'bgra8888'
 			| 'argb2101010'
+			| 'xrgb2101010'
+			| 'xbgr2101010'
+			| 'abgr2101010'
+			| 'rgb48'
+			| 'bgr48'
+			| 'rgba64'
+			| 'argb64'
+			| 'bgra64'
+			| 'abgr64'
+			| 'rgb48f'
+			| 'bgr48f'
+			| 'rgba64f'
+			| 'argb64f'
+			| 'bgra64f'
+			| 'abgr64f'
+			| 'rgb96f'
+			| 'bgr96f'
+			| 'rgba128f'
+			| 'argb128f'
+			| 'bgra128f'
+			| 'abgr128f'
 			| 'rgba32'
 			| 'argb32'
 			| 'bgra32'
 			| 'abgr32'
+			| 'rgbx32'
+			| 'xrgb32'
+			| 'bgrx32'
+			| 'xbgr32'
 			| 'yv12'
 			| 'iyuv'
 			| 'yuy2'
@@ -444,13 +483,14 @@ export namespace Sdl {
 			| 'yvyu'
 			| 'nv12'
 			| 'nv21'
+			| 'p010'
 
 		export type Scaling
 			= 'nearest'
 			| 'linear'
-			| 'best'
 
 		export interface Display {
+			readonly id: number
 			readonly name: string | null
 			readonly format: Format | null
 			readonly frequency: number
@@ -466,11 +506,7 @@ export namespace Sdl {
 				readonly width: number
 				readonly height: number
 			}
-			readonly dpi: {
-				readonly horizontal: number
-				readonly vertical: number
-				readonly diagonal: number
-			} | null
+			readonly scale: number | null
 			readonly orientation: Orientation | null
 		}
 
@@ -567,10 +603,9 @@ export namespace Sdl {
 
 			readonly hovered: boolean
 
-			readonly skipTaskbar: boolean
-			readonly popupMenu: boolean
-			readonly tooltip: boolean
-			readonly utility: boolean
+			readonly relativeMouseMode: boolean
+			setRelativeMouseMode (relative?: boolean): void
+			unsetRelativeMouseMode (): void
 
 			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, options?: {
 				scaling?: Scaling,
@@ -597,6 +632,9 @@ export namespace Sdl {
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
 			on (event: 'displayMove', listener: (event: Events.Display.Move) => void): this
+			on (event: 'displayScaleChange', listener: (event: Events.Display.Scale) => void): this
+			on (event: 'displayModeChange', listener: (event: Events.Display.Mode) => void): this
+			on (event: 'displayUsableChange', listener: (event: Events.Display.Usable) => void): this
 			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
@@ -622,10 +660,6 @@ export namespace Sdl {
 				vsync?: boolean
 				opengl?: boolean
 				webgpu?: boolean
-				skipTaskbar?: boolean
-				popupMenu?: boolean
-				tooltip?: boolean
-				utility?: boolean
 			}): Window
 
 			bytesPerPixel (format: Format): number
@@ -853,16 +887,11 @@ export namespace Sdl {
 			| 'RALT'
 			| 'RGUI'
 			| 'MODE'
-			| 'AUDIONEXT'
-			| 'AUDIOPREV'
-			| 'AUDIOSTOP'
-			| 'AUDIOPLAY'
-			| 'AUDIOMUTE'
-			| 'MEDIASELECT'
-			| 'WWW'
-			| 'MAIL'
-			| 'CALCULATOR'
-			| 'COMPUTER'
+			| 'MEDIA_NEXT_TRACK'
+			| 'MEDIA_PREVIOUS_TRACK'
+			| 'MEDIA_STOP'
+			| 'MEDIA_PLAY'
+			| 'MEDIA_SELECT'
 			| 'AC_SEARCH'
 			| 'AC_HOME'
 			| 'AC_BACK'
@@ -870,18 +899,10 @@ export namespace Sdl {
 			| 'AC_STOP'
 			| 'AC_REFRESH'
 			| 'AC_BOOKMARKS'
-			| 'BRIGHTNESSDOWN'
-			| 'BRIGHTNESSUP'
-			| 'DISPLAYSWITCH'
-			| 'KBDILLUMTOGGLE'
-			| 'KBDILLUMDOWN'
-			| 'KBDILLUMUP'
-			| 'EJECT'
+			| 'MEDIA_EJECT'
 			| 'SLEEP'
-			| 'APP1'
-			| 'APP2'
-			| 'AUDIOREWIND'
-			| 'AUDIOFASTFORWARD'
+			| 'MEDIA_REWIND'
+			| 'MEDIA_FAST_FORWARD'
 			| 'SOFTLEFT'
 			| 'SOFTRIGHT'
 			| 'CALL'
@@ -912,20 +933,30 @@ export namespace Sdl {
 			= 'LEFT'
 			| 'MIDDLE'
 			| 'RIGHT'
+			| 'X1'
+			| 'X2'
 
 		export type Cursor
-			= 'arrow'
-			| 'ibeam'
+			= 'default'
+			| 'text'
 			| 'wait'
 			| 'crosshair'
-			| 'waitarrow'
-			| 'sizenwse'
-			| 'sizenesw'
-			| 'sizewe'
-			| 'sizens'
-			| 'sizeall'
-			| 'no'
-			| 'hand'
+			| 'progress'
+			| 'nwseResize'
+			| 'neswResize'
+			| 'ewResize'
+			| 'nsResize'
+			| 'move'
+			| 'notAllowed'
+			| 'pointer'
+			| 'nwResize'
+			| 'nResize'
+			| 'neResize'
+			| 'eResize'
+			| 'seResize'
+			| 'sResize'
+			| 'swResize'
+			| 'wResize'
 
 		interface Module {
 			readonly BUTTON: { [name in ButtonNames]: number }
@@ -949,10 +980,6 @@ export namespace Sdl {
 			readonly captured: boolean
 			capture (capture?: boolean): void
 			uncapture (): void
-
-			readonly relativeMode: boolean
-			setRelativeMode (relative?: boolean): void
-			unsetRelativeMode (): void
 		}
 
 	}
@@ -984,14 +1011,14 @@ export namespace Sdl {
 		}
 
 		export type JoystickType
-			= 'gamecontroller'
+			= 'gamepad'
 			| 'wheel'
-			| 'arcadestick'
-			| 'flightstick'
-			| 'dancepad'
+			| 'arcadeStick'
+			| 'flightStick'
+			| 'dancePad'
 			| 'guitar'
-			| 'drumkit'
-			| 'arcadepad'
+			| 'drumKit'
+			| 'arcadePad'
 			| 'throttle'
 
 		export type HatPosition
@@ -1000,17 +1027,15 @@ export namespace Sdl {
 			| 'right'
 			| 'down'
 			| 'left'
-			| 'rightup'
-			| 'rightdown'
-			| 'leftup'
-			| 'leftdown'
+			| 'rightUp'
+			| 'rightDown'
+			| 'leftUp'
+			| 'leftDown'
 
-		export type PowerLevel
-			= 'empty'
-			| 'low'
-			| 'medium'
-			| 'full'
-			| 'wired'
+		export interface PowerInfo {
+			readonly state: Sdl.Power.PowerState | null
+			readonly percent: number | null
+		}
 
 		export interface Device {
 			readonly id: number
@@ -1044,7 +1069,7 @@ export namespace Sdl {
 			readonly hats: HatPosition[]
 			readonly buttons: boolean[]
 
-			readonly power: PowerLevel | null
+			readonly power: PowerInfo
 
 			setPlayer (index: number): void
 			resetPlayer (): void
@@ -1077,22 +1102,20 @@ export namespace Sdl {
 
 	}
 
-	export namespace Controller {
+	export namespace Gamepad {
 
-		export type ControllerType
-			= 'xbox360'
+		export type GamepadType
+			= 'standard'
+			| 'xbox360'
 			| 'xboxOne'
 			| 'ps3'
 			| 'ps4'
-			| 'nintendoSwitchPro'
-			| 'virtual'
 			| 'ps5'
-			| 'amazonLuna'
-			| 'googleStadia'
-			| 'nvidiaShield'
+			| 'nintendoSwitchPro'
 			| 'nintendoSwitchJoyconLeft'
 			| 'nintendoSwitchJoyconRight'
 			| 'nintendoSwitchJoyconPair'
+			| 'gamecube'
 
 		export type Axis
 			= 'leftStickX'
@@ -1107,10 +1130,10 @@ export namespace Sdl {
 			| 'dpadRight'
 			| 'dpadUp'
 			| 'dpadDown'
-			| 'a'
-			| 'b'
-			| 'x'
-			| 'y'
+			| 'south'
+			| 'east'
+			| 'west'
+			| 'north'
 			| 'guide'
 			| 'back'
 			| 'start'
@@ -1118,18 +1141,33 @@ export namespace Sdl {
 			| 'rightStick'
 			| 'leftShoulder'
 			| 'rightShoulder'
-			| 'paddle1'
-			| 'paddle2'
-			| 'paddle3'
-			| 'paddle4'
+			| 'rightPaddle1'
+			| 'leftPaddle1'
+			| 'rightPaddle2'
+			| 'leftPaddle2'
 			| 'misc1'
+			| 'misc2'
+			| 'misc3'
+			| 'misc4'
+			| 'misc5'
+			| 'misc6'
 			| 'touchpad'
+
+		export type ButtonLabel
+			= 'a'
+			| 'b'
+			| 'x'
+			| 'y'
+			| 'cross'
+			| 'circle'
+			| 'square'
+			| 'triangle'
 
 		export interface Device {
 			readonly id: number
 			readonly name: string | null
 			readonly path: string | null
-			readonly type: ControllerType | null
+			readonly type: GamepadType | null
 			readonly guid: string | null
 			readonly vendor: number | null
 			readonly product: number | null
@@ -1138,15 +1176,15 @@ export namespace Sdl {
 			readonly mapping: string | null
 		}
 
-		export class ControllerInstance extends EventEmitter {
-			on (event: 'axisMotion', listener: (event: Events.Controller.AxisMotion) => void): this
-			on (event: 'buttonDown', listener: (event: Events.Controller.ButtonDown) => void): this
-			on (event: 'buttonUp', listener: (event: Events.Controller.ButtonUp) => void): this
-			on (event: 'powerUpdate', listener: (event: Events.Controller.PowerUpdate) => void): this
-			on (event: 'steamHandleUpdate', listener: (event: Events.Controller.SteamHandleUpdate) => void): this
-			on (event: 'remap', listener: (event: Events.Controller.Remap) => void): this
-			on (event: 'close', listener: (event: Events.Controller.Close) => void): this
-			on (event: '*', listener: (type: string, event: Events.Controller.Any) => void): this
+		export class GamepadInstance extends EventEmitter {
+			on (event: 'axisMotion', listener: (event: Events.Gamepad.AxisMotion) => void): this
+			on (event: 'buttonDown', listener: (event: Events.Gamepad.ButtonDown) => void): this
+			on (event: 'buttonUp', listener: (event: Events.Gamepad.ButtonUp) => void): this
+			on (event: 'powerUpdate', listener: (event: Events.Gamepad.PowerUpdate) => void): this
+			on (event: 'steamHandleUpdate', listener: (event: Events.Gamepad.SteamHandleUpdate) => void): this
+			on (event: 'remap', listener: (event: Events.Gamepad.Remap) => void): this
+			on (event: 'close', listener: (event: Events.Gamepad.Close) => void): this
+			on (event: '*', listener: (type: string, event: Events.Gamepad.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly device: Device
@@ -1154,40 +1192,16 @@ export namespace Sdl {
 			readonly serialNumber: string | null
 			readonly steamHandle: Buffer | null
 
-			readonly axes: {
-				readonly leftStickX: number
-				readonly leftStickY: number
-				readonly rightStickX: number
-				readonly rightStickY: number
-				readonly leftTrigger: number
-				readonly rightTrigger: number
+			readonly axes: { readonly [axis in Axis]: number }
+			readonly buttons: { readonly [button in Button]: boolean }
+			readonly buttonLabels: {
+				readonly south: ButtonLabel | null
+				readonly east: ButtonLabel | null
+				readonly west: ButtonLabel | null
+				readonly north: ButtonLabel | null
 			}
 
-			readonly buttons: {
-				readonly dpadLeft: boolean
-				readonly dpadRight: boolean
-				readonly dpadUp: boolean
-				readonly dpadDown: boolean
-				readonly a: boolean
-				readonly b: boolean
-				readonly x: boolean
-				readonly y: boolean
-				readonly guide: boolean
-				readonly back: boolean
-				readonly start: boolean
-				readonly leftStick: boolean
-				readonly rightStick: boolean
-				readonly leftShoulder: boolean
-				readonly rightShoulder: boolean
-				readonly paddle1: boolean
-				readonly paddle2: boolean
-				readonly paddle3: boolean
-				readonly paddle4: boolean
-				readonly misc1: boolean
-				readonly touchpad: boolean
-			}
-
-			readonly power: Joystick.PowerLevel | null
+			readonly power: Joystick.PowerInfo
 
 			setPlayer (index: number): void
 			resetPlayer (): void
@@ -1208,16 +1222,16 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
-			on (event: 'deviceAdd', listener: (event: Events.ControllerDevice.Add) => void): this
-			on (event: 'deviceRemove', listener: (event: Events.ControllerDevice.Remove) => void): this
-			on (event: '*', listener: (type: string, event: Events.ControllerDevice.Any) => void): this
+			on (event: 'deviceAdd', listener: (event: Events.GamepadDevice.Add) => void): this
+			on (event: 'deviceRemove', listener: (event: Events.GamepadDevice.Remove) => void): this
+			on (event: '*', listener: (type: string, event: Events.GamepadDevice.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
 			addMappings (mappings: string[]): void
 
 			readonly devices: Device[]
 
-			openDevice (device: Device): ControllerInstance
+			openDevice (device: Device): GamepadInstance
 		}
 
 	}
@@ -1240,7 +1254,6 @@ export namespace Sdl {
 		}
 
 		export interface Data {
-			readonly timestamp: number | null
 			readonly x: number
 			readonly y: number
 			readonly z: number
@@ -1275,44 +1288,35 @@ export namespace Sdl {
 		export type Format
 			= 's8'
 			| 'u8'
-			| 's16lsb'
-			| 's16msb'
-			| 's16sys'
+			| 's16le'
+			| 's16be'
 			| 's16'
-			| 'u16lsb'
-			| 'u16msb'
-			| 'u16sys'
-			| 'u16'
-			| 's32lsb'
-			| 's32msb'
-			| 's32sys'
+			| 's32le'
+			| 's32be'
 			| 's32'
-			| 'f32lsb'
-			| 'f32msb'
-			| 'f32sys'
+			| 'f32le'
+			| 'f32be'
 			| 'f32'
 
 		export interface Device {
-			readonly type: "recording"|"playback"
-			readonly name?: string | null
+			readonly id: number
+			readonly name: string
 		}
 
-		export interface PlaybackDevice extends Device {
-			readonly type: "playback"
+		export interface StreamOptions {
+			readonly channels?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+			readonly frequency?: number
+			readonly format?: Format
+			readonly buffered?: number
 		}
 
-		export interface RecordingDevice extends Device {
-			readonly type: "recording"
-		}
-
-		export class AudioInstance extends EventEmitter {
+		export class AudioStream extends EventEmitter {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly id: number
-			readonly device: Device
-			readonly name: string | null
+			readonly device: Device | null
 
 			readonly channels: number
 			readonly frequency: number
@@ -1323,8 +1327,7 @@ export namespace Sdl {
 			play (play?: boolean): void
 			pause (): void
 
-			readonly queued: number
-			clearQueue (): void
+			clear (): void
 
 			readonly bytesPerSample: number
 			readonly minSampleValue: number
@@ -1337,31 +1340,30 @@ export namespace Sdl {
 			close (): void
 		}
 
-		export class AudioPlaybackInstance extends AudioInstance {
-			enqueue (buffer: Buffer, bytes?: number): void
+		export class AudioPlaybackStream extends AudioStream {
+			readonly queued: number
+			putData (buffer: Buffer, bytes?: number): void
 		}
 
-		export class AudioRecordingInstance extends AudioInstance {
-			dequeue (buffer: Buffer, bytes?: number): number
+		export class AudioRecordingStream extends AudioStream {
+			readonly available: number
+			getData (buffer: Buffer, bytes?: number): number
 		}
 
-		export interface AudioOptions {
-			readonly channels?: 1 | 2 | 4 | 6
-			readonly frequency?: number
-			readonly format?: Format
-			readonly buffered?: number
-		}
-
-		interface Module extends EventEmitter {
+		interface DeviceModule<Stream extends AudioStream> extends EventEmitter {
 			on (event: 'deviceAdd', listener: (event: Events.AudioDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.AudioDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.AudioDevice.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
-			readonly devices: Array<PlaybackDevice | RecordingDevice>
+			readonly devices: Device[]
 
-			openDevice (device: PlaybackDevice, options?: AudioOptions): AudioPlaybackInstance
-			openDevice (device: RecordingDevice, options?: AudioOptions): AudioRecordingInstance
+			openDevice (device?: Device | null, options?: StreamOptions): Stream
+		}
+
+		interface Module {
+			readonly playback: DeviceModule<AudioPlaybackStream>
+			readonly recording: DeviceModule<AudioRecordingStream>
 
 			bytesPerSample (format: Format): number
 			minSampleValue (format: Format): number
@@ -1413,7 +1415,7 @@ export const keyboard: Sdl.Keyboard.Module
 export const mouse: Sdl.Mouse.Module
 export const touch: Sdl.Touch.Module
 export const joystick: Sdl.Joystick.Module
-export const controller: Sdl.Controller.Module
+export const gamepad: Sdl.Gamepad.Module
 export const sensor: Sdl.Sensor.Module
 export const audio: Sdl.Audio.Module
 export const clipboard: Sdl.Clipboard.Module

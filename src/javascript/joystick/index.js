@@ -6,16 +6,16 @@ const { JoystickInstance } = require('./joystick-instance')
 
 const { make: makeJoystickDevice } = require('./device')
 const {
-	make: makeControllerDevice,
-	filter: filterControllerDevice,
-} = require('../controller/device')
+	make: makeGamepadDevice,
+	filter: filterGamepadDevice,
+} = require('../gamepad/device')
 
 const devices = Bindings.joystick_getDevices()
 Globals.joystickDevices = devices
 	.map(makeJoystickDevice)
-Globals.controllerDevices = devices
-	.filter(filterControllerDevice)
-	.map(makeControllerDevice)
+Globals.gamepadDevices = devices
+	.filter(filterGamepadDevice)
+	.map(makeGamepadDevice)
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]

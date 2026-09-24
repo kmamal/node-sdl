@@ -2,12 +2,12 @@ import E from '@kmamal/evdev'
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
 
-T.test("sdl::controller", async (t) => {
+T.test("sdl::gamepad", async (t) => {
 	t.timeout(3e3)
 
-	t.ok(Array.isArray(sdl.controller.devices))
+	t.ok(Array.isArray(sdl.gamepad.devices))
 
-	t.equal(sdl.controller.devices.length, 0)
+	t.equal(sdl.gamepad.devices.length, 0)
 
 	const virtualJoystick = E.uinput.createDevice({
 		name: 'Emulated Joystick',
@@ -27,9 +27,9 @@ T.test("sdl::controller", async (t) => {
 	})
 	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
 
-	t.equal(sdl.controller.devices.length, 1)
+	t.equal(sdl.gamepad.devices.length, 1)
 
-	const device = sdl.controller.devices[0]
+	const device = sdl.gamepad.devices[0]
 
 	t.equal(typeof device.id, 'number')
 	t.equal(device.name, 'Emulated Joystick')
@@ -45,7 +45,7 @@ T.test("sdl::controller", async (t) => {
 	t.equal(device.mapping.slice(0, 32), device.guid)
 	t.equal(device.mapping.slice(33, 33 + device.name.length), device.name)
 
-	const instance = sdl.controller.openDevice(device)
+	const instance = sdl.gamepad.openDevice(device)
 
 	t.equal(instance.device, device)
 	t.equal(instance.firmwareVersion, null)
@@ -69,10 +69,10 @@ T.test("sdl::controller", async (t) => {
 		dpadRight: false,
 		dpadUp: false,
 		dpadDown: false,
-		a: false,
-		b: false,
-		x: false,
-		y: false,
+		south: false,
+		east: false,
+		west: false,
+		north: false,
 		guide: false,
 		back: false,
 		start: false,
@@ -80,16 +80,23 @@ T.test("sdl::controller", async (t) => {
 		rightStick: false,
 		leftShoulder: false,
 		rightShoulder: false,
-		paddle1: false,
-		paddle2: false,
-		paddle3: false,
-		paddle4: false,
+		rightPaddle1: false,
+		leftPaddle1: false,
+		rightPaddle2: false,
+		leftPaddle2: false,
 		misc1: false,
+		misc2: false,
+		misc3: false,
+		misc4: false,
+		misc5: false,
+		misc6: false,
 		touchpad: false,
 	})
 
+	t.equal(Object.keys(instance.buttonLabels), [ 'south', 'east', 'west', 'north' ])
+
 	const newMapping = device.mapping.replace(device.name, 'foobar')
-	sdl.controller.addMappings([ newMapping ])
+	sdl.gamepad.addMappings([ newMapping ])
 	t.equal(instance.device, device)
 	t.equal(instance.device.name, 'foobar')
 

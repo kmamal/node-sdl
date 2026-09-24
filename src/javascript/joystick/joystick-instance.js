@@ -19,7 +19,7 @@ class JoystickInstance extends EventsViaPoll {
 		Globals.events.poll()
 		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
-		const result = Bindings.joystick_open(device._index)
+		const result = Bindings.joystick_open(device.id)
 
 		this._firmwareVersion = result.firmwareVersion
 		this._serialNumber = result.serialNumber
@@ -211,8 +211,9 @@ class JoystickInstance extends EventsViaPoll {
 		collection.delete(this)
 		if (collection.size === 0) { Globals.joystickInstances.byId.delete(this._device.id) }
 
-		// TODO: Will this call throw if the device is gone?
-		Bindings.joystick_close(this._device.id)
+		// TODO: This call could throw if the device is gone
+		try { Bindings.joystick_close(this._device.id) }
+		catch (_) {}
 
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })

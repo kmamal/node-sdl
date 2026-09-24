@@ -2,7 +2,7 @@ import sdl from '@kmamal/sdl'
 
 const TWO_PI = 2 * Math.PI
 
-const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
+const playbackStream = sdl.audio.playback.openDevice()
 const {
 	channels,
 	frequency,
@@ -10,7 +10,7 @@ const {
 	minSampleValue,
 	maxSampleValue,
 	zeroSampleValue,
-} = playbackInstance
+} = playbackStream
 const range = maxSampleValue - minSampleValue
 const amplitude = range / 2
 
@@ -30,9 +30,9 @@ for (let i = 0; i < numFrames; i++) {
 	const angle = time / sinePeriod * TWO_PI
 	const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
 	for (let j = 0; j < channels; j++) {
-		offset = playbackInstance.writeSample(buffer, sample, offset)
+		offset = playbackStream.writeSample(buffer, sample, offset)
 	}
 }
 
-playbackInstance.enqueue(buffer)
-playbackInstance.play()
+playbackStream.putData(buffer)
+playbackStream.play()

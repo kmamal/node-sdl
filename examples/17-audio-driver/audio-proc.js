@@ -10,27 +10,27 @@ const audioBuffer = await loadAudio(
 	{ channels, frequency },
 )
 
-let audioInstance
+let playbackStream
 let startTime
 let interval
 
 const play = (time = 0) => {
-	if (audioInstance) { return }
-	audioInstance = sdl.audio.openDevice({ type: 'playback' }, {
+	if (playbackStream) { return }
+	playbackStream = sdl.audio.playback.openDevice(null, {
 		channels,
 		frequency,
-		format: 'f32lsb',
+		format: 'f32le',
 	})
 
 	const skippedFrames = Math.round(frequency * time / 1e3)
 	const skippedSamples = skippedFrames * channels
-	const skippedBytes = skippedSamples * audioInstance.bytesPerSample
-	audioInstance.enqueue(audioBuffer.slice(skippedBytes))
-	audioInstance.play()
+	const skippedBytes = skippedSamples * playbackStream.bytesPerSample
+	playbackStream.putData(audioBuffer.slice(skippedBytes))
+	playbackStream.play()
 
 	startTime = Date.now() - time
 	interval = setInterval(() => {
-		if (audioInstance.queued === 0) {
+		if (playbackStream.queued === 0) {
 			process.send({ type: 'end' })
 			stop()
 			return
@@ -41,10 +41,10 @@ const play = (time = 0) => {
 }
 
 const stop = () => {
-	if (!audioInstance) { return }
-	audioInstance.pause()
-	audioInstance.close()
-	audioInstance = null
+	if (!playbackStream) { return }
+	playbackStream.pause()
+	playbackStream.close()
+	playbackStream = null
 	clearInterval(interval)
 	process.send({ type: 'time', time: 0 })
 }

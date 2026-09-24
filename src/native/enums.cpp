@@ -1,5 +1,5 @@
 #include "enums.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 Napi::Value
 enums::get(const Napi::CallbackInfo &info)
@@ -8,9 +8,10 @@ enums::get(const Napi::CallbackInfo &info)
 
 	Napi::Object pixel_formats = Napi::Object::New(env);
 	pixel_formats.Set("rgb332", (int) SDL_PIXELFORMAT_RGB332);
-	pixel_formats.Set("rgb444", (int) SDL_PIXELFORMAT_RGB444);
-	pixel_formats.Set("rgb555", (int) SDL_PIXELFORMAT_RGB555);
-	pixel_formats.Set("bgr555", (int) SDL_PIXELFORMAT_BGR555);
+	pixel_formats.Set("xrgb4444", (int) SDL_PIXELFORMAT_XRGB4444);
+	pixel_formats.Set("xbgr4444", (int) SDL_PIXELFORMAT_XBGR4444);
+	pixel_formats.Set("xrgb1555", (int) SDL_PIXELFORMAT_XRGB1555);
+	pixel_formats.Set("xbgr1555", (int) SDL_PIXELFORMAT_XBGR1555);
 	pixel_formats.Set("argb4444", (int) SDL_PIXELFORMAT_ARGB4444);
 	pixel_formats.Set("rgba4444", (int) SDL_PIXELFORMAT_RGBA4444);
 	pixel_formats.Set("abgr4444", (int) SDL_PIXELFORMAT_ABGR4444);
@@ -23,19 +24,44 @@ enums::get(const Napi::CallbackInfo &info)
 	pixel_formats.Set("bgr565", (int) SDL_PIXELFORMAT_BGR565);
 	pixel_formats.Set("rgb24", (int) SDL_PIXELFORMAT_RGB24);
 	pixel_formats.Set("bgr24", (int) SDL_PIXELFORMAT_BGR24);
-	pixel_formats.Set("rgb888", (int) SDL_PIXELFORMAT_RGB888);
+	pixel_formats.Set("xrgb8888", (int) SDL_PIXELFORMAT_XRGB8888);
 	pixel_formats.Set("rgbx8888", (int) SDL_PIXELFORMAT_RGBX8888);
-	pixel_formats.Set("bgr888", (int) SDL_PIXELFORMAT_BGR888);
+	pixel_formats.Set("xbgr8888", (int) SDL_PIXELFORMAT_XBGR8888);
 	pixel_formats.Set("bgrx8888", (int) SDL_PIXELFORMAT_BGRX8888);
 	pixel_formats.Set("argb8888", (int) SDL_PIXELFORMAT_ARGB8888);
 	pixel_formats.Set("rgba8888", (int) SDL_PIXELFORMAT_RGBA8888);
 	pixel_formats.Set("abgr8888", (int) SDL_PIXELFORMAT_ABGR8888);
 	pixel_formats.Set("bgra8888", (int) SDL_PIXELFORMAT_BGRA8888);
 	pixel_formats.Set("argb2101010", (int) SDL_PIXELFORMAT_ARGB2101010);
+	pixel_formats.Set("xrgb2101010", (int) SDL_PIXELFORMAT_XRGB2101010);
+	pixel_formats.Set("xbgr2101010", (int) SDL_PIXELFORMAT_XBGR2101010);
+	pixel_formats.Set("abgr2101010", (int) SDL_PIXELFORMAT_ABGR2101010);
+	pixel_formats.Set("rgb48", (int) SDL_PIXELFORMAT_RGB48);
+	pixel_formats.Set("bgr48", (int) SDL_PIXELFORMAT_BGR48);
+	pixel_formats.Set("rgba64", (int) SDL_PIXELFORMAT_RGBA64);
+	pixel_formats.Set("argb64", (int) SDL_PIXELFORMAT_ARGB64);
+	pixel_formats.Set("bgra64", (int) SDL_PIXELFORMAT_BGRA64);
+	pixel_formats.Set("abgr64", (int) SDL_PIXELFORMAT_ABGR64);
+	pixel_formats.Set("rgb48f", (int) SDL_PIXELFORMAT_RGB48_FLOAT);
+	pixel_formats.Set("bgr48f", (int) SDL_PIXELFORMAT_BGR48_FLOAT);
+	pixel_formats.Set("rgba64f", (int) SDL_PIXELFORMAT_RGBA64_FLOAT);
+	pixel_formats.Set("argb64f", (int) SDL_PIXELFORMAT_ARGB64_FLOAT);
+	pixel_formats.Set("bgra64f", (int) SDL_PIXELFORMAT_BGRA64_FLOAT);
+	pixel_formats.Set("abgr64f", (int) SDL_PIXELFORMAT_ABGR64_FLOAT);
+	pixel_formats.Set("rgb96f", (int) SDL_PIXELFORMAT_RGB96_FLOAT);
+	pixel_formats.Set("bgr96f", (int) SDL_PIXELFORMAT_BGR96_FLOAT);
+	pixel_formats.Set("rgba128f", (int) SDL_PIXELFORMAT_RGBA128_FLOAT);
+	pixel_formats.Set("argb128f", (int) SDL_PIXELFORMAT_ARGB128_FLOAT);
+	pixel_formats.Set("bgra128f", (int) SDL_PIXELFORMAT_BGRA128_FLOAT);
+	pixel_formats.Set("abgr128f", (int) SDL_PIXELFORMAT_ABGR128_FLOAT);
 	pixel_formats.Set("rgba32", (int) SDL_PIXELFORMAT_RGBA32);
 	pixel_formats.Set("argb32", (int) SDL_PIXELFORMAT_ARGB32);
 	pixel_formats.Set("bgra32", (int) SDL_PIXELFORMAT_BGRA32);
 	pixel_formats.Set("abgr32", (int) SDL_PIXELFORMAT_ABGR32);
+	pixel_formats.Set("rgbx32", (int) SDL_PIXELFORMAT_RGBX32);
+	pixel_formats.Set("xrgb32", (int) SDL_PIXELFORMAT_XRGB32);
+	pixel_formats.Set("bgrx32", (int) SDL_PIXELFORMAT_BGRX32);
+	pixel_formats.Set("xbgr32", (int) SDL_PIXELFORMAT_XBGR32);
 	pixel_formats.Set("yv12", (int) SDL_PIXELFORMAT_YV12);
 	pixel_formats.Set("iyuv", (int) SDL_PIXELFORMAT_IYUV);
 	pixel_formats.Set("yuy2", (int) SDL_PIXELFORMAT_YUY2);
@@ -43,31 +69,24 @@ enums::get(const Napi::CallbackInfo &info)
 	pixel_formats.Set("yvyu", (int) SDL_PIXELFORMAT_YVYU);
 	pixel_formats.Set("nv12", (int) SDL_PIXELFORMAT_NV12);
 	pixel_formats.Set("nv21", (int) SDL_PIXELFORMAT_NV21);
+	pixel_formats.Set("p010", (int) SDL_PIXELFORMAT_P010);
 
 	Napi::Object scale_mode = Napi::Object::New(env);
-	scale_mode.Set("nearest", (int) SDL_ScaleModeNearest);
-	scale_mode.Set("linear", (int) SDL_ScaleModeLinear);
-	scale_mode.Set("best", (int) SDL_ScaleModeBest);
+	scale_mode.Set("nearest", (int) SDL_SCALEMODE_NEAREST);
+	scale_mode.Set("linear", (int) SDL_SCALEMODE_LINEAR);
 
 	Napi::Object audio_formats = Napi::Object::New(env);
-	audio_formats.Set("s8", (int) AUDIO_S8);
-	audio_formats.Set("u8", (int) AUDIO_U8);
-	audio_formats.Set("s16lsb", (int) AUDIO_S16LSB);
-	audio_formats.Set("s16msb", (int) AUDIO_S16MSB);
-	audio_formats.Set("s16sys", (int) AUDIO_S16SYS);
-	audio_formats.Set("s16", (int) AUDIO_S16);
-	audio_formats.Set("u16lsb", (int) AUDIO_U16LSB);
-	audio_formats.Set("u16msb", (int) AUDIO_U16MSB);
-	audio_formats.Set("u16sys", (int) AUDIO_U16SYS);
-	audio_formats.Set("u16", (int) AUDIO_U16);
-	audio_formats.Set("s32lsb", (int) AUDIO_S32LSB);
-	audio_formats.Set("s32msb", (int) AUDIO_S32MSB);
-	audio_formats.Set("s32sys", (int) AUDIO_S32SYS);
-	audio_formats.Set("s32", (int) AUDIO_S32);
-	audio_formats.Set("f32lsb", (int) AUDIO_F32LSB);
-	audio_formats.Set("f32msb", (int) AUDIO_F32MSB);
-	audio_formats.Set("f32sys", (int) AUDIO_F32SYS);
-	audio_formats.Set("f32", (int) AUDIO_F32);
+	audio_formats.Set("s8", (int) SDL_AUDIO_S8);
+	audio_formats.Set("u8", (int) SDL_AUDIO_U8);
+	audio_formats.Set("s16le", (int) SDL_AUDIO_S16LE);
+	audio_formats.Set("s16be", (int) SDL_AUDIO_S16BE);
+	audio_formats.Set("s16", (int) SDL_AUDIO_S16);
+	audio_formats.Set("s32le", (int) SDL_AUDIO_S32LE);
+	audio_formats.Set("s32be", (int) SDL_AUDIO_S32BE);
+	audio_formats.Set("s32", (int) SDL_AUDIO_S32);
+	audio_formats.Set("f32le", (int) SDL_AUDIO_F32LE);
+	audio_formats.Set("f32be", (int) SDL_AUDIO_F32BE);
+	audio_formats.Set("f32", (int) SDL_AUDIO_F32);
 
 	Napi::Object scancodes = Napi::Object::New(env);
 	// scancodes.Set("UNKNOWN", (int) SDL_SCANCODE_UNKNOWN)); // js will use null here
@@ -284,16 +303,11 @@ enums::get(const Napi::CallbackInfo &info)
 	scancodes.Set("RALT", (int) SDL_SCANCODE_RALT);
 	scancodes.Set("RGUI", (int) SDL_SCANCODE_RGUI);
 	scancodes.Set("MODE", (int) SDL_SCANCODE_MODE);
-	scancodes.Set("AUDIONEXT", (int) SDL_SCANCODE_AUDIONEXT);
-	scancodes.Set("AUDIOPREV", (int) SDL_SCANCODE_AUDIOPREV);
-	scancodes.Set("AUDIOSTOP", (int) SDL_SCANCODE_AUDIOSTOP);
-	scancodes.Set("AUDIOPLAY", (int) SDL_SCANCODE_AUDIOPLAY);
-	scancodes.Set("AUDIOMUTE", (int) SDL_SCANCODE_AUDIOMUTE);
-	scancodes.Set("MEDIASELECT", (int) SDL_SCANCODE_MEDIASELECT);
-	scancodes.Set("WWW", (int) SDL_SCANCODE_WWW);
-	scancodes.Set("MAIL", (int) SDL_SCANCODE_MAIL);
-	scancodes.Set("CALCULATOR", (int) SDL_SCANCODE_CALCULATOR);
-	scancodes.Set("COMPUTER", (int) SDL_SCANCODE_COMPUTER);
+	scancodes.Set("MEDIA_NEXT_TRACK", (int) SDL_SCANCODE_MEDIA_NEXT_TRACK);
+	scancodes.Set("MEDIA_PREVIOUS_TRACK", (int) SDL_SCANCODE_MEDIA_PREVIOUS_TRACK);
+	scancodes.Set("MEDIA_STOP", (int) SDL_SCANCODE_MEDIA_STOP);
+	scancodes.Set("MEDIA_PLAY", (int) SDL_SCANCODE_MEDIA_PLAY);
+	scancodes.Set("MEDIA_SELECT", (int) SDL_SCANCODE_MEDIA_SELECT);
 	scancodes.Set("AC_SEARCH", (int) SDL_SCANCODE_AC_SEARCH);
 	scancodes.Set("AC_HOME", (int) SDL_SCANCODE_AC_HOME);
 	scancodes.Set("AC_BACK", (int) SDL_SCANCODE_AC_BACK);
@@ -301,18 +315,10 @@ enums::get(const Napi::CallbackInfo &info)
 	scancodes.Set("AC_STOP", (int) SDL_SCANCODE_AC_STOP);
 	scancodes.Set("AC_REFRESH", (int) SDL_SCANCODE_AC_REFRESH);
 	scancodes.Set("AC_BOOKMARKS", (int) SDL_SCANCODE_AC_BOOKMARKS);
-	scancodes.Set("BRIGHTNESSDOWN", (int) SDL_SCANCODE_BRIGHTNESSDOWN);
-	scancodes.Set("BRIGHTNESSUP", (int) SDL_SCANCODE_BRIGHTNESSUP);
-	scancodes.Set("DISPLAYSWITCH", (int) SDL_SCANCODE_DISPLAYSWITCH);
-	scancodes.Set("KBDILLUMTOGGLE", (int) SDL_SCANCODE_KBDILLUMTOGGLE);
-	scancodes.Set("KBDILLUMDOWN", (int) SDL_SCANCODE_KBDILLUMDOWN);
-	scancodes.Set("KBDILLUMUP", (int) SDL_SCANCODE_KBDILLUMUP);
-	scancodes.Set("EJECT", (int) SDL_SCANCODE_EJECT);
+	scancodes.Set("MEDIA_EJECT", (int) SDL_SCANCODE_MEDIA_EJECT);
 	scancodes.Set("SLEEP", (int) SDL_SCANCODE_SLEEP);
-	scancodes.Set("APP1", (int) SDL_SCANCODE_APP1);
-	scancodes.Set("APP2", (int) SDL_SCANCODE_APP2);
-	scancodes.Set("AUDIOREWIND", (int) SDL_SCANCODE_AUDIOREWIND);
-	scancodes.Set("AUDIOFASTFORWARD", (int) SDL_SCANCODE_AUDIOFASTFORWARD);
+	scancodes.Set("MEDIA_REWIND", (int) SDL_SCANCODE_MEDIA_REWIND);
+	scancodes.Set("MEDIA_FAST_FORWARD", (int) SDL_SCANCODE_MEDIA_FAST_FORWARD);
 	scancodes.Set("SOFTLEFT", (int) SDL_SCANCODE_SOFTLEFT);
 	scancodes.Set("SOFTRIGHT", (int) SDL_SCANCODE_SOFTRIGHT);
 	scancodes.Set("CALL", (int) SDL_SCANCODE_CALL);
@@ -322,20 +328,30 @@ enums::get(const Napi::CallbackInfo &info)
 	mouse_buttons.Set("LEFT", (int) SDL_BUTTON_LEFT);
 	mouse_buttons.Set("MIDDLE", (int) SDL_BUTTON_MIDDLE);
 	mouse_buttons.Set("RIGHT", (int) SDL_BUTTON_RIGHT);
+	mouse_buttons.Set("X1", (int) SDL_BUTTON_X1);
+	mouse_buttons.Set("X2", (int) SDL_BUTTON_X2);
 
 	Napi::Object cursors = Napi::Object::New(env);
-	cursors.Set("arrow", (int) SDL_SYSTEM_CURSOR_ARROW);
-	cursors.Set("ibeam", (int) SDL_SYSTEM_CURSOR_IBEAM);
+	cursors.Set("default", (int) SDL_SYSTEM_CURSOR_DEFAULT);
+	cursors.Set("text", (int) SDL_SYSTEM_CURSOR_TEXT);
 	cursors.Set("wait", (int) SDL_SYSTEM_CURSOR_WAIT);
 	cursors.Set("crosshair", (int) SDL_SYSTEM_CURSOR_CROSSHAIR);
-	cursors.Set("waitarrow", (int) SDL_SYSTEM_CURSOR_WAITARROW);
-	cursors.Set("sizenwse", (int) SDL_SYSTEM_CURSOR_SIZENWSE);
-	cursors.Set("sizenesw", (int) SDL_SYSTEM_CURSOR_SIZENESW);
-	cursors.Set("sizewe", (int) SDL_SYSTEM_CURSOR_SIZEWE);
-	cursors.Set("sizens", (int) SDL_SYSTEM_CURSOR_SIZENS);
-	cursors.Set("sizeall", (int) SDL_SYSTEM_CURSOR_SIZEALL);
-	cursors.Set("no", (int) SDL_SYSTEM_CURSOR_NO);
-	cursors.Set("hand", (int) SDL_SYSTEM_CURSOR_HAND);
+	cursors.Set("progress", (int) SDL_SYSTEM_CURSOR_PROGRESS);
+	cursors.Set("nwseResize", (int) SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+	cursors.Set("neswResize", (int) SDL_SYSTEM_CURSOR_NESW_RESIZE);
+	cursors.Set("ewResize", (int) SDL_SYSTEM_CURSOR_EW_RESIZE);
+	cursors.Set("nsResize", (int) SDL_SYSTEM_CURSOR_NS_RESIZE);
+	cursors.Set("move", (int) SDL_SYSTEM_CURSOR_MOVE);
+	cursors.Set("notAllowed", (int) SDL_SYSTEM_CURSOR_NOT_ALLOWED);
+	cursors.Set("pointer", (int) SDL_SYSTEM_CURSOR_POINTER);
+	cursors.Set("nwResize", (int) SDL_SYSTEM_CURSOR_NW_RESIZE);
+	cursors.Set("nResize", (int) SDL_SYSTEM_CURSOR_N_RESIZE);
+	cursors.Set("neResize", (int) SDL_SYSTEM_CURSOR_NE_RESIZE);
+	cursors.Set("eResize", (int) SDL_SYSTEM_CURSOR_E_RESIZE);
+	cursors.Set("seResize", (int) SDL_SYSTEM_CURSOR_SE_RESIZE);
+	cursors.Set("sResize", (int) SDL_SYSTEM_CURSOR_S_RESIZE);
+	cursors.Set("swResize", (int) SDL_SYSTEM_CURSOR_SW_RESIZE);
+	cursors.Set("wResize", (int) SDL_SYSTEM_CURSOR_W_RESIZE);
 
 	Napi::Object all = Napi::Object::New(env);
 	all.Set("pixelFormat", pixel_formats);

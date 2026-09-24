@@ -6,34 +6,34 @@ process.on('exit', (code) => {
 
 	Globals.events.stopPolling()
 
-	try {
-		// Close all windows
-		for (const window of Globals.windows.all.values()) {
-			window.destroy()
-		}
+	const errors = []
 
-		// Close all audio instances
-		for (const instance of Globals.audioInstances.values()) {
-			instance.close()
-		}
-
-		// Close all joysticks
-		for (const joystick of Globals.joystickInstances.all.values()) {
-			joystick.close()
-		}
-
-		// Close all controllers
-		for (const controller of Globals.controllerInstances.all.values()) {
-			controller.close()
-		}
-
-		// Close all sensors
-		for (const sensor of Globals.sensorInstances.all.values()) {
-			sensor.close()
-		}
+	for (const window of Globals.windows.all.values()) {
+		try { window.destroy() }
+		catch (error) { errors.push(error) }
 	}
-	finally {
-		// SDL must shut down even if a close listener throws
-		Bindings.global_cleanup()
+
+	for (const stream of Globals.audioStreams.values()) {
+		try { stream.close() }
+		catch (error) { errors.push(error) }
 	}
+
+	for (const joystick of Globals.joystickInstances.all.values()) {
+		try { joystick.close() }
+		catch (error) { errors.push(error) }
+	}
+
+	for (const gamepad of Globals.gamepadInstances.all.values()) {
+		try { gamepad.close() }
+		catch (error) { errors.push(error) }
+	}
+
+	for (const sensor of Globals.sensorInstances.all.values()) {
+		try { sensor.close() }
+		catch (error) { errors.push(error) }
+	}
+
+	Bindings.global_cleanup()
+
+	if (errors.length) { throw new AggregateError(errors, "errors occurred during process exit cleanup") }
 })

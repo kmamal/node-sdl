@@ -15,7 +15,7 @@ class SensorInstance extends EventsViaPoll {
 		refreshDevices()
 		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
-		Bindings.sensor_open(device._index)
+		Bindings.sensor_open(device.id)
 
 		this._device = device
 
@@ -52,7 +52,9 @@ class SensorInstance extends EventsViaPoll {
 			Globals.sensorInstances.byId.delete(this._device.id)
 		}
 
-		Bindings.sensor_close(this._device.id)
+		// TODO: This call could throw if the device is gone
+		try { Bindings.sensor_close(this._device.id) }
+		catch (_) {}
 
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })

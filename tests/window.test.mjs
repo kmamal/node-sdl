@@ -150,11 +150,6 @@ T.test("sdl::window", (t) => {
 
 	t.equal(typeof window1.hovered, 'boolean')
 
-	t.equal(typeof window1.skipTaskbar, 'boolean')
-	t.equal(typeof window1.popupMenu, 'boolean')
-	t.equal(typeof window1.tooltip, 'boolean')
-	t.equal(typeof window1.utility, 'boolean')
-
 	t.equal(typeof window1.render, 'function')
 
 	t.equal(typeof window1.setIcon, 'function')

@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "sdl-example-controller",
+  "name": "sdl-example-gamepad",
   "main": "index.js",
   "type": "module",
   "dependencies": {

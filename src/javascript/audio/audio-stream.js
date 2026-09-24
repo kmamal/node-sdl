@@ -6,11 +6,9 @@ const { AudioFormatHelpers } = require('./format-helpers')
 
 const validEvents = [ 'close' ]
 
-class AudioInstance extends EventsViaPoll {
-	constructor (device, options) {
+class AudioStream extends EventsViaPoll {
+	constructor (recording, device, options) {
 		super(validEvents)
-
-		const { name, type } = device
 
 		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
 
@@ -21,8 +19,8 @@ class AudioInstance extends EventsViaPoll {
 			buffered = 4096,
 		} = options
 
-		if (name !== undefined && name !== null && typeof name !== 'string') { throw Object.assign(new Error("device.name must be a string"), { name }) }
-		if (![ 1, 2, 4, 6 ].includes(channels)) { throw Object.assign(new Error("invalid channels"), { channels }) }
+		if (!Number.isInteger(channels)) { throw Object.assign(new Error("channels must be an integer"), { channels }) }
+		if (channels < 1 || channels > 8) { throw Object.assign(new Error("invalid channels"), { channels }) }
 		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }
 		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
@@ -34,10 +32,10 @@ class AudioInstance extends EventsViaPoll {
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
-		this._id = Bindings.audio_open(name ?? null, type === 'recording', frequency, _format, channels, buffered)
+		this._id = Bindings.audio_open(device?.id ?? null, recording, frequency, _format, channels, buffered)
 
+		this._recording = recording
 		this._device = device
-		this._name = name ?? null
 		this._buffered = buffered
 		this._channels = channels
 		this._format = format
@@ -54,12 +52,11 @@ class AudioInstance extends EventsViaPoll {
 		this._reader = helper.reader
 		this._writer = helper.writer
 
-		Globals.audioInstances.set(this._id, this)
+		Globals.audioStreams.set(this._id, this)
 	}
 
 	get id () { return this._id }
 	get device () { return this._device }
-	get name () { return this._name }
 
 	get channels () { return this._channels }
 	get frequency () { return this._frequency }
@@ -84,7 +81,7 @@ class AudioInstance extends EventsViaPoll {
 
 	get playing () { return this._playing }
 	play (play = true) {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
+		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
 		if (typeof play !== 'boolean') { throw Object.assign(new Error("play must be a boolean"), { play }) }
 
@@ -97,28 +94,23 @@ class AudioInstance extends EventsViaPoll {
 		this.play(false)
 	}
 
-	get queued () {
-		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
+	clear () {
+		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
-		return Bindings.audio_getQueueSize(this._id)
-	}
-
-	clearQueue () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
-
-		Bindings.audio_clearQueue(this._id)
+		Bindings.audio_clear(this._id)
 	}
 
 	get closed () { return this._closed }
 	close () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._id }) }
+		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
 		this._closed = true
 
-		Globals.audioInstances.delete(this._id)
+		Globals.audioStreams.delete(this._id)
 
-		Bindings.audio_close(this._id)
+		// TODO: This call could throw if the device is gone
+		try { Bindings.audio_close(this._id) }
+		catch (_) { }
 
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
@@ -128,4 +120,4 @@ class AudioInstance extends EventsViaPoll {
 	}
 }
 
-module.exports = { AudioInstance }
+module.exports = { AudioStream }

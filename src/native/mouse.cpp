@@ -1,5 +1,5 @@
 #include "mouse.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 
@@ -14,7 +14,7 @@ mouse::getButton (const Napi::CallbackInfo &info)
 	int button = info[0].As<Napi::Number>().Int32Value();
 
 	Uint32 buttons = SDL_GetMouseState(nullptr, nullptr);
-	bool state = buttons & (Uint32(1) << (button - 1));
+	bool state = buttons & SDL_BUTTON_MASK(button);
 
 	return Napi::Boolean::New(env, state);
 }
@@ -24,7 +24,7 @@ mouse::getPosition (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int x, y;
+	float x, y;
 	SDL_GetGlobalMouseState(&x, &y);
 
 	Napi::Object result = Napi::Object::New(env);
@@ -39,10 +39,10 @@ mouse::setPosition (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int x = info[0].As<Napi::Number>().Int32Value();
-	int y = info[1].As<Napi::Number>().Int32Value();
+	float x = info[0].As<Napi::Number>().FloatValue();
+	float y = info[1].As<Napi::Number>().FloatValue();
 
-	if (SDL_WarpMouseGlobal(x, y) < 0) {
+	if (!SDL_WarpMouseGlobal(x, y)) {
 		std::ostringstream message;
 		message << "SDL_WarpMouseGlobal(" << x << ", " << y << ") error: " << SDL_GetError();
 		SDL_ClearError();
@@ -69,7 +69,7 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 
 	SDL_SetCursor(cursor);
 
-	if (allocated_cursor != nullptr) { SDL_FreeCursor(allocated_cursor); }
+	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
 	allocated_cursor = cursor;
 
 	return env.Undefined();
@@ -91,7 +91,7 @@ mouse::resetCursor(const Napi::CallbackInfo &info)
 	SDL_SetCursor(cursor);
 
 	if (allocated_cursor != nullptr) {
-		SDL_FreeCursor(allocated_cursor);
+		SDL_DestroyCursor(allocated_cursor);
 		allocated_cursor = nullptr;
 	}
 
@@ -111,17 +111,17 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 	int x = info[5].As<Napi::Number>().Int32Value();
 	int y = info[6].As<Napi::Number>().Int32Value();
 
-	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, SDL_BITSPERPIXEL(format), stride, format);
+	SDL_Surface* surface = SDL_CreateSurfaceFrom(w, h, (SDL_PixelFormat) format, pixels, stride);
 	if (surface == nullptr) {
 		std::ostringstream message;
-		message << "SDL_CreateRGBSurfaceWithFormatFrom(" << w << ", " << h << ", " << format << ") error: " << SDL_GetError();
+		message << "SDL_CreateSurfaceFrom(" << w << ", " << h << ", " << format << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
 	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, x, y);
 	if (cursor == nullptr) {
-		SDL_FreeSurface(surface);
+		SDL_DestroySurface(surface);
 
 		std::ostringstream message;
 		message << "SDL_CreateColorCursor(" << x << ", " << y << ") error: " << SDL_GetError();
@@ -131,10 +131,10 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 
 	SDL_SetCursor(cursor);
 
-	if (allocated_cursor != nullptr) { SDL_FreeCursor(allocated_cursor); }
+	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
 	allocated_cursor = cursor;
 
-	SDL_FreeSurface(surface);
+	SDL_DestroySurface(surface);
 	return env.Undefined();
 }
 
@@ -145,9 +145,10 @@ mouse::showCursor (const Napi::CallbackInfo &info)
 
 	bool should_show = info[0].As<Napi::Boolean>().Value();
 
-	if (SDL_ShowCursor(should_show ? SDL_ENABLE : SDL_DISABLE) < 0) {
+	bool success = should_show ? SDL_ShowCursor() : SDL_HideCursor();
+	if (!success) {
 		std::ostringstream message;
-		message << "SDL_ShowCursor(" << should_show << ") error: " << SDL_GetError();
+		message << (should_show ? "SDL_ShowCursor(" : "SDL_HideCursor(") << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
@@ -166,30 +167,13 @@ mouse::redrawCursor (const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-mouse::setRelativeMode (const Napi::CallbackInfo &info)
-{
-	Napi::Env env = info.Env();
-
-	bool relative = info[0].As<Napi::Boolean>().Value();
-
-	if (SDL_SetRelativeMouseMode(relative ? SDL_TRUE : SDL_FALSE) < 0) {
-		std::ostringstream message;
-		message << "SDL_SetRelativeMouseMode(" << relative << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	return env.Undefined();
-}
-
-Napi::Value
 mouse::capture (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
 	bool should_capture = info[0].As<Napi::Boolean>().Value();
 
-	if (SDL_CaptureMouse(should_capture ? SDL_TRUE : SDL_FALSE) == -1) {
+	if (!SDL_CaptureMouse(should_capture)) {
 		std::ostringstream message;
 		message << "SDL_CaptureMouse(" << should_capture << ") error: " << SDL_GetError();
 		SDL_ClearError();

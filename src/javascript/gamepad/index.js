@@ -1,19 +1,20 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { ControllerInstance } = require('./controller-instance')
+const { GamepadInstance } = require('./gamepad-instance')
+const { make: makeGamepadDevice } = require('./device')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
-const controller = new class extends EventsViaPoll {
+const gamepad = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
 	get devices () {
 		Globals.events.poll()
-		return [ ...Globals.controllerDevices ]
+		return [ ...Globals.gamepadDevices ]
 	}
 
-	openDevice (device) { return new ControllerInstance(device) }
+	openDevice (device) { return new GamepadInstance(device) }
 
 	addMappings (mappings) {
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }
@@ -21,15 +22,18 @@ const controller = new class extends EventsViaPoll {
 			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mapping }) }
 		}
 
-		try { Bindings.controller_addMappings(mappings) }
+		try { Bindings.gamepad_addMappings(mappings) }
 		finally {
 			Globals.events.poll()
 
+			// Updated mappings change existing gamepad devices without an event
 			const devices = Bindings.joystick_getDevices()
-			require('../events/reconcile-joystick-and-controller-devices')
-				.reconcileJoystickAndControllerDevices(devices)
+			for (const gamepadDevice of Globals.gamepadDevices) {
+				const device = devices.find(({ id }) => id === gamepadDevice.id)
+				if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
+			}
 		}
 	}
 }()
 
-module.exports = { controller }
+module.exports = { gamepad }

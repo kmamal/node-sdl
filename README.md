@@ -4,13 +4,18 @@
 [![Dependencies](https://img.shields.io/librariesio/release/npm/@kmamal/sdl)](https://libraries.io/npm/@kmamal%2Fsdl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> [!NOTE]
+> This version has migrated from SDL2 to SDL3.
+> Most of the API is unchanged, but there are a number of breaking changes.
+> See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for the full list.
+
 SDL bindings for Node.js. Provides access to systems that are not normally available to Node.js applications:
 
 - 💻 Window management
 - ⌨ Keyboard
 - 🖱 Mouse
 - 🕹 Joysticks
-- 🎮 Controllers
+- 🎮 Gamepads
 - 🔈 Audio playback
 - 🎤 Audio recording
 - 📋 Clipboard manipulation

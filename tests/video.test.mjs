@@ -10,6 +10,7 @@ T.test("sdl::video", (t) => {
 	}
 
 	for (const display of sdl.video.displays) {
+		t.equal(typeof display.id, 'number')
 		t.equal(typeof display.name, 'string')
 		t.ok(display.name.length > 0)
 
@@ -28,10 +29,8 @@ T.test("sdl::video", (t) => {
 		t.equal(typeof display.usable.width, 'number')
 		t.equal(typeof display.usable.height, 'number')
 
-		if (display.dpi !== null) {
-			t.equal(typeof display.dpi.horizontal, 'number')
-			t.equal(typeof display.dpi.vertical, 'number')
-			t.equal(typeof display.dpi.diagonal, 'number')
+		if (display.scale !== null) {
+			t.equal(typeof display.scale, 'number')
 		}
 
 		if (display.orientation !== null) {

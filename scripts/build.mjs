@@ -46,7 +46,7 @@ await Promise.all([
 	(async () => {
 		const libs = await Fs.promises.readdir(SDL_LIB)
 		await Promise.all(libs.map(async (name) => {
-			if (C.platform === 'win32' && name !== 'SDL2.dll') { return }
+			if (C.platform === 'win32' && name !== 'SDL3.dll') { return }
 			await Fs.promises.cp(
 				Path.join(SDL_LIB, name),
 				Path.join(C.dir.dist, name),

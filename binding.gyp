@@ -14,7 +14,7 @@
                 'src/native/mouse.cpp',
                 'src/native/touch.cpp',
                 'src/native/joystick.cpp',
-                'src/native/controller.cpp',
+                'src/native/gamepad.cpp',
                 'src/native/sensor.cpp',
                 'src/native/audio.cpp',
                 'src/native/clipboard.cpp',
@@ -35,7 +35,7 @@
                         'cflags': ['-D_REENTRANT'],
                         'cflags_cc': ['-std=c++17'],
                         'include_dirs': ['$(SDL_INC)'],
-                        'libraries': ['-L$(SDL_LIB)', '-lSDL2'],
+                        'libraries': ['-L$(SDL_LIB)', '-lSDL3'],
                         'link_settings': {
                             'libraries': ["-Wl,-rpath,'$$ORIGIN'"],
                         },
@@ -55,7 +55,7 @@
                             '$(SDL_INC)',
                             '/opt/X11/include',
                         ],
-                        'libraries': ['-L$(SDL_LIB)', '-lSDL2'],
+                        'libraries': ['-L$(SDL_LIB)', '-lSDL3'],
                         'link_settings': {
                             'libraries': ['-Wl,-rpath,@loader_path'],
                         },
@@ -70,7 +70,7 @@
                             },
                         },
                         'include_dirs': ['<!(echo %SDL_INC%)'],
-                        'libraries': ['-l<!(echo %SDL_LIB%)\\SDL2.lib'],
+                        'libraries': ['-l<!(echo %SDL_LIB%)\\SDL3.lib'],
                     }
                 ],
             ],

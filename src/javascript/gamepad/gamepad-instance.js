@@ -12,14 +12,14 @@ const validEvents = [
 	'close',
 ]
 
-class ControllerInstance extends EventsViaPoll {
+class GamepadInstance extends EventsViaPoll {
 	constructor (device) {
 		super(validEvents)
 
 		Globals.events.poll()
-		if (!Globals.controllerDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+		if (!Globals.gamepadDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
-		const result = Bindings.controller_open(device._index)
+		const result = Bindings.gamepad_open(device.id)
 
 		this._firmwareVersion = result.firmwareVersion
 		this._serialNumber = result.serialNumber
@@ -30,6 +30,7 @@ class ControllerInstance extends EventsViaPoll {
 		this._power = result.power
 		this._axes = result.axes
 		this._buttons = result.buttons
+		this._buttonLabels = result.buttonLabels
 
 		this._device = device
 
@@ -37,11 +38,11 @@ class ControllerInstance extends EventsViaPoll {
 		this._rumbleTriggersTimeout = null
 		this._closed = false
 
-		Globals.controllerInstances.all.add(this)
-		let collection = Globals.controllerInstances.byId.get(this._device.id)
+		Globals.gamepadInstances.all.add(this)
+		let collection = Globals.gamepadInstances.byId.get(this._device.id)
 		if (!collection) {
 			collection = new Set()
-			Globals.controllerInstances.byId.set(this._device.id, collection)
+			Globals.gamepadInstances.byId.set(this._device.id, collection)
 		}
 		collection.add(this)
 	}
@@ -69,6 +70,13 @@ class ControllerInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		return this._buttons
+	}
+
+	get buttonLabels () {
+		Globals.events.poll()
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		return this._buttonLabels
 	}
 
 	get power () {
@@ -198,15 +206,16 @@ class ControllerInstance extends EventsViaPoll {
 
 		this._closed = true
 
-		Globals.controllerInstances.all.delete(this)
-		const collection = Globals.controllerInstances.byId.get(this._device.id)
+		Globals.gamepadInstances.all.delete(this)
+		const collection = Globals.gamepadInstances.byId.get(this._device.id)
 		collection.delete(this)
 		if (collection.size === 0) {
-			Globals.controllerInstances.byId.delete(this._device.id)
+			Globals.gamepadInstances.byId.delete(this._device.id)
 		}
 
-		// TODO: Will this call throw if the device is gone?
-		Bindings.controller_close(this._device.id)
+		// TODO: This call could throw if the device is gone
+		try { Bindings.gamepad_close(this._device.id) }
+		catch (_) {}
 
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })
@@ -216,4 +225,4 @@ class ControllerInstance extends EventsViaPoll {
 	}
 }
 
-module.exports = { ControllerInstance }
+module.exports = { GamepadInstance }

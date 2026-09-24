@@ -4,34 +4,33 @@
 #include "video.h"
 #include "touch.h"
 #include "joystick.h"
-#include "controller.h"
+#include "gamepad.h"
 #include "sensor.h"
 #include "audio.h"
 #include "power.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 #include <vector>
 
-#if defined(__MACOSX__)
+#if defined(SDL_PLATFORM_MACOS)
 	#include "cocoa-global.h"
 #endif
 
 
-static SDL_threadID mainThreadId;
+static SDL_ThreadID mainThreadId;
 
-int filterEvents(void*, SDL_Event *event) {
+bool watchEvents(void*, SDL_Event *event) {
 	if (true
-		&& SDL_ThreadID() == mainThreadId
-		&& event->type == SDL_WINDOWEVENT
+		&& SDL_GetCurrentThreadID() == mainThreadId
 		&& (false
-			|| event->window.event == SDL_WINDOWEVENT_MOVED
-			|| event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+			|| event->type == SDL_EVENT_WINDOW_MOVED
+			|| event->type == SDL_EVENT_WINDOW_RESIZED
 		)
 	) {
-		events::dispatchEventFromFilter(*event);
+		events::dispatchEventFromWatch(*event);
 	}
-	return 1;
+	return true;
 }
 
 
@@ -40,27 +39,26 @@ global::initialize(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	events::families::APP = "app";
-	events::families::DISPLAY = "display";
-	events::families::WINDOW = "window";
-	events::families::DROP = "drop";
-	events::families::KEYMAP = "keymap";
-	events::families::KEYBOARD = "keyboard";
-	events::families::TEXT = "text";
-	events::families::MOUSE = "mouse";
-	events::families::TOUCH = "touch";
-	events::families::JOYSTICK_DEVICE = "joystickDevice";
-	events::families::JOYSTICK = "joystick";
-	events::families::CONTROLLER = "controller";
-	events::families::SENSOR = "sensor";
-	events::families::AUDIO_DEVICE = "audioDevice";
-	events::families::CLIPBOARD = "clipboard";
+	events::targets::APP = "app";
+	events::targets::VIDEO = "video";
+	events::targets::WINDOW = "window";
+	events::targets::KEYBOARD = "keyboard";
+	events::targets::JOYSTICK = "joystick";
+	events::targets::GAMEPAD = "gamepad";
+	events::targets::SENSOR = "sensor";
+	events::targets::CLIPBOARD = "clipboard";
+	events::targets::JOYSTICK_DEVICE = "joystickDevice";
+	events::targets::GAMEPAD_DEVICE = "gamepadDevice";
+	events::targets::AUDIO_DEVICE = "audioDevice";
 
 	events::types::QUIT = "quit";
 	events::types::DISPLAY_ADD = "displayAdd";
 	events::types::DISPLAY_REMOVE = "displayRemove";
 	events::types::DISPLAY_ORIENT = "displayOrient";
 	events::types::DISPLAY_MOVE = "displayMove";
+	events::types::DISPLAY_SCALE = "displayScaleChange";
+	events::types::DISPLAY_MODE = "displayModeChange";
+	events::types::DISPLAY_USABLE = "displayUsableChange";
 	events::types::DISPLAY_CHANGE = "displayChange";
 	events::types::SHOW = "show";
 	events::types::HIDE = "hide";
@@ -109,9 +107,10 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::orientations[SDL_ORIENTATION_PORTRAIT_FLIPPED] = "portraitFlipped";
 
 	video::formats[SDL_PIXELFORMAT_RGB332] = "rgb332";
-	video::formats[SDL_PIXELFORMAT_RGB444] = "rgb444";
-	video::formats[SDL_PIXELFORMAT_RGB555] = "rgb555";
-	video::formats[SDL_PIXELFORMAT_BGR555] = "bgr555";
+	video::formats[SDL_PIXELFORMAT_XRGB4444] = "xrgb4444";
+	video::formats[SDL_PIXELFORMAT_XBGR4444] = "xbgr4444";
+	video::formats[SDL_PIXELFORMAT_XRGB1555] = "xrgb1555";
+	video::formats[SDL_PIXELFORMAT_XBGR1555] = "xbgr1555";
 	video::formats[SDL_PIXELFORMAT_ARGB4444] = "argb4444";
 	video::formats[SDL_PIXELFORMAT_RGBA4444] = "rgba4444";
 	video::formats[SDL_PIXELFORMAT_ABGR4444] = "abgr4444";
@@ -124,15 +123,36 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::formats[SDL_PIXELFORMAT_BGR565] = "bgr565";
 	video::formats[SDL_PIXELFORMAT_RGB24] = "rgb24";
 	video::formats[SDL_PIXELFORMAT_BGR24] = "bgr24";
-	video::formats[SDL_PIXELFORMAT_RGB888] = "rgb888";
+	video::formats[SDL_PIXELFORMAT_XRGB8888] = "xrgb8888";
 	video::formats[SDL_PIXELFORMAT_RGBX8888] = "rgbx8888";
-	video::formats[SDL_PIXELFORMAT_BGR888] = "bgr888";
+	video::formats[SDL_PIXELFORMAT_XBGR8888] = "xbgr8888";
 	video::formats[SDL_PIXELFORMAT_BGRX8888] = "bgrx8888";
 	video::formats[SDL_PIXELFORMAT_ARGB8888] = "argb8888";
 	video::formats[SDL_PIXELFORMAT_RGBA8888] = "rgba8888";
 	video::formats[SDL_PIXELFORMAT_ABGR8888] = "abgr8888";
 	video::formats[SDL_PIXELFORMAT_BGRA8888] = "bgra8888";
 	video::formats[SDL_PIXELFORMAT_ARGB2101010] = "argb2101010";
+	video::formats[SDL_PIXELFORMAT_XRGB2101010] = "xrgb2101010";
+	video::formats[SDL_PIXELFORMAT_XBGR2101010] = "xbgr2101010";
+	video::formats[SDL_PIXELFORMAT_ABGR2101010] = "abgr2101010";
+	video::formats[SDL_PIXELFORMAT_RGB48] = "rgb48";
+	video::formats[SDL_PIXELFORMAT_BGR48] = "bgr48";
+	video::formats[SDL_PIXELFORMAT_RGBA64] = "rgba64";
+	video::formats[SDL_PIXELFORMAT_ARGB64] = "argb64";
+	video::formats[SDL_PIXELFORMAT_BGRA64] = "bgra64";
+	video::formats[SDL_PIXELFORMAT_ABGR64] = "abgr64";
+	video::formats[SDL_PIXELFORMAT_RGB48_FLOAT] = "rgb48f";
+	video::formats[SDL_PIXELFORMAT_BGR48_FLOAT] = "bgr48f";
+	video::formats[SDL_PIXELFORMAT_RGBA64_FLOAT] = "rgba64f";
+	video::formats[SDL_PIXELFORMAT_ARGB64_FLOAT] = "argb64f";
+	video::formats[SDL_PIXELFORMAT_BGRA64_FLOAT] = "bgra64f";
+	video::formats[SDL_PIXELFORMAT_ABGR64_FLOAT] = "abgr64f";
+	video::formats[SDL_PIXELFORMAT_RGB96_FLOAT] = "rgb96f";
+	video::formats[SDL_PIXELFORMAT_BGR96_FLOAT] = "bgr96f";
+	video::formats[SDL_PIXELFORMAT_RGBA128_FLOAT] = "rgba128f";
+	video::formats[SDL_PIXELFORMAT_ARGB128_FLOAT] = "argb128f";
+	video::formats[SDL_PIXELFORMAT_BGRA128_FLOAT] = "bgra128f";
+	video::formats[SDL_PIXELFORMAT_ABGR128_FLOAT] = "abgr128f";
 	video::formats[SDL_PIXELFORMAT_YV12] = "yv12";
 	video::formats[SDL_PIXELFORMAT_IYUV] = "iyuv";
 	video::formats[SDL_PIXELFORMAT_YUY2] = "yuy2";
@@ -140,6 +160,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	video::formats[SDL_PIXELFORMAT_YVYU] = "yvyu";
 	video::formats[SDL_PIXELFORMAT_NV12] = "nv12";
 	video::formats[SDL_PIXELFORMAT_NV21] = "nv21";
+	video::formats[SDL_PIXELFORMAT_P010] = "p010";
 
 	// touch::device_types[SDL_TOUCH_DEVICE_INVALID] = nullptr;
 	touch::device_types[SDL_TOUCH_DEVICE_DIRECT] = "direct";
@@ -147,76 +168,82 @@ global::initialize(const Napi::CallbackInfo &info)
 	touch::device_types[SDL_TOUCH_DEVICE_INDIRECT_RELATIVE] = "indirectRelative";
 
 	// joystick::types[SDL_JOYSTICK_TYPE_UNKNOWN] = nullptr;
-	joystick::types[SDL_JOYSTICK_TYPE_GAMECONTROLLER] = "gamecontroller";
+	joystick::types[SDL_JOYSTICK_TYPE_GAMEPAD] = "gamepad";
 	joystick::types[SDL_JOYSTICK_TYPE_WHEEL] = "wheel";
-	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_STICK] = "arcadestick";
-	joystick::types[SDL_JOYSTICK_TYPE_FLIGHT_STICK] = "flightstick";
-	joystick::types[SDL_JOYSTICK_TYPE_DANCE_PAD] = "dancepad";
+	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_STICK] = "arcadeStick";
+	joystick::types[SDL_JOYSTICK_TYPE_FLIGHT_STICK] = "flightStick";
+	joystick::types[SDL_JOYSTICK_TYPE_DANCE_PAD] = "dancePad";
 	joystick::types[SDL_JOYSTICK_TYPE_GUITAR] = "guitar";
-	joystick::types[SDL_JOYSTICK_TYPE_DRUM_KIT] = "drumkit";
-	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_PAD] = "arcadepad";
+	joystick::types[SDL_JOYSTICK_TYPE_DRUM_KIT] = "drumKit";
+	joystick::types[SDL_JOYSTICK_TYPE_ARCADE_PAD] = "arcadePad";
 	joystick::types[SDL_JOYSTICK_TYPE_THROTTLE] = "throttle";
-
-	// joystick::power_levels[SDL_JOYSTICK_POWER_UNKNOWN] = nullptr;
-	joystick::power_levels[SDL_JOYSTICK_POWER_EMPTY] = "empty";
-	joystick::power_levels[SDL_JOYSTICK_POWER_LOW] = "low";
-	joystick::power_levels[SDL_JOYSTICK_POWER_MEDIUM] = "medium";
-	joystick::power_levels[SDL_JOYSTICK_POWER_FULL] = "full";
-	joystick::power_levels[SDL_JOYSTICK_POWER_WIRED] = "wired";
 
 	joystick::hat_positions[SDL_HAT_CENTERED] = "centered";
 	joystick::hat_positions[SDL_HAT_UP] = "up";
 	joystick::hat_positions[SDL_HAT_RIGHT] = "right";
 	joystick::hat_positions[SDL_HAT_DOWN] = "down";
 	joystick::hat_positions[SDL_HAT_LEFT] = "left";
-	joystick::hat_positions[SDL_HAT_RIGHTUP] = "rightup";
-	joystick::hat_positions[SDL_HAT_RIGHTDOWN] = "rightdown";
-	joystick::hat_positions[SDL_HAT_LEFTUP] = "leftup";
-	joystick::hat_positions[SDL_HAT_LEFTDOWN] = "leftdown";
+	joystick::hat_positions[SDL_HAT_RIGHTUP] = "rightUp";
+	joystick::hat_positions[SDL_HAT_RIGHTDOWN] = "rightDown";
+	joystick::hat_positions[SDL_HAT_LEFTUP] = "leftUp";
+	joystick::hat_positions[SDL_HAT_LEFTDOWN] = "leftDown";
 
-	// controller::types[SDL_CONTROLLER_TYPE_UNKNOWN] = nullptr;
-	controller::types[SDL_CONTROLLER_TYPE_XBOX360] = "xbox360";
-	controller::types[SDL_CONTROLLER_TYPE_XBOXONE] = "xboxOne";
-	controller::types[SDL_CONTROLLER_TYPE_PS3] = "ps3";
-	controller::types[SDL_CONTROLLER_TYPE_PS4] = "ps4";
-	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO] = "nintendoSwitchPro";
-	controller::types[SDL_CONTROLLER_TYPE_VIRTUAL] = "virtual";
-	controller::types[SDL_CONTROLLER_TYPE_PS5] = "ps5";
-	controller::types[SDL_CONTROLLER_TYPE_AMAZON_LUNA] = "amazonLuna";
-	controller::types[SDL_CONTROLLER_TYPE_GOOGLE_STADIA] = "googleStadia";
-	controller::types[SDL_CONTROLLER_TYPE_NVIDIA_SHIELD] = "nvidiaShield";
-	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT] = "nintendoSwitchJoyconLeft";
-	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT] = "nintendoSwitchJoyconRight";
-	controller::types[SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR] = "nintendoSwitchJoyconPair";
+	// gamepad::types[SDL_GAMEPAD_TYPE_UNKNOWN] = nullptr;
+	gamepad::types[SDL_GAMEPAD_TYPE_STANDARD] = "standard";
+	gamepad::types[SDL_GAMEPAD_TYPE_XBOX360] = "xbox360";
+	gamepad::types[SDL_GAMEPAD_TYPE_XBOXONE] = "xboxOne";
+	gamepad::types[SDL_GAMEPAD_TYPE_PS3] = "ps3";
+	gamepad::types[SDL_GAMEPAD_TYPE_PS4] = "ps4";
+	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO] = "nintendoSwitchPro";
+	gamepad::types[SDL_GAMEPAD_TYPE_PS5] = "ps5";
+	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT] = "nintendoSwitchJoyconLeft";
+	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT] = "nintendoSwitchJoyconRight";
+	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR] = "nintendoSwitchJoyconPair";
+	gamepad::types[SDL_GAMEPAD_TYPE_GAMECUBE] = "gamecube";
 
-	controller::axes[SDL_CONTROLLER_AXIS_LEFTX] = "leftStickX";
-	controller::axes[SDL_CONTROLLER_AXIS_LEFTY] = "leftStickY";
-	controller::axes[SDL_CONTROLLER_AXIS_RIGHTX] = "rightStickX";
-	controller::axes[SDL_CONTROLLER_AXIS_RIGHTY] = "rightStickY";
-	controller::axes[SDL_CONTROLLER_AXIS_TRIGGERLEFT] = "leftTrigger";
-	controller::axes[SDL_CONTROLLER_AXIS_TRIGGERRIGHT] = "rightTrigger";
+	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTX] = "leftStickX";
+	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTY] = "leftStickY";
+	gamepad::axes[SDL_GAMEPAD_AXIS_RIGHTX] = "rightStickX";
+	gamepad::axes[SDL_GAMEPAD_AXIS_RIGHTY] = "rightStickY";
+	gamepad::axes[SDL_GAMEPAD_AXIS_LEFT_TRIGGER] = "leftTrigger";
+	gamepad::axes[SDL_GAMEPAD_AXIS_RIGHT_TRIGGER] = "rightTrigger";
 
-	controller::buttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT] = "dpadLeft";
-	controller::buttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = "dpadRight";
-	controller::buttons[SDL_CONTROLLER_BUTTON_DPAD_UP] = "dpadUp";
-	controller::buttons[SDL_CONTROLLER_BUTTON_DPAD_DOWN] = "dpadDown";
-	controller::buttons[SDL_CONTROLLER_BUTTON_A] = "a";
-	controller::buttons[SDL_CONTROLLER_BUTTON_B] = "b";
-	controller::buttons[SDL_CONTROLLER_BUTTON_X] = "x";
-	controller::buttons[SDL_CONTROLLER_BUTTON_Y] = "y";
-	controller::buttons[SDL_CONTROLLER_BUTTON_GUIDE] = "guide";
-	controller::buttons[SDL_CONTROLLER_BUTTON_BACK] = "back";
-	controller::buttons[SDL_CONTROLLER_BUTTON_START] = "start";
-	controller::buttons[SDL_CONTROLLER_BUTTON_LEFTSTICK] = "leftStick";
-	controller::buttons[SDL_CONTROLLER_BUTTON_RIGHTSTICK] = "rightStick";
-	controller::buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = "leftShoulder";
-	controller::buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = "rightShoulder";
-	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE1] = "paddle1";
-	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE2] = "paddle2";
-	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE3] = "paddle3";
-	controller::buttons[SDL_CONTROLLER_BUTTON_PADDLE4] = "paddle4";
-	controller::buttons[SDL_CONTROLLER_BUTTON_MISC1] = "misc1";
-	controller::buttons[SDL_CONTROLLER_BUTTON_TOUCHPAD] = "touchpad";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_DPAD_LEFT] = "dpadLeft";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_DPAD_RIGHT] = "dpadRight";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_DPAD_UP] = "dpadUp";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_DPAD_DOWN] = "dpadDown";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_SOUTH] = "south";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_EAST] = "east";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_WEST] = "west";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_NORTH] = "north";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_GUIDE] = "guide";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_BACK] = "back";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_START] = "start";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_LEFT_STICK] = "leftStick";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_RIGHT_STICK] = "rightStick";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_LEFT_SHOULDER] = "leftShoulder";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER] = "rightShoulder";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1] = "rightPaddle1";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_LEFT_PADDLE1] = "leftPaddle1";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2] = "rightPaddle2";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_LEFT_PADDLE2] = "leftPaddle2";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC1] = "misc1";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC2] = "misc2";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC3] = "misc3";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC4] = "misc4";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC5] = "misc5";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_MISC6] = "misc6";
+	gamepad::buttons[SDL_GAMEPAD_BUTTON_TOUCHPAD] = "touchpad";
+
+	// gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN] = nullptr;
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_A] = "a";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_B] = "b";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_X] = "x";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_Y] = "y";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_CROSS] = "cross";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_CIRCLE] = "circle";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_SQUARE] = "square";
+	gamepad::button_labels[SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE] = "triangle";
 
 	// sensor::types[SDL_SENSOR_UNKNOWN] = nullptr;
 	sensor::types[SDL_SENSOR_ACCEL] = "accelerometer";
@@ -249,28 +276,26 @@ global::initialize(const Napi::CallbackInfo &info)
 	SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
 	SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "0");
 
-	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0) {
+	if (!SDL_InitSubSystem(SDL_INIT_EVENTS)) {
 		std::ostringstream message;
 		message << "SDL_Init() error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_version sdl_compile_version;
-	SDL_VERSION(&sdl_compile_version);
+	int sdl_compile_version = SDL_VERSION;
 
 	Napi::Object compile_version = Napi::Object::New(env);
-	compile_version.Set("major", sdl_compile_version.major);
-	compile_version.Set("minor", sdl_compile_version.minor);
-	compile_version.Set("patch", sdl_compile_version.patch);
+	compile_version.Set("major", SDL_VERSIONNUM_MAJOR(sdl_compile_version));
+	compile_version.Set("minor", SDL_VERSIONNUM_MINOR(sdl_compile_version));
+	compile_version.Set("patch", SDL_VERSIONNUM_MICRO(sdl_compile_version));
 
-	SDL_version sdl_runtime_version;
-	SDL_GetVersion(&sdl_runtime_version);
+	int sdl_runtime_version = SDL_GetVersion();
 
 	Napi::Object runtime_version = Napi::Object::New(env);
-	runtime_version.Set("major", sdl_runtime_version.major);
-	runtime_version.Set("minor", sdl_runtime_version.minor);
-	runtime_version.Set("patch", sdl_runtime_version.patch);
+	runtime_version.Set("major", SDL_VERSIONNUM_MAJOR(sdl_runtime_version));
+	runtime_version.Set("minor", SDL_VERSIONNUM_MINOR(sdl_runtime_version));
+	runtime_version.Set("patch", SDL_VERSIONNUM_MICRO(sdl_runtime_version));
 
 	Napi::Object versions = Napi::Object::New(env);
 	versions.Set("compile", compile_version);
@@ -281,33 +306,13 @@ global::initialize(const Napi::CallbackInfo &info)
 	Napi::Array all_video_drivers = Napi::Array::New(env);
 
 	int num_video_drivers = SDL_GetNumVideoDrivers();
-	if (num_video_drivers < 0) {
-		std::ostringstream message;
-		message << "SDL_GetNumVideoDrivers() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
 	for (int i = 0; i < num_video_drivers; i ++) {
-		const char *name = SDL_GetVideoDriver(i);
-		if(name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetVideoDriver(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-		all_video_drivers.Set(all_video_drivers.Length(), name);
+		all_video_drivers.Set(i, SDL_GetVideoDriver(i));
 	}
 
 	Napi::Value current_video_driver;
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {
-		const char *name = SDL_GetCurrentVideoDriver();
-		if(name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetCurrentVideoDriver() error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-		current_video_driver = Napi::String::New(env, name);
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+		current_video_driver = Napi::String::New(env, SDL_GetCurrentVideoDriver());
 		initialized.Set("video", true);
 	}
 	else {
@@ -322,34 +327,13 @@ global::initialize(const Napi::CallbackInfo &info)
 	Napi::Array all_audio_drivers = Napi::Array::New(env);
 
 	int num_audio_drivers = SDL_GetNumAudioDrivers();
-	if (num_audio_drivers < 0) {
-		std::ostringstream message;
-		message << "SDL_GetNumAudioDrivers() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
 	for (int i = 0; i < num_audio_drivers; i ++) {
-		const char *name = SDL_GetAudioDriver(i);
-		if(name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetAudioDriver(" << i << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-		all_audio_drivers.Set(all_audio_drivers.Length(), name);
+		all_audio_drivers.Set(i, SDL_GetAudioDriver(i));
 	}
 
 	Napi::Value current_audio_driver;
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO) == 0) {
-		const char *name = SDL_GetCurrentAudioDriver();
-		if(name == nullptr) {
-			std::ostringstream message;
-			message << "SDL_GetCurrentAudioDriver() error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-		current_audio_driver = Napi::String::New(env, name);
+	if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+		current_audio_driver = Napi::String::New(env, SDL_GetCurrentAudioDriver());
 		initialized.Set("audio", true);
 	}
 	else {
@@ -365,21 +349,25 @@ global::initialize(const Napi::CallbackInfo &info)
 	drivers.Set("video", video_drivers);
 	drivers.Set("audio", audio_drivers);
 
-	initialized.Set("joystick", SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0);
-	initialized.Set("controller", SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0);
-	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
-	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR) == 0);
+	initialized.Set("joystick", SDL_InitSubSystem(SDL_INIT_JOYSTICK));
+	initialized.Set("gamepad", SDL_InitSubSystem(SDL_INIT_GAMEPAD));
+	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC));
+	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR));
 
 	// Drop errors from optional subsystems that failed to initialize
 	SDL_ClearError();
 
-	mainThreadId = SDL_ThreadID();
-	SDL_SetEventFilter(filterEvents, nullptr);
+	mainThreadId = SDL_GetCurrentThreadID();
+	if (!SDL_AddEventWatch(watchEvents, nullptr)) {
+		std::ostringstream message;
+		message << "SDL_AddEventWatch() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
-	SDL_StartTextInput();
 
-#if defined(__MACOSX__)
+#if defined(SDL_PLATFORM_MACOS)
 	reenableInertialScrolling();
 #endif
 

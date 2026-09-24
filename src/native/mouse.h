@@ -14,7 +14,6 @@ namespace mouse {
 	Napi::Value showCursor(const Napi::CallbackInfo &info);
 	Napi::Value redrawCursor(const Napi::CallbackInfo &info);
 	Napi::Value capture(const Napi::CallbackInfo &info);
-	Napi::Value setRelativeMode(const Napi::CallbackInfo &info);
 
 }; // namespace mouse
 

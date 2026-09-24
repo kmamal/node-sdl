@@ -1,101 +1,118 @@
 #include "video.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 #include <map>
 
 
 std::map<SDL_DisplayOrientation, std::string> video::orientations;
-std::map<SDL_PixelFormatEnum, std::string> video::formats;
+std::map<SDL_PixelFormat, std::string> video::formats;
 
+
+static Napi::Value
+_packDisplay (Napi::Env &env, SDL_DisplayID display_id)
+{
+	const char *_name = SDL_GetDisplayName(display_id);
+	Napi::Value name = _name != nullptr
+		? Napi::String::New(env, _name)
+		: env.Null();
+
+	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(display_id);
+	if (mode == nullptr) {
+		SDL_ClearError();
+		return env.Null();
+	}
+
+	SDL_Rect rect;
+	if(!SDL_GetDisplayBounds(display_id, &rect)) {
+		SDL_ClearError();
+		return env.Null();
+	}
+
+	Napi::Object geometry = Napi::Object::New(env);
+	geometry.Set("x", rect.x);
+	geometry.Set("y", rect.y);
+	geometry.Set("width", rect.w);
+	geometry.Set("height", rect.h);
+
+	if(!SDL_GetDisplayUsableBounds(display_id, &rect)) {
+		SDL_ClearError();
+		return env.Null();
+	}
+
+	Napi::Object usable = Napi::Object::New(env);
+	usable.Set("x", rect.x);
+	usable.Set("y", rect.y);
+	usable.Set("width", rect.w);
+	usable.Set("height", rect.h);
+
+	Napi::Value scale;
+	float _scale = SDL_GetDisplayContentScale(display_id);
+	if (_scale == 0.0f) {
+		SDL_ClearError();
+		scale = env.Null();
+	}
+	else {
+		scale = Napi::Number::New(env, _scale);
+	}
+
+	SDL_DisplayOrientation _orientation = SDL_GetCurrentDisplayOrientation(display_id);
+	auto orientation_entry = video::orientations.find(_orientation);
+	Napi::Value orientation = orientation_entry != video::orientations.end()
+		? Napi::String::New(env, orientation_entry->second)
+		: env.Null();
+
+	auto format_entry = video::formats.find(mode->format);
+	Napi::Value format = format_entry != video::formats.end()
+		? Napi::String::New(env, format_entry->second)
+		: env.Null();
+
+	Napi::Object display = Napi::Object::New(env);
+	display.Set("id", display_id);
+	display.Set("name", name);
+	display.Set("format", format);
+	display.Set("frequency", mode->refresh_rate);
+	display.Set("geometry", geometry);
+	display.Set("usable", usable);
+	display.Set("scale", scale);
+	display.Set("orientation", orientation);
+
+	return display;
+}
+
+Napi::Value
+video::_getDisplay (Napi::Env &env, SDL_DisplayID display_id)
+{
+	return _packDisplay(env, display_id);
+}
 
 Napi::Array
-video::_getDisplays(Napi::Env &env)
+video::_getDisplays (Napi::Env &env)
 {
-	int num_displays = SDL_GetNumVideoDisplays();
-	if (num_displays < 0) {
+	int num_displays;
+	SDL_DisplayID *display_ids = SDL_GetDisplays(&num_displays);
+	if (display_ids == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetNumVideoDisplays() error: " << SDL_GetError();
+		message << "SDL_GetDisplays() error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
 	Napi::Array displays = Napi::Array::New(env);
 
-	int num_returned = 0;
-	for (int i = 0; i < num_displays; i++) {
-		const char *_name = SDL_GetDisplayName(i);
-		Napi::Value name = _name != nullptr
-			? Napi::String::New(env, _name)
-			: env.Null();
-
-		// A display can be removed mid-enumeration, failing the queries below
-
-		SDL_DisplayMode mode;
-		if (SDL_GetCurrentDisplayMode(i, &mode) < 0) {
-			SDL_ClearError();
-			continue;
+	try {
+		int num_returned = 0;
+		for (int i = 0; i < num_displays; i++) {
+			Napi::Value display = _packDisplay(env, display_ids[i]);
+			if (display.IsNull()) { continue; }
+			displays.Set(num_returned++, display);
 		}
-
-		SDL_Rect rect;
-		if(SDL_GetDisplayBounds(i, &rect) < 0) {
-			SDL_ClearError();
-			continue;
-		}
-
-		Napi::Object geometry = Napi::Object::New(env);
-		geometry.Set("x", rect.x);
-		geometry.Set("y", rect.y);
-		geometry.Set("width", rect.w);
-		geometry.Set("height", rect.h);
-
-		if(SDL_GetDisplayUsableBounds(i, &rect) < 0) {
-			SDL_ClearError();
-			continue;
-		}
-
-		Napi::Object usable = Napi::Object::New(env);
-		usable.Set("x", rect.x);
-		usable.Set("y", rect.y);
-		usable.Set("width", rect.w);
-		usable.Set("height", rect.h);
-
-		Napi::Value dpi;
-		float ddpi, hdpi, vdpi;
-		if (SDL_GetDisplayDPI(i, &ddpi, &hdpi, &vdpi) < 0) {
-			dpi = env.Null();
-		}
-		else {
-			Napi::Object dpi_obj = Napi::Object::New(env);
-			dpi_obj.Set("diagonal", ddpi);
-			dpi_obj.Set("horizontal", hdpi);
-			dpi_obj.Set("vertical", vdpi);
-			dpi = dpi_obj;
-		}
-
-		SDL_DisplayOrientation _orientation = SDL_GetDisplayOrientation(i);
-		auto orientation_entry = video::orientations.find(_orientation);
-		Napi::Value orientation = orientation_entry != video::orientations.end()
-			? Napi::String::New(env, orientation_entry->second)
-			: env.Null();
-
-		auto format_entry = video::formats.find((SDL_PixelFormatEnum) mode.format);
-		Napi::Value format = format_entry != video::formats.end()
-			? Napi::String::New(env, format_entry->second)
-			: env.Null();
-
-		Napi::Object display = Napi::Object::New(env);
-		display.Set("_index", i);
-		display.Set("name", name);
-		display.Set("format", format);
-		display.Set("frequency", mode.refresh_rate);
-		display.Set("geometry", geometry);
-		display.Set("usable", usable);
-		display.Set("dpi", dpi);
-		display.Set("orientation", orientation);
-
-		displays.Set(num_returned++, display);
 	}
+	catch (...) {
+		SDL_free(display_ids);
+		throw;
+	}
+	SDL_free(display_ids);
 
 	return displays;
 }

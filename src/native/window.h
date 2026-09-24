@@ -2,7 +2,7 @@
 #define _WINDOW_H_
 
 #include <napi.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 namespace window {
 
@@ -13,6 +13,7 @@ namespace window {
 		Napi::Value setFullscreen(const Napi::CallbackInfo &info);
 		Napi::Value setResizable(const Napi::CallbackInfo &info);
 		Napi::Value setBorderless(const Napi::CallbackInfo &info);
+		Napi::Value setRelativeMouseMode(const Napi::CallbackInfo &info);
 		Napi::Value setAcceleratedAndVsync(const Napi::CallbackInfo &info);
 		Napi::Value focus(const Napi::CallbackInfo &info);
 		Napi::Value show(const Napi::CallbackInfo &info);

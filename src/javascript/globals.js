@@ -14,8 +14,8 @@ module.exports = {
 		all: new Set(),
 		byId: new Map(),
 	},
-	controllerDevices: [],
-	controllerInstances: {
+	gamepadDevices: [],
+	gamepadInstances: {
 		all: new Set(),
 		byId: new Map(),
 	},
@@ -28,7 +28,7 @@ module.exports = {
 		playback: [],
 		recording: [],
 	},
-	audioInstances: new Map(),
+	audioStreams: new Map(),
 
 	events: null,
 }

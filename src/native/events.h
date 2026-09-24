@@ -2,27 +2,23 @@
 #define _EVENTS_H_
 
 #include <napi.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <string>
 
 namespace events {
 
-	namespace families {
+	namespace targets {
 		extern std::string APP;
-		extern std::string DISPLAY;
+		extern std::string VIDEO;
 		extern std::string WINDOW;
-		extern std::string DROP;
-		extern std::string KEYMAP;
 		extern std::string KEYBOARD;
-		extern std::string TEXT;
-		extern std::string MOUSE;
-		extern std::string TOUCH;
-		extern std::string JOYSTICK_DEVICE;
 		extern std::string JOYSTICK;
-		extern std::string CONTROLLER;
+		extern std::string GAMEPAD;
 		extern std::string SENSOR;
-		extern std::string AUDIO_DEVICE;
 		extern std::string CLIPBOARD;
+		extern std::string JOYSTICK_DEVICE;
+		extern std::string GAMEPAD_DEVICE;
+		extern std::string AUDIO_DEVICE;
 	};
 
 	namespace types {
@@ -31,6 +27,9 @@ namespace events {
 		extern std::string DISPLAY_REMOVE;
 		extern std::string DISPLAY_ORIENT;
 		extern std::string DISPLAY_MOVE;
+		extern std::string DISPLAY_SCALE;
+		extern std::string DISPLAY_MODE;
+		extern std::string DISPLAY_USABLE;
 		extern std::string DISPLAY_CHANGE;
 		extern std::string SHOW;
 		extern std::string HIDE;
@@ -74,9 +73,9 @@ namespace events {
 	};
 
 	bool dispatchEvent(const SDL_Event &event);
-	bool dispatchEventFromFilter(const SDL_Event &event);
+	bool dispatchEventFromWatch(const SDL_Event &event);
 
-	Napi::Value isDispatchingFromFilter(const Napi::CallbackInfo &info);
+	Napi::Value isDispatchingFromWatch(const Napi::CallbackInfo &info);
 	Napi::Value poll(const Napi::CallbackInfo &info);
 
 }; // namespace events

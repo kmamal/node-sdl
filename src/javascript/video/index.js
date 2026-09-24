@@ -10,7 +10,15 @@ Globals.displays = Globals.info.initialized.video
 	: []
 
 
-const validEvents = [ 'displayAdd', 'displayRemove', 'displayOrient', 'displayMove' ]
+const validEvents = [
+	'displayAdd',
+	'displayRemove',
+	'displayOrient',
+	'displayMove',
+	'displayScaleChange',
+	'displayModeChange',
+	'displayUsableChange',
+]
 
 const video = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }

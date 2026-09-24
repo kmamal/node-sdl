@@ -4,10 +4,10 @@ import { loadAudio } from './ffmpeg.js'
 
 const channels = 1
 const frequency = 48e3
-const audioInstance = sdl.audio.openDevice({ type: 'playback' }, {
+const playbackStream = sdl.audio.playback.openDevice(null, {
 	channels,
 	frequency,
-	format: 'f32lsb',
+	format: 'f32le',
 })
 
 const buffer = await loadAudio(
@@ -15,5 +15,5 @@ const buffer = await loadAudio(
 	{ channels, frequency },
 )
 
-audioInstance.enqueue(buffer)
-audioInstance.play()
+playbackStream.putData(buffer)
+playbackStream.play()

@@ -12,7 +12,7 @@ const { keyboard } = require('./keyboard')
 const { mouse } = require('./mouse')
 const { touch } = require('./touch')
 const { joystick } = require('./joystick')
-const { controller } = require('./controller')
+const { gamepad } = require('./gamepad')
 const { sensor } = require('./sensor')
 const { audio } = require('./audio')
 const { clipboard } = require('./clipboard')
@@ -28,7 +28,7 @@ module.exports = {
 	mouse,
 	touch,
 	joystick,
-	controller,
+	gamepad,
 	sensor,
 	audio,
 	clipboard,

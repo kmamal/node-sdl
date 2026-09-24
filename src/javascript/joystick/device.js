@@ -1,18 +1,13 @@
 
 const make = (device) => {
 	const {
-		isController,
-		controllerMapping,
-		controllerName,
-		controllerType,
+		isGamepad,
+		gamepadMapping,
+		gamepadName,
+		gamepadType,
 		...rest
 	} = device
 	return rest
 }
 
-const keys = [ (device) => device.id ]
-
-module.exports = {
-	make,
-	keys,
-}
+module.exports = { make }

@@ -3,6 +3,7 @@
 
 
 #ifndef __OBJC__
+	class NSWindow;
 	class NSView;
 	class CALayer;
 #endif

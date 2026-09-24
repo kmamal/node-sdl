@@ -9,7 +9,7 @@ const ctx = canvas.getContext('2d')
 
 const channels = 1
 const buffered = 128
-const recordingInstance = sdl.audio.openDevice({ type: 'recording' }, {
+const recordingStream = sdl.audio.recording.openDevice(null, {
 	channels,
 	buffered,
 })
@@ -19,7 +19,7 @@ const {
 	minSampleValue,
 	maxSampleValue,
 	zeroSampleValue,
-} = recordingInstance
+} = recordingStream
 const range = maxSampleValue - minSampleValue
 const amplitude = range / 2
 
@@ -28,20 +28,20 @@ const numSamples = duration * frequency
 const numBytes = numSamples * bytesPerSample
 const audioBuffer = Buffer.alloc(numBytes, 0)
 
-recordingInstance.play()
+recordingStream.play()
 
 const supersampling = 4
 
 while (!window.destroyed) {
 	// Read new audio samples
 	{
-		const { queued } = recordingInstance
-		if (queued === 0) {
+		const { available } = recordingStream
+		if (available === 0) {
 			await setTimeout(1)
 			continue
 		}
-		audioBuffer.copy(audioBuffer, 0, queued)
-		recordingInstance.dequeue(audioBuffer.slice(-queued))
+		audioBuffer.copy(audioBuffer, 0, available)
+		recordingStream.getData(audioBuffer.slice(-available))
 	}
 
 	// Render
@@ -70,7 +70,7 @@ while (!window.destroyed) {
 					max = -Infinity
 				}
 
-				const sample = recordingInstance.readSample(audioBuffer, i * bytesPerSample)
+				const sample = recordingStream.readSample(audioBuffer, i * bytesPerSample)
 				max = Math.max(max, sample)
 				min = Math.min(min, sample)
 			}

@@ -2,12 +2,12 @@
 #define _KEYBOARD_H_
 
 #include <napi.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 namespace keyboard {
 
 	extern int num_keys;
-	extern const Uint8 *keys;
+	extern const bool *keys;
 
 	Napi::Value getKey(const Napi::CallbackInfo &info);
 	Napi::Value getScancode(const Napi::CallbackInfo &info);

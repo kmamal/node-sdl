@@ -13,6 +13,9 @@
   - [Event: 'displayRemove'](#event-displayremove)
   - [Event: 'displayOrient'](#event-displayorient)
   - [Event: 'displayMove'](#event-displaymove)
+  - [Event: 'displayScaleChange'](#event-displayscalechange)
+  - [Event: 'displayModeChange'](#event-displaymodechange)
+  - [Event: 'displayUsableChange'](#event-displayusablechange)
   - [sdl.video.bytesPerPixel(format)](#sdlvideobytesperpixelformat)
   - [sdl.video.isYuv(format)](#sdlvideoisyuvformat)
   - [sdl.video.isPlanarYuv(format)](#sdlvideoisplanaryuvformat)
@@ -90,10 +93,9 @@
     - [window.focused](#windowfocused)
     - [window.focus()](#windowfocus)
     - [window.hovered](#windowhovered)
-    - [window.skipTaskbar](#windowskiptaskbar)
-    - [window.popupMenu](#windowpopupmenu)
-    - [window.tooltip](#windowtooltip)
-    - [window.utility](#windowutility)
+    - [window.relativeMouseMode](#windowrelativemousemode)
+    - [window.setRelativeMouseMode([relative])](#windowsetrelativemousemoderelative)
+    - [window.unsetRelativeMouseMode()](#windowunsetrelativemousemode)
     - [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
     - [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
     - [window.flash([untilFocused])](#windowflashuntilfocused)
@@ -122,14 +124,10 @@
   - [sdl.mouse.captured](#sdlmousecaptured)
   - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   - [sdl.mouse.uncapture()](#sdlmouseuncapture)
-  - [sdl.mouse.relativeMode](#sdlmouserelativemode)
-  - [sdl.mouse.setRelativeMode([relative])](#sdlmousesetrelativemoderelative)
-  - [sdl.mouse.unsetRelativeMode()](#sdlmouseunsetrelativemode)
 - [sdl.touch](#sdltouch)
   - [sdl.touch.devices](#sdltouchdevices)
 - [sdl.joystick](#sdljoystick)
   - [Hat positions](#hat-positions)
-  - [Power levels](#power-levels)
   - [Event: 'deviceAdd'](#joystick-event-deviceadd)
   - [Event: 'deviceRemove'](#joystick-event-deviceremove)
   - [sdl.joystick.devices](#sdljoystickdevices)
@@ -162,39 +160,40 @@
     - [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
     - [joystickInstance.closed](#joystickinstanceclosed)
     - [joystickInstance.close()](#joystickinstanceclose)
-- [sdl.controller](#sdlcontroller)
-  - [Event: 'deviceAdd'](#controller-event-deviceadd)
-  - [Event: 'deviceRemove'](#controller-event-deviceremove)
-  - [sdl.controller.addMappings(mappings)](#sdlcontrolleraddmappingsmappings)
-  - [sdl.controller.devices](#sdlcontrollerdevices)
-  - [sdl.controller.openDevice(device)](#sdlcontrolleropendevicedevice)
-  - [class ControllerInstance](#class-controllerinstance)
-    - [Event: 'axisMotion'](#controller-instance-event-axismotion)
-    - [Event: 'buttonDown'](#controller-instance-event-buttondown)
-    - [Event: 'buttonUp'](#controller-instance-event-buttonup)
-    - [Event: 'powerUpdate'](#controller-instance-event-power-update)
+- [sdl.gamepad](#sdlgamepad)
+  - [Event: 'deviceAdd'](#gamepad-event-deviceadd)
+  - [Event: 'deviceRemove'](#gamepad-event-deviceremove)
+  - [sdl.gamepad.addMappings(mappings)](#sdlgamepadaddmappingsmappings)
+  - [sdl.gamepad.devices](#sdlgamepaddevices)
+  - [sdl.gamepad.openDevice(device)](#sdlgamepadopendevicedevice)
+  - [class GamepadInstance](#class-gamepadinstance)
+    - [Event: 'axisMotion'](#gamepad-instance-event-axismotion)
+    - [Event: 'buttonDown'](#gamepad-instance-event-buttondown)
+    - [Event: 'buttonUp'](#gamepad-instance-event-buttonup)
+    - [Event: 'powerUpdate'](#gamepad-instance-event-power-update)
     - [Event: 'steamHandleUpdate'](#event-steamhandleupdate)
     - [Event: 'remap'](#event-remap)
-    - [Event: 'close'](#controller-instance-event-close)
-    - [controllerInstance.device](#controllerinstancedevice)
-    - [controllerInstance.firmwareVersion](#controllerinstancefirmwareversion)
-    - [controllerInstance.serialNumber](#controllerinstanceserialnumber)
-    - [controllerInstance.steamHandle](#controllerinstancesteamhandle)
-    - [controllerInstance.axes](#controllerinstanceaxes)
-    - [controllerInstance.buttons](#controllerinstancebuttons)
-    - [controllerInstance.power](#controllerinstancepower)
-    - [controllerInstance.setPlayer(index)](#controllerinstancesetplayerindex)
-    - [controllerInstance.resetPlayer()](#controllerinstanceresetplayer)
-    - [controllerInstance.hasLed](#controllerinstancehasled)
-    - [controllerInstance.setLed(red, green, blue)](#controllerinstancesetledred-green-blue)
-    - [controllerInstance.hasRumble](#controllerinstancehasrumble)
-    - [controllerInstance.rumble([low[, high[, duration]]])](#controllerinstancerumblelow-high-duration)
-    - [controllerInstance.stopRumble()](#controllerinstancestoprumble)
-    - [controllerInstance.hasRumbleTriggers](#controllerinstancehasrumbletriggers)
-    - [controllerInstance.rumbleTriggers([left[, right[, duration]]])](#controllerinstancerumbletriggersleft-right-duration)
-    - [controllerInstance.stopRumbleTriggers()](#controllerinstancestoprumbletriggers)
-    - [controllerInstance.closed](#controllerinstanceclosed)
-    - [controllerInstance.close()](#controllerinstanceclose)
+    - [Event: 'close'](#gamepad-instance-event-close)
+    - [gamepadInstance.device](#gamepadinstancedevice)
+    - [gamepadInstance.firmwareVersion](#gamepadinstancefirmwareversion)
+    - [gamepadInstance.serialNumber](#gamepadinstanceserialnumber)
+    - [gamepadInstance.steamHandle](#gamepadinstancesteamhandle)
+    - [gamepadInstance.axes](#gamepadinstanceaxes)
+    - [gamepadInstance.buttons](#gamepadinstancebuttons)
+    - [gamepadInstance.buttonLabels](#gamepadinstancebuttonlabels)
+    - [gamepadInstance.power](#gamepadinstancepower)
+    - [gamepadInstance.setPlayer(index)](#gamepadinstancesetplayerindex)
+    - [gamepadInstance.resetPlayer()](#gamepadinstanceresetplayer)
+    - [gamepadInstance.hasLed](#gamepadinstancehasled)
+    - [gamepadInstance.setLed(red, green, blue)](#gamepadinstancesetledred-green-blue)
+    - [gamepadInstance.hasRumble](#gamepadinstancehasrumble)
+    - [gamepadInstance.rumble([low[, high[, duration]]])](#gamepadinstancerumblelow-high-duration)
+    - [gamepadInstance.stopRumble()](#gamepadinstancestoprumble)
+    - [gamepadInstance.hasRumbleTriggers](#gamepadinstancehasrumbletriggers)
+    - [gamepadInstance.rumbleTriggers([left[, right[, duration]]])](#gamepadinstancerumbletriggersleft-right-duration)
+    - [gamepadInstance.stopRumbleTriggers()](#gamepadinstancestoprumbletriggers)
+    - [gamepadInstance.closed](#gamepadinstanceclosed)
+    - [gamepadInstance.close()](#gamepadinstanceclose)
 - [sdl.sensor](#sdlsensor)
   - [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandard_gravity)
   - [sdl.sensor.devices](#sdlsensordevices)
@@ -209,42 +208,48 @@
 - [sdl.audio](#sdlaudio)
   - [Audio data](#audio-data)
   - [Sample formats](#sample-formats)
-  - [Event: 'deviceAdd'](#audio-event-deviceadd)
-  - [Event: 'deviceRemove'](#audio-event-deviceremove)
   - [sdl.audio.bytesPerSample(format)](#sdlaudiobytespersampleformat)
   - [sdl.audio.minSampleValue(format)](#sdlaudiominsamplevalueformat)
   - [sdl.audio.maxSampleValue(format)](#sdlaudiomaxsamplevalueformat)
   - [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
   - [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
   - [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
-  - [sdl.audio.devices](#sdlaudiodevices)
-  - [sdl.audio.openDevice(device[, options])](#sdlaudioopendevicedevice-options)
-  - [class AudioInstance](#class-audioinstance)
-    - [Event: 'close'](#audio-instance-event-close)
-    - [audioInstance.id](#audioinstanceid)
-    - [audioInstance.device](#audioinstancedevice)
-    - [audioInstance.name](#audioinstancename)
-    - [audioInstance.channels](#audioinstancechannels)
-    - [audioInstance.frequency](#audioinstancefrequency)
-    - [audioInstance.format](#audioinstanceformat)
-    - [audioInstance.bytesPerSample](#audioinstancebytespersample)
-    - [audioInstance.minSampleValue](#audioinstanceminsamplevalue)
-    - [audioInstance.maxSampleValue](#audioinstancemaxsamplevalue)
-    - [audioInstance.zeroSampleValue](#audioinstancezerosamplevalue)
-    - [audioInstance.readSample(buffer[, offset])](#audioinstancereadsamplebuffer-offset)
-    - [audioInstance.writeSample(buffer, value[, offset])](#audioinstancewritesamplebuffer-value-offset)
-    - [audioInstance.buffered](#audioinstancebuffered)
-    - [audioInstance.playing](#audioinstanceplaying)
-    - [audioInstance.play([play])](#audioinstanceplayplay)
-    - [audioInstance.pause()](#audioinstancepause)
-    - [audioInstance.queued](#audioinstancequeued)
-    - [audioInstance.clearQueue()](#audioinstanceclearqueue)
-    - [audioInstance.closed](#audioinstanceclosed)
-    - [audioInstance.close()](#audioinstanceclose)
-  - [class AudioPlaybackInstance extends AudioInstance](#class-audioplaybackinstance-extends-audioinstance)
-    - [playbackInstance.enqueue(buffer[, bytes])](#playbackinstanceenqueuebuffer-bytes)
-  - [class AudioRecordingInstance extends AudioInstance](#class-audiorecordinginstance-extends-audioinstance)
-    - [recordingInstance.dequeue(buffer[, bytes])](#recordinginstancedequeuebuffer-bytes)
+  - [sdl.audio.playback](#sdlaudioplayback)
+    - [Event: 'deviceAdd'](#audio-playback-event-deviceadd)
+    - [Event: 'deviceRemove'](#audio-playback-event-deviceremove)
+    - [sdl.audio.playback.devices](#sdlaudioplaybackdevices)
+    - [sdl.audio.playback.openDevice([device[, options]])](#sdlaudioplaybackopendevicedevice-options)
+  - [sdl.audio.recording](#sdlaudiorecording)
+    - [Event: 'deviceAdd'](#audio-recording-event-deviceadd)
+    - [Event: 'deviceRemove'](#audio-recording-event-deviceremove)
+    - [sdl.audio.recording.devices](#sdlaudiorecordingdevices)
+    - [sdl.audio.recording.openDevice([device[, options]])](#sdlaudiorecordingopendevicedevice-options)
+  - [class AudioStream](#class-audiostream)
+    - [Event: 'close'](#audio-stream-event-close)
+    - [audioStream.id](#audiostreamid)
+    - [audioStream.device](#audiostreamdevice)
+    - [audioStream.channels](#audiostreamchannels)
+    - [audioStream.frequency](#audiostreamfrequency)
+    - [audioStream.format](#audiostreamformat)
+    - [audioStream.bytesPerSample](#audiostreambytespersample)
+    - [audioStream.minSampleValue](#audiostreamminsamplevalue)
+    - [audioStream.maxSampleValue](#audiostreammaxsamplevalue)
+    - [audioStream.zeroSampleValue](#audiostreamzerosamplevalue)
+    - [audioStream.readSample(buffer[, offset])](#audiostreamreadsamplebuffer-offset)
+    - [audioStream.writeSample(buffer, value[, offset])](#audiostreamwritesamplebuffer-value-offset)
+    - [audioStream.buffered](#audiostreambuffered)
+    - [audioStream.playing](#audiostreamplaying)
+    - [audioStream.play([play])](#audiostreamplayplay)
+    - [audioStream.pause()](#audiostreampause)
+    - [audioStream.clear()](#audiostreamclear)
+    - [audioStream.closed](#audiostreamclosed)
+    - [audioStream.close()](#audiostreamclose)
+  - [class AudioPlaybackStream extends AudioStream](#class-audioplaybackstream-extends-audiostream)
+    - [playbackStream.queued](#playbackstreamqueued)
+    - [playbackStream.putData(buffer[, bytes])](#playbackstreamputdatabuffer-bytes)
+  - [class AudioRecordingStream extends AudioStream](#class-audiorecordingstream-extends-audiostream)
+    - [recordingStream.available](#recordingstreamavailable)
+    - [recordingStream.getData(buffer[, bytes])](#recordingstreamgetdatabuffer-bytes)
 - [sdl.clipboard](#sdlclipboard)
   - [Event: 'update'](#clipboard-event-update)
   - [sdl.clipboard.text](#sdlclipboardtext)
@@ -277,7 +282,7 @@ Unless noted otherwise, wherever the API expects a whole-number quantity (positi
     - `video: <boolean>`: Is `true` if the video subsystem was successfully initialized, or `false` otherwise.
     - `audio: <boolean>`: Is `true` if the audio subsystem was successfully initialized, or `false` otherwise.
     - `joystick: <boolean>`: Is `true` if the joystick subsystem was successfully initialized, or `false` otherwise.
-    - `controller: <boolean>`: Is `true` if the controller subsystem was successfully initialized, or `false` otherwise.
+    - `gamepad: <boolean>`: Is `true` if the gamepad subsystem was successfully initialized, or `false` otherwise.
     - `haptic: <boolean>`: Is `true` if the haptic subsystem was successfully initialized, or `false` otherwise.
     - `sensor: <boolean>`: Is `true` if the sensor subsystem was successfully initialized, or `false` otherwise.
 
@@ -312,7 +317,7 @@ Sample data for Ubuntu:
     video: true,
     audio: true,
     joystick: true,
-    controller: true,
+    gamepad: true,
     haptic: true,
     sensor: true,
   },
@@ -321,7 +326,7 @@ Sample data for Ubuntu:
 
 ### Event Emitters
 
-Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.controller`, `sdl.audio`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, e.t.c. all work.
+Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.gamepad`, `sdl.audio.playback`, `sdl.audio.recording`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances and audio streams) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, e.t.c. all work.
 Only the event names listed in this document are valid for each object.
 Attaching a listener for any other event name throws.
 
@@ -388,12 +393,13 @@ I recommend that in these cases you always use `pixelWidth` and `pixelHeight`, s
 
 String values used to represent how the pixels of an image are stored in a Buffer.
 
-| Value           | Corresponding `SDL_PixelFormatEnum` | Comment                                                                                      |
+| Value           | Corresponding `SDL_PixelFormat`     | Comment                                                                                      |
 | ---             | ---                                 | ---                                                                                          |
 | `'rgb332'`      | `SDL_PIXELFORMAT_RGB332`            |                                                                                              |
-| `'rgb444'`      | `SDL_PIXELFORMAT_RGB444`            |                                                                                              |
-| `'rgb555'`      | `SDL_PIXELFORMAT_RGB555`            |                                                                                              |
-| `'bgr555'`      | `SDL_PIXELFORMAT_BGR555`            |                                                                                              |
+| `'xrgb4444'`    | `SDL_PIXELFORMAT_XRGB4444`          |                                                                                              |
+| `'xbgr4444'`    | `SDL_PIXELFORMAT_XBGR4444`          |                                                                                              |
+| `'xrgb1555'`    | `SDL_PIXELFORMAT_XRGB1555`          |                                                                                              |
+| `'xbgr1555'`    | `SDL_PIXELFORMAT_XBGR1555`          |                                                                                              |
 | `'argb4444'`    | `SDL_PIXELFORMAT_ARGB4444`          |                                                                                              |
 | `'rgba4444'`    | `SDL_PIXELFORMAT_RGBA4444`          |                                                                                              |
 | `'abgr4444'`    | `SDL_PIXELFORMAT_ABGR4444`          |                                                                                              |
@@ -406,19 +412,44 @@ String values used to represent how the pixels of an image are stored in a Buffe
 | `'bgr565'`      | `SDL_PIXELFORMAT_BGR565`            |                                                                                              |
 | `'rgb24'`       | `SDL_PIXELFORMAT_RGB24`             |                                                                                              |
 | `'bgr24'`       | `SDL_PIXELFORMAT_BGR24`             |                                                                                              |
-| `'rgb888'`      | `SDL_PIXELFORMAT_RGB888`            |                                                                                              |
+| `'xrgb8888'`    | `SDL_PIXELFORMAT_XRGB8888`          |                                                                                              |
 | `'rgbx8888'`    | `SDL_PIXELFORMAT_RGBX8888`          |                                                                                              |
-| `'bgr888'`      | `SDL_PIXELFORMAT_BGR888`            |                                                                                              |
+| `'xbgr8888'`    | `SDL_PIXELFORMAT_XBGR8888`          |                                                                                              |
 | `'bgrx8888'`    | `SDL_PIXELFORMAT_BGRX8888`          |                                                                                              |
 | `'argb8888'`    | `SDL_PIXELFORMAT_ARGB8888`          |                                                                                              |
 | `'rgba8888'`    | `SDL_PIXELFORMAT_RGBA8888`          |                                                                                              |
 | `'abgr8888'`    | `SDL_PIXELFORMAT_ABGR8888`          |                                                                                              |
 | `'bgra8888'`    | `SDL_PIXELFORMAT_BGRA8888`          |                                                                                              |
 | `'argb2101010'` | `SDL_PIXELFORMAT_ARGB2101010`       |                                                                                              |
+| `'xrgb2101010'` | `SDL_PIXELFORMAT_XRGB2101010`       |                                                                                              |
+| `'xbgr2101010'` | `SDL_PIXELFORMAT_XBGR2101010`       |                                                                                              |
+| `'abgr2101010'` | `SDL_PIXELFORMAT_ABGR2101010`       |                                                                                              |
+| `'rgb48'`       | `SDL_PIXELFORMAT_RGB48`             | 16-bit integer per channel                                                                   |
+| `'bgr48'`       | `SDL_PIXELFORMAT_BGR48`             | 16-bit integer per channel                                                                   |
+| `'rgba64'`      | `SDL_PIXELFORMAT_RGBA64`            | 16-bit integer per channel                                                                   |
+| `'argb64'`      | `SDL_PIXELFORMAT_ARGB64`            | 16-bit integer per channel                                                                   |
+| `'bgra64'`      | `SDL_PIXELFORMAT_BGRA64`            | 16-bit integer per channel                                                                   |
+| `'abgr64'`      | `SDL_PIXELFORMAT_ABGR64`            | 16-bit integer per channel                                                                   |
+| `'rgb48f'`      | `SDL_PIXELFORMAT_RGB48_FLOAT`       | 16-bit float per channel                                                                     |
+| `'bgr48f'`      | `SDL_PIXELFORMAT_BGR48_FLOAT`       | 16-bit float per channel                                                                     |
+| `'rgba64f'`     | `SDL_PIXELFORMAT_RGBA64_FLOAT`      | 16-bit float per channel                                                                     |
+| `'argb64f'`     | `SDL_PIXELFORMAT_ARGB64_FLOAT`      | 16-bit float per channel                                                                     |
+| `'bgra64f'`     | `SDL_PIXELFORMAT_BGRA64_FLOAT`      | 16-bit float per channel                                                                     |
+| `'abgr64f'`     | `SDL_PIXELFORMAT_ABGR64_FLOAT`      | 16-bit float per channel                                                                     |
+| `'rgb96f'`      | `SDL_PIXELFORMAT_RGB96_FLOAT`       | 32-bit float per channel                                                                     |
+| `'bgr96f'`      | `SDL_PIXELFORMAT_BGR96_FLOAT`       | 32-bit float per channel                                                                     |
+| `'rgba128f'`    | `SDL_PIXELFORMAT_RGBA128_FLOAT`     | 32-bit float per channel                                                                     |
+| `'argb128f'`    | `SDL_PIXELFORMAT_ARGB128_FLOAT`     | 32-bit float per channel                                                                     |
+| `'bgra128f'`    | `SDL_PIXELFORMAT_BGRA128_FLOAT`     | 32-bit float per channel                                                                     |
+| `'abgr128f'`    | `SDL_PIXELFORMAT_ABGR128_FLOAT`     | 32-bit float per channel                                                                     |
 | `'rgba32'`      | `SDL_PIXELFORMAT_RGBA32`            | alias for `'rgba8888'` on big endian machines and for `'abgr8888'` on little endian machines |
 | `'argb32'`      | `SDL_PIXELFORMAT_ARGB32`            | alias for `'argb8888'` on big endian machines and for `'bgra8888'` on little endian machines |
 | `'bgra32'`      | `SDL_PIXELFORMAT_BGRA32`            | alias for `'bgra8888'` on big endian machines and for `'argb8888'` on little endian machines |
 | `'abgr32'`      | `SDL_PIXELFORMAT_ABGR32`            | alias for `'abgr8888'` on big endian machines and for `'rgba8888'` on little endian machines |
+| `'rgbx32'`      | `SDL_PIXELFORMAT_RGBX32`            | alias for `'rgbx8888'` on big endian machines and for `'xbgr8888'` on little endian machines |
+| `'xrgb32'`      | `SDL_PIXELFORMAT_XRGB32`            | alias for `'xrgb8888'` on big endian machines and for `'bgrx8888'` on little endian machines |
+| `'bgrx32'`      | `SDL_PIXELFORMAT_BGRX32`            | alias for `'bgrx8888'` on big endian machines and for `'xrgb8888'` on little endian machines |
+| `'xbgr32'`      | `SDL_PIXELFORMAT_XBGR32`            | alias for `'xbgr8888'` on big endian machines and for `'rgbx8888'` on little endian machines |
 | `'yv12'`        | `SDL_PIXELFORMAT_YV12`              | planar mode: Y + V + U (3 planes)                                                            |
 | `'iyuv'`        | `SDL_PIXELFORMAT_IYUV`              | planar mode: Y + U + V (3 planes)                                                            |
 | `'yuy2'`        | `SDL_PIXELFORMAT_YUY2`              | packed mode: Y0+U0+Y1+V0 (1 plane)                                                           |
@@ -426,6 +457,7 @@ String values used to represent how the pixels of an image are stored in a Buffe
 | `'yvyu'`        | `SDL_PIXELFORMAT_YVYU`              | packed mode: Y0+V0+Y1+U0 (1 plane)                                                           |
 | `'nv12'`        | `SDL_PIXELFORMAT_NV12`              | planar mode: Y + U/V interleaved (2 planes)                                                  |
 | `'nv21'`        | `SDL_PIXELFORMAT_NV21`              | planar mode: Y + V/U interleaved (2 planes)                                                  |
+| `'p010'`        | `SDL_PIXELFORMAT_P010`              | planar mode: 10-bit Y + U/V interleaved in 16-bit samples (2 planes), rejected by `window.render()` |
 
 ### Event: 'displayAdd'
 
@@ -453,6 +485,29 @@ Fired when a display changes orientation.
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 
 Fired when a display changes position.
+
+### Event: 'displayScaleChange'
+
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `scale: <number>|<null>`: The display's new `scale`, or `null` if it can't be determined.
+
+Fired when a display changes content scale.
+
+### Event: 'displayModeChange'
+
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+- `format: `[`<PixelFormat>`](#pixel-formats)`|<null>`: The display's new pixel format, or `null` if it can't be determined.
+- `frequency: <number>`: The display's new refresh rate.
+- `geometry: <object>`: The display's new `geometry`, since the mode determines its size.
+  - `x, y, width, height: <Rect>` The position and size of the display's geometry.
+
+Fired when a display changes its current mode.
+
+### Event: 'displayUsableChange'
+
+- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
+
+Fired when a display's `usable` region changes, for example when a dock or taskbar is shown, hidden, or moved.
 
 ### sdl.video.bytesPerPixel(format)
 
@@ -500,6 +555,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 ### sdl.video.displays
 
 - `<object>[]`
+  - `id: <number>` The unique id of the display. Ids are never reused: a display that is disconnected and reconnected gets a new id.
   - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
   - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
   - `frequency: <number>` The refresh rate of the display.
@@ -507,10 +563,7 @@ This function is also available from `@kmamal/sdl/helpers`.
     - `x, y, width, height: <Rect>` The position and size of the display's geometry.
   - `usable: <object>` Similar to `geometry`, but excludes areas taken up by the OS or window manager such as menus, docks, e.t.c.
     - `x, y, width, height: <Rect>` The position and size of the display's usable region.
-  - `dpi: <object>|<null>` Return pixel density for the display in dots/pixels-per-inch units. Might be `null` on some devices if DPI info can't be retrieved.
-    - `horizontal: <number>` The horizontal density.
-    - `vertical: <number>` The vertical density.
-    - `diagonal: <number>` The diagonal density.
+  - `scale: <number>|<null>` The content scale of the display: how much larger UI elements should be drawn to appear at their intended size, where `1` is the 96dpi baseline. Might be `null` on some devices if it can't be retrieved.
   - `orientation: <string>|<null>` The orientation of the display.
 
 A list of all detected displays.
@@ -531,20 +584,20 @@ Notice how the geometries don't overlap:
 [
   {
     name: '0',
-    format: 'rgb888',
+    format: 'xrgb8888',
     frequency: 60,
     geometry: { x: 0, y: 0, width: 1920, height: 1080 },
     usable: { x: 0, y: 27, width: 1920, height: 1053 },
-    dpi: { horizontal: 141.76, vertical: 142.13, diagonal: 141.85 },
+    scale: 1.5,
     orientation: 'landscape',
   },
   {
     name: '1',
-    format: 'rgb888',
+    format: 'xrgb8888',
     frequency: 60,
     geometry: { x: 1920, y: 0, width: 1920, height: 1080 },
     usable: { x: 1920, y: 27, width: 1920, height: 1053 },
-    dpi: { horizontal: 141.76, vertical: 142.13, diagonal: 141.85 },
+    scale: 1.5,
     orientation: 'landscape',
   },
 ]
@@ -586,10 +639,6 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   - `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
   - `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
   - `webgpu: <boolean>` Set to `true` to create an WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
-  - `skipTaskbar: <boolean>` X11 only. Set to `true` to not add the window to the taskbar. Default: `false`
-  - `popupMenu: <boolean>` X11 only. Set to `true` to treat the window like a popup menu. Default: `false`
-  - `tooltip: <boolean>` X11 only. Set to `true` to treat the window like a tooltip. Default: `false`
-  - `utility: <boolean>` X11 only. Set to `true` to treat the window like a utility window. Default: `false`
 - Returns: [`<Window>`](#class-window) an object representing the new window.
 
 Creates a new window.
@@ -1075,37 +1124,25 @@ Gives the window the keyboard focus.
 
 Is `true` if the mouse is over the window.
 
-### window.skipTaskbar
+### window.relativeMouseMode
 
 - `<boolean>`
 
-X11 only.
-Is `true` if the window was created with `skipTaskbar: true`.
-Such a window is not added to the taskbar.
+Is `true` if the window has relative mouse mode enabled.
 
-### window.popupMenu
+### window.setRelativeMouseMode([relative])
 
-- `<boolean>`
+- `relative: <boolean>` The new value of the property. Default: `true`
 
-X11 only.
-Is `true` if the window was created with `popupMenu: true`.
-Such a window is always treated as a popup menu.
+Enables or disables relative mouse mode for the window.
+While the window has focus in relative mode, the cursor is hidden, locked inside the window, and the mouse reports movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
+Use this for FPS-style camera controls.
+The `x` and `y` positions reported by mouse events are not meaningful while in relative mode.
+This function may fail on platforms that don't support raw mouse input.
 
-### window.tooltip
+### window.unsetRelativeMouseMode()
 
-- `<boolean>`
-
-X11 only.
-Is `true` if the window was created with `tooltip: true`.
-Such a window is always treated as a tooltip.
-
-### window.utility
-
-- `<boolean>`
-
-X11 only.
-Is `true` if the window was created with `utility: true`.
-Such a window is always treated as a utility window.
+Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemoderelative).
 
 ### window.render(width, height, stride, format, buffer[, options])
 
@@ -1113,9 +1150,10 @@ Such a window is always treated as a utility window.
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
   - `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
-    - `x, y, width, height: <rect>` The components of the rectangle.
+    - `x, y, width, height: <rect>` The components of the rectangle. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
 
 Displays an image in the window.
+The `'p010'` pixel format can't be rendered and is rejected.
 
 By default the image is displayed over the entire surface of the window.
 You may pass the optional `dstRect` parameter to set where exactly on the window to display the image.
@@ -1129,7 +1167,6 @@ Possible values are:
 | ---         | ---                           | ---                    |
 | `'nearest'` | `SDL_ScaleModeNearest`        | nearest pixel sampling |
 | `'linear'`  | `SDL_ScaleModeLinear`         | linear filtering       |
-| `'best'`    | `SDL_ScaleModeBest`           | anisotropic filtering  |
 
 If the window was created with either of the `opengl` or `webgpu` options, then you must use OpenGL/WebGPU calls to render to the window.
 Calls to `render()` will fail.
@@ -1201,7 +1238,7 @@ A Key can be either one of the values below __or__ any unicode character.
 Keys that produce characters are represented by that character.
 All others are represented by one of these values:
 
-`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'app1'`, `'app2'`, `'application'`, `'audioFastForward'`, `'audioMute'`, `'audioNext'`, `'audioPlay'`, `'audioPrev'`, `'audioRewind'`, `'audioStop'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'brightnessDown'`, `'brightnessUp'`, `'calculator'`, `'call'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clear/again'`, `'clearEntry'`, `'computer'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'displaySwitch'`, `'down'`, `'eject'`, `'end'`, `'endCall'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'illumDown'`, `'illumToggle'`, `'illumUp'`, `'insert'`, `'left'`, `'mail'`, `'mediaSelect'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'softLeft'`, `'softRight'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'www'`, `'xor'`.
+`'&&'`, `'+/-'`, `'||'`, `'00'`, `'000'`, `'again'`, `'alt'`, `'altErase'`, `'back'`, `'backspace'`, `'binary'`, `'bookmarks'`, `'call'`, `'cancel'`, `'capsLock'`, `'clear'`, `'clear/again'`, `'clearEntry'`, `'copy'`, `'crSel'`, `'ctrl'`, `'currencySubUnit'`, `'currencyUnit'`, `'cut'`, `'decimal'`, `'decimalSeparator'`, `'delete'`, `'down'`, `'eject'`, `'end'`, `'endCall'`, `'enter'`, `'escape'`, `'execute'`, `'exSel'`, `'f1'`, `'f2'`, `'f3'`, `'f4'`, `'f5'`, `'f6'`, `'f7'`, `'f8'`, `'f9'`, `'f10'`, `'f11'`, `'f12'`, `'f13'`, `'f14'`, `'f15'`, `'f16'`, `'f17'`, `'f18'`, `'f19'`, `'f20'`, `'f21'`, `'f22'`, `'f23'`, `'f24'`, `'find'`, `'forward'`, `'gui'`, `'help'`, `'hexadecimal'`, `'home'`, `'insert'`, `'left'`, `'mediaFastForward'`, `'mediaPlay'`, `'mediaRewind'`, `'mediaSelect'`, `'mediaStop'`, `'mediaTrackNext'`, `'mediaTrackPrevious'`, `'memAdd'`, `'memClear'`, `'memDivide'`, `'memMultiply'`, `'memRecall'`, `'memStore'`, `'memSubtract'`, `'menu'`, `'modeSwitch'`, `'mute'`, `'numlock'`, `'octal'`, `'oper'`, `'out'`, `'pageDown'`, `'pageUp'`, `'paste'`, `'pause'`, `'power'`, `'printScreen'`, `'prior'`, `'refresh'`, `'return'`, `'right'`, `'scrollLock'`, `'search'`, `'select'`, `'separator'`, `'shift'`, `'sleep'`, `'softLeft'`, `'softRight'`, `'stop'`, `'sysReq'`, `'tab'`, `'thousandsSeparator'`, `'undo'`, `'up'`, `'volumeDown'`, `'volumeUp'`, `'xor'`.
 
 ### Enum: SCANCODE
 
@@ -1430,16 +1467,11 @@ This enum is also available from `@kmamal/sdl/helpers`.
   | `sdl.keyboard.SCANCODE.RALT`               | `SDL_SCANCODE_RALT`               | alt gr, option                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
   | `sdl.keyboard.SCANCODE.RGUI`               | `SDL_SCANCODE_RGUI`               | windows, command (apple), meta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
   | `sdl.keyboard.SCANCODE.MODE`               | `SDL_SCANCODE_MODE`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIONEXT`          | `SDL_SCANCODE_AUDIONEXT`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOPREV`          | `SDL_SCANCODE_AUDIOPREV`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOSTOP`          | `SDL_SCANCODE_AUDIOSTOP`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOPLAY`          | `SDL_SCANCODE_AUDIOPLAY`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOMUTE`          | `SDL_SCANCODE_AUDIOMUTE`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.MEDIASELECT`        | `SDL_SCANCODE_MEDIASELECT`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.WWW`                | `SDL_SCANCODE_WWW`                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.MAIL`               | `SDL_SCANCODE_MAIL`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.CALCULATOR`         | `SDL_SCANCODE_CALCULATOR`         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.COMPUTER`           | `SDL_SCANCODE_COMPUTER`           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_NEXT_TRACK`  | `SDL_SCANCODE_MEDIA_NEXT_TRACK`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_PREVIOUS_TRACK` | `SDL_SCANCODE_MEDIA_PREVIOUS_TRACK`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_STOP`        | `SDL_SCANCODE_MEDIA_STOP`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_PLAY`        | `SDL_SCANCODE_MEDIA_PLAY`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_SELECT`      | `SDL_SCANCODE_MEDIA_SELECT`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AC_SEARCH`          | `SDL_SCANCODE_AC_SEARCH`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AC_HOME`            | `SDL_SCANCODE_AC_HOME`            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AC_BACK`            | `SDL_SCANCODE_AC_BACK`            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -1447,18 +1479,10 @@ This enum is also available from `@kmamal/sdl/helpers`.
   | `sdl.keyboard.SCANCODE.AC_STOP`            | `SDL_SCANCODE_AC_STOP`            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AC_REFRESH`         | `SDL_SCANCODE_AC_REFRESH`         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.AC_BOOKMARKS`       | `SDL_SCANCODE_AC_BOOKMARKS`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.BRIGHTNESSDOWN`     | `SDL_SCANCODE_BRIGHTNESSDOWN`     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.BRIGHTNESSUP`       | `SDL_SCANCODE_BRIGHTNESSUP`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.DISPLAYSWITCH`      | `SDL_SCANCODE_DISPLAYSWITCH`      | display mirroring/dual display switch, video mode switch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-  | `sdl.keyboard.SCANCODE.KBDILLUMTOGGLE`     | `SDL_SCANCODE_KBDILLUMTOGGLE`     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.KBDILLUMDOWN`       | `SDL_SCANCODE_KBDILLUMDOWN`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.KBDILLUMUP`         | `SDL_SCANCODE_KBDILLUMUP`         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.EJECT`              | `SDL_SCANCODE_EJECT`              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_EJECT`       | `SDL_SCANCODE_MEDIA_EJECT`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.SLEEP`              | `SDL_SCANCODE_SLEEP`              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.APP1`               | `SDL_SCANCODE_APP1`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.APP2`               | `SDL_SCANCODE_APP2`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOREWIND`        | `SDL_SCANCODE_AUDIOREWIND`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  | `sdl.keyboard.SCANCODE.AUDIOFASTFORWARD`   | `SDL_SCANCODE_AUDIOFASTFORWARD`   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_REWIND`      | `SDL_SCANCODE_MEDIA_REWIND`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+  | `sdl.keyboard.SCANCODE.MEDIA_FAST_FORWARD` | `SDL_SCANCODE_MEDIA_FAST_FORWARD` |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.SOFTLEFT`           | `SDL_SCANCODE_SOFTLEFT`           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.SOFTRIGHT`          | `SDL_SCANCODE_SOFTRIGHT`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
   | `sdl.keyboard.SCANCODE.CALL`               | `SDL_SCANCODE_CALL`               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -1503,7 +1527,7 @@ Each value in the array is either `true` if the corresponding key is pressed, or
 ### Enum: BUTTON
 
 Used to represent the buttons on a mouse.
-A mouse can have many buttons, but the values for the three most common ones are represented in this enum.
+A mouse can have many buttons, but the values for the five most common ones are represented in this enum.
 
 This enum is also available from `@kmamal/sdl/helpers`.
 
@@ -1512,6 +1536,8 @@ This enum is also available from `@kmamal/sdl/helpers`.
 | `sdl.mouse.BUTTON.LEFT`   | `SDL_BUTTON_LEFT`            |
 | `sdl.mouse.BUTTON.MIDDLE` | `SDL_BUTTON_MIDDLE`          |
 | `sdl.mouse.BUTTON.RIGHT`  | `SDL_BUTTON_RIGHT`           |
+| `sdl.mouse.BUTTON.X1`     | `SDL_BUTTON_X1`              |
+| `sdl.mouse.BUTTON.X2`     | `SDL_BUTTON_X2`              |
 
 ### sdl.mouse.getButton(button)
 
@@ -1543,20 +1569,28 @@ Changes the icon that is displayed for the mouse cursor.
 
 Possible values for `cursor` are:
 
-| Value         | Corresponding `SDL_SystemCursor` | Description                                              |
-| ---           | ---                              | ---                                                      |
-| `'arrow'`     | `SDL_SYSTEM_CURSOR_ARROW`        | arrow                                                    |
-| `'ibeam'`     | `SDL_SYSTEM_CURSOR_IBEAM`        | i-beam                                                   |
-| `'wait'`      | `SDL_SYSTEM_CURSOR_WAIT`         | wait                                                     |
-| `'crosshair'` | `SDL_SYSTEM_CURSOR_CROSSHAIR`    | crosshair                                                |
-| `'waitarrow'` | `SDL_SYSTEM_CURSOR_WAITARROW`    | small wait cursor (or wait if not available)             |
-| `'sizenwse'`  | `SDL_SYSTEM_CURSOR_SIZENWSE`     | double arrow pointing northwest and southeast            |
-| `'sizenesw'`  | `SDL_SYSTEM_CURSOR_SIZENESW`     | double arrow pointing northeast and southwest            |
-| `'sizewe'`    | `SDL_SYSTEM_CURSOR_SIZEWE`       | double arrow pointing west and east                      |
-| `'sizens'`    | `SDL_SYSTEM_CURSOR_SIZENS`       | double arrow pointing north and south                    |
-| `'sizeall'`   | `SDL_SYSTEM_CURSOR_SIZEALL`      | four pointed arrow pointing north, south, east, and west |
-| `'no'`        | `SDL_SYSTEM_CURSOR_NO`           | slashed circle or crossbones                             |
-| `'hand'`      | `SDL_SYSTEM_CURSOR_HAND`         | hand                                                     |
+| Value          | Corresponding `SDL_SystemCursor`  | Description                                              |
+| ---            | ---                               | ---                                                      |
+| `'default'`    | `SDL_SYSTEM_CURSOR_DEFAULT`       | default cursor, usually an arrow                         |
+| `'text'`       | `SDL_SYSTEM_CURSOR_TEXT`          | text selection, usually an i-beam                        |
+| `'wait'`       | `SDL_SYSTEM_CURSOR_WAIT`          | wait                                                     |
+| `'crosshair'`  | `SDL_SYSTEM_CURSOR_CROSSHAIR`     | crosshair                                                |
+| `'progress'`   | `SDL_SYSTEM_CURSOR_PROGRESS`      | program is busy but still interactive, usually an arrow with a small wait cursor |
+| `'nwseResize'` | `SDL_SYSTEM_CURSOR_NWSE_RESIZE`   | double arrow pointing northwest and southeast            |
+| `'neswResize'` | `SDL_SYSTEM_CURSOR_NESW_RESIZE`   | double arrow pointing northeast and southwest            |
+| `'ewResize'`   | `SDL_SYSTEM_CURSOR_EW_RESIZE`     | double arrow pointing west and east                      |
+| `'nsResize'`   | `SDL_SYSTEM_CURSOR_NS_RESIZE`     | double arrow pointing north and south                    |
+| `'move'`       | `SDL_SYSTEM_CURSOR_MOVE`          | four pointed arrow pointing north, south, east, and west |
+| `'notAllowed'` | `SDL_SYSTEM_CURSOR_NOT_ALLOWED`   | slashed circle or crossbones                             |
+| `'pointer'`    | `SDL_SYSTEM_CURSOR_POINTER`       | pointer that indicates a link, usually a hand            |
+| `'nwResize'`   | `SDL_SYSTEM_CURSOR_NW_RESIZE`     | window resize, top-left                                  |
+| `'nResize'`    | `SDL_SYSTEM_CURSOR_N_RESIZE`      | window resize, top                                       |
+| `'neResize'`   | `SDL_SYSTEM_CURSOR_NE_RESIZE`     | window resize, top-right                                 |
+| `'eResize'`    | `SDL_SYSTEM_CURSOR_E_RESIZE`      | window resize, right                                     |
+| `'seResize'`   | `SDL_SYSTEM_CURSOR_SE_RESIZE`     | window resize, bottom-right                              |
+| `'sResize'`    | `SDL_SYSTEM_CURSOR_S_RESIZE`      | window resize, bottom                                    |
+| `'swResize'`   | `SDL_SYSTEM_CURSOR_SW_RESIZE`     | window resize, bottom-left                               |
+| `'wResize'`    | `SDL_SYSTEM_CURSOR_W_RESIZE`      | window resize, left                                      |
 
 ### sdl.mouse.resetCursor()
 
@@ -1598,31 +1632,11 @@ Is `true` if the mouse is currently captured.
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
 This is meant for short-lived operations such as dragging.
-If instead you want to lock the cursor to the window for FPS-style camera controls, use [`sdl.mouse.setRelativeMode()`](#sdlmousesetrelativemoderelative).
+If instead you want to lock the cursor to the window for FPS-style camera controls, use [`window.setRelativeMouseMode()`](#windowsetrelativemousemoderelative).
 
 ### sdl.mouse.uncapture()
 
 Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
-
-### sdl.mouse.relativeMode
-
-- `<boolean>`
-
-Is `true` if the mouse is in relative mode.
-
-### sdl.mouse.setRelativeMode([relative])
-
-- `relative: <boolean>` The new value of the property. Default: `true`
-
-Enables or disables relative mouse mode.
-In relative mode the cursor is hidden, locked inside the focused window, and the mouse reports movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
-Use this for FPS-style camera controls.
-The `x` and `y` positions reported by mouse events are not meaningful while in relative mode.
-This function may fail on platforms that don't support raw mouse input.
-
-### sdl.mouse.unsetRelativeMode()
-
-Equivalent to [`sdl.mouse.setRelativeMode(false)`](#sdlmousesetrelativemoderelative).
 
 ## sdl.touch
 
@@ -1661,22 +1675,10 @@ String values used to represent the positions of a joystick hat
 | `'right'`     | `SDL_HAT_RIGHT`           |
 | `'down'`      | `SDL_HAT_DOWN`            |
 | `'left'`      | `SDL_HAT_LEFT`            |
-| `'rightup'`   | `SDL_HAT_RIGHTUP`         |
-| `'rightdown'` | `SDL_HAT_RIGHTDOWN`       |
-| `'leftup'`    | `SDL_HAT_LEFTUP`          |
-| `'leftdown'`  | `SDL_HAT_LEFTDOWN`        |
-
-### Power levels
-
-String values used to represent the power level of a joystick or controller
-
-| Value      | Corresponding `SDL_JoystickPowerLevel` |
-| ---        | ---                                    |
-| `'empty'`  | `SDL_JOYSTICK_POWER_EMPTY`             |
-| `'low'`    | `SDL_JOYSTICK_POWER_LOW`               |
-| `'medium'` | `SDL_JOYSTICK_POWER_MEDIUM`            |
-| `'full'`   | `SDL_JOYSTICK_POWER_FULL`              |
-| `'wired'`  | `SDL_JOYSTICK_POWER_WIRED`             |
+| `'rightUp'`   | `SDL_HAT_RIGHTUP`         |
+| `'rightDown'` | `SDL_HAT_RIGHTDOWN`       |
+| `'leftUp'`    | `SDL_HAT_LEFTUP`          |
+| `'leftDown'`  | `SDL_HAT_LEFTDOWN`        |
 
 <a id="joystick-event-deviceadd"></a>
 
@@ -1716,14 +1718,14 @@ Possible values for `type` are `null` if it is unknown, or one of:
 
 | Value              | Corresponding `SDL_JoystickType`   |
 | ---                | ---                                |
-| `'gamecontroller'` | `SDL_JOYSTICK_TYPE_GAMECONTROLLER` |
+| `'gamepad'`        | `SDL_JOYSTICK_TYPE_GAMEPAD`        |
 | `'wheel'`          | `SDL_JOYSTICK_TYPE_WHEEL`          |
-| `'arcadestick'`    | `SDL_JOYSTICK_TYPE_ARCADE_STICK`   |
-| `'flightstick'`    | `SDL_JOYSTICK_TYPE_FLIGHT_STICK`   |
-| `'dancepad'`       | `SDL_JOYSTICK_TYPE_DANCE_PAD`      |
+| `'arcadeStick'`    | `SDL_JOYSTICK_TYPE_ARCADE_STICK`   |
+| `'flightStick'`    | `SDL_JOYSTICK_TYPE_FLIGHT_STICK`   |
+| `'dancePad'`       | `SDL_JOYSTICK_TYPE_DANCE_PAD`      |
 | `'guitar'`         | `SDL_JOYSTICK_TYPE_GUITAR`         |
-| `'drumkit'`        | `SDL_JOYSTICK_TYPE_DRUM_KIT`       |
-| `'arcadepad'`      | `SDL_JOYSTICK_TYPE_ARCADE_PAD`     |
+| `'drumKit'`        | `SDL_JOYSTICK_TYPE_DRUM_KIT`       |
+| `'arcadePad'`      | `SDL_JOYSTICK_TYPE_ARCADE_PAD`     |
 | `'throttle'`       | `SDL_JOYSTICK_TYPE_THROTTLE`       |
 
 Sample output:
@@ -1735,7 +1737,7 @@ Sample output:
     name: 'DragonRise Inc. Generic USB Joystick',
     path: '/dev/input/event21',
     guid: '03000000790000000600000010010000',
-    type: 'gamecontroller',
+    type: 'gamepad',
     vendor: 121,
     product: 6,
     version: 272,
@@ -1803,9 +1805,11 @@ Fired when one of the joystick's hats is moved.
 
 ### Event: 'powerUpdate'
 
-- `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
+- `power: <object>` The new power info.
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determined.
+  - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determined.
 
-Fired when the joystick's [power level](#joystickinstancepower) changes.
+Fired when the joystick's power info changes.
 
 <a id="joystick-instance-event-close"></a>
 
@@ -1864,9 +1868,11 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 ### joystickInstance.power
 
-- [`<PowerLevel>`](#power-levels)`|<null>`
+- `<object>`
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determined.
+  - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determined.
 
-The current power level of the joystick device, or `null` if it is unknown.
+The current power info of the joystick device.
 
 ### joystickInstance.setPlayer(index)
 
@@ -1945,56 +1951,57 @@ A closed instance object must not be used any further.
 
 Closes the instance.
 
-## sdl.controller
+## sdl.gamepad
 
-An SDL controller is an abstraction over [`joysticks`](#sdljoystick) based on the xbox360 controller: They have a dpad, two analog sticks, 4 buttons on the right (called A, B, X, Y), shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
-The SDL controller abstraction uses the naming-conventions of xbox360/XInput for all supported devices (for example devices that have a similar layout, like the Playstation DualShock Controller, but different button names), so you'll know that for example `controllerInstance.axes.leftStickX` is always the x-axis of the left analog stick, or `controllerInstance.buttons.b` is always the rightmost button of the 4 buttons on the right.
-This makes it easy to provide consistent input bindings, like "press B to jump, move around with the left analog stick".
+An SDL gamepad is an abstraction over [`joysticks`](#sdljoystick) based on the layout of the xbox360 controller: a dpad, two analog sticks, 4 face buttons on the right, shoulder buttons (two of which might be axes) and 3 buttons in the middle ("Start", "Back" and usually some kind of logo-button called "Guide").
+The gamepad abstraction names axes and buttons by their position on all supported devices (for example devices that have a similar layout, like the Playstation DualShock controller, but different button labels), so you'll know that for example `gamepadInstance.axes.leftStickX` is always the x-axis of the left analog stick, or `gamepadInstance.buttons.east` is always the rightmost of the 4 face buttons.
+This makes it easy to provide consistent input bindings, like "press the east button to jump, move around with the left analog stick".
+To show the user which physical button that is, [`gamepadInstance.buttonLabels`](#gamepadinstancebuttonlabels) tells you what each face button is labeled on the device.
 With a pure joystick instance it's impossible to know which axis or button corresponds to which physical axis/button on the device.
 
-Because controllers are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a controller device have the same id, then they refer to the same underlying physical device).
-For a joystick device to also be available as a controller device it needs a "mapping".
-A mapping is a string that consists of the device's GUID, its name, and a series of pairings between one joystick axis/button and the corresponding controller axis/button name.
-See the sample output [`here`](#sdlcontrollerdevices) for an example.
-SDL has pretty good default controller mappings, but if you need more, there's a community sourced database available on [gabomdq/SDL_GameControllerDB](https://github.com/gabomdq/SDL_GameControllerDB).
+Because gamepads are an abstraction over joysticks, they operate on the same set of devices (if a joystick device and a gamepad device have the same id, then they refer to the same underlying physical device).
+For a joystick device to also be available as a gamepad device it needs a "mapping".
+A mapping is a string that consists of the device's GUID, its name, and a series of pairings between one joystick axis/button and the corresponding gamepad axis/button name.
+See the sample output [`here`](#sdlgamepaddevices) for an example.
+SDL has pretty good default gamepad mappings, but if you need more, there's a community sourced database available on [gabomdq/SDL_GameGamepadDB](https://github.com/gabomdq/SDL_GameGamepadDB).
 Add them via:
 
 ```js
-const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt'
+const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameGamepadDB/master/gamepaddb.txt'
 const result = await fetch(url)
 const text = await result.text()
 const mappings = text.split('\n').filter((line) => line && !line.startsWith('#'))
-sdl.controller.addMappings(mappings)
+sdl.gamepad.addMappings(mappings)
 ```
 
-<a id="controller-event-deviceadd"></a>
+<a id="gamepad-event-deviceadd"></a>
 
 ### Event: 'deviceAdd'
 
-- `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.gamepad.devices`](#sdlgamepaddevices) indicating the device that caused the event.
 
-Fired when a new controller device becomes available.
-Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
+Fired when a new gamepad device becomes available.
+Check [`sdl.gamepad.devices`](#sdlgamepaddevices) to get the new list of gamepad devices.
 
-<a id="controller-event-deviceremove"></a>
+<a id="gamepad-event-deviceremove"></a>
 
 ### Event: 'deviceRemove'
 
-- `device: <object>`: An object from [`sdl.controller.devices`](#sdlcontrollerdevices) indicating the device that caused the event.
+- `device: <object>`: An object from [`sdl.gamepad.devices`](#sdlgamepaddevices) indicating the device that caused the event.
 
-Fired when an existing controller device is removed.
-Check [`sdl.controller.devices`](#sdlcontrollerdevices) to get the new list of controller devices.
+Fired when an existing gamepad device is removed.
+Check [`sdl.gamepad.devices`](#sdlgamepaddevices) to get the new list of gamepad devices.
 When this event is emitted, all instances that were opened from the removed device are closed automatically.
 
-### sdl.controller.addMappings(mappings)
+### sdl.gamepad.addMappings(mappings)
 
 - `mappings: <string>[]` An array of mappings to register.
 
-Registers new mappings for controllers.
-This may cause already opened controller instances to be [remapped](#event-remap).
+Registers new mappings for gamepads.
+This may cause already opened gamepad instances to be [remapped](#event-remap).
 If one of the mappings is invalid, the mappings before it in the array remain registered.
 
-### sdl.controller.devices
+### sdl.gamepad.devices
 
 - `<object>[]`
   - `id: <number>` The unique id for the device.
@@ -2008,25 +2015,23 @@ If one of the mappings is invalid, the mappings before it in the array remain re
   - `player: <number>|<null>` The player index for the device, or `null` if it can't be determined.
   - `mapping: <string>|<null>` The axis and button mapping for the device, or `null` if it can't be determined.
 
-A list of all the detected controller devices.
+A list of all the detected gamepad devices.
 
 Possible values for `type` are `null` if it is unknown, or one of:
 
-| Value                         | Corresponding `SDL_GameControllerType`           |
-| ---                           | ---                                              |
-| `'xbox360'`                   | SDL_CONTROLLER_TYPE_XBOX360                      |
-| `'xboxOne'`                   | SDL_CONTROLLER_TYPE_XBOXONE                      |
-| `'ps3'`                       | SDL_CONTROLLER_TYPE_PS3                          |
-| `'ps4'`                       | SDL_CONTROLLER_TYPE_PS4                          |
-| `'nintendoSwitchPro'`         | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO          |
-| `'virtual'`                   | SDL_CONTROLLER_TYPE_VIRTUAL                      |
-| `'ps5'`                       | SDL_CONTROLLER_TYPE_PS5                          |
-| `'amazonLuna'`                | SDL_CONTROLLER_TYPE_AMAZON_LUNA                  |
-| `'googleStadia'`              | SDL_CONTROLLER_TYPE_GOOGLE_STADIA                |
-| `'nvidiaShield'`              | SDL_CONTROLLER_TYPE_NVIDIA_SHIELD                |
-| `'nintendoSwitchJoyconLeft'`  | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT  |
-| `'nintendoSwitchJoyconRight'` | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT |
-| `'nintendoSwitchJoyconPair'`  | SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR  |
+| Value                         | Corresponding `SDL_GamepadType`               |
+| ---                           | ---                                           |
+| `'standard'`                  | SDL_GAMEPAD_TYPE_STANDARD                     |
+| `'xbox360'`                   | SDL_GAMEPAD_TYPE_XBOX360                      |
+| `'xboxOne'`                   | SDL_GAMEPAD_TYPE_XBOXONE                      |
+| `'ps3'`                       | SDL_GAMEPAD_TYPE_PS3                          |
+| `'ps4'`                       | SDL_GAMEPAD_TYPE_PS4                          |
+| `'ps5'`                       | SDL_GAMEPAD_TYPE_PS5                          |
+| `'nintendoSwitchPro'`         | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO          |
+| `'nintendoSwitchJoyconLeft'`  | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT  |
+| `'nintendoSwitchJoyconRight'` | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT |
+| `'nintendoSwitchJoyconPair'`  | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR  |
+| `'gamecube'`                  | SDL_GAMEPAD_TYPE_GAMECUBE                     |
 
 Sample output:
 
@@ -2047,95 +2052,97 @@ Sample output:
 ]
 ```
 
-### sdl.controller.openDevice(device)
+### sdl.gamepad.openDevice(device)
 
-- `device: <object>` An object from [`sdl.controller.devices`](#sdlcontrollerdevices) that is to be opened. Must be the actual object from that list, not a copy.
-- Returns: [`<ControllerInstance>`](#class-controllerinstance) an object representing the opened controller device instance.
+- `device: <object>` An object from [`sdl.gamepad.devices`](#sdlgamepaddevices) that is to be opened. Must be the actual object from that list, not a copy.
+- Returns: [`<GamepadInstance>`](#class-gamepadinstance) an object representing the opened gamepad device instance.
 
-Initializes an controller device and returns a corresponding instance.
+Initializes an gamepad device and returns a corresponding instance.
 
-## class ControllerInstance
+## class GamepadInstance
 
-The `ControllerInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
-Instead, objects returned by [`sdl.controller.openDevice()`](#sdlcontrolleropendevicedevice) are of type `ControllerInstance`.
+The `GamepadInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
+Instead, objects returned by [`sdl.gamepad.openDevice()`](#sdlgamepadopendevicedevice) are of type `GamepadInstance`.
 
-<a id="controller-instance-event-axismotion"></a>
+<a id="gamepad-instance-event-axismotion"></a>
 
 ### Event: 'axisMotion'
 
-- `axis:`[`<Axis>`](#controllerinstanceaxes) The axis that moved.
+- `axis:`[`<Axis>`](#gamepadinstanceaxes) The axis that moved.
 - `value: <number>` The new axis position.
 
-Fired when one of the controller's axes moves.
+Fired when one of the gamepad's axes moves.
 
-<a id="controller-instance-event-buttondown"></a>
+<a id="gamepad-instance-event-buttondown"></a>
 
 ### Event: 'buttonDown'
 
-- `button:`[`<Button>`](#controllerinstancebuttons) The button that was pressed.
+- `button:`[`<Button>`](#gamepadinstancebuttons) The button that was pressed.
 
-Fired when one of the controller's buttons is pressed.
+Fired when one of the gamepad's buttons is pressed.
 
-<a id="controller-instance-event-buttonup"></a>
+<a id="gamepad-instance-event-buttonup"></a>
 
 ### Event: 'buttonUp'
 
-- `button:`[`<Button>`](#controllerinstancebuttons) The button that was released.
+- `button:`[`<Button>`](#gamepadinstancebuttons) The button that was released.
 
-Fired when one of the controller's buttons is released.
+Fired when one of the gamepad's buttons is released.
 
-<a id="controller-instance-event-power-update"></a>
+<a id="gamepad-instance-event-power-update"></a>
 
 ### Event: 'powerUpdate'
 
-- `power: `[`<PowerLevel>`](#power-levels)`|<null>` The new power level.
+- `power: <object>` The new power info.
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determined.
+  - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determined.
 
-Fired when the controller's [power level](#controllerinstancepower) changes.
+Fired when the gamepad's power info changes.
 
 ### Event: 'steamHandleUpdate'
 
 - `steamHandle: <Buffer>|<null>` The new steam handle.
 
-Fired when the controller's [`steamHandle`](#controllerinstancesteamhandle) changes.
+Fired when the gamepad's [`steamHandle`](#gamepadinstancesteamhandle) changes.
 
 ### Event: 'remap'
 
-Fired when a new mapping for the controller is applied (usually via [`sdl.controller.addMappings()`](#sdlcontrolleraddmappingsmappings)).
-This may cause all of the controller's axes and buttons to aquire new values.
+Fired when a new mapping for the gamepad is applied (usually via [`sdl.gamepad.addMappings()`](#sdlgamepadaddmappingsmappings)).
+This may cause all of the gamepad's axes and buttons to aquire new values.
 
-<a id="controller-instance-event-close"></a>
+<a id="gamepad-instance-event-close"></a>
 
 ### Event: 'close'
 
 Fired when the instance is about to close.
 Handle cleanup here.
 
-### controllerInstance.device
+### gamepadInstance.device
 
 - `<object>`
 
-The [device](#sdlcontrollerdevices) from which the instance was opened.
+The [device](#sdlgamepaddevices) from which the instance was opened.
 
-### controllerInstance.firmwareVersion
+### gamepadInstance.firmwareVersion
 
 - `<number>|<null>`
 
-The controller's firmware version, or `null` if it is not available.
+The gamepad's firmware version, or `null` if it is not available.
 
-### controllerInstance.serialNumber
+### gamepadInstance.serialNumber
 
 - `<string>|<null>`
 
-The controller's serial number, or `null` if it is not available.
+The gamepad's serial number, or `null` if it is not available.
 
-### controllerInstance.steamHandle
+### gamepadInstance.steamHandle
 
 - `<Buffer>|<null>`
 
-The controller's steam handle, or `null` if it is not available.
-The `Buffer` contains an `InputHandle_t` for the controller that can be used with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput)
+The gamepad's steam handle, or `null` if it is not available.
+The `Buffer` contains an `InputHandle_t` for the gamepad that can be used with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput)
 
-### controllerInstance.axes
+### gamepadInstance.axes
 
 - `<object>`
   - `leftStickX: <number>` Left stick horizontal position
@@ -2145,21 +2152,21 @@ The `Buffer` contains an `InputHandle_t` for the controller that can be used wit
   - `leftTrigger: <number>` Left trigger position
   - `rightTrigger: <number>` Right trigger position
 
-An object mapping each axis of the controller's axes to its position.
+An object mapping each axis of the gamepad's axes to its position.
 The values are normalized in the range from `-1` to `+1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
-### controllerInstance.buttons
+### gamepadInstance.buttons
 
 - `<object>`
   - `dpadLeft: <boolean>` D-Pad left pressed
   - `dpadRight: <boolean>`  D-Pad right pressed
   - `dpadUp: <boolean>`  D-Pad up pressed
   - `dpadDown: <boolean>`  D-Pad down pressed
-  - `a: <boolean>` A button pressed
-  - `b: <boolean>` B button pressed
-  - `x: <boolean>` X button pressed
-  - `y: <boolean>` Y button pressed
+  - `south: <boolean>` Bottom face button pressed (A on Xbox, Cross on Playstation)
+  - `east: <boolean>` Right face button pressed (B on Xbox, Circle on Playstation)
+  - `west: <boolean>` Left face button pressed (X on Xbox, Square on Playstation)
+  - `north: <boolean>` Top face button pressed (Y on Xbox, Triangle on Playstation)
   - `guide: <boolean>` Middle button pressed
   - `back: <boolean>` Back button pressed
   - `start: <boolean>` Start button pressed
@@ -2167,96 +2174,118 @@ It may be necessary to impose certain tolerances on these values to account for 
   - `rightStick: <boolean>` Right stick pressed
   - `leftShoulder: <boolean>` Left shoulder button pressed
   - `rightShoulder: <boolean>` Right shoulder button pressed
-  - `paddle1: <boolean>` Paddle 1 pressed
-  - `paddle2: <boolean>` Paddle 2 pressed
-  - `paddle3: <boolean>` Paddle 3 pressed
-  - `paddle4: <boolean>` Paddle 4 pressed
+  - `rightPaddle1: <boolean>` Upper right paddle pressed (Xbox Elite P1)
+  - `leftPaddle1: <boolean>` Upper left paddle pressed (Xbox Elite P3)
+  - `rightPaddle2: <boolean>` Lower right paddle pressed (Xbox Elite P2)
+  - `leftPaddle2: <boolean>` Lower left paddle pressed (Xbox Elite P4)
   - `misc1: <boolean>` Miscellaneous button pressed (Xbox Series X share button, PS5 microphone button, Nintendo Switch Pro capture button, Amazon Luna microphone button)
+  - `misc2: <boolean>` Additional button pressed
+  - `misc3: <boolean>` Additional button pressed
+  - `misc4: <boolean>` Additional button pressed
+  - `misc5: <boolean>` Additional button pressed
+  - `misc6: <boolean>` Additional button pressed
   - `touchpad: <boolean>` Touchpad pressed (PS4/PS5 controllers)
 
-An object mapping each of the controller's buttons to a boolean value.
+An object mapping each of the gamepad's buttons to a boolean value.
 Each value in the object is either `true` if the corresponding button is pressed, or `false` otherwise.
+Buttons are named after their position on the gamepad, not their label, so that the same name always refers to the same physical position on every device.
 
-### controllerInstance.power
+### gamepadInstance.buttonLabels
 
-- [`<PowerLevel>`](#power-levels)`|<null>`
+- `<object>`
+  - `south: <string>|<null>` The label of the bottom face button.
+  - `east: <string>|<null>` The label of the right face button.
+  - `west: <string>|<null>` The label of the left face button.
+  - `north: <string>|<null>` The label of the top face button.
 
-The current power level of the controller device, or `null` if it is unknown.
+An object mapping each of the gamepad's face buttons to the label printed on it, for showing hints to the user.
+Possible values are `null` if the label is unknown, or one of:
 
-### controllerInstance.setPlayer(index)
+| Value          | Corresponding `SDL_GamepadButtonLabel` |
+| ---            | ---                                    |
+| `'a'`          | `SDL_GAMEPAD_BUTTON_LABEL_A`           |
+| `'b'`          | `SDL_GAMEPAD_BUTTON_LABEL_B`           |
+| `'x'`          | `SDL_GAMEPAD_BUTTON_LABEL_X`           |
+| `'y'`          | `SDL_GAMEPAD_BUTTON_LABEL_Y`           |
+| `'cross'`      | `SDL_GAMEPAD_BUTTON_LABEL_CROSS`       |
+| `'circle'`     | `SDL_GAMEPAD_BUTTON_LABEL_CIRCLE`      |
+| `'square'`     | `SDL_GAMEPAD_BUTTON_LABEL_SQUARE`      |
+| `'triangle'`   | `SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE`    |
 
-- `index: <number>` The player index to assign to the controller. Must be a non-negative integer.
+### gamepadInstance.setPlayer(index)
 
-Sets the player index of the controller.
+- `index: <number>` The player index to assign to the gamepad. Must be a non-negative integer.
 
-### controllerInstance.resetPlayer()
+Sets the player index of the gamepad.
+
+### gamepadInstance.resetPlayer()
 
 Clears player assignment and player led.
 
-### controllerInstance.hasLed
+### gamepadInstance.hasLed
 
 - `<boolean>`
 
-Is `true` if the controller has a LED light whose color can be controlled.
+Is `true` if the gamepad has a LED light whose color can be controlled.
 
-### controllerInstance.setLed(red, green, blue)
+### gamepadInstance.setLed(red, green, blue)
 
 - `red: <number>` The red component of the led color, from `0` to `1`.
 - `green: <number>` The green component of the led color, from `0` to `1`.
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
-Sets the color of the LED light on the controller.
+Sets the color of the LED light on the gamepad.
 
-### controllerInstance.hasRumble
+### gamepadInstance.hasRumble
 
 - `<boolean>`
 
-Is `true` if the controller has rumble motors.
+Is `true` if the gamepad has rumble motors.
 
-### controllerInstance.rumble([low[, high[, duration]]])
+### gamepadInstance.rumble([low[, high[, duration]]])
 
 - `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
-Makes the controller rumble for a set `duration`.
+Makes the gamepad rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
 Passing `0` for both intensities stops the rumble.
 
-### controllerInstance.stopRumble()
+### gamepadInstance.stopRumble()
 
-Stops the controller rumbling.
-Equivalent to [`controllerInstance.rumble(0, 0)`](#controllerinstancerumblelow-high-duration).
+Stops the gamepad rumbling.
+Equivalent to [`gamepadInstance.rumble(0, 0)`](#gamepadinstancerumblelow-high-duration).
 
-### controllerInstance.hasRumbleTriggers
+### gamepadInstance.hasRumbleTriggers
 
 - `<boolean>`
 
-Is `true` if the controller has rumble motors on the triggers.
+Is `true` if the gamepad has rumble motors on the triggers.
 
-### controllerInstance.rumbleTriggers([left[, right[, duration]]])
+### gamepadInstance.rumbleTriggers([left[, right[, duration]]])
 
 - `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
-Makes the controller triggers rumble for a set `duration`.
+Makes the gamepad triggers rumble for a set `duration`.
 Calling this function again before `duration` has ran out, overrides the previous call.
 Passing `0` for both intensities stops the rumble.
 
-### controllerInstance.stopRumbleTriggers()
+### gamepadInstance.stopRumbleTriggers()
 
-Stops the controller trigger rumbling.
-Equivalent to [`controllerInstance.rumbleTriggers(0, 0)`](#controllerinstancerumbletriggersleft-right-duration).
+Stops the gamepad trigger rumbling.
+Equivalent to [`gamepadInstance.rumbleTriggers(0, 0)`](#gamepadinstancerumbletriggersleft-right-duration).
 
-### controllerInstance.closed
+### gamepadInstance.closed
 
 - `<boolean>`
 
 Is `true` if the instance is closed.
 A closed instance object must not be used any further.
 
-### controllerInstance.close()
+### gamepadInstance.close()
 
 Closes the instance.
 
@@ -2324,7 +2353,6 @@ The [device](#sdlsensordevices) from which the `sensorInstance` was opened.
 ### sensorInstance.data
 
 - `<object>`
-  - `timestamp: <number>|<null>` The time the latest measurement was taken __in microseconds__, or `null` if it can't be determined.
   - `x: <number>` X axis value.
   - `y: <number>` Y axis value.
   - `z: <number>` Z axis value.
@@ -2359,8 +2387,8 @@ Closes the instance.
 
 ### Audio data
 
-The [`playbackInstance.enqueue()`](#playbackinstanceenqueuebuffer-bytes) function expects a buffer of audio data as input and the [`recordingInstance.dequeue()`](#recordinginstancedequeuebuffer-bytes) function returns a buffer of audio data as output.
-The format of the data in these buffers depends on the options you passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options).
+The [`playbackStream.putData()`](#playbackstreamputdatabuffer-bytes) function expects a buffer of audio data as input and the [`recordingStream.getData()`](#recordingstreamgetdatabuffer-bytes) function fills a buffer with audio data as output.
+The format of the data in these buffers depends on the options you passed to [`openDevice()`](#sdlaudioplaybackopendevicedevice-options) when the stream was opened.
 
 An audio buffer is a sequence of frames, and each frame is a sequence of samples.
 A _sample_ is a single number representing the intensity of an audio channel at a point in time.
@@ -2368,9 +2396,13 @@ For audio with multiple channels, each point in time is represented by multiple 
 The samples in a frame are arranged as follows:
 
 - For 1 channel (mono) a frame contains just the one sample.
-- For 2 channels (stereo) the frame contains two samples and the layout is: left, right. This means that the first sample corresponds to the left channel and the second sample corresponds to the right channel.
-- For 4 channels (quad) the layout is front-left, front-right, rear-left, rear-right.
-- For 6 channels (5.1) the layout is front-left, front-right, center, low-freq, rear-left, rear-right.
+- For 2 channels (stereo) the frame contains two samples and the layout is: front-left, front-right. This means that the first sample corresponds to the left channel and the second sample corresponds to the right channel.
+- For 3 channels (2.1) the layout is front-left, front-right, low-frequency.
+- For 4 channels (quad) the layout is front-left, front-right, back-left, back-right.
+- For 5 channels (4.1) the layout is front-left, front-right, low-frequency, back-left, back-right.
+- For 6 channels (5.1) the layout is front-left, front-right, front-center, low-frequency, back-left, back-right. The last two can also be side-left, side-right.
+- For 7 channels (6.1) the layout is front-left, front-right, front-center, low-frequency, back-center, side-left, side-right.
+- For 8 channels (7.1) the layout is front-left, front-right, front-center, low-frequency, back-left, back-right, side-left, side-right.
 
 So for example, to play 3 seconds of a 440Hz sine wave, you could do:
 
@@ -2384,7 +2416,7 @@ const {
   minSampleValue,
   maxSampleValue,
   zeroSampleValue,
-} = playbackInstance
+} = playbackStream
 
 const range = maxSampleValue - minSampleValue
 const amplitude = range / 2
@@ -2405,12 +2437,12 @@ for (let i = 0; i < numFrames; i++) {
   const angle = time / sinePeriod * TWO_PI
   const sample = zeroSampleValue + Math.sin(angle) * sineAmplitude
   for (let j = 0; j < channels; j++) {
-    offset = playbackInstance.writeSample(buffer, sample, offset)
+    offset = playbackStream.writeSample(buffer, sample, offset)
   }
 }
 
-playbackInstance.enqueue(buffer)
-playbackInstance.play()
+playbackStream.putData(buffer)
+playbackStream.play()
 ```
 
 ### Sample formats
@@ -2419,43 +2451,17 @@ String values used to represent how audio samples are stored in a Buffer.
 
 | Value      | Corresponding `SDL_AudioFormat` | Comment                                                   |
 | ---        | ---                             | ---                                                       |
-| `'s8'`     | `AUDIO_S8`                      | signed 8-bit samples                                      |
-| `'u8'`     | `AUDIO_U8`                      | unsigned 8-bit samples                                    |
-| `'s16lsb'` | `AUDIO_S16LSB`                  | signed 16-bit samples in little-endian byte order         |
-| `'s16msb'` | `AUDIO_S16MSB`                  | signed 16-bit samples in big-endian byte order            |
-| `'s16sys'` | `AUDIO_S16SYS`                  | signed 16-bit samples in native byte order                |
-| `'s16'`    | `AUDIO_S16`                     | alias for `'s16lsb'`                                      |
-| `'u16lsb'` | `AUDIO_U16LSB`                  | unsigned 16-bit samples in little-endian byte order       |
-| `'u16msb'` | `AUDIO_U16MSB`                  | unsigned 16-bit samples in big-endian byte order          |
-| `'u16sys'` | `AUDIO_U16SYS`                  | unsigned 16-bit samples in native byte order              |
-| `'u16'`    | `AUDIO_U16`                     | alias for `'u16lsb'`                                      |
-| `'s32lsb'` | `AUDIO_S32LSB`                  | 32-bit integer samples in little-endian byte order        |
-| `'s32msb'` | `AUDIO_S32MSB`                  | 32-bit integer samples in big-endian byte order           |
-| `'s32sys'` | `AUDIO_S32SYS`                  | 32-bit integer samples in native byte order               |
-| `'s32'`    | `AUDIO_S32`                     | alias for `'s32lsb'`                                      |
-| `'f32lsb'` | `AUDIO_F32LSB`                  | 32-bit floating point samples in little-endian byte order |
-| `'f32msb'` | `AUDIO_F32MSB`                  | 32-bit floating point samples in big-endian byte order    |
-| `'f32sys'` | `AUDIO_F32SYS`                  | 32-bit floating point samples in native byte order        |
-| `'f32'`    | `AUDIO_F32`                     | alias for `'f32lsb'`                                      |
-
-<a id="audio-event-deviceadd"></a>
-
-### Event: 'deviceAdd'
-
-- `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
-
-Fired when a new audio device becomes available.
-Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
-
-<a id="audio-event-deviceremove"></a>
-
-### Event: 'deviceRemove'
-
-- `device: <object>`: An object from [`sdl.audio.devices`](#sdlaudiodevices) indicating the device that caused the event.
-
-Fired when an existing audio device is removed.
-Check [`sdl.audio.devices`](#sdlaudiodevices) to get the new list of audio devices.
-When the `'deviceRemove'` event is emitted, all instances that were opened from the removed device are closed automatically.
+| `'s8'`     | `SDL_AUDIO_S8`                  | signed 8-bit samples                                      |
+| `'u8'`     | `SDL_AUDIO_U8`                  | unsigned 8-bit samples                                    |
+| `'s16le'`  | `SDL_AUDIO_S16LE`               | signed 16-bit samples in little-endian byte order         |
+| `'s16be'`  | `SDL_AUDIO_S16BE`               | signed 16-bit samples in big-endian byte order            |
+| `'s16'`    | `SDL_AUDIO_S16`                 | signed 16-bit samples in native byte order                |
+| `'s32le'`  | `SDL_AUDIO_S32LE`               | 32-bit integer samples in little-endian byte order        |
+| `'s32be'`  | `SDL_AUDIO_S32BE`               | 32-bit integer samples in big-endian byte order           |
+| `'s32'`    | `SDL_AUDIO_S32`                 | 32-bit integer samples in native byte order               |
+| `'f32le'`  | `SDL_AUDIO_F32LE`               | 32-bit floating point samples in little-endian byte order |
+| `'f32be'`  | `SDL_AUDIO_F32BE`               | 32-bit floating point samples in big-endian byte order    |
+| `'f32'`    | `SDL_AUDIO_F32`                 | 32-bit floating point samples in native byte order        |
 
 ### sdl.audio.bytesPerSample(format)
 
@@ -2518,225 +2524,294 @@ For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` wou
 
 This function is also available from `@kmamal/sdl/helpers`.
 
-### sdl.audio.devices
+### sdl.audio.playback
+
+Playback and recording devices are managed separately, through `sdl.audio.playback` and `sdl.audio.recording`.
+Both have the same shape: a list of devices, an `openDevice()` function, and `deviceAdd`/`deviceRemove` events.
+
+<a id="audio-playback-event-deviceadd"></a>
+
+### Event: 'deviceAdd'
+
+- `device: <object>`: An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices) indicating the device that caused the event.
+
+Fired when a new playback device becomes available.
+Check [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices) to get the new list of devices.
+
+<a id="audio-playback-event-deviceremove"></a>
+
+### Event: 'deviceRemove'
+
+- `device: <object>`: An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices) indicating the device that caused the event.
+
+Fired when an existing playback device is removed.
+Check [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices) to get the new list of devices.
+When the `'deviceRemove'` event is emitted, all streams that were opened from the removed device are closed automatically.
+
+### sdl.audio.playback.devices
 
 - `<object>[]`
-  - `type: <string>` Either `'playback'` or `'recording'`.
+  - `id: <number>` The unique id of the device.
   - `name: <string>` The name of the device.
 
-A list of all the detected audio devices.
+A list of all the detected playback devices.
 Sample output for PulseAudio:
 
 ```js
 [
-  { name: 'Built-in Audio Analog Stereo', type: 'playback' },
-  { name: 'Built-in Audio Analog Stereo', type: 'recording' },
+  { id: 3, name: 'Built-in Audio Analog Stereo' },
 ]
 ```
 
-Note that `sdl.audio.devices` may sometimes be an empty list.
-Despite that, in many common cases, it's still possible to successfully open the default device by only passing `type` to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) like this:
+Note that the list may sometimes be empty.
+Despite that, in many common cases, it's still possible to successfully open the default device by calling [`openDevice()`](#sdlaudioplaybackopendevicedevice-options) without a device:
 
 ```js
-const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
+const playbackStream = sdl.audio.playback.openDevice()
 ```
 
-### sdl.audio.openDevice(device[, options])
+### sdl.audio.playback.openDevice([device[, options]])
 
-- `device: <object>` An object from [`sdl.audio.devices`](#sdlaudiodevices), or a custom device.
-  - `type: <string>`: Either `'playback'` or `'recording'`.
-  - `name: <string>|<null>`: The name of the device. Optional.
+- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices). Must be the actual object from that list, not a copy. Pass `null` to let SDL pick the default device. Default: `null`
 - `options: <object>`
-  - `channels: <number>`: Number of audio channels. Valid values: `1`, `2`, `4`, `6`. Default: `1`
+  - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
-- Returns: [`<AudioInstance>`](#class-audioinstance) an object representing the opened audio device instance.
+- Returns: [`<AudioPlaybackStream>`](#class-audioplaybackstream-extends-audiostream) an object representing the opened stream.
 
-Initializes an audio device for playback/recording and returns a corresponding instance.
-If the opened device is a playback device, then it returns an [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance), otherwise it returns an [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+Opens a playback device and returns a stream bound to it.
 
-Most of the time, you will be passing objects from [`sdl.audio.devices`](#sdlaudiodevices) for the `device` argument:
-
-```js
-const device = sdl.audio.devices[selectedIndex]
-const playbackInstance = sdl.audio.openDevice(device)
-```
-
-It's also possible to let SDL pick the most appropriate device by only passing the `type` property:
-
-```js
-const playbackInstance = sdl.audio.openDevice({ type: 'playback' })
-```
-
-Some audio drivers also support arbitrary and driver-specific strings for the device `name` such as hostname/IP address for a remote audio server, or a filename in the diskaudio driver.
-These drivers usually return an empty list for [`sdl.audio.devices`](#sdlaudiodevices).
-
-The `channels`, `frequency` and `format` options together define how the data is laid out in the `Buffer` objects that you write to playback instances of read from recording instances.
+The `channels`, `frequency` and `format` options together define how the data is laid out in the `Buffer` objects that you write to the stream.
 See also the section on [audio data](#audio-data).
 
 The `buffered` option specifies the "delay" between the application and the audio driver.
-With smaller values you have smaller delays, but you also have to read/write data from/to the driver more frequently.
+With smaller values you have smaller delays, but you also have to write data more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
 
-## class AudioInstance
+### sdl.audio.recording
 
-The `AudioInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
-It only serves as the base class for [`AudioPlaybackInstance`](#class-audioplaybackinstance-extends-audioinstance) and [`AudioRecordingInstance`](#class-audiorecordinginstance-extends-audioinstance).
+Playback and recording devices are managed separately, through `sdl.audio.playback` and `sdl.audio.recording`.
+Both have the same shape: a list of devices, an `openDevice()` function, and `deviceAdd`/`deviceRemove` events.
 
-<a id="audio-instance-event-close"></a>
+<a id="audio-recording-event-deviceadd"></a>
+
+### Event: 'deviceAdd'
+
+- `device: <object>`: An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices) indicating the device that caused the event.
+
+Fired when a new recording device becomes available.
+Check [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices) to get the new list of devices.
+
+<a id="audio-recording-event-deviceremove"></a>
+
+### Event: 'deviceRemove'
+
+- `device: <object>`: An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices) indicating the device that caused the event.
+
+Fired when an existing recording device is removed.
+Check [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices) to get the new list of devices.
+When the `'deviceRemove'` event is emitted, all streams that were opened from the removed device are closed automatically.
+
+### sdl.audio.recording.devices
+
+- `<object>[]`
+  - `id: <number>` The unique id of the device.
+  - `name: <string>` The name of the device.
+
+A list of all the detected recording devices.
+Sample output for PulseAudio:
+
+```js
+[
+  { id: 4, name: 'Built-in Audio Analog Stereo' },
+]
+```
+
+Note that the list may sometimes be empty.
+Despite that, in many common cases, it's still possible to successfully open the default device by calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device:
+
+```js
+const recordingStream = sdl.audio.recording.openDevice()
+```
+
+### sdl.audio.recording.openDevice([device[, options]])
+
+- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices). Must be the actual object from that list, not a copy. Pass `null` to let SDL pick the default device. Default: `null`
+- `options: <object>`
+  - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
+  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
+  - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
+  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
+- Returns: [`<AudioRecordingStream>`](#class-audiorecordingstream-extends-audiostream) an object representing the opened stream.
+
+Opens a recording device and returns a stream bound to it.
+
+The `channels`, `frequency` and `format` options together define how the data is laid out in the `Buffer` objects that you read from the stream.
+See also the section on [audio data](#audio-data).
+
+The `buffered` option specifies the "delay" between the application and the audio driver.
+With smaller values you have smaller delays, but you also have to read data more frequently.
+Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
+
+## class AudioStream
+
+The `AudioStream` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
+It only serves as the base class for [`AudioPlaybackStream`](#class-audioplaybackstream-extends-audiostream) and [`AudioRecordingStream`](#class-audiorecordingstream-extends-audiostream).
+
+<a id="audio-stream-event-close"></a>
 
 ### Event: 'close'
 
-Fired when the audio instance is about to close.
+Fired when the stream is about to close.
 Handle cleanup here.
 
-### audioInstance.id
+### audioStream.id
 
 - `<number>`
 
-A unique identifier for the instance.
+A unique identifier for the stream.
 
-### audioInstance.device
+### audioStream.device
 
-- `<object>`
+- `<object>|<null>`
 
-The device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when the `audioInstance` was opened.
+The device passed to `openDevice()` when the stream was opened, or `null` if the stream was opened on the default device.
 
-### audioInstance.name
-
-- `<string>|<null>`
-
-The `name` of the device passed to [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) when the `audioInstance` was opened, or `null` if the instance was opened without specifying a device name.
-
-### audioInstance.channels
+### audioStream.channels
 
 - `<number>`
 
-The number of channels the instance was opened with.
+The number of channels the stream was opened with.
 
-### audioInstance.frequency
+### audioStream.frequency
 
 - `<number>`
 
-The sampling frequency (in frames per second) the instance was opened with.
+The sampling frequency (in frames per second) the stream was opened with.
 
-### audioInstance.format
+### audioStream.format
 
 - [`<SampleFormat>`](#sample-formats)
 
-The audio sample format the instance was opened with.
+The audio sample format the stream was opened with.
 
-### audioInstance.bytesPerSample
-
-- `<number>`
-
-The number of bytes that make up a single audio sample, based on the format the instance was opened with.
-
-### audioInstance.minSampleValue
+### audioStream.bytesPerSample
 
 - `<number>`
 
-The minimum value a sample can take, based on the format the instance was opened with.
+The number of bytes that make up a single audio sample, based on the format the stream was opened with.
 
-### audioInstance.maxSampleValue
-
-- `<number>`
-
-The maximum value a sample can take, based on the format the instance was opened with.
-
-### audioInstance.zeroSampleValue
+### audioStream.minSampleValue
 
 - `<number>`
 
-The sample value that corresponds to silence, based on the format the instance was opened with.
+The minimum value a sample can take, based on the format the stream was opened with.
 
-### audioInstance.readSample(buffer[, offset])
+### audioStream.maxSampleValue
+
+- `<number>`
+
+The maximum value a sample can take, based on the format the stream was opened with.
+
+### audioStream.zeroSampleValue
+
+- `<number>`
+
+The sample value that corresponds to silence, based on the format the stream was opened with.
+
+### audioStream.readSample(buffer[, offset])
 
 - `buffer: <Buffer>` The buffer to read the sample from.
 - `offset: <number>` The position from which to read the sample. Default: `0`
 - Returns: `<number>` The value of the sample read.
 
-Helper function which calls the appropriate `read*` method of `Buffer` based on the format the instance was opened with.
-For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+Helper function which calls the appropriate `read*` method of `Buffer` based on the format the stream was opened with.
+For example, for a stream opened with the `'f32'` sample format, a call to `audioStream.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
-### audioInstance.writeSample(buffer, value[, offset])
+### audioStream.writeSample(buffer, value[, offset])
 
 - `buffer: <Buffer>` The buffer to write the sample to.
 - `value: <number>` The value of the sample to write.
 - `offset: <number>` The position at which to write the sample. Default: `0`
 - Returns: `<number>` The updated `offset`.
 
-Helper function which calls the appropriate `write*` method of `Buffer` based on the format the instance was opened with.
-For example, for an instance opened with the `'f32'` sample format, a call to `audioinstance.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+Helper function which calls the appropriate `write*` method of `Buffer` based on the format the stream was opened with.
+For example, for a stream opened with the `'f32'` sample format, a call to `audioStream.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
-### audioInstance.buffered
-
-- `<number>`
-
-The buffer size (in frames) the instance was opened with.
-
-### audioInstance.playing
-
-- `<boolean>`
-
-Is `true` if the instance is currently playing.
-
-### audioInstance.play([play])
-
-- `play: <boolean>` Set to `true` to start the instance, `false` to stop. Default: `true`
-
-Starts or stops the instance.
-
-### audioInstance.pause()
-
-Equivalent to [`audioInstance.play(false)`](#audioinstanceplayplay)
-
-### audioInstance.queued
+### audioStream.buffered
 
 - `<number>`
 
-The number of bytes that are currently queued up, waiting to be either played by the system or dequeued by the user.
+The buffer size (in frames) the stream was opened with.
 
-### audioInstance.clearQueue()
-
-Clears the queued data.
-
-### audioInstance.closed
+### audioStream.playing
 
 - `<boolean>`
 
-Is `true` if the instance is closed.
-A closed instance object must not be used any further.
+Is `true` if the stream is currently running.
 
-### audioInstance.close()
+### audioStream.play([play])
 
-Closes the instance.
+- `play: <boolean>` Set to `true` to start the stream, `false` to stop. Default: `true`
 
-## class AudioPlaybackInstance extends AudioInstance
+Starts or stops the stream.
 
-The `AudioPlaybackInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
-Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of type `AudioPlaybackInstance`, if a playback device is opened.
+### audioStream.pause()
 
-### playbackInstance.enqueue(buffer[, bytes])
+Equivalent to [`audioStream.play(false)`](#audiostreamplayplay)
+
+### audioStream.clear()
+
+Discards all data buffered in the stream: queued playback data that has not been played yet, or recorded data that has not been read yet.
+
+### audioStream.closed
+
+- `<boolean>`
+
+Is `true` if the stream is closed.
+A closed stream object must not be used any further.
+
+### audioStream.close()
+
+Closes the stream.
+
+## class AudioPlaybackStream extends AudioStream
+
+The `AudioPlaybackStream` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.playback.openDevice()`](#sdlaudioplaybackopendevicedevice-options) are of type `AudioPlaybackStream`.
+
+### playbackStream.queued
+
+- `<number>`
+
+The number of bytes that have been written to the stream but not yet played by the device.
+
+### playbackStream.putData(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to read data from.
 - `bytes: <number>` The number of bytes to read from the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
 
-Takes the audio data that you have written to the buffer, and writes it to the queue, from where it will be played back as audio.
+Takes the audio data that you have written to the buffer, and queues it on the stream, from where it will be played back as audio.
 
-## class AudioRecordingInstance extends AudioInstance
+## class AudioRecordingStream extends AudioStream
 
-The `AudioRecordingInstance` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
-Instead, objects returned by [`sdl.audio.openDevice()`](#sdlaudioopendevicedevice-options) are of type `AudioRecordingInstance`, if a recording device is opened.
+The `AudioRecordingStream` class is not directly exposed by the API so you can't (and shouldn't) use it with the `new` operator.
+Instead, objects returned by [`sdl.audio.recording.openDevice()`](#sdlaudiorecordingopendevicedevice-options) are of type `AudioRecordingStream`.
 
-### recordingInstance.dequeue(buffer[, bytes])
+### recordingStream.available
+
+- `<number>`
+
+The number of bytes of recorded audio that are waiting to be read from the stream.
+
+### recordingStream.getData(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to write data to.
 - `bytes: <number>` The number of bytes to write to the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
 - Returns: `<number>` The actual number of bytes read.
 
-Takes recorded audio data that has is waiting on the queue, and writes it to the provided buffer.
+Takes recorded audio data that is waiting on the stream, and writes it to the provided buffer.
 
 ## sdl.clipboard
 
@@ -2764,7 +2839,7 @@ Changes the text contents of the clipboard.
 ### sdl.power.info
 
 - `<object>`
-  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determinded.
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determined.
   - `seconds: <number>|<null>` Seconds of battery life left, or `null` if not running on battery or if it can't be determinded.
   - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determinded.
 

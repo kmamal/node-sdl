@@ -4,38 +4,38 @@ import { setTimeout } from 'node:timers/promises'
 const buffered = 128
 const options = { buffered }
 
-const recordingInstance = sdl.audio.openDevice({ type: 'recording' }, options)
-const playbackInstance = sdl.audio.openDevice({ type: 'playback' }, options)
+const recordingStream = sdl.audio.recording.openDevice(null, options)
+const playbackStream = sdl.audio.playback.openDevice(null, options)
 
-const { frequency, bytesPerSample } = playbackInstance
+const { frequency, bytesPerSample } = playbackStream
 
 const duration = 0.25
 const numSamples = duration * frequency
 const numBytes = numSamples * bytesPerSample
 const buffer = Buffer.alloc(numBytes, 0)
 
-recordingInstance.play()
-playbackInstance.play()
+recordingStream.play()
+playbackStream.play()
 
 for (;;) {
-	const { queued } = recordingInstance
+	const { available } = recordingStream
 
-	if (queued === 0) {
+	if (available === 0) {
 		await setTimeout(1)
 		continue
 	}
 
 	// Copy new samples
-	const discarded = buffer.slice(0, queued)
-	playbackInstance.enqueue(discarded)
-	buffer.copy(buffer, 0, queued)
-	recordingInstance.dequeue(buffer.slice(-queued))
+	const discarded = buffer.slice(0, available)
+	playbackStream.putData(discarded)
+	buffer.copy(buffer, 0, available)
+	recordingStream.getData(buffer.slice(-available))
 
 	// Apply effect
 	const offset = buffer.length - discarded.length
 	for (let i = 0; i < discarded.length; i += bytesPerSample) {
-		const a = recordingInstance.readSample(buffer, offset + i)
-		const b = recordingInstance.readSample(discarded, i)
-		recordingInstance.writeSample(buffer, a + b * 0.5, offset + i)
+		const a = recordingStream.readSample(buffer, offset + i)
+		const b = recordingStream.readSample(discarded, i)
+		recordingStream.writeSample(buffer, a + b * 0.5, offset + i)
 	}
 }

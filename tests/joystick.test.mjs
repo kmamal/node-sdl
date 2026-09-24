@@ -32,7 +32,7 @@ T.test("sdl::joystick", async (t) => {
 	const device = sdl.joystick.devices[0]
 
 	t.equal(typeof device.id, 'number')
-	t.equal(device.type, 'gamecontroller')
+	t.equal(device.type, 'gamepad')
 	t.equal(device.name, 'Emulated Joystick')
 	t.equal(typeof device.path, 'string')
 	t.equal(typeof device.guid, 'string')

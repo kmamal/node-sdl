@@ -9,7 +9,7 @@
 #include "mouse.h"
 #include "touch.h"
 #include "joystick.h"
-#include "controller.h"
+#include "gamepad.h"
 #include "sensor.h"
 #include "audio.h"
 #include "clipboard.h"
@@ -25,7 +25,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("global_cleanup", Napi::Function::New<global::cleanup>(env));
 
 	exports.Set("events_poll", Napi::Function::New<events::poll>(env));
-	exports.Set("events_isDispatchingFromFilter", Napi::Function::New<events::isDispatchingFromFilter>(env));
+	exports.Set("events_isDispatchingFromWatch", Napi::Function::New<events::isDispatchingFromWatch>(env));
 
 	exports.Set("video_getDisplays", Napi::Function::New<video::getDisplays>(env));
 
@@ -36,6 +36,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("window_setFullscreen", Napi::Function::New<window::setFullscreen>(env));
 	exports.Set("window_setResizable", Napi::Function::New<window::setResizable>(env));
 	exports.Set("window_setBorderless", Napi::Function::New<window::setBorderless>(env));
+	exports.Set("window_setRelativeMouseMode", Napi::Function::New<window::setRelativeMouseMode>(env));
 	exports.Set("window_setAcceleratedAndVsync", Napi::Function::New<window::setAcceleratedAndVsync>(env));
 	exports.Set("window_focus", Napi::Function::New<window::focus>(env));
 	exports.Set("window_show", Napi::Function::New<window::show>(env));
@@ -61,7 +62,6 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("mouse_setCursorImage", Napi::Function::New<mouse::setCursorImage>(env));
 	exports.Set("mouse_showCursor", Napi::Function::New<mouse::showCursor>(env));
 	exports.Set("mouse_redrawCursor", Napi::Function::New<mouse::redrawCursor>(env));
-	exports.Set("mouse_setRelativeMode", Napi::Function::New<mouse::setRelativeMode>(env));
 
 	exports.Set("touch_getDevices", Napi::Function::New<touch::getDevices>(env));
 
@@ -73,9 +73,9 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("joystick_rumbleTriggers", Napi::Function::New<joystick::rumbleTriggers>(env));
 	exports.Set("joystick_close", Napi::Function::New<joystick::close>(env));
 
-	exports.Set("controller_addMappings", Napi::Function::New<controller::addMappings>(env));
-	exports.Set("controller_open", Napi::Function::New<controller::open>(env));
-	exports.Set("controller_close", Napi::Function::New<controller::close>(env));
+	exports.Set("gamepad_addMappings", Napi::Function::New<gamepad::addMappings>(env));
+	exports.Set("gamepad_open", Napi::Function::New<gamepad::open>(env));
+	exports.Set("gamepad_close", Napi::Function::New<gamepad::close>(env));
 
 	exports.Set("sensor_getDevices", Napi::Function::New<sensor::getDevices>(env));
 	exports.Set("sensor_open", Napi::Function::New<sensor::open>(env));
@@ -85,10 +85,11 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("audio_getDevices", Napi::Function::New<audio::getDevices>(env));
 	exports.Set("audio_open", Napi::Function::New<audio::open>(env));
 	exports.Set("audio_play", Napi::Function::New<audio::play>(env));
-	exports.Set("audio_getQueueSize", Napi::Function::New<audio::getQueueSize>(env));
-	exports.Set("audio_enqueue", Napi::Function::New<audio::enqueue>(env));
-	exports.Set("audio_dequeue", Napi::Function::New<audio::dequeue>(env));
-	exports.Set("audio_clearQueue", Napi::Function::New<audio::clearQueue>(env));
+	exports.Set("audio_getQueued", Napi::Function::New<audio::getQueued>(env));
+	exports.Set("audio_getAvailable", Napi::Function::New<audio::getAvailable>(env));
+	exports.Set("audio_putData", Napi::Function::New<audio::putData>(env));
+	exports.Set("audio_getData", Napi::Function::New<audio::getData>(env));
+	exports.Set("audio_clear", Napi::Function::New<audio::clear>(env));
 	exports.Set("audio_close", Napi::Function::New<audio::close>(env));
 
 	exports.Set("clipboard_getText", Napi::Function::New<clipboard::getText>(env));

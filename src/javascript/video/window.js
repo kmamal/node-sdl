@@ -56,10 +56,6 @@ class Window extends EventsViaPoll {
 			vsync = true,
 			opengl = false,
 			webgpu = false,
-			skipTaskbar = false,
-			popupMenu = false,
-			tooltip = false,
-			utility = false,
 		} = options
 
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
@@ -85,30 +81,20 @@ class Window extends EventsViaPoll {
 		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
 		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
-		if (typeof skipTaskbar !== 'boolean') { throw Object.assign(new Error("skipTaskbar must be a boolean"), { skipTaskbar }) }
-		if (typeof popupMenu !== 'boolean') { throw Object.assign(new Error("popupMenu must be a boolean"), { popupMenu }) }
-		if (typeof tooltip !== 'boolean') { throw Object.assign(new Error("tooltip must be a boolean"), { tooltip }) }
-		if (typeof utility !== 'boolean') { throw Object.assign(new Error("utility must be a boolean"), { utility }) }
 		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 
-		let displayIndex = 0
+		let displayId = 0
 		if (display) {
-			// Identical monitors share a name, so also match on position
-			const { name, geometry } = display
-			const displays = Bindings.video_getDisplays()
-			const index = displays.findIndex((a) => a.name === name
-				&& a.geometry.x === geometry?.x
-				&& a.geometry.y === geometry?.y)
-			if (index === -1) { throw Object.assign(new Error("display not found"), { display }) }
-			// SDL indexes can skip positions when a display vanishes mid-enumeration
-			displayIndex = displays[index]._index
+			Globals.events.poll()
+			if (!Globals.displays.includes(display)) { throw Object.assign(new Error("invalid display"), { display }) }
+			displayId = display.id
 		}
 
 		const result = Bindings.window_create(
 			title,
-			displayIndex,
+			displayId,
 			x,
 			y,
 			width,
@@ -122,10 +108,6 @@ class Window extends EventsViaPoll {
 			vsync,
 			opengl,
 			webgpu,
-			skipTaskbar,
-			popupMenu,
-			tooltip,
-			utility,
 		)
 
 		this._id = result.id
@@ -135,7 +117,7 @@ class Window extends EventsViaPoll {
 		this._height = result.height
 		this._pixelWidth = result.pixelWidth
 		this._pixelHeight = result.pixelHeight
-		this._displayIndex = result.displayIndex
+		this._displayId = result.displayId
 		this._fullscreen = result.fullscreen
 		this._resizable = result.resizable
 		this._borderless = result.borderless
@@ -143,10 +125,6 @@ class Window extends EventsViaPoll {
 		this._accelerated = result.accelerated
 		this._vsync = result.vsync
 		this._native = result.native
-		this._skipTaskbar = result.skipTaskbar
-		this._popupMenu = result.popupMenu
-		this._tooltip = result.tooltip
-		this._utility = result.utility
 
 		this._title = title
 		this._visible = visible
@@ -155,6 +133,7 @@ class Window extends EventsViaPoll {
 
 		this._minimized = false
 		this._maximized = false
+		this._relativeMouseMode = false
 		this._destroyed = false
 
 		Globals.windows.all.set(this._id, this)
@@ -304,7 +283,7 @@ class Window extends EventsViaPoll {
 		Globals.events.poll()
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		return Globals.displays.find((a) => a._index === this._displayIndex) ?? null
+		return Globals.displays.find((a) => a.id === this._displayId) ?? null
 	}
 
 	get visible () {
@@ -497,29 +476,21 @@ class Window extends EventsViaPoll {
 		return Globals.windows.hovered === this
 	}
 
-	get skipTaskbar () {
+	get relativeMouseMode () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		return this._skipTaskbar
+		return this._relativeMouseMode
 	}
 
-	get popupMenu () {
+	setRelativeMouseMode (relative = true) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
-		return this._popupMenu
+		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
+
+		this._relativeMouseMode = Bindings.window_setRelativeMouseMode(this._id, relative)
 	}
 
-	get tooltip () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
-
-		return this._tooltip
-	}
-
-	get utility () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
-
-		return this._utility
-	}
+	unsetRelativeMouseMode () { this.setRelativeMouseMode(false) }
 
 	render (width, height, stride, format, buffer, options = {}) {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
@@ -540,6 +511,7 @@ class Window extends EventsViaPoll {
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		const helpers = VideoFormatHelpers[format]
 		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+		if (!helpers.isRenderable) { throw Object.assign(new Error("format can't be rendered"), { format }) }
 		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
@@ -547,14 +519,12 @@ class Window extends EventsViaPoll {
 
 		if (dstRect !== null) {
 			if (typeof dstRect !== 'object') { throw Object.assign(new Error("dstRect must be an object"), { dstRect }) }
-			if (!Number.isInteger(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be an integer"), { dstRect }) }
-			if (dstRect.x < -(2 ** 31) || dstRect.x > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.x"), { dstRect }) }
-			if (!Number.isInteger(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be an integer"), { dstRect }) }
-			if (dstRect.y < -(2 ** 31) || dstRect.y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.y"), { dstRect }) }
-			if (!Number.isInteger(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be an integer"), { dstRect }) }
-			if (dstRect.width <= 0 || dstRect.width > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.width"), { dstRect }) }
-			if (!Number.isInteger(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be an integer"), { dstRect }) }
-			if (dstRect.height <= 0 || dstRect.height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid dstRect.height"), { dstRect }) }
+			if (!Number.isFinite(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be a number"), { dstRect }) }
+			if (!Number.isFinite(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be a number"), { dstRect }) }
+			if (!Number.isFinite(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be a number"), { dstRect }) }
+			if (dstRect.width <= 0) { throw Object.assign(new Error("invalid dstRect.width"), { dstRect }) }
+			if (!Number.isFinite(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be a number"), { dstRect }) }
+			if (dstRect.height <= 0) { throw Object.assign(new Error("invalid dstRect.height"), { dstRect }) }
 		}
 
 		const _format = Enums.pixelFormat[format]
@@ -608,7 +578,7 @@ class Window extends EventsViaPoll {
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
 
 		// Defer the native destruction until the pump has unwound.
-		if (Bindings.events_isDispatchingFromFilter()) {
+		if (Bindings.events_isDispatchingFromWatch()) {
 			process.nextTick(() => { Bindings.window_destroy(this._id) })
 		}
 		else {

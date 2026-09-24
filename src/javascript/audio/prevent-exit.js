@@ -16,14 +16,16 @@ process.on('beforeExit', (code) => {
 	let duration = 0
 
 	Globals.events.poll()
-	for (const instance of Globals.audioInstances.values()) {
-		if (instance.device.type !== 'playback') { continue }
-		if (!instance.playing) { continue }
+	for (const stream of Globals.audioStreams.values()) {
+		if (stream._recording) { continue }
+		if (!stream.playing) { continue }
 
-		const queued = Bindings.audio_getQueueSize(instance.id)
+		let queued = null
+		try { queued = Bindings.audio_getQueued(stream.id) }
+		catch (_) { }
 		if (!queued) { continue }
 
-		const { channels, frequency, buffered, bytesPerSample } = instance
+		const { channels, frequency, buffered, bytesPerSample } = stream
 		const bytesPerSecond = channels * frequency * bytesPerSample
 		const bufferedBytes = buffered * channels * bytesPerSample
 		duration = Math.max(duration, (queued + bufferedBytes) / bytesPerSecond)

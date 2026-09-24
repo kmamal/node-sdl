@@ -42,7 +42,7 @@ const render = () => {
 		x += 20
 		y += 20
 
-		const message = "No controllers connected"
+		const message = "No gamepads connected"
 		ctx.fillText(message, x, y)
 
 		const metrics = ctx.measureText(message)
@@ -112,8 +112,8 @@ const render = () => {
 	window.render(W, H, W * 4, 'rgba32', canvas.data())
 }
 
-const openController = (device) => {
-	const instance = sdl.controller.openDevice(device)
+const openGamepad = (device) => {
+	const instance = sdl.gamepad.openDevice(device)
 	instances.add(instance)
 
 	instance.on('*', (eventType) => {
@@ -124,15 +124,15 @@ const openController = (device) => {
 	})
 }
 
-sdl.controller.on('deviceAdd', (event) => {
-	openController(event.device)
+sdl.gamepad.on('deviceAdd', (event) => {
+	openGamepad(event.device)
 	render()
 })
 
-sdl.controller.on('deviceRemove', render)
+sdl.gamepad.on('deviceRemove', render)
 
-for (const device of sdl.controller.devices) {
-	openController(device)
+for (const device of sdl.gamepad.devices) {
+	openGamepad(device)
 }
 
 const cleanup = () => {
@@ -140,8 +140,8 @@ const cleanup = () => {
 		instance.close()
 	}
 
-	sdl.controller.removeAllListeners('deviceAdd')
-	sdl.controller.removeAllListeners('deviceRemove')
+	sdl.gamepad.removeAllListeners('deviceAdd')
+	sdl.gamepad.removeAllListeners('deviceRemove')
 }
 
 window
