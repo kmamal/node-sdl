@@ -457,7 +457,6 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		Bindings.window_focus(this._id)
-		Globals.windows.focused = this
 	}
 
 	get hovered () {

@@ -1138,7 +1138,9 @@ Is `true` if the window has keyboard input.
 
 ### window.focus()
 
-Gives the window the keyboard focus.
+Focuses the window.
+The change is a requested asynchronously from the windowing system, which may deny it.
+The `focused` property updates when/if the change takes effect.
 
 ### window.hovered
 

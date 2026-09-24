@@ -167,14 +167,20 @@ T.test("sdl::window", async (t) => {
 	// t.equal(window1.focused, false)
 	t.equal(window2.focused, false)
 	window1.focus()
-	t.equal(window1.focused, true)
-	t.equal(window2.focused, false)
-	t.equal(sdl.video.focused, window1)
-	window2.focus()
-	t.equal(window1.focused, false)
-	t.equal(window2.focused, true)
-	t.equal(sdl.video.focused, window2)
-	window1.focus()
+	if (await waitFor(() => window1.focused)) {
+		t.equal(window2.focused, false)
+		t.equal(sdl.video.focused, window1)
+		window2.show()
+		window2.focus()
+		t.ok(await waitFor(() => window2.focused))
+		t.equal(window1.focused, false)
+		t.equal(sdl.video.focused, window2)
+		window1.focus()
+		t.ok(await waitFor(() => window1.focused))
+		window2.hide()
+	} else {
+		console.warn("WINDOW MANAGER IGNORED FOCUS")
+	}
 
 	t.equal(typeof window1.hovered, 'boolean')
 
