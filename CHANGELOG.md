@@ -153,6 +153,7 @@ Audio:
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
 - Unplugging an audio device now closes every stream opened from it, as documented, instead of only the first one SDL reports, and the device list is updated even when a `close` listener throws.
 - An audio device disappearing while the device list is being enumerated no longer crashes the process. The audio backend's own notification thread can remove a device mid-enumeration; the resulting error used to escape the internal polling loop as an uncaught exception. Devices that vanish mid-query are now skipped, like displays already were.
+- `audioStream.buffered` reports the buffer size the driver is actually using. SDL only sizes the buffer when it first opens a device, so the `buffered` option is ignored for a device that is already open, and the keep-alive timing used to be computed from the wrong value.
 - Audio device objects no longer carry a `type` property, as the docs and types already said.
 
 Clipboard:

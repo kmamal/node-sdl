@@ -32,11 +32,12 @@ class AudioStream extends EventsViaPoll {
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
-		this._id = Bindings.audio_open(device?.id ?? null, recording, frequency, _format, channels, buffered)
+		const { id, buffered: actualBuffered } = Bindings.audio_open(device?.id ?? null, recording, frequency, _format, channels, buffered)
 
+		this._id = id
 		this._recording = recording
 		this._device = device
-		this._buffered = buffered
+		this._buffered = actualBuffered
 		this._channels = channels
 		this._format = format
 		this._frequency = frequency

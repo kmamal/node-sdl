@@ -3,7 +3,6 @@
 #include <string>
 #include <sstream>
 
-
 std::map<bool, std::string> audio::device_types;
 
 static std::map<SDL_AudioDeviceID, SDL_AudioStream *> open_streams;
@@ -115,6 +114,7 @@ audio::open (const Napi::CallbackInfo &info)
 	SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, samples_string.c_str());
 
 	SDL_AudioStream *stream = SDL_OpenAudioDeviceStream(device_id, &desired, nullptr, nullptr);
+	SDL_ResetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES);
 	if (stream == nullptr) {
 		std::ostringstream message;
 		message << "SDL_OpenAudioDeviceStream() error: " << SDL_GetError();
@@ -131,9 +131,23 @@ audio::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	SDL_AudioSpec actual;
+	int sample_frames;
+	if (!SDL_GetAudioDeviceFormat(audio_id, &actual, &sample_frames)) {
+		std::ostringstream message;
+		message << "SDL_GetAudioDeviceFormat(" << audio_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		SDL_DestroyAudioStream(stream);
+		throw Napi::Error::New(env, message.str());
+	}
+
 	open_streams[audio_id] = stream;
 
-	return Napi::Number::New(env, audio_id);
+	Napi::Object result = Napi::Object::New(env);
+	result.Set("id", audio_id);
+	result.Set("buffered", sample_frames);
+
+	return result;
 }
 
 Napi::Value

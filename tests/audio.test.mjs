@@ -62,7 +62,7 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream2.zeroSampleValue, 0)
 
 		t.equal(stream1.buffered, 4096)
-		t.equal(stream2.buffered, 1024)
+		t.ok([ 1024, stream1.buffered ].includes(stream2.buffered))
 
 		t.equal(stream1.playing, false)
 		t.equal(stream2.playing, false)
@@ -137,7 +137,7 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream2.format, 's16')
 
 		t.equal(stream1.buffered, 4096)
-		t.equal(stream2.buffered, 1024)
+		t.ok([ 1024, stream1.buffered ].includes(stream2.buffered))
 
 		t.equal(stream1.playing, false)
 		t.equal(stream2.playing, false)

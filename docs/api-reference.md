@@ -2625,6 +2625,8 @@ See also the section on [audio data](#audio-data).
 The `buffered` option specifies the "delay" between the application and the audio driver.
 With smaller values you have smaller delays, but you also have to write data more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
+SDL sizes the driver's buffer when it first opens the device, so streams opened on an already-open device share its buffer size.
+Read `buffered` on the returned stream for the size in effect.
 
 ### sdl.audio.recording
 
@@ -2690,6 +2692,8 @@ See also the section on [audio data](#audio-data).
 The `buffered` option specifies the "delay" between the application and the audio driver.
 With smaller values you have smaller delays, but you also have to read data more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
+SDL sizes the driver's buffer when it first opens the device, so streams opened on an already-open device share its buffer size.
+Read `buffered` on the returned stream for the size in effect.
 
 ## class AudioStream
 
@@ -2780,7 +2784,7 @@ For example, for a stream opened with the `'f32'` sample format, a call to `audi
 
 - `<number>`
 
-The buffer size (in frames) the stream was opened with.
+The buffer size (in frames) the driver is using for the stream's device. This may differ from the `buffered` option, see [`openDevice()`](#sdlaudioplaybackopendevicedevice-options).
 
 ### audioStream.playing
 
