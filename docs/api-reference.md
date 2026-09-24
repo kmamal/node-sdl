@@ -992,7 +992,7 @@ A resizable window can be resized by dragging its borders.
 - `resizable: <boolean>` The new value of the property.
 
 Changes the window's resizable property.
-Throws if the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
+Throws if `resizable` is `true` and the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
 
 ### window.borderless
 
@@ -1006,7 +1006,7 @@ A borderless window has no borders or title bar.
 - `borderless: <boolean>` The new value of the property.
 
 Changes the window's borderless property.
-Throws if the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
+Throws if `borderless` is `true` and the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
 
 ### window.alwaysOnTop
 

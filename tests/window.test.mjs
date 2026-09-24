@@ -107,8 +107,14 @@ T.test("sdl::window", async (t) => {
 	}
 	window1.setBorderless(true)
 	t.equal(window1.borderless, true)
+	t.throws(() => { window1.setResizable(true) })
+	t.throwsNot(() => { window1.setResizable(false) })
 	window1.setBorderless(false)
 	t.equal(window1.borderless, false)
+	t.throws(() => { window2.setBorderless(true) })
+	t.throwsNot(() => { window2.setBorderless(false) })
+	t.equal(window2.resizable, true)
+	t.equal(window2.borderless, false)
 
 	t.equal(window1.alwaysOnTop, false)
 	t.equal(window2.alwaysOnTop, true)
