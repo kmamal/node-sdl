@@ -211,7 +211,7 @@ class JoystickInstance extends EventsViaPoll {
 		collection.delete(this)
 		if (collection.size === 0) { Globals.joystickInstances.byId.delete(this._device.id) }
 
-		// TODO: This call could throw if the device is gone
+		// This call could throw if the device is gone
 		try { Bindings.joystick_close(this._device.id) }
 		catch (_) {}
 

@@ -108,7 +108,7 @@ class AudioStream extends EventsViaPoll {
 
 		Globals.audioStreams.delete(this._id)
 
-		// TODO: This call could throw if the device is gone
+		// This call could throw if the device is gone
 		try { Bindings.audio_close(this._id) }
 		catch (_) { }
 

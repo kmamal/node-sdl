@@ -213,7 +213,7 @@ class GamepadInstance extends EventsViaPoll {
 			Globals.gamepadInstances.byId.delete(this._device.id)
 		}
 
-		// TODO: This call could throw if the device is gone
+		// This call could throw if the device is gone
 		try { Bindings.gamepad_close(this._device.id) }
 		catch (_) {}
 
