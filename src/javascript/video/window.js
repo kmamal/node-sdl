@@ -488,6 +488,8 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
+		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+
 		const {
 			scaling = 'nearest',
 			dstRect = null,
