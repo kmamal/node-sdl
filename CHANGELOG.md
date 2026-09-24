@@ -139,6 +139,7 @@ Sensors:
 - `sdl.sensor.devices` no longer crashes when a sensor disappears while the list is being read (its `name` is `null`), no longer throws for sensors of unknown type (their `type` is `null`), and its device objects now remain valid across reads. `sdl.sensor.openDevice()` no longer throws a `TypeError`.
 - `sdl.sensor.devices` now reports `side` for left/right sensors (such as Joy-Con pairs) instead of always `null`.
 - Reading a sensor instance's `data` now pumps events first, so it returns current readings instead of values up to a second old.
+- `sdl.sensor.devices` returns a copy of the internal list, like the joystick and gamepad lists, so modifying it no longer corrupts the library's state.
 
 Audio:
 
