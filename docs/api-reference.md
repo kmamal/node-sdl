@@ -697,7 +697,7 @@ Fired when the window changes position.
 - `pixelWidth: <number>` The window's new width in pixels. See [high-dpi](#high-dpi).
 - `pixelHeight: <number>` The window's new height in pixels. See [high-dpi](#high-dpi).
 
-Fired when the window changes size.
+Fired when the window changes size, either in logical coordinates or in pixels (for example when it moves to a display with a different scale).
 
 ### Event: 'displayChange'
 

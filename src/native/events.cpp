@@ -86,7 +86,8 @@ _windowEventType (Uint32 type)
 		case SDL_EVENT_WINDOW_HIDDEN: return &events::types::HIDE;
 		case SDL_EVENT_WINDOW_EXPOSED: return &events::types::EXPOSE;
 		case SDL_EVENT_WINDOW_MOVED: return &events::types::MOVE;
-		case SDL_EVENT_WINDOW_RESIZED: return &events::types::RESIZE;
+		case SDL_EVENT_WINDOW_RESIZED:
+		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: return &events::types::RESIZE;
 		case SDL_EVENT_WINDOW_DISPLAY_CHANGED: return &events::types::DISPLAY_CHANGE;
 		case SDL_EVENT_WINDOW_MINIMIZED: return &events::types::MINIMIZE;
 		case SDL_EVENT_WINDOW_MAXIMIZED: return &events::types::MAXIMIZE;
@@ -118,7 +119,8 @@ _packWindowEvent (Napi::Env &env, const SDL_Event &event, Napi::Object &packed)
 			packed.Set("y", event.window.data2);
 			break;
 		}
-		case SDL_EVENT_WINDOW_RESIZED: {
+		case SDL_EVENT_WINDOW_RESIZED:
+		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: {
 			// The window was destroyed with events for it still in the queue
 			SDL_Window *window = SDL_GetWindowFromID(event.window.windowID);
 			if (window == nullptr) {
@@ -126,11 +128,13 @@ _packWindowEvent (Napi::Env &env, const SDL_Event &event, Napi::Object &packed)
 				return false;
 			}
 
+			int width, height;
+			SDL_GetWindowSize(window, &width, &height);
 			int pixel_width, pixel_height;
 			SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-			packed.Set("width", event.window.data1);
-			packed.Set("height", event.window.data2);
+			packed.Set("width", width);
+			packed.Set("height", height);
 			packed.Set("pixelWidth", pixel_width);
 			packed.Set("pixelHeight", pixel_height);
 			break;

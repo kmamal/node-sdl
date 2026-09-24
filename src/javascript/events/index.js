@@ -124,6 +124,12 @@ const handleEvent = (event) => {
 					window._y = event.y
 				} break
 				case 'resize': {
+					if (
+						window._width === event.width
+						&& window._height === event.height
+						&& window._pixelWidth === event.pixelWidth
+						&& window._pixelHeight === event.pixelHeight
+					) { return }
 					window._width = event.width
 					window._height = event.height
 					window._pixelWidth = event.pixelWidth
