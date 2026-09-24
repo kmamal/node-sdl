@@ -93,6 +93,7 @@ Mouse and keyboard:
 - `mouse.getButton()` now pumps events first, so it returns the current button state instead of values up to a second old. It also accepts the correct button range, and no longer relies on undefined behavior for button 32.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
+- Keys whose SDL3 default name differs from the X11 one (`'+/-'`, `'modeSwitch'`, `'('`, `')'`, and the menu key) are recognized again on every platform. Their default names had been dropped from the key table during the migration, so they came out as `null` outside X11.
 
 Touch:
 
