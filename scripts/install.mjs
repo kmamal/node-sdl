@@ -1,7 +1,13 @@
 
-const fromSource = ![ undefined, '', '0', 'false' ].includes(process.env.NODE_SDL_FROM_SOURCE)
+import C from './util/common.js'
 
-if (!fromSource) {
+if (C.systemSdl) {
+	console.log("build against the system sdl")
+	await import('./build.mjs')
+	process.exit(0)
+}
+
+if (!C.fromSource) {
 	try {
 		await import('./download-release.mjs')
 		process.exit(0)

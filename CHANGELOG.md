@@ -43,7 +43,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - Pixel-format helpers `sdl.video.bytesPerPixel()`, `sdl.video.isYuv()`, `sdl.video.isPlanarYuv()`, and `sdl.video.minBufferSize()`, mirroring the existing audio sample-format helpers.
 - `@kmamal/sdl/helpers` now also exposes the pixel-format helpers and the `keyboard.SCANCODE`, `mouse.BUTTON`, and `sensor.STANDARD_GRAVITY` constants, under the same paths as in the main module.
 - Prebuilt binaries for Windows on arm64.
-- The `npm run build` script honors pre-set `SDL_INC`/`SDL_LIB` environment variables, so it can build against a system or custom SDL.
+- `NODE_SDL_SYSTEM=1 npm install` builds against the SDL already installed on the system (located through `pkg-config`, or through `SDL_INC`/`SDL_LIB` when set) instead of downloading one, and links to it at runtime rather than bundling a copy. This is for platforms without prebuilt binaries, cross-compilation sysroots, and distribution packaging.
 - `gamepadInstance.buttonLabels`, reporting the label printed on each face button (`'a'`, `'cross'`, ...), so the position-named buttons can still be shown to the user by name.
 - Gamepad buttons `misc2` through `misc6`, and the `'standard'` gamepad type for generic gamepads that used to report `null`.
 - The single-edge and corner resize cursors SDL3 added (`nResize`, `neResize`, `eResize`, `seResize`, `sResize`, `swResize`, `wResize`, `nwResize`), and the `X1` and `X2` mouse buttons in `sdl.mouse.BUTTON`.

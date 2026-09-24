@@ -2902,6 +2902,26 @@ These are downloaded automatically through the [@kmamal/build-sdl](https://githu
 If `@kmamal/build-sdl` has no prebuilt library for your platform, it tries to compile one on the spot.
 You need to have `cmake` installed for that to work.
 
+### Using the system SDL
+
+If you would rather build against an SDL that is already installed on your system (or in a cross-compilation sysroot), set `NODE_SDL_SYSTEM=1`:
+
+```bash
+NODE_SDL_SYSTEM=1 npm install @kmamal/sdl
+```
+
+The install script then skips both the prebuilt binaries and the SDL download, asks `pkg-config` where the `sdl3` package's headers and libraries are, and compiles against those.
+Nothing gets bundled: the resulting addon links to your SDL at runtime, so the library has to be findable by the dynamic loader (it is, if `pkg-config` found it in a standard location; otherwise use `LD_LIBRARY_PATH` or the equivalent for your platform).
+`pkg-config` must be installed and able to find `sdl3`.
+The standard `pkg-config` environment variables (`PKG_CONFIG`, `PKG_CONFIG_PATH`, `PKG_CONFIG_SYSROOT_DIR`, ...) are honored, which is how you point it at a sysroot when cross-compiling.
+
+If `pkg-config` can't find your SDL, or you want to point at a specific one, set `SDL_INC` to the directory holding the `SDL3/` headers and `SDL_LIB` to the directory holding the library.
+Each variable takes precedence over the corresponding `pkg-config` answer, and both are ignored unless `NODE_SDL_SYSTEM=1` is also set:
+
+```bash
+NODE_SDL_SYSTEM=1 SDL_INC=/opt/sdl3/include SDL_LIB=/opt/sdl3/lib npm install @kmamal/sdl
+```
+
 ---
 
 You could also have found your way to the "Building from source" section because you are trying to contribute to this package.
@@ -2912,6 +2932,7 @@ There are some npm scripts in `package.json` that could be of use to you:
 - `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. This is the second step in the install script, after `download-release` has failed.
 - `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
 - `NODE_SDL_FROM_SOURCE=1 npm install` runs the install script normally, but skips the inital attempt to download the binaries, and goes straight to building from source.
+- `NODE_SDL_SYSTEM=1 npm install` skips both downloads and builds against the SDL that `pkg-config` finds on the system, as described above.
 
 The SDL headers and libs get downloaded to `sdl/`, the build happens in `build/`, and the final binaries get collected into `dist/`.
 

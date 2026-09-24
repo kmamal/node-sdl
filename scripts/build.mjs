@@ -11,9 +11,17 @@ await Promise.all([
 	await Fs.promises.rm(dir, { recursive: true }).catch(() => {})
 }))
 
+let SDL_INC = Path.join(C.dir.sdl, 'include')
+let SDL_LIB = Path.join(C.dir.sdl, 'lib')
+if (C.systemSdl) {
+	const pkgConfig = process.env.PKG_CONFIG || 'pkg-config'
+	const query = (variable) => execSync(`${pkgConfig} --variable=${variable} sdl3`, { encoding: 'utf8' }).trim()
+	SDL_INC = process.env.SDL_INC || query('includedir')
+	SDL_LIB = process.env.SDL_LIB || query('libdir')
+	console.log("system sdl in", SDL_INC, SDL_LIB)
+}
+
 console.log("build in", C.dir.build)
-const SDL_INC = process.env.SDL_INC || Path.join(C.dir.sdl, 'include')
-const SDL_LIB = process.env.SDL_LIB || Path.join(C.dir.sdl, 'lib')
 
 let archFlag = ''
 if (process.env.CROSS_COMPILE_ARCH) {
@@ -43,22 +51,24 @@ await Promise.all([
 		Path.join(C.dir.build, 'Release/sdl.node'),
 		Path.join(C.dir.dist, 'sdl.node'),
 	),
-	(async () => {
-		const libs = await Fs.promises.readdir(SDL_LIB)
-		await Promise.all(libs.map(async (name) => {
-			if (C.platform === 'win32' && name !== 'SDL3.dll') { return }
-			await Fs.promises.cp(
-				Path.join(SDL_LIB, name),
-				Path.join(C.dir.dist, name),
-				{ verbatimSymlinks: true },
-			)
-		}))
-	})(),
-	// Include SDL's license (older build-sdl assets don't ship it)
-	Fs.promises.cp(
-		Path.join(C.dir.sdl, 'LICENSE.txt'),
-		Path.join(C.dir.dist, 'LICENSE.SDL.txt'),
-	).catch(() => {}),
+	...C.systemSdl ? [] : [
+		(async () => {
+			const libs = await Fs.promises.readdir(SDL_LIB)
+			await Promise.all(libs.map(async (name) => {
+				if (C.platform === 'win32' && name !== 'SDL3.dll') { return }
+				await Fs.promises.cp(
+					Path.join(SDL_LIB, name),
+					Path.join(C.dir.dist, name),
+					{ verbatimSymlinks: true },
+				)
+			}))
+		})(),
+		// Include SDL's license
+		Fs.promises.cp(
+			Path.join(C.dir.sdl, 'LICENSE.txt'),
+			Path.join(C.dir.dist, 'LICENSE.SDL.txt'),
+		).catch(() => {}),
+	],
 ])
 
 // Strip binaries on linux

@@ -14,6 +14,10 @@ const version = pkg.version
 const isPrerelease = version.includes('-')
 const [ , owner, repo ] = pkg.repository.url.match(/([^/:]+)\/([^/]+)\.git$/u)
 
+const isSet = (value) => ![ undefined, '', '0', 'false' ].includes(value)
+const fromSource = isSet(process.env.NODE_SDL_FROM_SOURCE)
+const systemSdl = isSet(process.env.NODE_SDL_SYSTEM)
+
 const { platform, arch } = process
 const targetArch = process.env.CROSS_COMPILE_ARCH || arch
 const assetName = `sdl.node-v${version}-${platform}-${targetArch}.tar.gz`
@@ -23,6 +27,8 @@ sdl.assetName = `SDL-v${sdl.version}-${platform}-${targetArch}.tar.gz`
 
 module.exports = {
 	dir,
+	fromSource,
+	systemSdl,
 	version,
 	isPrerelease,
 	owner,
