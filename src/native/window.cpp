@@ -402,7 +402,7 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
-	int is_fullscreen = info[1].As<Napi::Boolean>().Value();
+	bool is_fullscreen = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -413,12 +413,7 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (!SDL_SyncWindow(window)) { SDL_ClearError(); }
-
-	Uint64 actual_flags = SDL_GetWindowFlags(window);
-	is_fullscreen = actual_flags & SDL_WINDOW_FULLSCREEN;
-
-	return Napi::Boolean::New(env, is_fullscreen);
+	return env.Undefined();
 }
 
 Napi::Value
@@ -548,7 +543,12 @@ window::maximize (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_MaximizeWindow(window);
+	if (!SDL_MaximizeWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_MaximizeWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }
@@ -562,7 +562,12 @@ window::minimize (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_MinimizeWindow(window);
+	if (!SDL_MinimizeWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_MinimizeWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }
@@ -576,7 +581,12 @@ window::restore (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_RestoreWindow(window);
+	if (!SDL_RestoreWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_RestoreWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }

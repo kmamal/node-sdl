@@ -146,23 +146,26 @@ const handleEvent = (event) => {
 				} break
 
 				case 'minimize': {
-					window._visible = false
 					window._minimized = true
 					window._maximized = false
-					window._fullscreen = false
 				} break
 				case 'maximize': {
-					window._visible = true
 					window._minimized = false
 					window._maximized = true
-					window._fullscreen = false
 				} break
 				case 'restore': {
-					window._visible = true
 					window._minimized = false
 					window._maximized = false
-					window._fullscreen = false
 				} break
+
+				case 'enterFullscreen': {
+					window._fullscreen = true
+					return
+				}
+				case 'leaveFullscreen': {
+					window._fullscreen = false
+					return
+				}
 
 				case 'focus': {
 					Globals.windows.focused = window

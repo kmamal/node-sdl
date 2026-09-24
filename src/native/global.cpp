@@ -68,6 +68,8 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::MINIMIZE = "minimize";
 	events::types::MAXIMIZE = "maximize";
 	events::types::RESTORE = "restore";
+	events::types::ENTER_FULLSCREEN = "enterFullscreen";
+	events::types::LEAVE_FULLSCREEN = "leaveFullscreen";
 	events::types::FOCUS = "focus";
 	events::types::BLUR = "blur";
 	events::types::HOVER = "hover";

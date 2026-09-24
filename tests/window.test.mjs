@@ -1,7 +1,18 @@
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
 
-T.test("sdl::window", (t) => {
+const waitFor = async (predicate, timeout = 1000) => {
+	const deadline = Date.now() + timeout
+	while (!predicate()) {
+		if (Date.now() > deadline) { return false }
+		await new Promise((resolve) => { setTimeout(resolve, 20) })
+	}
+	return true
+}
+
+T.test("sdl::window", async (t) => {
+	t.timeout(10e3)
+
 	t.ok(Array.isArray(sdl.video.windows))
 	t.equal(sdl.video.windows.length, 0)
 	t.equal(sdl.video.focused, null)
@@ -77,9 +88,9 @@ T.test("sdl::window", (t) => {
 		window3.destroy()
 	}
 	window1.setFullscreen(true)
-	t.equal(window1.fullscreen, true)
+	t.ok(await waitFor(() => window1.fullscreen))
 	window1.setFullscreen(false)
-	t.equal(window1.fullscreen, false)
+	t.ok(await waitFor(() => !window1.fullscreen))
 
 	t.equal(window1.resizable, false)
 	t.equal(window2.resizable, true)
@@ -126,15 +137,26 @@ T.test("sdl::window", (t) => {
 
 	t.equal(window1.maximized, false)
 	t.equal(window1.minimized, false)
+	window1.setResizable(true)
 	window1.maximize()
-	t.equal(window1.maximized, true)
-	t.equal(window1.minimized, false)
+	if (await waitFor(() => window1.maximized)) {
+		t.equal(window1.minimized, false)
+		window1.restore()
+		t.ok(await waitFor(() => !window1.maximized))
+		t.equal(window1.minimized, false)
+	} else {
+		console.warn("WINDOW MANAGER IGNORED MAXIMIZE")
+	}
+	window1.setResizable(false)
 	window1.minimize()
-	t.equal(window1.maximized, false)
-	t.equal(window1.minimized, true)
-	window1.restore()
-	t.equal(window1.maximized, false)
-	t.equal(window1.minimized, false)
+	if (await waitFor(() => window1.minimized)) {
+		t.equal(window1.maximized, false)
+		window1.restore()
+		t.ok(await waitFor(() => !window1.minimized))
+		t.equal(window1.maximized, false)
+	} else {
+		console.warn("WINDOW MANAGER IGNORED MINIMIZE")
+	}
 
 	// t.equal(window1.focused, false)
 	t.equal(window2.focused, false)

@@ -39,6 +39,8 @@ std::string events::types::RESIZE;
 std::string events::types::MINIMIZE;
 std::string events::types::MAXIMIZE;
 std::string events::types::RESTORE;
+std::string events::types::ENTER_FULLSCREEN;
+std::string events::types::LEAVE_FULLSCREEN;
 std::string events::types::FOCUS;
 std::string events::types::BLUR;
 std::string events::types::HOVER;
@@ -88,6 +90,8 @@ _windowEventType (Uint32 type)
 		case SDL_EVENT_WINDOW_MINIMIZED: return &events::types::MINIMIZE;
 		case SDL_EVENT_WINDOW_MAXIMIZED: return &events::types::MAXIMIZE;
 		case SDL_EVENT_WINDOW_RESTORED: return &events::types::RESTORE;
+		case SDL_EVENT_WINDOW_ENTER_FULLSCREEN: return &events::types::ENTER_FULLSCREEN;
+		case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: return &events::types::LEAVE_FULLSCREEN;
 		case SDL_EVENT_WINDOW_FOCUS_GAINED: return &events::types::FOCUS;
 		case SDL_EVENT_WINDOW_FOCUS_LOST: return &events::types::BLUR;
 		case SDL_EVENT_WINDOW_MOUSE_ENTER: return &events::types::HOVER;

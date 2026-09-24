@@ -29,6 +29,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - Declared support for Node.js >= 22 in `package.json`, and pinned the native addon to the matching Node-API version 9.
 - **Breaking:** The space key is now reported as `' '`, like every other character-producing key, instead of `'space'`.
 - **Breaking:** Joystick axes are now normalized relative to the axis's true center, like gamepad axes, instead of relative to whatever value the axis had when the device was opened. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
+- **Breaking:** `window.setFullscreen()`, `window.minimize()`, `window.maximize()`, and `window.restore()` follow SDL3's asynchronous model: they submit a request to the windowing system and return, and `fullscreen`, `minimized`, and `maximized` update once the change has taken effect (or not at all, if the windowing system denies it). Code that read those properties right after the call should listen for the `minimize`/`maximize`/`restore` events or poll instead. `maximize()` now throws on a non-resizable window, which SDL3 refuses to maximize.
 - **Breaking:** `rumble()` and `rumbleTriggers()` now reject durations above `65535` ms, the maximum SDL supports. Longer durations used to be silently clamped by SDL while the process was still kept alive for the full requested time.
 
 ### Added
@@ -55,6 +56,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 
 Windows and events:
 
+- `window.fullscreen` now tracks SDL's own enter/leave-fullscreen notifications. It used to be reset to `false` whenever the window was minimized, maximized, or restored, although SDL keeps a fullscreen window fullscreen across those (a fullscreen window that is minimized on focus loss and then restored comes back fullscreen). `minimized`, `maximized`, and `visible` likewise no longer guess: they only change when the windowing system reports the change, so a `minimize()` request that the window manager ignores is no longer reported as minimized.
 - `move` and `resize` events are no longer delivered twice.
 - An exception thrown in an event listener no longer permanently stops event delivery, and no longer crashes the process when it happens in a `move` or `resize` listener while the window is being dragged. Listener exceptions are now re-emitted as an `'error'` event on the window or instance, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception.
 - Calling `window.destroy()` from a `move` or `resize` listener that fires while the window is being dragged or resized no longer risks a crash. The window reports `destroyed` immediately, and the native window is destroyed once it is safe to do so.

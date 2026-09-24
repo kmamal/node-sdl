@@ -316,7 +316,7 @@ class Window extends EventsViaPoll {
 
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
 
-		this._fullscreen = Bindings.window_setFullscreen(this._id, fullscreen)
+		Bindings.window_setFullscreen(this._id, fullscreen)
 	}
 
 	get resizable () {
@@ -422,10 +422,6 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		Bindings.window_minimize(this._id)
-		this._visible = false
-		this._minimized = true
-		this._maximized = false
-		this._fullscreen = false
 	}
 
 	get maximized () {
@@ -438,21 +434,15 @@ class Window extends EventsViaPoll {
 	maximize () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
+		if (!this._resizable) { throw new Error("can't maximize a non-resizable window") }
+
 		Bindings.window_maximize(this._id)
-		this._visible = true
-		this._minimized = false
-		this._maximized = true
-		this._fullscreen = false
 	}
 
 	restore () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		Bindings.window_restore(this._id)
-		this._visible = true
-		this._minimized = false
-		this._maximized = false
-		this._fullscreen = false
 	}
 
 	get focused () {

@@ -39,6 +39,8 @@ namespace events {
 		extern std::string MINIMIZE;
 		extern std::string MAXIMIZE;
 		extern std::string RESTORE;
+		extern std::string ENTER_FULLSCREEN;
+		extern std::string LEAVE_FULLSCREEN;
 		extern std::string FOCUS;
 		extern std::string BLUR;
 		extern std::string HOVER;
