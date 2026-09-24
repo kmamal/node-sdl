@@ -991,7 +991,7 @@ A fullscreen window is displayed over the entire screen.
 
 Changes the window's fullscreen property.
 The change is a requested asynchronously from the windowing system, which may deny it.
-The `fullscreen` property updates/if once the change takes effect.
+The `fullscreen` property updates when/if the change takes effect.
 
 ### window.resizable
 
@@ -1110,7 +1110,7 @@ Is `true` if the window is maximized.
 Maximizes the window.
 Throws if the window is not resizable.
 The change is a requested asynchronously from the windowing system, which may deny it.
-The `maximized` property updates/if once the change takes effect.
+The `maximized` property updates when/if the change takes effect.
 
 ### window.minimized
 
@@ -1122,7 +1122,7 @@ Is `true` if the window is minimized.
 
 Minimizes the window.
 The change is a requested asynchronously from the windowing system, which may deny it.
-The `minimized` property updates/if once the change takes effect.
+The `minimized` property updates when/if the change takes effect.
 
 ### window.restore()
 
