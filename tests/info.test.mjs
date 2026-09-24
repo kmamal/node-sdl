@@ -10,7 +10,7 @@ T.test("sdl::info", (t) => {
 	t.equal(typeof sdl.info.version.runtime.minor, 'number')
 	t.equal(typeof sdl.info.version.runtime.patch, 'number')
 
-	t.ok([ 'Linux', 'Mac OS X', 'Windows' ].includes(sdl.info.platform))
+	t.ok([ 'Linux', 'macOS', 'Windows' ].includes(sdl.info.platform))
 
 	t.ok(Array.isArray(sdl.info.drivers.video.all))
 	for (const driver of sdl.info.drivers.video.all) {

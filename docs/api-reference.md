@@ -271,7 +271,7 @@ Unless noted otherwise, wherever the API expects a whole-number quantity (positi
       - `major, minor, patch: <Semver>` The components of the version.
     - `runtime: <object>` The version of the SDL library that was found and loaded at runtime.
       - `major, minor, patch: <Semver>` The components of the version.
-  - `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'Mac OS X'`.
+  - `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'macOS'`.
   - `drivers: <object>`
     - `video: <object>`
       - `all: <string>[]` A list of all video drivers.

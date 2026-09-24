@@ -393,7 +393,7 @@ export namespace Sdl {
 				readonly patch: number
 			}
 		}
-		readonly platform: 'Linux' | 'Windows' | 'Mac OS X'
+		readonly platform: 'Linux' | 'Windows' | 'macOS'
 		readonly drivers: {
 			readonly video: {
 				readonly all: string[]

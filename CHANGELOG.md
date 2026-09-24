@@ -95,6 +95,7 @@ Mouse and keyboard:
 - `mouse.getButton()` now pumps events first, so it returns the current button state instead of values up to a second old. It also accepts the correct button range, and no longer relies on undefined behavior for button 32.
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
+- `sdl.info.platform` is `'macOS'` on macOS, following SDL3's platform name. It used to be documented and typed as `'Mac OS X'`, which SDL3 no longer reports.
 - Keys whose SDL3 default name differs from the X11 one (`'+/-'`, `'modeSwitch'`, `'('`, `')'`, and the menu key) are recognized again on every platform. Their default names had been dropped from the key table during the migration, so they came out as `null` outside X11.
 - Character keys are now reported as the unshifted character SDL assigns to them. SDL3 names non-ASCII letters by their capital, so `ü` used to arrive as `'Ü'`, and `getKey(getScancode('ü'))` did not round-trip.
 
