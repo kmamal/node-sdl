@@ -2843,12 +2843,12 @@ Instead, objects returned by [`sdl.audio.playback.openDevice()`](#sdlaudioplayba
 
 - `<number>`
 
-The number of bytes that have been written to the stream but not yet played by the device.
+The number of bytes that have been written to the stream but not yet consumed by the device.
 
 ### playbackStream.putData(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to read data from.
-- `bytes: <number>` The number of bytes to read from the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
+- `bytes: <number>` The number of bytes to read from the buffer. Must be a non-negative integer that doesn't exceed `buffer.length`, and a whole number of sample frames (a multiple of `channels * bytesPerSample`). Default: `buffer.length`
 
 Takes the audio data that you have written to the buffer, and queues it on the stream, from where it will be played back as audio.
 

@@ -153,6 +153,8 @@ Audio:
 - `putData()` and `getData()` now accept empty buffers as no-ops, as the docs already implied, instead of throwing "invalid bytes" on the zero-length chunks streaming pipelines naturally produce. A zero-length `Buffer` with no backing memory (such as `Buffer.alloc(0)`) is also accepted; SDL used to reject its null pointer.
 - `buffered` values larger than `32768` are now rejected instead of silently truncating to a driver-chosen buffer size.
 - `playbackStream.queued` no longer reports negative values for queues over 2 GiB.
+- `putData()` now rejects a `bytes` count that isn't a whole number of sample frames with a validation error, instead of a raw native error from SDL.
+- A `close` listener that throws no longer leaves a playback stream's keep-alive timer running after the stream is closed.
 - `readSample()` and `writeSample()` now reject non-`Buffer` arguments with a validation error instead of silently operating on array-likes.
 - `zeroSampleValue` for `u8` now matches SDL's silence value (`128`) instead of being one below it.
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.
