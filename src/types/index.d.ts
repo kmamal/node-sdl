@@ -649,11 +649,11 @@ export namespace Sdl {
 
 			createWindow (options?: {
 				title?: string
-				display?: Display
+				display?: Display | null
 				x?: number | null
 				y?: number | null
-				width?: number
-				height?: number
+				width?: number | null
+				height?: number | null
 				visible?: boolean
 				fullscreen?: boolean
 				resizable?: boolean

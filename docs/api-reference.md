@@ -625,11 +625,11 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
 
 - `options: <object>`
   - `title: <string>` Appears in the window's title bar. Default: `''`
-  - `display: <object>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays). Default: `sdl.video.displays[0]`
-  - `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
-  - `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Default: `null`
-  - `width: <number>` The width of the window. Default: `640`
-  - `height: <number>` The height of the window. Default: `480`
+  - `display: <object>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays), or `null` for the primary display. Default: `null`
+  - `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
+  - `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
+  - `width: <number>` The width of the window. Must be a positive 32-bit integer. Default: `640`
+  - `height: <number>` The height of the window. Must be a positive 32-bit integer. Default: `480`
   - `visible: <boolean>` Set to `false` to create a hidden window that will only be shown when you call [`window.show()`](#windowshowshow). Default: `true`
   - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
@@ -648,7 +648,6 @@ The following restrictions apply:
 - The `display` option is mutually exclusive with the `x` and `y` options.
 - The `resizable` and `borderless` options are mutually exclusive.
 - The `opengl` and `webgpu` options are mutually exclusive.
-- The `vsync` option only applies to windows that are also `accelerated`.
 - The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
 
 If you set the `opengl` or `webgpu` options, then you must use OpenGL/WebGPU calls to render to the window.
@@ -907,8 +906,8 @@ The window's y position, relative to the screen.
 
 ### window.setPosition(x, y)
 
-- `x: <number>`: The new x position, relative to the screen.
-- `y: <number>`: The new y position, relative to the screen.
+- `x: <number>`: The new x position, relative to the screen. Must be a 32-bit integer.
+- `y: <number>`: The new y position, relative to the screen. Must be a 32-bit integer.
 
 Moves the window to a new position on the screen.
 The call only submits a request to the windowing system: [`x`](#windowx) and [`y`](#windowy) update, and a [`'move'`](#event-move) event fires, once the window has actually moved.
@@ -943,8 +942,8 @@ Is larger than [`height`](#windowheight) on [high-dpi](#high-dpi) displays.
 
 ### window.setSize(width, height)
 
-- `width: <number>`: The new width.
-- `height: <number>`: The new height.
+- `width: <number>`: The new width. Must be a positive 32-bit integer.
+- `height: <number>`: The new height. Must be a positive 32-bit integer.
 
 Changes the size of the window.
 The call only submits a request to the windowing system: [`width`](#windowwidth), [`height`](#windowheight), [`pixelWidth`](#windowpixelwidth), and [`pixelHeight`](#windowpixelheight) update, and a [`'resize'`](#event-resize) event fires, once the window has actually been resized.
@@ -952,8 +951,8 @@ The windowing system may also adjust or ignore the request (for example while th
 
 ### window.setSizeInPixels(pixelWidth, pixelHeight)
 
-- `pixelWidth: <number>`: The new width in pixels.
-- `pixelHeight: <number>`: The new height in pixels.
+- `pixelWidth: <number>`: The new width in pixels. Must be a positive 32-bit integer.
+- `pixelHeight: <number>`: The new height in pixels. Must be a positive 32-bit integer.
 
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
@@ -1053,7 +1052,6 @@ If you have set the `opengl` or `webgpu` options, then calls to this function wi
 
 Is `true` if the window is using vsync.
 Vsync synchronizes the window's frame rate with the display's refresh rate to prevent tearing.
-Note that vsync can only be set to `true` if [`accelerated`](#windowaccelerated) is also `true`.
 
 ### window.setVsync(vsync)
 
