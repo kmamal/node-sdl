@@ -4,6 +4,7 @@
 #include <sstream>
 
 std::map<bool, std::string> audio::device_types;
+std::map<SDL_AudioFormat, std::string> audio::formats;
 
 static std::map<SDL_AudioDeviceID, SDL_AudioStream *> open_streams;
 
@@ -131,20 +132,36 @@ audio::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_AudioSpec actual;
+	open_streams[audio_id] = stream;
+
+	return Napi::Number::New(env, audio_id);
+}
+
+Napi::Value
+audio::getDeviceFormat (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	int audio_id = info[0].As<Napi::Number>().Int32Value();
+
+	SDL_AudioSpec spec;
 	int sample_frames;
-	if (!SDL_GetAudioDeviceFormat(audio_id, &actual, &sample_frames)) {
+	if (!SDL_GetAudioDeviceFormat(audio_id, &spec, &sample_frames)) {
 		std::ostringstream message;
 		message << "SDL_GetAudioDeviceFormat(" << audio_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
-		SDL_DestroyAudioStream(stream);
 		throw Napi::Error::New(env, message.str());
 	}
 
-	open_streams[audio_id] = stream;
+	auto format_entry = audio::formats.find(spec.format);
+	Napi::Value format = format_entry != audio::formats.end()
+		? Napi::String::New(env, format_entry->second)
+		: env.Null();
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("id", audio_id);
+	result.Set("format", format);
+	result.Set("channels", spec.channels);
+	result.Set("frequency", spec.freq);
 	result.Set("buffered", sample_frames);
 
 	return result;

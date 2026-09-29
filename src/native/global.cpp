@@ -93,6 +93,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::FINGER_CANCEL = "fingerCancel";
 	events::types::DEVICE_ADD = "deviceAdd";
 	events::types::DEVICE_REMOVE = "deviceRemove";
+	events::types::DEVICE_FORMAT_CHANGE = "deviceFormatChange";
 	events::types::AXIS_MOTION = "axisMotion";
 	events::types::BUTTON_DOWN = "buttonDown";
 	events::types::BUTTON_UP = "buttonUp";
@@ -266,6 +267,18 @@ global::initialize(const Napi::CallbackInfo &info)
 
 	audio::device_types[true] = "recording";
 	audio::device_types[false] = "playback";
+
+	audio::formats[SDL_AUDIO_S8] = "s8";
+	audio::formats[SDL_AUDIO_U8] = "u8";
+	audio::formats[SDL_AUDIO_S16LE] = "s16le";
+	audio::formats[SDL_AUDIO_S16BE] = "s16be";
+	audio::formats[SDL_AUDIO_S32LE] = "s32le";
+	audio::formats[SDL_AUDIO_S32BE] = "s32be";
+	audio::formats[SDL_AUDIO_F32LE] = "f32le";
+	audio::formats[SDL_AUDIO_F32BE] = "f32be";
+	audio::formats[SDL_AUDIO_S16] = "s16";
+	audio::formats[SDL_AUDIO_S32] = "s32";
+	audio::formats[SDL_AUDIO_F32] = "f32";
 
 	// power::states[SDL_POWERSTATE_UNKNOWN] = nullptr;
 	power::states[SDL_POWERSTATE_NO_BATTERY] = "noBattery";

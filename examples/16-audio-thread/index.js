@@ -6,9 +6,10 @@ const playbackStream = sdl.audio.playback.openDevice()
 const {
 	channels,
 	frequency,
-	buffered,
 	format,
 } = playbackStream
+const { buffered, frequency: deviceFrequency } = playbackStream.device
+const leadTime = (buffered / deviceFrequency) * 1e3
 
 const workerPath = Path.join(import.meta.dirname, 'audio-worker.js')
 
@@ -16,7 +17,7 @@ const worker = new Worker(workerPath, {
 	workerData: {
 		channels,
 		frequency,
-		buffered,
+		leadTime,
 		format,
 	},
 })

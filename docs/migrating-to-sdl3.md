@@ -236,12 +236,13 @@ const instance = sdl.audio.openDevice(devices[0], { channels: 2 })
 sdl.audio.on('deviceAdd', ({ device }) => { if (device.type === 'playback') { ... } })
 
 // After
-const devices = sdl.audio.playback.devices
+const [ defaultDevice, ...devices ] = sdl.audio.playback.devices
 const stream = sdl.audio.playback.openDevice(devices[0], { channels: 2 })
 sdl.audio.playback.on('deviceAdd', ({ device }) => { ... })
 ```
 
-To open the default device, pass no device (or `null`) instead of an object with only a `type`:
+Each list now starts with an entry for the default device, whose `id` and `name` are `null`, so the first real device is at index `1`.
+To open the default device, pass that entry, no device, or `null` instead of an object with only a `type`:
 
 ```js
 // Before
@@ -265,10 +266,12 @@ Streams can now be opened with any number of channels from 1 to 8, adding the 2.
 | `recordingInstance.dequeue(buffer[, bytes])` | `recordingStream.getData(buffer[, bytes])` |
 | `recordingInstance.queued` | `recordingStream.available` |
 | `audioInstance.clearQueue()` | `audioStream.clear()` |
-| `audioInstance.name` | removed, use `audioStream.device?.name` |
+| `audioInstance.name` | removed, use `audioStream.device.name` |
+| `audioInstance.buffered` | `audioStream.device.buffered` |
 
 `playbackStream.queued` keeps its name.
-`audioStream.device` is now `null` for streams opened on the default device, where it used to echo back the `{ type }` object you passed in.
+`audioStream.device` is now the default-device entry for streams opened on the default device, where it used to echo back the `{ type }` object you passed in.
+The driver's buffer size moved to the device because it belongs to the device, not the stream: SDL converts between each stream's format and the device's, and the device's `format`, `channels`, `frequency`, and `buffered` are available on its object while streams are open on it.
 
 ```js
 // Before

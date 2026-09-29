@@ -238,7 +238,6 @@
     - [audioStream.zeroSampleValue](#audiostreamzerosamplevalue)
     - [audioStream.readSample(buffer[, offset])](#audiostreamreadsamplebuffer-offset)
     - [audioStream.writeSample(buffer, value[, offset])](#audiostreamwritesamplebuffer-value-offset)
-    - [audioStream.buffered](#audiostreambuffered)
     - [audioStream.playing](#audiostreamplaying)
     - [audioStream.play([play])](#audiostreamplayplay)
     - [audioStream.pause()](#audiostreampause)
@@ -2589,28 +2588,39 @@ When the `'deviceRemove'` event is emitted, all streams that were opened from th
 ### sdl.audio.playback.devices
 
 - `<object>[]`
-  - `id: <number>` The unique id of the device.
-  - `name: <string>` The name of the device.
+  - `id: <number>|<null>` The unique id of the device, or `null` for the default device.
+  - `name: <string>|<null>` The name of the device, or `null` for the default device.
+  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The sample format the device is running at, or `null` if no stream is open on it.
+  - `channels: <number>|<null>` The number of channels the device is running with, or `null` if no stream is open on it.
+  - `frequency: <number>|<null>` The sampling frequency the device is running at, in frames per second, or `null` if no stream is open on it.
+  - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
 
 A list of all the detected playback devices.
+The first entry is always the default device, whose `id` is `null`.
+Opening a stream on it is the same as calling [`openDevice()`](#sdlaudioplaybackopendevicedevice-options) without a device: the stream plays on whichever device the system currently considers the default, and follows the system default when it changes.
 Sample output for PulseAudio:
 
 ```js
 [
-  { id: 3, name: 'Built-in Audio Analog Stereo' },
+  { id: null, name: null, format: null, channels: null, frequency: null, buffered: null },
+  { id: 3, name: 'Built-in Audio Analog Stereo', format: null, channels: null, frequency: null, buffered: null },
 ]
 ```
 
-Note that the list may sometimes be empty.
-Despite that, in many common cases, it's still possible to successfully open the default device by calling [`openDevice()`](#sdlaudioplaybackopendevicedevice-options) without a device:
+Even when no other devices are listed, it's often still possible to open the default device:
 
 ```js
 const playbackStream = sdl.audio.playback.openDevice()
 ```
 
+The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
+They are filled in when the first stream is opened on the device object, kept up to date while streams are open on it, and reset to `null` when the last of them is closed.
+A device is only filled in for the streams opened on that same object, so a stream on the default device only fills in the default device's entry, even if it plays on hardware that is also listed separately.
+Since `buffered` is counted in frames at the device's `frequency`, the delay it adds is `buffered / frequency` seconds.
+
 ### sdl.audio.playback.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices). Must be the actual object from that list, not a copy. Pass `null` to let SDL pick the default device. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices). Must be the actual object from that list, not a copy. Passing `null` is the same as passing the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
@@ -2626,8 +2636,8 @@ See also the section on [audio data](#audio-data).
 The `buffered` option specifies the "delay" between the application and the audio driver.
 With smaller values you have smaller delays, but you also have to write data more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
-SDL sizes the driver's buffer when it first opens the device, so streams opened on an already-open device share its buffer size.
-Read `buffered` on the returned stream for the size in effect.
+SDL sizes the driver's buffer when it first opens the device, so the option has no effect on a device that already has streams open, and the driver may also pick a different size.
+Read `buffered` on the stream's [`device`](#audiostreamdevice) for the size in effect.
 
 ### sdl.audio.recording
 
@@ -2656,28 +2666,39 @@ When the `'deviceRemove'` event is emitted, all streams that were opened from th
 ### sdl.audio.recording.devices
 
 - `<object>[]`
-  - `id: <number>` The unique id of the device.
-  - `name: <string>` The name of the device.
+  - `id: <number>|<null>` The unique id of the device, or `null` for the default device.
+  - `name: <string>|<null>` The name of the device, or `null` for the default device.
+  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The sample format the device is running at, or `null` if no stream is open on it.
+  - `channels: <number>|<null>` The number of channels the device is running with, or `null` if no stream is open on it.
+  - `frequency: <number>|<null>` The sampling frequency the device is running at, in frames per second, or `null` if no stream is open on it.
+  - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
 
 A list of all the detected recording devices.
+The first entry is always the default device, whose `id` is `null`.
+Opening a stream on it is the same as calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device: the stream plays on whichever device the system currently considers the default, and follows the system default when it changes.
 Sample output for PulseAudio:
 
 ```js
 [
-  { id: 4, name: 'Built-in Audio Analog Stereo' },
+  { id: null, name: null, format: null, channels: null, frequency: null, buffered: null },
+  { id: 4, name: 'Built-in Audio Analog Stereo', format: null, channels: null, frequency: null, buffered: null },
 ]
 ```
 
-Note that the list may sometimes be empty.
-Despite that, in many common cases, it's still possible to successfully open the default device by calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device:
+Even when no other devices are listed, it's often still possible to open the default device:
 
 ```js
 const recordingStream = sdl.audio.recording.openDevice()
 ```
 
+The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
+They are filled in when the first stream is opened on the device object, kept up to date while streams are open on it, and reset to `null` when the last of them is closed.
+A device is only filled in for the streams opened on that same object, so a stream on the default device only fills in the default device's entry, even if it plays on hardware that is also listed separately.
+Since `buffered` is counted in frames at the device's `frequency`, the delay it adds is `buffered / frequency` seconds.
+
 ### sdl.audio.recording.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices). Must be the actual object from that list, not a copy. Pass `null` to let SDL pick the default device. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices). Must be the actual object from that list, not a copy. Passing `null` is the same as passing the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
@@ -2693,8 +2714,8 @@ See also the section on [audio data](#audio-data).
 The `buffered` option specifies the "delay" between the application and the audio driver.
 With smaller values you have smaller delays, but you also have to read data more frequently.
 Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
-SDL sizes the driver's buffer when it first opens the device, so streams opened on an already-open device share its buffer size.
-Read `buffered` on the returned stream for the size in effect.
+SDL sizes the driver's buffer when it first opens the device, so the option has no effect on a device that already has streams open, and the driver may also pick a different size.
+Read `buffered` on the stream's [`device`](#audiostreamdevice) for the size in effect.
 
 ## class AudioStream
 
@@ -2716,9 +2737,10 @@ A unique identifier for the stream.
 
 ### audioStream.device
 
-- `<object>|<null>`
+- `<object>`
 
-The device passed to `openDevice()` when the stream was opened, or `null` if the stream was opened on the default device.
+The object from the devices list the stream was opened on.
+For streams opened without a device, this is the default device, the list's first entry.
 
 ### audioStream.channels
 
@@ -2780,12 +2802,6 @@ For example, for a stream opened with the `'f32'` sample format, a call to `audi
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format the stream was opened with.
 For example, for a stream opened with the `'f32'` sample format, a call to `audioStream.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
-
-### audioStream.buffered
-
-- `<number>`
-
-The buffer size (in frames) the driver is using for the stream's device. This may differ from the `buffered` option, see [`openDevice()`](#sdlaudioplaybackopendevicedevice-options).
 
 ### audioStream.playing
 

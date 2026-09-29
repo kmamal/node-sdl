@@ -6,7 +6,7 @@ const TWO_PI = 2 * Math.PI
 const {
 	channels,
 	frequency,
-	buffered,
+	leadTime,
 	format,
 } = workerData
 
@@ -24,7 +24,6 @@ const sinePeriod = 1 / sineNote
 let index = 0
 
 const startTime = Date.now()
-const leadTime = (buffered / frequency) * 1e3
 let lastTime = startTime - leadTime
 
 setInterval(() => {

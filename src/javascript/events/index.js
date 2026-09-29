@@ -8,6 +8,7 @@ const { make: makeJoystickDevice } = require('../joystick/device')
 const { gamepad: gamepadModule } = require('../gamepad')
 const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('../gamepad/device')
 const { audio: audioModule } = require('../audio')
+const { make: makeAudioDevice, update: updateAudioDevice } = require('../audio/device')
 const { clipboard: clipboardModule } = require('../clipboard')
 
 
@@ -419,8 +420,10 @@ const handleEvent = (event) => {
 					delete event.device
 
 					if (list.some((a) => a.id === device.id)) { return }
-					list.push(device)
-					event.device = device
+					const made = makeAudioDevice(device)
+					list.push(made)
+					event.device = made
+					updateAudioDevice(list[0])
 				} break
 
 				case 'deviceRemove': {
@@ -437,9 +440,17 @@ const handleEvent = (event) => {
 							tryCall(() => { stream.close() })
 						}
 					}
+					updateAudioDevice(list[0])
 
 					event.device = device
 				} break
+
+				case 'deviceFormatChange': {
+					const { deviceId } = event
+					const device = Globals.audioStreams.get(deviceId)?.device
+						?? list.find((a) => a.id === deviceId)
+					if (device) { updateAudioDevice(device) }
+				} return
 
 				// No default
 			}

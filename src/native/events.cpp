@@ -65,6 +65,7 @@ std::string events::types::FINGER_MOVE;
 std::string events::types::FINGER_CANCEL;
 std::string events::types::DEVICE_ADD;
 std::string events::types::DEVICE_REMOVE;
+std::string events::types::DEVICE_FORMAT_CHANGE;
 std::string events::types::AXIS_MOTION;
 std::string events::types::BUTTON_DOWN;
 std::string events::types::BUTTON_UP;
@@ -536,6 +537,13 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_EVENT_AUDIO_DEVICE_REMOVED: {
 			packed.Set("target", events::targets::AUDIO_DEVICE);
 			packed.Set("type", events::types::DEVICE_REMOVE);
+			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
+			packed.Set("deviceId", event.adevice.which);
+			break;
+		}
+		case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: {
+			packed.Set("target", events::targets::AUDIO_DEVICE);
+			packed.Set("type", events::types::DEVICE_FORMAT_CHANGE);
 			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
 			packed.Set("deviceId", event.adevice.which);
 			break;

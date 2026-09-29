@@ -4,17 +4,23 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
 const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
+const {
+	make: makeDevice,
+	makeDefault: makeDefaultDevice,
+} = require('./device')
 
 
+Globals.audioDevices.playback = [ makeDefaultDevice() ]
+Globals.audioDevices.recording = [ makeDefaultDevice() ]
 if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback = Bindings.audio_getDevices(false)
-	Globals.audioDevices.recording = Bindings.audio_getDevices(true)
+	Globals.audioDevices.playback.push(...Bindings.audio_getDevices(false).map(makeDevice))
+	Globals.audioDevices.recording.push(...Bindings.audio_getDevices(true).map(makeDevice))
 }
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
-const makeDeviceModule = (type, Stream) => new class extends EventsViaPoll {
+const makeModule = (type, Stream) => new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
 	get devices () {
@@ -23,18 +29,18 @@ const makeDeviceModule = (type, Stream) => new class extends EventsViaPoll {
 	}
 
 	openDevice (device = null, options = {}) {
-		if (device !== null) {
-			Globals.events.poll()
-			if (!Globals.audioDevices[type].includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
-		}
+		Globals.events.poll()
+		const list = Globals.audioDevices[type]
+		if (device === null) { device = list[0] }
+		else if (!list.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
 
 		return new Stream(device, options)
 	}
 }()
 
 const audio = {
-	playback: makeDeviceModule('playback', AudioPlaybackStream),
-	recording: makeDeviceModule('recording', AudioRecordingStream),
+	playback: makeModule('playback', AudioPlaybackStream),
+	recording: makeModule('recording', AudioRecordingStream),
 
 	bytesPerSample (format) { return getFormatHelpers(format).bytesPerSample },
 	minSampleValue (format) { return getFormatHelpers(format).minSampleValue },

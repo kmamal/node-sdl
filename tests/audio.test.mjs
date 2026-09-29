@@ -9,17 +9,36 @@ T.test("sdl::audio", async (t) => {
 	t.equal(sdl.audio.maxSampleValue('f32le'), 1)
 	t.equal(sdl.audio.zeroSampleValue('f32le'), 0)
 
+	const checkClosedFormat = (device) => {
+		t.equal(device.format, null)
+		t.equal(device.channels, null)
+		t.equal(device.frequency, null)
+		t.equal(device.buffered, null)
+	}
+
+	const checkOpenFormat = (device) => {
+		t.equal(typeof device.format, 'string')
+		t.ok(Number.isInteger(device.channels) && device.channels > 0)
+		t.ok(Number.isInteger(device.frequency) && device.frequency > 0)
+		t.ok(Number.isInteger(device.buffered) && device.buffered > 0)
+	}
+
 	for (const module of [ sdl.audio.playback, sdl.audio.recording ]) {
 		t.ok(Array.isArray(module.devices))
-		for (const device of module.devices) {
+		const [ defaultDevice, ...devices ] = module.devices
+		t.equal(defaultDevice.id, null)
+		t.equal(defaultDevice.name, null)
+		checkClosedFormat(defaultDevice)
+		for (const device of devices) {
 			t.equal(typeof device.id, 'number')
 			t.equal(typeof device.name, 'string')
 			t.ok(device.name.length > 0)
+			checkClosedFormat(device)
 		}
 	}
 
-	const playbackDevices = sdl.audio.playback.devices
-	const recordingDevices = sdl.audio.recording.devices
+	const [ defaultPlaybackDevice, ...playbackDevices ] = sdl.audio.playback.devices
+	const [ defaultRecordingDevice, ...recordingDevices ] = sdl.audio.recording.devices
 
 	if (playbackDevices.length === 0) {
 		console.warn("NO AUDIO PLAYBACK FOUND")
@@ -37,8 +56,10 @@ T.test("sdl::audio", async (t) => {
 		t.equal(typeof stream2.id, 'number')
 		t.notEqual(stream1.id, stream2.id)
 
-		t.equal(stream1.device, null)
+		t.equal(stream1.device, defaultPlaybackDevice)
 		t.equal(playbackDevices[0], stream2.device)
+		checkOpenFormat(defaultPlaybackDevice)
+		checkOpenFormat(playbackDevices[0])
 
 		t.equal(stream1.channels, 1)
 		t.equal(stream2.channels, 2)
@@ -61,8 +82,6 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream1.zeroSampleValue, 0)
 		t.equal(stream2.zeroSampleValue, 0)
 
-		t.equal(stream1.buffered, 4096)
-		t.ok([ 1024, stream1.buffered ].includes(stream2.buffered))
 
 		t.equal(stream1.playing, false)
 		t.equal(stream2.playing, false)
@@ -105,7 +124,10 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream2.queued, 0)
 
 		stream1.close()
+		checkClosedFormat(defaultPlaybackDevice)
+		checkOpenFormat(playbackDevices[0])
 		stream2.close()
+		checkClosedFormat(playbackDevices[0])
 	}
 
 	if (recordingDevices.length === 0) {
@@ -124,8 +146,10 @@ T.test("sdl::audio", async (t) => {
 		t.equal(typeof stream2.id, 'number')
 		t.notEqual(stream1.id, stream2.id)
 
-		t.equal(stream1.device, null)
+		t.equal(stream1.device, defaultRecordingDevice)
 		t.equal(recordingDevices[0], stream2.device)
+		checkOpenFormat(defaultRecordingDevice)
+		checkOpenFormat(recordingDevices[0])
 
 		t.equal(stream1.channels, 1)
 		t.equal(stream2.channels, 2)
@@ -136,8 +160,6 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream1.format, 'f32')
 		t.equal(stream2.format, 's16')
 
-		t.equal(stream1.buffered, 4096)
-		t.ok([ 1024, stream1.buffered ].includes(stream2.buffered))
 
 		t.equal(stream1.playing, false)
 		t.equal(stream2.playing, false)
@@ -183,6 +205,9 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream2.available, 0)
 
 		stream1.close()
+		checkClosedFormat(defaultRecordingDevice)
+		checkOpenFormat(recordingDevices[0])
 		stream2.close()
+		checkClosedFormat(recordingDevices[0])
 	}
 })

@@ -64,6 +64,7 @@ namespace events {
 		extern std::string FINGER_CANCEL;
 		extern std::string DEVICE_ADD;
 		extern std::string DEVICE_REMOVE;
+		extern std::string DEVICE_FORMAT_CHANGE;
 		extern std::string AXIS_MOTION;
 		extern std::string BUTTON_DOWN;
 		extern std::string BUTTON_UP;

@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioFormatHelpers } = require('./format-helpers')
+const { update: updateDevice } = require('./device')
 
 const validEvents = [ 'close' ]
 
@@ -32,12 +33,11 @@ class AudioStream extends EventsViaPoll {
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
-		const { id, buffered: actualBuffered } = Bindings.audio_open(device?.id ?? null, recording, frequency, _format, channels, buffered)
+		const id = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered)
 
 		this._id = id
 		this._recording = recording
 		this._device = device
-		this._buffered = actualBuffered
 		this._channels = channels
 		this._format = format
 		this._frequency = frequency
@@ -54,6 +54,7 @@ class AudioStream extends EventsViaPoll {
 		this._writer = helper.writer
 
 		Globals.audioStreams.set(this._id, this)
+		updateDevice(this._device)
 	}
 
 	get id () { return this._id }
@@ -77,8 +78,6 @@ class AudioStream extends EventsViaPoll {
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		return this._writer.call(buffer, value, offset)
 	}
-
-	get buffered () { return this._buffered }
 
 	get playing () { return this._playing }
 	play (play = true) {
@@ -112,6 +111,8 @@ class AudioStream extends EventsViaPoll {
 		// This call could throw if the device is gone
 		try { Bindings.audio_close(this._id) }
 		catch (_) { }
+
+		updateDevice(this._device)
 
 		// We might be inside an event listener
 		process.nextTick(() => { this.removeAllListeners() })

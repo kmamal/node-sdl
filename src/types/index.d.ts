@@ -1315,8 +1315,12 @@ export namespace Sdl {
 			| 'f32'
 
 		export interface Device {
-			readonly id: number
-			readonly name: string
+			readonly id: number | null
+			readonly name: string | null
+			readonly format: Format | null
+			readonly channels: number | null
+			readonly frequency: number | null
+			readonly buffered: number | null
 		}
 
 		export interface StreamOptions {
@@ -1332,12 +1336,11 @@ export namespace Sdl {
 			on (event: 'error', listener: (error: Error) => void): this
 
 			readonly id: number
-			readonly device: Device | null
+			readonly device: Device
 
 			readonly channels: number
 			readonly frequency: number
 			readonly format: Format
-			readonly buffered: number
 
 			readonly playing: boolean
 			play (play?: boolean): void
