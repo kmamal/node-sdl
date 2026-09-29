@@ -123,11 +123,11 @@ Joysticks and gamepads:
 - The `steamHandleUpdate` event is now emitted correctly instead of a spurious `remap` event.
 - The `power` and `steamHandle` getters now poll for pending events first, like the other instance getters, instead of returning stale values.
 - `rumbleTriggers()` no longer stops the main rumble motors when its duration elapses, and pending rumble timeouts are cleared on close.
-- Closing a joystick or gamepad instance now stops any rumble that instance started. When another instance kept the same physical device open, the effect used to keep running with nothing holding the process alive, so the program could exit mid-rumble.
+- Rumble effects are now tracked per device instead of per instance, since all instances of a device share its motors. Stopping or replacing an effect from one instance no longer leaves another instance's timer keeping the process alive for up to 65 seconds, and closing an instance stops the device's rumble only once no other joystick or gamepad instance of it remains open.
 - A joystick or gamepad disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
 - `sdl.gamepad.addMappings()` now refreshes the device lists even when one of the mappings is invalid, so the devices made available by the mappings before it are reported.
-- `joystickInstance.setPlayer()`/`resetPlayer()` (and the gamepad equivalents) now update `player` on the device object, and throw if SDL refuses the assignment.
+- `joystickInstance.setPlayer()`/`resetPlayer()` (and the gamepad equivalents) now update `player` on the device's objects in both `sdl.joystick.devices` and `sdl.gamepad.devices`, and throw if SDL refuses the assignment.
 - `rumble()` and `rumbleTriggers()` no longer keep the process alive for an effect SDL never started when the intensities round to zero.
 
 Instances (joystick, gamepad, sensor, and audio):

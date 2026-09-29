@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { startEffect, stopEffect, releaseDevice, setPlayer } = require('../joystick/shared')
 
 const validEvents = [
 	'axisMotion',
@@ -34,8 +35,6 @@ class GamepadInstance extends EventsViaPoll {
 
 		this._device = device
 
-		this._rumbleTimeout = null
-		this._rumbleTriggersTimeout = null
 		this._closed = false
 
 		Globals.gamepadInstances.all.add(this)
@@ -92,13 +91,13 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
 		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("invalid player"), { player }) }
 
-		this._device.player = Bindings.joystick_setPlayer(this._device.id, player)
+		setPlayer(this._device.id, player)
 	}
 
 	resetPlayer () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		this._device.player = Bindings.joystick_setPlayer(this._device.id, -1)
+		setPlayer(this._device.id, -1)
 	}
 
 	get hasLed () { return this._hasLed }
@@ -126,30 +125,13 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		const _lowFreqRumble = Math.round(lowFreqRumble * 0xFFFF)
-		const _highFreqRumble = Math.round(highFreqRumble * 0xFFFF)
-		Bindings.joystick_rumble(this._device.id, _lowFreqRumble, _highFreqRumble, duration)
-
-		clearTimeout(this._rumbleTimeout)
-		this._rumbleTimeout = null
-
-		// Zero intensity stops the effect, so there is nothing to wait for
-		if (_lowFreqRumble === 0 && _highFreqRumble === 0) { return }
-
-		// Keeps Node.js alive while rumbling
-		this._rumbleTimeout = setTimeout(() => {
-			try { this.stopRumble() }
-			catch (_) {}
-		}, duration)
+		startEffect('rumble', this._device.id, lowFreqRumble, highFreqRumble, duration)
 	}
 
 	stopRumble () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		clearTimeout(this._rumbleTimeout)
-		this._rumbleTimeout = null
-		Bindings.joystick_rumble(this._device.id, 0, 0, 0)
-		Globals.events.poll()
+		stopEffect('rumble', this._device.id)
 	}
 
 	get hasRumbleTriggers () { return this._hasRumbleTriggers }
@@ -163,50 +145,18 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
-		const _leftRumble = Math.round(leftRumble * 0xFFFF)
-		const _rightRumble = Math.round(rightRumble * 0xFFFF)
-		Bindings.joystick_rumbleTriggers(this._device.id, _leftRumble, _rightRumble, duration)
-
-		clearTimeout(this._rumbleTriggersTimeout)
-		this._rumbleTriggersTimeout = null
-
-		// Zero intensity stops the effect, so there is nothing to wait for
-		if (_leftRumble === 0 && _rightRumble === 0) { return }
-
-		// Keeps Node.js alive while rumbling
-		this._rumbleTriggersTimeout = setTimeout(() => {
-			try { this.stopRumbleTriggers() }
-			catch (_) {}
-		}, duration)
+		startEffect('rumbleTriggers', this._device.id, leftRumble, rightRumble, duration)
 	}
 
 	stopRumbleTriggers () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		clearTimeout(this._rumbleTriggersTimeout)
-		this._rumbleTriggersTimeout = null
-		Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0)
-		Globals.events.poll()
+		stopEffect('rumbleTriggers', this._device.id)
 	}
 
 	get closed () { return this._closed }
 	close () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
-
-		if (this._rumbleTimeout) {
-			// This call will throw if the device is gone
-			try { Bindings.joystick_rumble(this._device.id, 0, 0, 0) }
-			catch (_) {}
-			clearTimeout(this._rumbleTimeout)
-			this._rumbleTimeout = null
-		}
-		if (this._rumbleTriggersTimeout) {
-			// This call will throw if the device is gone
-			try { Bindings.joystick_rumbleTriggers(this._device.id, 0, 0, 0) }
-			catch (_) {}
-			clearTimeout(this._rumbleTriggersTimeout)
-			this._rumbleTriggersTimeout = null
-		}
 
 		this._closed = true
 
@@ -216,6 +166,7 @@ class GamepadInstance extends EventsViaPoll {
 		if (collection.size === 0) {
 			Globals.gamepadInstances.byId.delete(this._device.id)
 		}
+		releaseDevice(this._device.id)
 
 		// This call could throw if the device is gone
 		try { Bindings.gamepad_close(this._device.id) }

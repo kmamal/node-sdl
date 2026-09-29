@@ -1915,7 +1915,7 @@ The current power info of the joystick device.
 
 - `index: <number>` The player index to assign to the joystick. Must be a non-negative integer.
 
-Sets the player index of the joystick, and updates `player` on the device object.
+Sets the player index of the joystick, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
 ### joystickInstance.resetPlayer()
 
@@ -1948,7 +1948,8 @@ Is `true` if the joystick has rumble motors.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick rumble for a set `duration`.
-Calling this function again before `duration` has ran out, overrides the previous call.
+Calling this function again before `duration` has run out overrides the previous call.
+The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
 
 ### joystickInstance.stopRumble()
@@ -1969,7 +1970,8 @@ Is `true` if the joystick has rumble motors on the triggers.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick triggers rumble for a set `duration`.
-Calling this function again before `duration` has ran out, overrides the previous call.
+Calling this function again before `duration` has run out overrides the previous call.
+The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
 
 ### joystickInstance.stopRumbleTriggers()
@@ -2253,7 +2255,7 @@ Possible values are `null` if the label is unknown, or one of:
 
 - `index: <number>` The player index to assign to the gamepad. Must be a non-negative integer.
 
-Sets the player index of the gamepad, and updates `player` on the device object.
+Sets the player index of the gamepad, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
 ### gamepadInstance.resetPlayer()
 
@@ -2286,7 +2288,8 @@ Is `true` if the gamepad has rumble motors.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the gamepad rumble for a set `duration`.
-Calling this function again before `duration` has ran out, overrides the previous call.
+Calling this function again before `duration` has run out overrides the previous call.
+The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
 
 ### gamepadInstance.stopRumble()
@@ -2307,7 +2310,8 @@ Is `true` if the gamepad has rumble motors on the triggers.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the gamepad triggers rumble for a set `duration`.
-Calling this function again before `duration` has ran out, overrides the previous call.
+Calling this function again before `duration` has run out overrides the previous call.
+The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
 
 ### gamepadInstance.stopRumbleTriggers()
