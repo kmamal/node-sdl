@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 
 std::string events::targets::APP;
@@ -632,6 +633,8 @@ events::poll (const Napi::CallbackInfo &info)
 
 	Napi::Function callback = info[0].As<Napi::Function>();
 
+	Uint64 poll_start = SDL_GetTicksNS();
+
 	poll_env = &env;
 	poll_callback = &callback;
 
@@ -642,7 +645,14 @@ events::poll (const Napi::CallbackInfo &info)
 			events::dispatchEvent(event);
 		}
 
-		watch_dispatched_events.clear();
+		watch_dispatched_events.erase(
+			std::remove_if(
+				watch_dispatched_events.begin(),
+				watch_dispatched_events.end(),
+				[poll_start](const WatchDispatchedEvent &it) { return it.timestamp < poll_start; }
+			),
+			watch_dispatched_events.end()
+		);
 	}
 	catch (...) {
 		poll_env = nullptr;
