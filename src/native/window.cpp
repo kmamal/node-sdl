@@ -313,7 +313,12 @@ window::create (const Napi::CallbackInfo &info)
 			updateRenderer(env, window, &is_accelerated, &is_vsync);
 		}
 
-		if (is_visible) { SDL_ShowWindow(window); }
+		if (is_visible && !SDL_ShowWindow(window)) {
+			std::ostringstream message;
+			message << "SDL_ShowWindow(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
 
 		Napi::Object result = Napi::Object::New(env);
 		result.Set("id", window_id);
@@ -352,7 +357,12 @@ window::setTitle (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_SetWindowTitle(window, title.c_str());
+	if (!SDL_SetWindowTitle(window, title.c_str())) {
+		std::ostringstream message;
+		message << "SDL_SetWindowTitle(" << window_id << ", " << title << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }
@@ -368,18 +378,14 @@ window::setPosition (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_SetWindowPosition(window, x, y);
-
-	int actual_x = x, actual_y = y;
-	if (SDL_GetWindowFlags(window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED)) {
-		SDL_GetWindowPosition(window, &actual_x, &actual_y);
+	if (!SDL_SetWindowPosition(window, x, y)) {
+		std::ostringstream message;
+		message << "SDL_SetWindowPosition(" << window_id << ", " << x << ", " << y << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
 	}
 
-	Napi::Object result = Napi::Object::New(env);
-	result.Set("x", actual_x);
-	result.Set("y", actual_y);
-
-	return result;
+	return env.Undefined();
 }
 
 Napi::Value
@@ -393,22 +399,14 @@ window::setSize (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_SetWindowSize(window, width, height);
-
-	int actual_width = width, actual_height = height;
-	if (SDL_GetWindowFlags(window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED)) {
-		SDL_GetWindowSize(window, &actual_width, &actual_height);
+	if (!SDL_SetWindowSize(window, width, height)) {
+		std::ostringstream message;
+		message << "SDL_SetWindowSize(" << window_id << ", " << width << ", " << height << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
 	}
-	int pixel_width, pixel_height;
-	SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-	Napi::Object result = Napi::Object::New(env);
-	result.Set("width", actual_width);
-	result.Set("height", actual_height);
-	result.Set("pixelWidth", pixel_width);
-	result.Set("pixelHeight", pixel_height);
-
-	return result;
+	return env.Undefined();
 }
 
 Napi::Value
@@ -441,7 +439,12 @@ window::setResizable (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_SetWindowResizable(window, is_resizable);
+	if (!SDL_SetWindowResizable(window, is_resizable)) {
+		std::ostringstream message;
+		message << "SDL_SetWindowResizable(" << window_id << ", " << is_resizable << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	Uint64 actual_flags = SDL_GetWindowFlags(window);
 	is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
@@ -459,7 +462,12 @@ window::setBorderless (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_SetWindowBordered(window, !is_borderless);
+	if (!SDL_SetWindowBordered(window, !is_borderless)) {
+		std::ostringstream message;
+		message << "SDL_SetWindowBordered(" << window_id << ", " << !is_borderless << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	Uint64 actual_flags = SDL_GetWindowFlags(window);
 	is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
@@ -516,7 +524,12 @@ window::focus (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_RaiseWindow(window);
+	if (!SDL_RaiseWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_RaiseWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }
@@ -530,7 +543,12 @@ window::show (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_ShowWindow(window);
+	if (!SDL_ShowWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_ShowWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }
@@ -544,7 +562,12 @@ window::hide (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	SDL_HideWindow(window);
+	if (!SDL_HideWindow(window)) {
+		std::ostringstream message;
+		message << "SDL_HideWindow(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }

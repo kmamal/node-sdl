@@ -30,6 +30,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - **Breaking:** The space key is now reported as `' '`, like every other character-producing key, instead of `'space'`.
 - **Breaking:** Joystick axes are now normalized relative to the axis's true center, like gamepad axes, instead of relative to whatever value the axis had when the device was opened. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
 - **Breaking:** `window.setFullscreen()`, `window.minimize()`, `window.maximize()`, and `window.restore()` follow SDL3's asynchronous model: they submit a request to the windowing system and return, and `fullscreen`, `minimized`, and `maximized` update once the change has taken effect (or not at all, if the windowing system denies it). Code that read those properties right after the call should listen for the `minimize`/`maximize`/`restore` events or poll instead. `maximize()` now throws on a non-resizable window, which SDL3 refuses to maximize.
+- **Breaking:** `window.setPosition()`, `window.setSize()`, and `window.setSizeInPixels()` follow the same asynchronous model: `x`, `y`, `width`, `height`, `pixelWidth`, and `pixelHeight` update from the `move` and `resize` events once the windowing system has applied the change, instead of being set to the requested values right away. The requested values were often never taken, for example on fullscreen and maximized windows, or under window managers that adjust or refuse the request. Code that read those properties right after the call should listen for the `move`/`resize` events or poll instead.
 - **Breaking:** `rumble()` and `rumbleTriggers()` now reject durations above `65535` ms, the maximum SDL supports. Longer durations used to be silently clamped by SDL while the process was still kept alive for the full requested time.
 
 ### Added
@@ -61,7 +62,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 Windows and events:
 
 - `resize` now also fires, and `pixelWidth`/`pixelHeight` update, when only the window's pixel size changes (for example when it moves to a display with a different scale). SDL3 reports that separately from a logical resize, and it used to be dropped.
-- `window.setSize()` and `window.setPosition()` no longer record the requested size and position on fullscreen and maximized windows, where SDL ignores the request. `width`, `height`, `x`, and `y` used to report values the window never took.
+- `window.setPosition()` now throws when the windowing system can't position the window (regular windows under Wayland), and the other window setters (`setTitle()`, `setSize()`, `setResizable()`, `setBorderless()`, `show()`, `hide()`, `focus()`) throw if SDL reports a failure. The error used to be ignored and left pending, where later calls reported it as a spurious "SDL silent error".
 - `window.focus()` no longer marks the window as focused before the windowing system has honored the request. `focused` updates on the `focus` event, as it does for every other focus change.
 - `window.setIcon()` now throws when the windowing system refuses the icon (Wayland, for example) instead of silently doing nothing.
 - `window.render()` now reports a proper "options must be an object" error for a non-object `options` argument instead of a bare `TypeError`.
@@ -77,7 +78,7 @@ Windows and events:
 - Closing the last window via its close button no longer fires `beforeClose` twice. SDL used to follow the window's close event with a quit event, and the quit handling asked the same window to close again, so a listener that called `prevent()` was bypassed on the second round.
 - Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
 - The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.
-- `window.setSizeInPixels()` now reports the actual resulting pixel size instead of assuming the requested one was applied, and its error messages state the correct required multiple instead of its inverse.
+- `window.setSizeInPixels()` now computes the pixel-to-point ratio from up-to-date values, and its error messages state the correct required multiple instead of its inverse.
 - `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
 - `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
 - A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls, and destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture.

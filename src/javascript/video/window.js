@@ -210,9 +210,7 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
 		if (y < -(2 ** 31) || y > 2 ** 31 - 1) { throw Object.assign(new Error("invalid y"), { y }) }
 
-		const position = Bindings.window_setPosition(this._id, x, y)
-		this._x = position.x
-		this._y = position.y
+		Bindings.window_setPosition(this._id, x, y)
 	}
 
 	get width () {
@@ -237,14 +235,11 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
 		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("invalid height"), { height }) }
 
-		const size = Bindings.window_setSize(this._id, width, height)
-		this._width = size.width
-		this._height = size.height
-		this._pixelWidth = size.pixelWidth
-		this._pixelHeight = size.pixelHeight
+		Bindings.window_setSize(this._id, width, height)
 	}
 
 	setSizeInPixels (pixelWidth, pixelHeight) {
+		Globals.events.poll()
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		if (!Number.isInteger(pixelWidth)) { throw Object.assign(new Error("pixelWidth must be an integer"), { pixelWidth }) }
@@ -259,11 +254,7 @@ class Window extends EventsViaPoll {
 		if (!Number.isInteger(width)) { throw Object.assign(new Error(`pixelWidth must be a multiple of ${this._pixelWidth / this._width}`), { pixelWidth }) }
 		if (!Number.isInteger(height)) { throw Object.assign(new Error(`pixelHeight must be a multiple of ${this._pixelHeight / this._height}`), { pixelHeight }) }
 
-		const result = Bindings.window_setSize(this._id, width, height)
-		this._width = width
-		this._height = height
-		this._pixelWidth = result.pixelWidth
-		this._pixelHeight = result.pixelHeight
+		Bindings.window_setSize(this._id, width, height)
 	}
 
 	get pixelWidth () {

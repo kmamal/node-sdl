@@ -56,16 +56,14 @@ T.test("sdl::window", async (t) => {
 	t.equal(window2.x, 12)
 	t.equal(window2.y, 23)
 	window1.setPosition(34, 56)
-	t.equal(window1.x, 34)
-	t.equal(window1.y, 56)
+	t.ok(await waitFor(() => window1.x === 34 && window1.y === 56))
 
 	t.equal(typeof window1.width, 'number')
 	t.equal(typeof window1.height, 'number')
 	t.equal(window2.width, 67)
 	t.equal(window2.height, 78)
 	window1.setSize(89, 90)
-	t.equal(window1.width, 89)
-	t.equal(window1.height, 90)
+	t.ok(await waitFor(() => window1.width === 89 && window1.height === 90))
 
 	t.equal(typeof window1.pixelWidth, 'number')
 	t.equal(typeof window1.pixelHeight, 'number')

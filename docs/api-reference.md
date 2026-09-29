@@ -911,6 +911,9 @@ The window's y position, relative to the screen.
 - `y: <number>`: The new y position, relative to the screen.
 
 Moves the window to a new position on the screen.
+The call only submits a request to the windowing system: [`x`](#windowx) and [`y`](#windowy) update, and a [`'move'`](#event-move) event fires, once the window has actually moved.
+The windowing system may also adjust or ignore the request (for example while the window is fullscreen or maximized), in which case they report where the window actually is.
+Throws if the windowing system can't position windows at all, as is the case for regular windows under Wayland.
 
 ### window.width
 
@@ -944,6 +947,8 @@ Is larger than [`height`](#windowheight) on [high-dpi](#high-dpi) displays.
 - `height: <number>`: The new height.
 
 Changes the size of the window.
+The call only submits a request to the windowing system: [`width`](#windowwidth), [`height`](#windowheight), [`pixelWidth`](#windowpixelwidth), and [`pixelHeight`](#windowpixelheight) update, and a [`'resize'`](#event-resize) event fires, once the window has actually been resized.
+The windowing system may also adjust or ignore the request (for example while the window is fullscreen or maximized, the new size only takes effect once it is restored), in which case they report the window's actual size.
 
 ### window.setSizeInPixels(pixelWidth, pixelHeight)
 
@@ -953,6 +958,7 @@ Changes the size of the window.
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
 On such displays, `pixelWidth` and `pixelHeight` must be multiples of the window's pixel-to-point ratio (`pixelWidth / width`), otherwise the call throws.
+As with [`window.setSize()`](#windowsetsizewidth-height), the size properties update once the change has taken effect.
 
 ### window.display
 

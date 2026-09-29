@@ -220,6 +220,16 @@ window.render(w, h, stride, format, buffer, { scaling: 'best' })
 window.render(w, h, stride, format, buffer, { scaling: 'linear' })
 ```
 
+### Window setters are asynchronous and report failures
+
+`window.setPosition()` now throws when the windowing system can't position the window, which is always the case for regular windows under Wayland.
+It used to fail silently and leave `x` and `y` reporting the requested position.
+Wrap the call in `try`/`catch` if your program also runs on Wayland.
+
+`setPosition()`, `setSize()`, and `setSizeInPixels()` no longer set `x`, `y`, `width`, `height`, `pixelWidth`, and `pixelHeight` to the requested values.
+Like `setFullscreen()` and the other state changes, they submit a request, and the properties update from the `move` and `resize` events once the windowing system has applied it, reporting what the window actually took.
+Listen for those events, or poll, instead of reading the properties right after the call.
+
 ## Audio
 
 SDL3 separates playback from recording devices and works with audio streams, and the JS API now mirrors that.
