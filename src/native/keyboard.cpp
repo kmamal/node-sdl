@@ -33,7 +33,7 @@ keyboard::getKey(const Napi::CallbackInfo &info)
 
 	int scancode = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Keycode keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode, SDL_KMOD_NONE, false);
+	SDL_Keycode keycode = SDL_GetKeyFromScancode((SDL_Scancode) scancode, SDL_KMOD_NONE, true);
 	return packKey(env, keycode);
 }
 
