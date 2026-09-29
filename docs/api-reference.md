@@ -541,8 +541,8 @@ This function is also available from `@kmamal/sdl/helpers`.
 ### sdl.video.minBufferSize(format, stride, height)
 
 - `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
-- `stride: <number>` How many bytes each row of the image takes up.
-- `height: <number>` The height of the image in pixels.
+- `stride: <number>` How many bytes each row of the image takes up. Must be a non-negative integer.
+- `height: <number>` The height of the image in pixels. Must be a non-negative integer.
 - Returns: `<number>` The minimum number of bytes.
 
 Helper function which computes the smallest buffer that can hold an image with the given format, stride, and height.

@@ -177,6 +177,7 @@ Validation and errors:
 - Integer arguments are now validated to fit in 32 bits everywhere the native layer reads them as such (window positions and sizes, image dimensions and strides, rumble durations, player indices, audio frequency, `numBytes`). Larger values used to silently wrap — `setSize(2 ** 32 + 100, 100)` set width 100, `rumble` durations above 2³¹−1 broke the auto-stop timer, and `setPlayer(2 ** 31)` silently behaved like `resetPlayer()`.
 - Enum values this build of the library doesn't know (a joystick or gamepad type, sensor type, power state, display orientation, display pixel format, touch device type, hat position, or gamepad axis or button name introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
 - SDL errors are now detected reliably, through SDL3's boolean return values or, where a call has none, the error message contents, instead of comparing `SDL_GetError()` pointers, which silently missed all errors when linked against an SDL build that returns a single static buffer. Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/gamepad opening, and window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale error text an earlier unrelated call had left behind.
+- `sdl.video.minBufferSize()` now validates `stride` and `height` instead of returning `NaN`.
 
 Native resource handling:
 
