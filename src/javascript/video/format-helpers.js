@@ -90,6 +90,7 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 })
 
 const getFormatHelpers = (format) => {
+	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 	const helpers = VideoFormatHelpers[format]
 	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 	return helpers

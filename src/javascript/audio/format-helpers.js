@@ -76,6 +76,7 @@ else {
 }
 
 const getFormatHelpers = (format) => {
+	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 	const helpers = AudioFormatHelpers[format]
 	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 	return helpers
