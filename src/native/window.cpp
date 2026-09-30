@@ -722,7 +722,12 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_RenderPresent(renderer);
+	if (!SDL_RenderPresent(renderer)) {
+		std::ostringstream message;
+		message << "SDL_RenderPresent(" << window_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }

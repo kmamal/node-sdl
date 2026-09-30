@@ -67,7 +67,13 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_SetCursor(cursor);
+	if (!SDL_SetCursor(cursor)) {
+		std::ostringstream message;
+		message << "SDL_SetCursor(" << cursor_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		SDL_DestroyCursor(cursor);
+		throw Napi::Error::New(env, message.str());
+	}
 
 	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
 	allocated_cursor = cursor;
@@ -88,7 +94,12 @@ mouse::resetCursor(const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_SetCursor(cursor);
+	if (!SDL_SetCursor(cursor)) {
+		std::ostringstream message;
+		message << "SDL_SetCursor() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	if (allocated_cursor != nullptr) {
 		SDL_DestroyCursor(allocated_cursor);
@@ -129,12 +140,19 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	SDL_SetCursor(cursor);
+	SDL_DestroySurface(surface);
+
+	if (!SDL_SetCursor(cursor)) {
+		std::ostringstream message;
+		message << "SDL_SetCursor() error: " << SDL_GetError();
+		SDL_ClearError();
+		SDL_DestroyCursor(cursor);
+		throw Napi::Error::New(env, message.str());
+	}
 
 	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
 	allocated_cursor = cursor;
 
-	SDL_DestroySurface(surface);
 	return env.Undefined();
 }
 
@@ -161,7 +179,12 @@ mouse::redrawCursor (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	SDL_SetCursor(nullptr);
+	if (!SDL_SetCursor(nullptr)) {
+		std::ostringstream message;
+		message << "SDL_SetCursor(nullptr) error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	return env.Undefined();
 }

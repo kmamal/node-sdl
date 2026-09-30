@@ -81,6 +81,7 @@ Windows and events:
 - `window.setSizeInPixels()` now computes the pixel-to-point ratio from up-to-date values, and its error messages state the correct required multiple instead of its inverse.
 - `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
 - `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
+- `window.render()`, `mouse.setCursor()`, `mouse.setCursorImage()`, `mouse.resetCursor()`, and `mouse.redrawCursor()` now throw if SDL fails to present the frame or apply the cursor, instead of ignoring the failure and leaving its error pending.
 - A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls, and destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture.
 - Renderer error messages now include the flag values instead of pointer addresses.
 - Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code. For the planar YUV formats the check also accounts for SDL rounding the chroma planes up, so odd dimensions no longer read out of bounds either, and for the packed YUV formats (`yuy2`, `uyvy`, `yvyu`) the minimum stride of an odd-width image covers the full last 4-byte pixel pair SDL reads.
