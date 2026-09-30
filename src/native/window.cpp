@@ -15,6 +15,7 @@ getWindow (Napi::Env &env, int window_id)
 	if (window == nullptr) {
 		std::ostringstream message;
 		message << "SDL_GetWindowFromID(" << window_id << ") error: invalid window id";
+		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 	return window;
