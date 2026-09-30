@@ -21,6 +21,7 @@ namespace joystick {
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);
+	Napi::Value getCapabilities(const Napi::CallbackInfo &info);
 	Napi::Value setLed(const Napi::CallbackInfo &info);
 	Napi::Value setPlayer(const Napi::CallbackInfo &info);
 	Napi::Value rumble(const Napi::CallbackInfo &info);

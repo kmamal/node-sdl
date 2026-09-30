@@ -24,9 +24,6 @@ class GamepadInstance extends EventsViaPoll {
 
 		this._firmwareVersion = result.firmwareVersion
 		this._serialNumber = result.serialNumber
-		this._hasLed = result.hasLed
-		this._hasRumble = result.hasRumble
-		this._hasRumbleTriggers = result.hasRumbleTriggers
 		this._steamHandle = result.steamHandle
 		this._power = result.power
 		this._axes = result.axes
@@ -100,7 +97,12 @@ class GamepadInstance extends EventsViaPoll {
 		setPlayer(this._device.id, -1)
 	}
 
-	get hasLed () { return this._hasLed }
+	get hasLed () {
+		Globals.events.poll()
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		return Bindings.joystick_getCapabilities(this._device.id).hasLed
+	}
 	setLed (red, green, blue) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
@@ -111,10 +113,17 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isFinite(blue)) { throw Object.assign(new Error("blue must be a number"), { blue }) }
 		if (blue < 0 || blue > 1) { throw Object.assign(new Error("blue must be between 0 and 1"), { blue }) }
 
+		if (!this.hasLed) { throw Object.assign(new Error("device has no led"), { id: this._device.id }) }
+
 		Bindings.joystick_setLed(this._device.id, red, green, blue)
 	}
 
-	get hasRumble () { return this._hasRumble }
+	get hasRumble () {
+		Globals.events.poll()
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		return Bindings.joystick_getCapabilities(this._device.id).hasRumble
+	}
 	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = 1e3) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
@@ -125,16 +134,25 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
+		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
+
 		startEffect('rumble', this._device.id, lowFreqRumble, highFreqRumble, duration)
 	}
 
 	stopRumble () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
+		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
+
 		stopEffect('rumble', this._device.id)
 	}
 
-	get hasRumbleTriggers () { return this._hasRumbleTriggers }
+	get hasRumbleTriggers () {
+		Globals.events.poll()
+		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		return Bindings.joystick_getCapabilities(this._device.id).hasRumbleTriggers
+	}
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = 1e3) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
@@ -145,11 +163,15 @@ class GamepadInstance extends EventsViaPoll {
 		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
 		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
 
+		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }
+
 		startEffect('rumbleTriggers', this._device.id, leftRumble, rightRumble, duration)
 	}
 
 	stopRumbleTriggers () {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+
+		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }
 
 		stopEffect('rumbleTriggers', this._device.id)
 	}

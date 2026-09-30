@@ -50,6 +50,11 @@ T.test("sdl::joystick", async (t) => {
 	t.equal(instance.hasLed, false)
 	t.equal(instance.hasRumble, false)
 	t.equal(instance.hasRumbleTriggers, false)
+	t.throws(() => { instance.setLed(1, 0, 0) })
+	t.throws(() => { instance.rumble() })
+	t.throws(() => { instance.stopRumble() })
+	t.throws(() => { instance.rumbleTriggers() })
+	t.throws(() => { instance.stopRumbleTriggers() })
 
 	t.ok(Array.isArray(instance.axes))
 	t.equal(instance.axes.length, 2)

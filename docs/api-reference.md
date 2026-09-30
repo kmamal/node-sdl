@@ -1936,6 +1936,7 @@ Clears player assignment and player led.
 - `<boolean>`
 
 Is `true` if the joystick has a LED light whose color can be controlled.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### joystickInstance.setLed(red, green, blue)
 
@@ -1944,12 +1945,14 @@ Is `true` if the joystick has a LED light whose color can be controlled.
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the LED light on the joystick.
+Throws if the joystick has no LED (see [`joystickInstance.hasLed`](#joystickinstancehasled)).
 
 ### joystickInstance.hasRumble
 
 - `<boolean>`
 
 Is `true` if the joystick has rumble motors.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### joystickInstance.rumble([low[, high[, duration]]])
 
@@ -1958,6 +1961,7 @@ Is `true` if the joystick has rumble motors.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick rumble for a set `duration`.
+Throws if the joystick has no rumble motors (see [`joystickInstance.hasRumble`](#joystickinstancehasrumble)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
@@ -1972,6 +1976,7 @@ Equivalent to [`joystickInstance.rumble(0, 0)`](#joystickinstancerumblelow-high-
 - `<boolean>`
 
 Is `true` if the joystick has rumble motors on the triggers.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### joystickInstance.rumbleTriggers([left[, right[, duration]]])
 
@@ -1980,6 +1985,7 @@ Is `true` if the joystick has rumble motors on the triggers.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the joystick triggers rumble for a set `duration`.
+Throws if the joystick has no trigger rumble motors (see [`joystickInstance.hasRumbleTriggers`](#joystickinstancehasrumbletriggers)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
@@ -2276,6 +2282,7 @@ Clears player assignment and player led.
 - `<boolean>`
 
 Is `true` if the gamepad has a LED light whose color can be controlled.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### gamepadInstance.setLed(red, green, blue)
 
@@ -2284,12 +2291,14 @@ Is `true` if the gamepad has a LED light whose color can be controlled.
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the LED light on the gamepad.
+Throws if the gamepad has no LED (see [`gamepadInstance.hasLed`](#gamepadinstancehasled)).
 
 ### gamepadInstance.hasRumble
 
 - `<boolean>`
 
 Is `true` if the gamepad has rumble motors.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### gamepadInstance.rumble([low[, high[, duration]]])
 
@@ -2298,6 +2307,7 @@ Is `true` if the gamepad has rumble motors.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the gamepad rumble for a set `duration`.
+Throws if the gamepad has no rumble motors (see [`gamepadInstance.hasRumble`](#gamepadinstancehasrumble)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.
@@ -2312,6 +2322,7 @@ Equivalent to [`gamepadInstance.rumble(0, 0)`](#gamepadinstancerumblelow-high-du
 - `<boolean>`
 
 Is `true` if the gamepad has rumble motors on the triggers.
+This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### gamepadInstance.rumbleTriggers([left[, right[, duration]]])
 
@@ -2320,6 +2331,7 @@ Is `true` if the gamepad has rumble motors on the triggers.
 - `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
 
 Makes the gamepad triggers rumble for a set `duration`.
+Throws if the gamepad has no trigger rumble motors (see [`gamepadInstance.hasRumbleTriggers`](#gamepadinstancehasrumbletriggers)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 Passing `0` for both intensities stops the rumble.

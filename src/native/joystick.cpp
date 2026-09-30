@@ -236,11 +236,6 @@ joystick::open (const Napi::CallbackInfo &info)
 			? Napi::String::New(env, _serial_number)
 			: env.Null();
 
-		SDL_PropertiesID props = SDL_GetJoystickProperties(joystick);
-		bool has_led = SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RGB_LED_BOOLEAN, false);
-		bool has_rumble = SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, false);
-		bool has_rumble_triggers = SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_TRIGGER_RUMBLE_BOOLEAN, false);
-
 		int num_axes = SDL_GetNumJoystickAxes(joystick);
 		if (num_axes < 0) {
 			std::ostringstream message;
@@ -322,9 +317,6 @@ joystick::open (const Napi::CallbackInfo &info)
 		Napi::Object result = Napi::Object::New(env);
 		result.Set("firmwareVersion", firmware_version);
 		result.Set("serialNumber", serial_number);
-		result.Set("hasLed", has_led);
-		result.Set("hasRumble", has_rumble);
-		result.Set("hasRumbleTriggers", has_rumble_triggers);
 		result.Set("axes", axes);
 		result.Set("balls", balls);
 		result.Set("buttons", buttons);
@@ -364,6 +356,30 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	}
 
 	return env.Undefined();
+}
+
+Napi::Value
+joystick::getCapabilities (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+
+	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
+	if (joystick == nullptr) {
+		std::ostringstream message;
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
+		throw Napi::Error::New(env, message.str());
+	}
+
+	SDL_PropertiesID props = SDL_GetJoystickProperties(joystick);
+
+	Napi::Object result = Napi::Object::New(env);
+	result.Set("hasLed", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RGB_LED_BOOLEAN, false));
+	result.Set("hasRumble", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, false));
+	result.Set("hasRumbleTriggers", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_TRIGGER_RUMBLE_BOOLEAN, false));
+
+	return result;
 }
 
 Napi::Value

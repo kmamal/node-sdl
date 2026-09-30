@@ -144,11 +144,6 @@ gamepad::open (const Napi::CallbackInfo &info)
 			? Napi::String::New(env, _serial_number)
 			: env.Null();
 
-		SDL_PropertiesID props = SDL_GetGamepadProperties(gamepad);
-		bool has_led = SDL_GetBooleanProperty(props, SDL_PROP_GAMEPAD_CAP_RGB_LED_BOOLEAN, false);
-		bool has_rumble = SDL_GetBooleanProperty(props, SDL_PROP_GAMEPAD_CAP_RUMBLE_BOOLEAN, false);
-		bool has_rumble_triggers = SDL_GetBooleanProperty(props, SDL_PROP_GAMEPAD_CAP_TRIGGER_RUMBLE_BOOLEAN, false);
-
 		Napi::Value steam_handle = getSteamHandle(env, gamepad);
 
 		SDL_Joystick *joystick = SDL_GetGamepadJoystick(gamepad);
@@ -157,9 +152,6 @@ gamepad::open (const Napi::CallbackInfo &info)
 		Napi::Object result = Napi::Object::New(env);
 		result.Set("firmwareVersion", firmware_version);
 		result.Set("serialNumber", serial_number);
-		result.Set("hasLed", has_led);
-		result.Set("hasRumble", has_rumble);
-		result.Set("hasRumbleTriggers", has_rumble_triggers);
 		result.Set("steamHandle", steam_handle);
 		result.Set("power", power);
 

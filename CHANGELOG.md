@@ -140,6 +140,7 @@ Joysticks and gamepads:
 - `joystickInstance.setPlayer()`/`resetPlayer()` (and the gamepad equivalents) now update `player` on the device's objects in both `sdl.joystick.devices` and `sdl.gamepad.devices`, and throw if SDL refuses the assignment.
 - `setPlayer()` now also updates `player` on the device that previously held the requested index, which SDL moves to a free slot. It used to keep reporting its old index, so two devices reported the same player.
 - `rumble()` and `rumbleTriggers()` no longer keep the process alive for an effect SDL never started when the intensities round to zero.
+- `hasLed`, `hasRumble`, and `hasRumbleTriggers` on joystick and gamepad instances now report the device's current capabilities instead of the ones it had when opened, which SDL can change later (for example when it switches a PlayStation controller into enhanced mode). `setLed()`, `rumble()`, `stopRumble()`, `rumbleTriggers()`, and `stopRumbleTriggers()` now consistently throw when the device lacks the corresponding hardware; the stop calls and zero-intensity calls used to succeed silently.
 
 Instances (joystick, gamepad, sensor, and audio):
 
