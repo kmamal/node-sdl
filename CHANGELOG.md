@@ -196,6 +196,7 @@ Docs, types, and loading:
 - `window.native.subsystem` is now `null` on Windows and macOS instead of absent, and is no longer optional in the types.
 - Type fixes: `createWindow()`'s `x` and `y` options accept `null`, and the `orientation` on `displayOrient` events is nullable, both matching the implementation and docs.
 - The docs now state the constraints the API enforces on rumble `duration`, audio `frequency`, the `bytes` argument of `putData()`/`getData()`, and window positions and sizes.
+- The docs now also state the 32-bit limits on player indices, audio `frequency`, and the `bytes` argument of `putData()`/`getData()`, the limits on image `width`, `height`, and `stride`, and the allowed range of the cursor hotspot.
 - The docs no longer claim that `vsync` requires `accelerated`. SDL3 supports vsync with the software renderer too.
 - The docs now say that `createWindow()` defaults to the primary display, which isn't necessarily `sdl.video.displays[0]`, and the types accept `null` for its `display`, `width`, and `height` options.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.

@@ -352,9 +352,9 @@ There are 3 places in the API where you must provide an image to the library:
 
 All three of these functions accept the image as a series of arguments:
 
-- `width: <number>` The width of the image in pixels.
-- `height: <number>` The height of the image in pixels.
-- `stride: <number>` How many bytes each row of the image takes up in the buffer. Usually equal to `width * bytesPerPixel`, but may be larger if the rows of the buffer are padded to always be some multiple of bytes.
+- `width: <number>` The width of the image in pixels. Must be a positive 32-bit integer.
+- `height: <number>` The height of the image in pixels. Must be a positive 32-bit integer.
+- `stride: <number>` How many bytes each row of the image takes up in the buffer. Usually equal to `width * bytesPerPixel`, but may be larger if the rows of the buffer are padded to always be some multiple of bytes. Must be a 32-bit integer.
 - `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
 - `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
 
@@ -1642,8 +1642,8 @@ Switched back to the default cursor.
 ### sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)
 
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to use as a cursor.
-- `x: <number>` The x position of the cursor image's hotspot.
-- `y: <number>` The y position of the cursor image's hotspot.
+- `x: <number>` The x position of the cursor image's hotspot. Must be an integer from `0` to `width - 1`.
+- `y: <number>` The y position of the cursor image's hotspot. Must be an integer from `0` to `height - 1`.
 
 Sets a image to be the mouse cursor.
 The hotspot represents the pixel that is considered to be under the mouse, so `x` must be from `0` to `width - 1` and `y` from `0` to `height - 1`.
@@ -1919,7 +1919,7 @@ The current power info of the joystick device.
 
 ### joystickInstance.setPlayer(index)
 
-- `index: <number>` The player index to assign to the joystick. Must be a non-negative integer.
+- `index: <number>` The player index to assign to the joystick. Must be a non-negative 32-bit integer.
 
 Sets the player index of the joystick, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
@@ -2259,7 +2259,7 @@ Possible values are `null` if the label is unknown, or one of:
 
 ### gamepadInstance.setPlayer(index)
 
-- `index: <number>` The player index to assign to the gamepad. Must be a non-negative integer.
+- `index: <number>` The player index to assign to the gamepad. Must be a non-negative 32-bit integer.
 
 Sets the player index of the gamepad, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
@@ -2633,7 +2633,7 @@ Since `buffered` is counted in frames at the device's `frequency`, the delay it 
 - `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices). Must be the actual object from that list, not a copy. Passing `null` is the same as passing the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
-  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
+  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
 - Returns: [`<AudioPlaybackStream>`](#class-audioplaybackstream-extends-audiostream) an object representing the opened stream.
@@ -2711,7 +2711,7 @@ Since `buffered` is counted in frames at the device's `frequency`, the delay it 
 - `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices). Must be the actual object from that list, not a copy. Passing `null` is the same as passing the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
-  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive integer. Default: `48e3`
+  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
 - Returns: [`<AudioRecordingStream>`](#class-audiorecordingstream-extends-audiostream) an object representing the opened stream.
@@ -2858,7 +2858,7 @@ The number of bytes that have been written to the stream but not yet consumed by
 ### playbackStream.putData(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to read data from.
-- `bytes: <number>` The number of bytes to read from the buffer. Must be a non-negative integer that doesn't exceed `buffer.length`, and a whole number of sample frames (a multiple of `channels * bytesPerSample`). Default: `buffer.length`
+- `bytes: <number>` The number of bytes to read from the buffer. Must be a non-negative 32-bit integer that doesn't exceed `buffer.length`, and a whole number of sample frames (a multiple of `channels * bytesPerSample`). Default: `buffer.length`
 
 Takes the audio data that you have written to the buffer, and queues it on the stream, from where it will be played back as audio.
 
@@ -2876,7 +2876,7 @@ The number of bytes of recorded audio that are waiting to be read from the strea
 ### recordingStream.getData(buffer[, bytes])
 
 - `buffer: <Buffer>` The buffer to write data to.
-- `bytes: <number>` The number of bytes to write to the buffer. Must not exceed `buffer.length`. Default: `buffer.length`
+- `bytes: <number>` The number of bytes to write to the buffer. Must be a non-negative 32-bit integer that doesn't exceed `buffer.length`. Default: `buffer.length`
 - Returns: `<number>` The actual number of bytes read.
 
 Takes recorded audio data that is waiting on the stream, and writes it to the provided buffer.
