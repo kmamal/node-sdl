@@ -86,6 +86,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::types::DROP_FILE = "dropFile";
 	events::types::DROP_TEXT = "dropText";
 	events::types::CLOSE = "close";
+	events::types::RENDER_DEVICE_LOST = "renderDeviceLost";
 	events::types::KEYMAP_CHANGE = "keymapChange";
 	events::types::FINGER_DOWN = "fingerDown";
 	events::types::FINGER_UP = "fingerUp";

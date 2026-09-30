@@ -59,6 +59,7 @@ std::string events::types::DROP_COMPLETE;
 std::string events::types::DROP_FILE;
 std::string events::types::DROP_TEXT;
 std::string events::types::CLOSE;
+std::string events::types::RENDER_DEVICE_LOST;
 std::string events::types::KEYMAP_CHANGE;
 std::string events::types::FINGER_DOWN;
 std::string events::types::FINGER_UP;
@@ -236,6 +237,13 @@ events::dispatchEvent(const SDL_Event &event)
 					: events::types::DISPLAY_USABLE);
 			packed.Set("displayId", event.display.displayID);
 			packed.Set("display", display);
+			break;
+		}
+
+		case SDL_EVENT_RENDER_DEVICE_LOST: {
+			packed.Set("target", events::targets::WINDOW);
+			packed.Set("targetId", event.render.windowID);
+			packed.Set("type", events::types::RENDER_DEVICE_LOST);
 			break;
 		}
 

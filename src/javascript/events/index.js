@@ -194,6 +194,15 @@ const handleEvent = (event) => {
 					return
 				}
 
+				case 'renderDeviceLost': {
+					tryCall(() => {
+						const result = Bindings.window_setAcceleratedAndVsync(window._id, window._accelerated, window._vsync)
+						window._accelerated = result.accelerated
+						window._vsync = result.vsync
+					})
+					return
+				}
+
 				case 'keyDown':
 				case 'keyUp': {
 					const { key } = event

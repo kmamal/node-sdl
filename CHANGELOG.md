@@ -201,6 +201,8 @@ Native resource handling:
 - Fixed a use-after-free when destroying a window.
 - Fixed native leaks: opening the same joystick, gamepad, or sensor multiple times, a failure while opening a joystick or gamepad, a failure while creating a window (such as renderer creation failing), a failure to create the JS counterpart of a gamepad mapping string during device enumeration, `mouse.setCursor()`, and file drop events all used to leak the corresponding SDL resource.
 - `window.render()` no longer leaks a texture on every call if SDL fails to cache it on the window.
+- `window.setAccelerated()` and `window.setVsync()` no longer throw after successfully switching the renderer when SDL fails to report its name or vsync state, which used to leave `accelerated` and `vsync` reporting the old renderer's values.
+- Windows recreate their renderer when SDL reports that the graphics device was lost (for example after a GPU driver reset). `window.render()` used to fail from then on.
 - SDL event types the library doesn't handle (such as gamepad touchpad events) no longer make a wasted native-to-JS call per event.
 
 Docs, types, and loading:

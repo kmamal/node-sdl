@@ -57,6 +57,7 @@ namespace events {
 		extern std::string DROP_FILE;
 		extern std::string DROP_TEXT;
 		extern std::string CLOSE;
+		extern std::string RENDER_DEVICE_LOST;
 		extern std::string KEYMAP_CHANGE;
 		extern std::string FINGER_DOWN;
 		extern std::string FINGER_UP;
