@@ -1046,6 +1046,8 @@ Changes the window's accelerated property.
 
 If you have set the `opengl` or `webgpu` options, then calls to this function will fail.
 
+If SDL can't create a renderer, not even a software one, this throws and leaves the window without a renderer. [`render()`](#windowrenderwidth-height-stride-format-buffer-options) then throws until a later call to `setAccelerated()` or `setVsync()` succeeds.
+
 ### window.vsync
 
 - `<boolean>`
@@ -1060,6 +1062,8 @@ Vsync synchronizes the window's frame rate with the display's refresh rate to pr
 Changes the window's vsync property.
 
 If you have set the `opengl` or `webgpu` options, then calls to this function will fail.
+
+If SDL can't create a renderer, not even a software one, this throws and leaves the window without a renderer. [`render()`](#windowrenderwidth-height-stride-format-buffer-options) then throws until a later call to `setAccelerated()` or `setVsync()` succeeds.
 
 ### window.opengl
 

@@ -674,8 +674,7 @@ window::render (const Napi::CallbackInfo &info)
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
 	if (renderer == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetRenderer(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetRenderer(" << window_id << ") error: window has no renderer";
 		throw Napi::Error::New(env, message.str());
 	}
 
