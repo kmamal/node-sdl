@@ -223,6 +223,7 @@ Building from source:
 
 - Building SDL from source (the fallback when no prebuilt SDL is available) no longer drops SDL's license from `dist/`, and a missing license now fails the build instead of being silently skipped.
 - Building SDL from source no longer crashes on Windows.
+- The native addon now compiles on Windows under SDL3, which no longer pulls in the declarations of `HWND` and `HINSTANCE`.
 - The native addon is now compiled with warnings enabled and treated as errors on macOS and Windows too, not only on Linux, and the `_THREAD_SAFE`/`_REENTRANT` defines now actually apply there.
 - `NO_PARALLEL=0` and `NO_PARALLEL=false` no longer disable the parallel native build, matching how the other environment variables are read.
 

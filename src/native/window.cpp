@@ -32,11 +32,11 @@ getWindow (Napi::Env &env, int window_id)
 	#define GPU_NativeData LinuxNativeData
 	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
 #elif defined(SDL_PLATFORM_WIN32)
-	#define NativeWindowHandle HWND
-	#define GL_NativeWindow HWND
+	#define NativeWindowHandle void *
+	#define GL_NativeWindow void *
 	struct GPU_NativeData {
-		HWND hwnd;
-		HINSTANCE hinstance;
+		void *hwnd;
+		void *hinstance;
 	};
 	#define GPU_WINDOW_FLAG 0
 #elif defined(SDL_PLATFORM_MACOS)
@@ -236,7 +236,7 @@ window::create (const Napi::CallbackInfo &info)
 					};
 				}
 			#elif defined(SDL_PLATFORM_WIN32)
-				_native_handle = (HWND) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+				_native_handle = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
 				NSWindow *cocoa_window = (NSWindow *) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
 				_native_handle = getCocoaWindowHandle(cocoa_window);
@@ -273,7 +273,7 @@ window::create (const Napi::CallbackInfo &info)
 					};
 				}
 			#elif defined(SDL_PLATFORM_WIN32)
-				native_gl = (HWND) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+				native_gl = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
 				NSWindow *cocoa_gl_window = (NSWindow *) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
 				native_gl = getCocoaGlView(cocoa_gl_window);
@@ -305,8 +305,8 @@ window::create (const Napi::CallbackInfo &info)
 					};
 				}
 			#elif defined(SDL_PLATFORM_WIN32)
-				native_gpu.hwnd = (HWND) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
-				native_gpu.hinstance = (HINSTANCE) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
+				native_gpu.hwnd = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+				native_gpu.hinstance = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
 				NSWindow *cocoa_gpu_window = (NSWindow *) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
 				native_gpu.layer = getCocoaGpuView(cocoa_gpu_window);
