@@ -730,8 +730,8 @@ If `prevent` is not called, then the `beforeClose` event will be followed by a [
 
 ### Event: 'close'
 
-Indicates that the window is about to be destroyed.
-Handle any cleanup here.
+Fired once the window has been destroyed.
+Handle cleanup here.
 
 ### Event: 'keyDown'
 
@@ -1858,7 +1858,7 @@ Fired when the joystick's power info changes.
 
 ### Event: 'close'
 
-Fired when the instance is about to close.
+Fired once the instance has been closed.
 Handle cleanup here.
 
 ### joystickInstance.device
@@ -2159,7 +2159,7 @@ This may cause all of the gamepad's axes and buttons to aquire new values.
 
 ### Event: 'close'
 
-Fired when the instance is about to close.
+Fired once the instance has been closed.
 Handle cleanup here.
 
 ### gamepadInstance.device
@@ -2388,7 +2388,7 @@ Get the new data by accessing [`sensorInstance.data`](#sensorinstancedata)
 
 ### Event: 'close'
 
-Fired when the instance is about to close.
+Fired once the instance has been closed.
 Handle cleanup here.
 
 ### sensorInstance.device
@@ -2736,7 +2736,7 @@ It only serves as the base class for [`AudioPlaybackStream`](#class-audioplaybac
 
 ### Event: 'close'
 
-Fired when the stream is about to close.
+Fired once the stream has been closed.
 Handle cleanup here.
 
 ### audioStream.id
