@@ -495,7 +495,7 @@ class Window extends EventsViaPoll {
 		const helpers = VideoFormatHelpers[format]
 		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 		if (!helpers.isRenderable) { throw Object.assign(new Error("format can't be rendered"), { format }) }
-		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
+		if (stride < helpers.minStride(width) || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 		if (typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
@@ -530,7 +530,7 @@ class Window extends EventsViaPoll {
 		const helpers = VideoFormatHelpers[format]
 		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 		if (helpers.isYuv) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
-		if (stride < width * helpers.bytesPerPixel || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, bytesPerPixel: helpers.bytesPerPixel }) }
+		if (stride < helpers.minStride(width) || stride > 2 ** 31 - 1) { throw Object.assign(new Error("invalid stride"), { stride, width, format }) }
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
 

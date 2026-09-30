@@ -83,7 +83,7 @@ Windows and events:
 - `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.
 - A failure to recreate the render texture (such as an oversized `render()`) no longer leaves a dangling texture pointer that corrupts memory on later calls, and destroying a window whose renderer could not be rebuilt (after a failed `setVsync()` or `setAccelerated()` call) no longer leaks its texture.
 - Renderer error messages now include the flag values instead of pointer addresses.
-- Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code. For the planar YUV formats the check also accounts for SDL rounding the chroma planes up, so odd dimensions no longer read out of bounds either.
+- Image `stride` and buffer sizes are now validated in bytes, preventing out-of-bounds reads in native code. For the planar YUV formats the check also accounts for SDL rounding the chroma planes up, so odd dimensions no longer read out of bounds either, and for the packed YUV formats (`yuy2`, `uyvy`, `yvyu`) the minimum stride of an odd-width image covers the full last 4-byte pixel pair SDL reads.
 - `window.setIcon()` and `mouse.setCursorImage()` now reject YUV pixel formats with a clear validation error. SDL cannot create surfaces from them, so they always failed — but with a cryptic native error.
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
 - `sdl.video.focused` and `sdl.video.hovered` now pump events first, like the per-window getters, instead of returning stale values.

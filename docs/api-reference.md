@@ -358,7 +358,7 @@ All three of these functions accept the image as a series of arguments:
 - `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
 - `buffer: <Buffer>` Holds the actual pixel data for the image, in the format and layout specified by all the above arguments.
 
-The `stride` must be at least `width * `[`sdl.video.bytesPerPixel(format)`](#sdlvideobytesperpixelformat), and the `buffer` must be at least [`sdl.video.minBufferSize(format, stride, height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, otherwise the call throws.
+The `stride` must be at least `width * `[`sdl.video.bytesPerPixel(format)`](#sdlvideobytesperpixelformat) (for the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'`, at least `4 * Math.ceil(width / 2)`, since each 4-byte group encodes two pixels), and the `buffer` must be at least [`sdl.video.minBufferSize(format, stride, height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, otherwise the call throws.
 
 So, for example, to fill the window with a red+green gradient you could do:
 

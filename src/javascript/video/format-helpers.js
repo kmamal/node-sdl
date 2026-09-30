@@ -1,4 +1,6 @@
 
+const minStride = (bytesPerPixel) => (width) => width * bytesPerPixel
+const minStridePacked = (width) => 4 * Math.ceil(width / 2)
 const minBufferSize = (stride, height) => stride * height
 const minBufferSizePlanar = (stride, height) => stride * height + 2 * Math.ceil(stride / 2) * Math.ceil(height / 2)
 
@@ -8,6 +10,7 @@ const rgb = (bytesPerPixel) => ({
 	isYuv: false,
 	isPlanarYuv: false,
 	isRenderable: true,
+	minStride: minStride(bytesPerPixel),
 	minBufferSize,
 })
 
@@ -16,6 +19,7 @@ const yuv = (bytesPerPixel, isPlanarYuv, isRenderable = true) => ({
 	isYuv: true,
 	isPlanarYuv,
 	isRenderable,
+	minStride: isPlanarYuv ? minStride(bytesPerPixel) : minStridePacked,
 	minBufferSize: isPlanarYuv ? minBufferSizePlanar : minBufferSize,
 })
 
