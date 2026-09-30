@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <cstdint>
+#include <cmath>
+#include <algorithm>
 
 static const char *TEXTURE_PROPERTY = "kmamal.sdl.texture";
 
@@ -396,8 +398,22 @@ window::setSize (const Napi::CallbackInfo &info)
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
+	bool in_pixels = info[3].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
+
+	if (in_pixels) {
+		float density = SDL_GetWindowPixelDensity(window);
+		if (density == 0.0f) {
+			std::ostringstream message;
+			message << "SDL_GetWindowPixelDensity(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
+		width = std::clamp<long>(std::lround(width / (double) density), 1, INT32_MAX);
+		height = std::clamp<long>(std::lround(height / (double) density), 1, INT32_MAX);
+	}
 
 	if (!SDL_SetWindowSize(window, width, height)) {
 		std::ostringstream message;

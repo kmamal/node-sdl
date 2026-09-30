@@ -956,7 +956,7 @@ The windowing system may also adjust or ignore the request (for example while th
 
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
-On such displays, `pixelWidth` and `pixelHeight` must be multiples of the window's pixel-to-point ratio (`pixelWidth / width`), otherwise the call throws.
+On such displays, the requested size is divided by the window's pixel density and rounded to the nearest whole size in points, so the resulting `pixelWidth` and `pixelHeight` may differ slightly from the requested ones when they aren't multiples of the density.
 As with [`window.setSize()`](#windowsetsizewidth-height), the size properties update once the change has taken effect.
 
 ### window.display
