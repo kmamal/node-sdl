@@ -1100,7 +1100,6 @@ Under any other Linux video driver (e.g. kmsdrm), `handle` and `subsystem` are `
 The `window.native` object might also sometimes include extra fields other than the ones documented here.
 Please ignore and do not use these.
 They are used internally for passing to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme) and can change at any time.
-(For maintainers: those internal fields reuse the `LinuxNativeData` layout above on Linux, with `window` holding the `wl_egl_window*` / `wl_surface*` under Wayland. The layout is an ABI contract compiled into all three packages, so changing it requires coordinated releases of `@kmamal/sdl`, `@kmamal/gl`, and `@kmamal/gpu`.)
 
 ### window.maximized
 
