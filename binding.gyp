@@ -47,9 +47,11 @@
                             'src/native/cocoa-global.mm',
                             'src/native/cocoa-window.mm',
                         ],
-                        'cflags': ['-D_THREAD_SAFE'],
+                        'defines': ['_THREAD_SAFE'],
                         'xcode_settings': {
-                            'OTHER_CFLAGS': ['-std=c++17']
+                            'OTHER_CFLAGS': ['-std=c++17'],
+                            'WARNING_CFLAGS': ['-Wall', '-Wextra'],
+                            'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
                         },
                         'include_dirs': [
                             '$(SDL_INC)',
@@ -63,10 +65,12 @@
                 ],
                 [
                     'OS == "win"', {
-                        'cflags': ['-D_REENTRANT'],
+                        'defines': ['_REENTRANT'],
                         'msvs_settings': {
                             'VCCLCompilerTool': {
                                 'AdditionalOptions': ['-std:c++17'],
+                                'WarningLevel': '4',
+                                'WarnAsError': 'true',
                             },
                         },
                         'include_dirs': ['<!(echo %SDL_INC%)'],
