@@ -217,6 +217,7 @@ Docs, types, and loading:
 - The docs now say that `createWindow()` defaults to the primary display, which isn't necessarily `sdl.video.displays[0]`, and the types accept `null` for its `display`, `width`, and `height` options.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
 - The `sdl.info` sample in the API reference now shows SDL3 data instead of SDL2's.
+- The docs now give the gamepad device `type` as `<GamepadType>`, like the TS declarations.
 
 Building from source:
 

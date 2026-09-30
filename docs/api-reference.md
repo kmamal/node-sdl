@@ -2064,7 +2064,7 @@ If one of the mappings is invalid, the mappings before it in the array remain re
   - `id: <number>` The unique id for the device.
   - `name: <string>|<null>` The name of the device.
   - `path: <string>|<null>` The implementation dependent path of the device, or `null` if it can't be determined.
-  - `type: <string>|<null>` The type of the device, or `null` if it can't be determined.
+  - `type: <GamepadType>|<null>` The type of the device, or `null` if it can't be determined.
   - `guid: <string>|<null>` The GUID of the device, or `null` if it can't be determined.
   - `vendor: <number>|<null>` The USB vendor ID of the device, or `null` if it can't be determined.
   - `product: <number>|<null>` The USB product ID of the device, or `null` if it can't be determined.
