@@ -95,6 +95,7 @@ Windows and events:
 - `window.setIcon()` and `mouse.setCursorImage()` now reject YUV pixel formats with a clear validation error. SDL cannot create surfaces from them, so they always failed — but with a cryptic native error.
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
 - `sdl.video.focused` and `sdl.video.hovered` now pump events first, like the per-window getters, instead of returning stale values.
+- Attaching a listener to a destroyed window or a closed instance or stream now throws right away, as documented, instead of being silently accepted and dropped at the end of the tick.
 
 Displays:
 

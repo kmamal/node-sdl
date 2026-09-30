@@ -48,10 +48,8 @@ class EventsViaPoll extends EventEmitter {
 	}
 
 	_retire (makeError) {
-		process.nextTick(() => {
-			this.removeAllListeners()
-			this._makeRetiredError = makeError
-		})
+		this._makeRetiredError = makeError
+		process.nextTick(() => { this.removeAllListeners() })
 	}
 
 	removeAllListeners (type) {
