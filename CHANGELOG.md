@@ -97,6 +97,7 @@ Displays:
 - The `displayMove` event is now emitted instead of throwing "invalid event", and both `displayOrient` and `displayMove` events now carry the documented `device` property.
 - `sdl.video.displays` now returns a copy of the display list, so modifying it no longer corrupts the library's internal state.
 - Display modes with a 32-bit RGBA pixel format now report it under its `*8888` name (such as `'argb8888'`) instead of the endianness-dependent `*32` alias (such as `'bgra32'`). The two are the same SDL format, but the `*8888` names were documented as possible values and could never actually appear.
+- A display's `frequency` (and the `frequency` on `displayModeChange` events) is now `null` when SDL doesn't know the refresh rate, instead of `0`.
 
 Mouse and keyboard:
 

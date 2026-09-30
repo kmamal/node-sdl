@@ -32,7 +32,7 @@ export namespace Events {
 		export interface Mode extends DisplayEvent {
 			readonly type: 'displayModeChange'
 			readonly format: Sdl.Video.Format | null
-			readonly frequency: number
+			readonly frequency: number | null
 			readonly geometry: Sdl.Video.Display['geometry']
 		}
 		export interface Usable extends DisplayEvent {
@@ -495,7 +495,7 @@ export namespace Sdl {
 			readonly id: number
 			readonly name: string | null
 			readonly format: Format | null
-			readonly frequency: number
+			readonly frequency: number | null
 			readonly geometry: {
 				readonly x: number
 				readonly y: number

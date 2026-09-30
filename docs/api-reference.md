@@ -497,7 +497,7 @@ Fired when a display changes content scale.
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) indicating the display that caused the event.
 - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>`: The display's new pixel format, or `null` if it can't be determined.
-- `frequency: <number>`: The display's new refresh rate.
+- `frequency: <number>|<null>`: The display's new refresh rate, or `null` if it can't be determined.
 - `geometry: <object>`: The display's new `geometry`, since the mode determines its size.
   - `x, y, width, height: <Rect>` The position and size of the display's geometry.
 
@@ -558,7 +558,7 @@ This function is also available from `@kmamal/sdl/helpers`.
   - `id: <number>` The unique id of the display. Ids are never reused: a display that is disconnected and reconnected gets a new id.
   - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
   - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
-  - `frequency: <number>` The refresh rate of the display.
+  - `frequency: <number>|<null>` The refresh rate of the display. Is `null` if it can't be determined.
   - `geometry: <object>` The desktop region represented by the display.
     - `x, y, width, height: <Rect>` The position and size of the display's geometry.
   - `usable: <object>` Similar to `geometry`, but excludes areas taken up by the OS or window manager such as menus, docks, e.t.c.

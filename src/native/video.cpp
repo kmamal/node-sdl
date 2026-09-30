@@ -77,11 +77,15 @@ _packDisplay (Napi::Env &env, SDL_DisplayID display_id)
 		? Napi::String::New(env, format_entry->second)
 		: env.Null();
 
+	Napi::Value frequency = mode->refresh_rate != 0.0f
+		? Napi::Number::New(env, mode->refresh_rate)
+		: env.Null();
+
 	Napi::Object display = Napi::Object::New(env);
 	display.Set("id", display_id);
 	display.Set("name", name);
 	display.Set("format", format);
-	display.Set("frequency", mode->refresh_rate);
+	display.Set("frequency", frequency);
 	display.Set("geometry", geometry);
 	display.Set("usable", usable);
 	display.Set("scale", scale);
