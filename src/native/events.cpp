@@ -504,10 +504,8 @@ events::dispatchEvent(const SDL_Event &event)
 
 			SDL_GamepadAxis axis = (SDL_GamepadAxis) event.gaxis.axis;
 			auto axis_entry = gamepad::axes.find(axis);
-			Napi::Value axis_name = axis_entry != gamepad::axes.end()
-				? Napi::String::New(env, axis_entry->second)
-				: env.Null();
-			packed.Set("axis", axis_name);
+			if (axis_entry == gamepad::axes.end()) { return false; }
+			packed.Set("axis", axis_entry->second);
 			packed.Set("value", gamepad::mapAxisValue(event.gaxis.value));
 			break;
 		}
@@ -523,10 +521,8 @@ events::dispatchEvent(const SDL_Event &event)
 			);
 
 			auto button_entry = gamepad::buttons.find((SDL_GamepadButton) event.gbutton.button);
-			Napi::Value button_name = button_entry != gamepad::buttons.end()
-				? Napi::String::New(env, button_entry->second)
-				: env.Null();
-			packed.Set("button", button_name);
+			if (button_entry == gamepad::buttons.end()) { return false; }
+			packed.Set("button", button_entry->second);
 			break;
 		}
 
