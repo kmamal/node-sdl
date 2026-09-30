@@ -8,12 +8,14 @@ clipboard::getText (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	if (!SDL_HasClipboardText()) {
-		return Napi::String::New(env, "");
-	}
+	bool has_text = SDL_HasClipboardText();
 
 	// Clear any stale error, since an empty result is otherwise ambiguous
 	SDL_ClearError();
+
+	if (!has_text) {
+		return Napi::String::New(env, "");
+	}
 
 	char *text = SDL_GetClipboardText();
 	if (text[0] == '\0') {

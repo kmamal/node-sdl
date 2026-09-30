@@ -89,7 +89,8 @@ mouse::resetCursor(const Napi::CallbackInfo &info)
 	SDL_Cursor *cursor = SDL_GetDefaultCursor();
 	if (cursor == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetDefaultCursor() error: no default cursor";
+		message << "SDL_GetDefaultCursor() error: " << SDL_GetError();
+		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 

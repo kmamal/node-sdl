@@ -138,6 +138,12 @@ window::create (const Napi::CallbackInfo &info)
 		;
 
 	SDL_PropertiesID create_props = SDL_CreateProperties();
+	if (create_props == 0) {
+		std::ostringstream message;
+		message << "SDL_CreateProperties() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 	SDL_SetStringProperty(create_props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str());
 	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x);
 	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y);
@@ -714,7 +720,13 @@ window::render (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		SDL_SetPointerProperty(props, TEXTURE_PROPERTY, texture);
+		if (!SDL_SetPointerProperty(props, TEXTURE_PROPERTY, texture)) {
+			std::ostringstream message;
+			message << "SDL_SetPointerProperty(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			SDL_DestroyTexture(texture);
+			throw Napi::Error::New(env, message.str());
+		}
 	}
 
 	if(!SDL_SetTextureScaleMode(texture, scaling)) {

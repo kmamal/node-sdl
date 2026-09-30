@@ -193,11 +193,14 @@ Validation and errors:
 - `sdl.video.minBufferSize()` now validates `stride` and `height` instead of returning `NaN`.
 - The pixel-format and sample-format helpers (on `sdl.video`, `sdl.audio`, and `@kmamal/sdl/helpers`) now reject a non-string `format` with a validation error, instead of coercing values such as `['rgb24']` to a format name.
 - Values SDL can't determine (a joystick without a device path, such as a virtual joystick; a display, touch device, or sensor that vanishes while being queried; an unknown power state or key name) no longer leave SDL's error pending. It used to be picked up by later calls, which reported it as a spurious "SDL silent error" when opening a joystick or gamepad or adding gamepad mappings.
+- Reading `sdl.clipboard.text` without a video subsystem and a failing `sdl.mouse.resetCursor()` no longer leave SDL's error pending, and `resetCursor()` now reports SDL's actual error message.
+- `hasLed`, `hasRumble`, and `hasRumbleTriggers` now throw when SDL fails to query the device's capabilities, instead of reporting `false`.
 
 Native resource handling:
 
 - Fixed a use-after-free when destroying a window.
 - Fixed native leaks: opening the same joystick, gamepad, or sensor multiple times, a failure while opening a joystick or gamepad, a failure while creating a window (such as renderer creation failing), a failure to create the JS counterpart of a gamepad mapping string during device enumeration, `mouse.setCursor()`, and file drop events all used to leak the corresponding SDL resource.
+- `window.render()` no longer leaks a texture on every call if SDL fails to cache it on the window.
 - SDL event types the library doesn't handle (such as gamepad touchpad events) no longer make a wasted native-to-JS call per event.
 
 Docs, types, and loading:

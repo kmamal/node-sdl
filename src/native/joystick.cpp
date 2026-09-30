@@ -373,6 +373,12 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 	}
 
 	SDL_PropertiesID props = SDL_GetJoystickProperties(joystick);
+	if (props == 0) {
+		std::ostringstream message;
+		message << "SDL_GetJoystickProperties(" << joystick_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("hasLed", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RGB_LED_BOOLEAN, false));
