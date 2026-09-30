@@ -75,6 +75,7 @@ Windows and events:
 - Listening for `newListener` or `removeListener` no longer engages fast event polling that keeps the process alive and could never be turned back off.
 - `emit()` on windows and instances now returns whether the event had listeners, as the `EventEmitter` contract specifies, instead of `undefined`.
 - A `close` listener that throws (with no `error` listener to catch it) no longer leaves the destroyed window's or closed instance's listeners registered, which kept event polling engaged and the process alive forever.
+- Attaching a listener to a destroyed window or a closed instance or stream now throws. Such a listener could never fire and was never removed, so it kept event polling engaged and the process alive forever.
 - Closing the last window via its close button no longer fires `beforeClose` twice. SDL used to follow the window's close event with a quit event, and the quit handling asked the same window to close again, so a listener that called `prevent()` was bypassed on the second round.
 - Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
 - The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.

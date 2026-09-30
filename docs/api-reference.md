@@ -329,6 +329,7 @@ Sample data for Ubuntu:
 Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.gamepad`, `sdl.audio.playback`, `sdl.audio.recording`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances and audio streams) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, e.t.c. all work.
 Only the event names listed in this document are valid for each object.
 Attaching a listener for any other event name throws.
+Once a window is destroyed or an instance or stream is closed, all of its listeners are removed at the end of the current tick, and attaching new listeners to it throws.
 
 Every emitter additionally supports the special `'*'` event.
 Listeners registered for `'*'` receive every event the object emits, with the event's name as an extra first argument:

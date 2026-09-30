@@ -116,7 +116,7 @@ class AudioStream extends EventsViaPoll {
 		updateDevice(this._device)
 
 		// We might be inside an event listener
-		process.nextTick(() => { this.removeAllListeners() })
+		this._retire(() => Object.assign(new Error("stream is closed"), { id: this._id }))
 
 		try { this.emit('close', { type: 'close' }) }
 		catch (error) { this.emit('error', error) }

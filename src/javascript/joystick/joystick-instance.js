@@ -171,7 +171,7 @@ class JoystickInstance extends EventsViaPoll {
 		catch (_) {}
 
 		// We might be inside an event listener
-		process.nextTick(() => { this.removeAllListeners() })
+		this._retire(() => Object.assign(new Error("instance is closed"), { id: this._device.id }))
 
 		try { this.emit('close', { type: 'close' }) }
 		catch (error) { this.emit('error', error) }

@@ -29,6 +29,8 @@ class EventsViaPoll extends EventEmitter {
 		})
 
 		this.on('newListener', (type) => {
+			if (this._makeRetiredError) { throw this._makeRetiredError() }
+
 			if (!commonEvents.includes(type) && !validEvents.includes(type)) {
 				throw Object.assign(new Error("invalid event"), { type })
 			}
@@ -42,6 +44,13 @@ class EventsViaPoll extends EventEmitter {
 			if (activeEmitters.size !== 1) { return }
 
 			Globals.events.switchToPollingFast()
+		})
+	}
+
+	_retire (makeError) {
+		process.nextTick(() => {
+			this.removeAllListeners()
+			this._makeRetiredError = makeError
 		})
 	}
 
