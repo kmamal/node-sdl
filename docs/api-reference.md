@@ -1806,7 +1806,7 @@ Instead, objects returned by [`sdl.joystick.openDevice()`](#sdljoystickopendevic
 ### Event: 'axisMotion'
 
 - `axis: <number>` The index of the axis that moved.
-- `value: <number>` The new axis position.
+- `value: <number>` The new axis position, normalized in the range from `-1` to `+1`.
 
 Fired when one of the joystick's axes moves.
 
@@ -2114,7 +2114,7 @@ Instead, objects returned by [`sdl.gamepad.openDevice()`](#sdlgamepadopendeviced
 ### Event: 'axisMotion'
 
 - `axis:`[`<Axis>`](#gamepadinstanceaxes) The axis that moved.
-- `value: <number>` The new axis position.
+- `value: <number>` The new axis position, normalized as in [`gamepadInstance.axes`](#gamepadinstanceaxes).
 
 Fired when one of the gamepad's axes moves.
 
@@ -2190,15 +2190,15 @@ The `Buffer` contains an `InputHandle_t` for the gamepad that can be used with t
 ### gamepadInstance.axes
 
 - `<object>`
-  - `leftStickX: <number>` Left stick horizontal position
-  - `leftStickY: <number>` Left stick vertical position
-  - `rightStickX: <number>` Right stick horizontal position
-  - `rightStickY: <number>` Right stick vertical position
-  - `leftTrigger: <number>` Left trigger position
-  - `rightTrigger: <number>` Right trigger position
+  - `leftStickX: <number>` Left stick horizontal position, from `-1` to `+1`
+  - `leftStickY: <number>` Left stick vertical position, from `-1` to `+1`
+  - `rightStickX: <number>` Right stick horizontal position, from `-1` to `+1`
+  - `rightStickY: <number>` Right stick vertical position, from `-1` to `+1`
+  - `leftTrigger: <number>` Left trigger position, from `0` (released) to `1` (fully pressed)
+  - `rightTrigger: <number>` Right trigger position, from `0` (released) to `1` (fully pressed)
 
 An object mapping each axis of the gamepad's axes to its position.
-The values are normalized in the range from `-1` to `+1`.
+The stick axes are normalized in the range from `-1` to `+1`, and the triggers in the range from `0` to `1`.
 It may be necessary to impose certain tolerances on these values to account for jitter.
 
 ### gamepadInstance.buttons
