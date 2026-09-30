@@ -159,26 +159,6 @@ window::create (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		Uint64 actual_flags = SDL_GetWindowFlags(window);
-		is_fullscreen = actual_flags & SDL_WINDOW_FULLSCREEN;
-		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
-		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
-		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
-
-		SDL_GetWindowPosition(window, &x, &y);
-		SDL_GetWindowSize(window, &width, &height);
-
-		int pixel_width, pixel_height;
-		SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
-
-		display = SDL_GetDisplayForWindow(window);
-		if (display == 0) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayForWindow(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
-		}
-
 		if (!SDL_StartTextInput(window)) { SDL_ClearError(); }
 
 		Napi::Object native = Napi::Object::New(env);
@@ -316,6 +296,26 @@ window::create (const Napi::CallbackInfo &info)
 		if (is_visible && !SDL_ShowWindow(window)) {
 			std::ostringstream message;
 			message << "SDL_ShowWindow(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+
+		Uint64 actual_flags = SDL_GetWindowFlags(window);
+		is_fullscreen = actual_flags & SDL_WINDOW_FULLSCREEN;
+		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
+		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
+		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
+
+		SDL_GetWindowPosition(window, &x, &y);
+		SDL_GetWindowSize(window, &width, &height);
+
+		int pixel_width, pixel_height;
+		SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+
+		display = SDL_GetDisplayForWindow(window);
+		if (display == 0) {
+			std::ostringstream message;
+			message << "SDL_GetDisplayForWindow(" << window_id << ") error: " << SDL_GetError();
 			SDL_ClearError();
 			throw Napi::Error::New(env, message.str());
 		}

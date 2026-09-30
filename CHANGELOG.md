@@ -62,6 +62,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 
 Windows and events:
 
+- A new window's initial position, size, pixel size, display, and flags are now read after the window is shown, so they include whatever the windowing system applied on showing it. They, and the initial `move` and `resize` events, used to report the pre-show values when the window was created from inside an event listener, since the real events from showing it were then dropped.
 - `resize` now also fires, and `pixelWidth`/`pixelHeight` update, when only the window's pixel size changes (for example when it moves to a display with a different scale). SDL3 reports that separately from a logical resize, and it used to be dropped.
 - `window.setPosition()` now throws when the windowing system can't position the window (regular windows under Wayland), and the other window setters (`setTitle()`, `setSize()`, `setResizable()`, `setBorderless()`, `show()`, `hide()`, `focus()`) throw if SDL reports a failure. The error used to be ignored and left pending, where later calls reported it as a spurious "SDL silent error".
 - `window.focus()` no longer marks the window as focused before the windowing system has honored the request. `focused` updates on the `focus` event, as it does for every other focus change.
