@@ -57,6 +57,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - Scancodes `SOFTLEFT`, `SOFTRIGHT`, `CALL`, and `ENDCALL`, and the corresponding `'softLeft'`, `'softRight'`, `'call'`, and `'endCall'` keys.
 - Scancodes `WAKE`, `CHANNEL_INCREMENT`, `CHANNEL_DECREMENT`, `MEDIA_PAUSE`, `MEDIA_RECORD`, `MEDIA_PLAY_PAUSE`, and `AC_NEW` through `AC_PROPERTIES`, and the corresponding `'wake'`, `'channelUp'`, `'channelDown'`, `'mediaPause'`, `'mediaRecord'`, `'mediaPlayPause'`, `'new'`, `'open'`, `'close'`, `'exit'`, `'save'`, `'print'`, and `'properties'` keys.
 - The keys SDL3 reports through its extended keycodes: `'compose'`, `'meta'`, `'hyper'`, and `'leftTab'`. They used to come out as `null`.
+- The keys `'international2'`, `'international4'`, `'international5'`, and `'language1'` through `'language4'`, found on Japanese and Korean keyboards. They used to come out as `null`.
 - Mouse and finger events have a `pen` flag, set when SDL synthesized the event from pen input.
 - Window event `'fingerCancel'`, fired when the system cancels a touch instead of lifting the finger. SDL3 reports these separately from `fingerUp`, and they used to be dropped.
 
