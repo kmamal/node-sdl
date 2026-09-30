@@ -393,7 +393,40 @@ export namespace Sdl {
 				readonly patch: number
 			}
 		}
-		readonly platform: 'Linux' | 'Windows' | 'macOS'
+		readonly platform:
+			| 'AIX'
+			| 'Android'
+			| 'Atari MiNT'
+			| 'BSDI'
+			| 'Emscripten'
+			| 'FreeBSD'
+			| 'GNU/Hurd'
+			| 'HP-UX'
+			| 'Haiku'
+			| 'Irix'
+			| 'Linux'
+			| 'Managarm'
+			| 'NetBSD'
+			| 'Nintendo 3DS'
+			| 'Nokia N-Gage'
+			| 'OS/2'
+			| 'OSF/1'
+			| 'OpenBSD'
+			| 'PlayStation 2'
+			| 'PlayStation Portable'
+			| 'PlayStation Vita'
+			| 'QNX Neutrino'
+			| 'RISC OS'
+			| 'Solaris'
+			| 'WinGDK'
+			| 'Windows'
+			| 'Xbox One'
+			| 'Xbox Series X|S'
+			| 'iOS'
+			| 'macOS'
+			| 'tvOS'
+			| 'visionOS'
+			| null
 		readonly drivers: {
 			readonly video: {
 				readonly all: string[]

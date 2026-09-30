@@ -317,7 +317,14 @@ global::initialize(const Napi::CallbackInfo &info)
 	versions.Set("compile", compile_version);
 	versions.Set("runtime", runtime_version);
 
-	const char *platform = SDL_GetPlatform();
+	const char *platform_name = SDL_GetPlatform();
+	Napi::Value platform;
+	if (SDL_strncmp(platform_name, "Unknown", 7) == 0) {
+		platform = env.Null();
+	}
+	else {
+		platform = Napi::String::New(env, platform_name);
+	}
 
 	Napi::Array all_video_drivers = Napi::Array::New(env);
 

@@ -270,7 +270,7 @@ Unless noted otherwise, wherever the API expects a whole-number quantity (positi
       - `major, minor, patch: <Semver>` The components of the version.
     - `runtime: <object>` The version of the SDL library that was found and loaded at runtime.
       - `major, minor, patch: <Semver>` The components of the version.
-  - `platform: <string>` The name of the platform we are running on. Possible values are: `'Linux'`, `'Windows'`, and `'macOS'`.
+  - `platform: <string>|<null>` The name of the platform we are running on, as reported by SDL, or `null` if SDL doesn't know it. The values for the supported platforms are `'Linux'`, `'Windows'`, and `'macOS'`, but other possible values include `'AIX'`, `'Android'`, `'Atari MiNT'`, `'BSDI'`, `'Emscripten'`, `'FreeBSD'`, `'GNU/Hurd'`, `'HP-UX'`, `'Haiku'`, `'Irix'`, `'Managarm'`, `'NetBSD'`, `'Nintendo 3DS'`, `'Nokia N-Gage'`, `'OS/2'`, `'OSF/1'`, `'OpenBSD'`, `'PlayStation 2'`, `'PlayStation Portable'`, `'PlayStation Vita'`, `'QNX Neutrino'`, `'RISC OS'`, `'Solaris'`, `'WinGDK'`, `'Xbox One'`, `'Xbox Series X|S'`, `'iOS'`, `'tvOS'`, and `'visionOS'`.
   - `drivers: <object>`
     - `video: <object>`
       - `all: <string>[]` A list of all video drivers.
