@@ -96,8 +96,7 @@ sensor::getData (const Napi::CallbackInfo &info)
 	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
 	if (sensor == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
 		throw Napi::Error::New(env, message.str());
 	}
 
@@ -127,8 +126,7 @@ sensor::close (const Napi::CallbackInfo &info)
 	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
 	if (sensor == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
 		throw Napi::Error::New(env, message.str());
 	}
 

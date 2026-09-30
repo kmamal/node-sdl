@@ -352,8 +352,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
 	if (joystick == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
 		throw Napi::Error::New(env, message.str());
 	}
 
@@ -380,8 +379,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
 	if (joystick == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
 		throw Napi::Error::New(env, message.str());
 	}
 
@@ -406,8 +404,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
 	if (joystick == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
 		throw Napi::Error::New(env, message.str());
 	}
 
@@ -434,8 +431,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
 	if (joystick == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
 		throw Napi::Error::New(env, message.str());
 	}
 
@@ -459,8 +455,7 @@ joystick::close (const Napi::CallbackInfo &info)
 	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
 	if (joystick == nullptr) {
 		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
 		throw Napi::Error::New(env, message.str());
 	}
 
