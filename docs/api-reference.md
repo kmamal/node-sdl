@@ -2277,6 +2277,14 @@ Possible values are `null` if the label is unknown, or one of:
 | `'square'`     | `SDL_GAMEPAD_BUTTON_LABEL_SQUARE`      |
 | `'triangle'`   | `SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE`    |
 
+### gamepadInstance.power
+
+- `<object>`
+  - `state: <string>|<null>` One of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`. Is `null` if it can't be determined.
+  - `percent: <number>|<null>` Percentage of battery life left, or `null` if not running on battery or if it can't be determined.
+
+The current power info of the gamepad device.
+
 ### gamepadInstance.setPlayer(index)
 
 - `index: <number>` The player index to assign to the gamepad. Must be a non-negative 32-bit integer.
