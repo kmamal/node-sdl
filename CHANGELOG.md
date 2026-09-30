@@ -120,6 +120,7 @@ Mouse and keyboard:
 - Keys whose SDL3 default name differs from the X11 one (`'+/-'`, `'modeSwitch'`, `'('`, `')'`, and the menu key) are recognized again on every platform. Their default names had been dropped from the key table during the migration, so they came out as `null` outside X11.
 - `sdl.keyboard.getKey()` now agrees with the `key` of keyboard events on layouts where SDL's keycode options apply. On AZERTY the number row maps to `'1'`…`'0'` instead of `'&'`, `'é'`, …, and on non-Latin layouts the letter keys map to `'a'`…`'z'`, as they do in events.
 - Character keys are now reported as the unshifted character SDL assigns to them. SDL3 names non-ASCII letters by their capital, so `ü` used to arrive as `'Ü'`, and `getKey(getScancode('ü'))` did not round-trip.
+- `sdl.keyboard.getKey()` and `getScancode()` now pick up a keyboard layout change right away. They used to keep answering with the old layout until the next event poll.
 
 Touch:
 

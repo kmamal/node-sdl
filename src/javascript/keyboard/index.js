@@ -15,6 +15,7 @@ const keyboard = new class extends EventsViaPoll {
 		if (!Number.isInteger(scancode)) { throw Object.assign(new Error("scancode must be an integer"), { scancode }) }
 		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("scancode must be between 0 and 511"), { scancode }) }
 
+		Globals.events.poll()
 		const _key = Bindings.keyboard_getKey(scancode)
 		return mapping[_key] ?? (isCharacter(_key) ? _key : null)
 	}
@@ -25,6 +26,7 @@ const keyboard = new class extends EventsViaPoll {
 		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
 
+		Globals.events.poll()
 		return Bindings.keyboard_getScancode(_key)
 	}
 
