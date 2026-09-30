@@ -94,6 +94,7 @@
     - [window.focused](#windowfocused)
     - [window.focus()](#windowfocus)
     - [window.hovered](#windowhovered)
+    - [window.mouseCaptured](#windowmousecaptured)
     - [window.relativeMouseMode](#windowrelativemousemode)
     - [window.setRelativeMouseMode([relative])](#windowsetrelativemousemoderelative)
     - [window.unsetRelativeMouseMode()](#windowunsetrelativemousemode)
@@ -1165,6 +1166,15 @@ The `focused` property updates when/if the change takes effect.
 
 Is `true` if the mouse is over the window.
 
+### window.mouseCaptured
+
+- `<boolean>`
+
+Is `true` if the window currently holds the mouse capture, so it keeps receiving mouse events even when the mouse is outside of it.
+The capture only takes effect once the mouse is over one of the windows.
+It is released while relative mouse mode is on or no window has focus.
+SDL also captures the mouse on its own while a mouse button is held down over a window.
+
 ### window.relativeMouseMode
 
 - `<boolean>`
@@ -1681,15 +1691,21 @@ Forces a cursor redraw.
 
 - `<boolean>`
 
-Is `true` if the mouse is currently captured.
+Is `true` if a mouse capture has been requested with [`sdl.mouse.capture()`](#sdlmousecapturecapture).
+Whether a window actually holds the capture at the moment is reported by [`window.mouseCaptured`](#windowmousecaptured).
 
 ### sdl.mouse.capture([capture])
 
-- `capture: <boolean>` If `true` the mouse is to be captured by the current window. Default: `true`
+- `capture: <boolean>` If `true` requests that the mouse be captured, if `false` withdraws the request. Default: `true`
 
 When the mouse has been captured you will continue receiving mouse events even if the mouse is not over a window.
 This is meant for short-lived operations such as dragging.
+SDL already captures the mouse on its own while a mouse button is held down over a window, so drags that last as long as a button is held need no explicit capture.
 If instead you want to lock the cursor to the window for FPS-style camera controls, use [`window.setRelativeMouseMode()`](#windowsetrelativemousemoderelative).
+
+The request is global, not tied to a particular window: it stays in effect until `sdl.mouse.capture(false)` is called, and while it does SDL captures the mouse for whichever window it is over.
+If the capture is released (see [`window.mouseCaptured`](#windowmousecaptured)) and the mouse later enters a different window, that window gets captured instead.
+Requesting a capture throws if no window has keyboard focus, or if the video driver doesn't support mouse capture (Wayland, for example).
 
 ### sdl.mouse.uncapture()
 

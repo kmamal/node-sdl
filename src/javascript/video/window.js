@@ -455,6 +455,13 @@ class Window extends EventsViaPoll {
 		return Globals.windows.hovered === this
 	}
 
+	get mouseCaptured () {
+		Globals.events.poll()
+		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+
+		return Bindings.window_getMouseCaptured(this._id)
+	}
+
 	get relativeMouseMode () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 

@@ -40,7 +40,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - Native window handles under the Wayland video driver (`SDL_VIDEODRIVER=wayland`). `window.native` now carries valid Wayland objects instead of garbage reinterpreted as X11 handles, and a new `window.native.subsystem` field (`'x11'` or `'wayland'`, Linux only) says which kind you're holding. Any other Linux video driver now yields `handle: null` and a clear error for `opengl`/`webgpu` windows.
 - Relative mouse mode for FPS-style camera controls, via `window.setRelativeMouseMode()`, `window.unsetRelativeMouseMode()`, and `window.relativeMouseMode`.
 - `sdl.video` events `'displayScaleChange'`, `'displayModeChange'`, and `'displayUsableChange'`, fired when a display's content scale, current mode, or usable region changes. The display objects in `sdl.video.displays` are updated accordingly, where before `scale`, `format`, `frequency`, and `usable` were only read at startup.
-- `sdl.mouse.captured`, reporting whether `sdl.mouse.capture()` is currently in effect.
+- `sdl.mouse.captured`, reporting whether a mouse capture has been requested with `sdl.mouse.capture()`, and `window.mouseCaptured`, reporting whether the window currently holds the capture.
 - Audio device objects report the `format`, `channels`, `frequency`, and `buffered` the device itself is running with while streams are open on them, and `null` otherwise. SDL converts between each stream's format and its device's, so these may differ from the stream's own.
 - `mouseMove` events now report the mouse's relative movement through `dx` and `dy`.
 - `ballMotion` events now report the ball's relative movement through `dx` and `dy`, alongside the accumulated `x` and `y` position.

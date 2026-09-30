@@ -14,6 +14,7 @@ namespace window {
 		Napi::Value setResizable(const Napi::CallbackInfo &info);
 		Napi::Value setBorderless(const Napi::CallbackInfo &info);
 		Napi::Value setRelativeMouseMode(const Napi::CallbackInfo &info);
+		Napi::Value getMouseCaptured(const Napi::CallbackInfo &info);
 		Napi::Value setAcceleratedAndVsync(const Napi::CallbackInfo &info);
 		Napi::Value focus(const Napi::CallbackInfo &info);
 		Napi::Value show(const Napi::CallbackInfo &info);

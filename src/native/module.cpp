@@ -37,6 +37,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("window_setResizable", Napi::Function::New<window::setResizable>(env));
 	exports.Set("window_setBorderless", Napi::Function::New<window::setBorderless>(env));
 	exports.Set("window_setRelativeMouseMode", Napi::Function::New<window::setRelativeMouseMode>(env));
+	exports.Set("window_getMouseCaptured", Napi::Function::New<window::getMouseCaptured>(env));
 	exports.Set("window_setAcceleratedAndVsync", Napi::Function::New<window::setAcceleratedAndVsync>(env));
 	exports.Set("window_focus", Napi::Function::New<window::focus>(env));
 	exports.Set("window_show", Napi::Function::New<window::show>(env));

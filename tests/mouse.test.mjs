@@ -43,10 +43,15 @@ T.test("sdl::mouse", async (t) => {
 
 	await new Promise((resolve) => { setTimeout(resolve, 0) })
 
+	t.equal(sdl.mouse.captured, false)
+	t.equal(typeof window.mouseCaptured, 'boolean')
 	sdl.mouse.capture()
+	t.equal(sdl.mouse.captured, true)
 	sdl.mouse.uncapture()
+	t.equal(sdl.mouse.captured, false)
 	sdl.mouse.capture(true)
 	sdl.mouse.capture(false)
+	if (!sdl.mouse.getButton(sdl.mouse.BUTTON.LEFT)) { t.equal(window.mouseCaptured, false) }
 
 	window.destroy()
 })

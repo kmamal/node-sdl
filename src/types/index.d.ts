@@ -640,6 +640,7 @@ export namespace Sdl {
 			focus (): void
 
 			readonly hovered: boolean
+			readonly mouseCaptured: boolean
 
 			readonly relativeMouseMode: boolean
 			setRelativeMouseMode (relative?: boolean): void

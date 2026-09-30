@@ -516,6 +516,18 @@ window::setRelativeMouseMode (const Napi::CallbackInfo &info)
 }
 
 Napi::Value
+window::getMouseCaptured (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	int window_id = info[0].As<Napi::Number>().Int32Value();
+
+	SDL_Window *window = getWindow(env, window_id);
+
+	return Napi::Boolean::New(env, (SDL_GetWindowFlags(window) & SDL_WINDOW_MOUSE_CAPTURE) != 0);
+}
+
+Napi::Value
 window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
