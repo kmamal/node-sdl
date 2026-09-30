@@ -56,6 +56,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - Scancodes `SOFTLEFT`, `SOFTRIGHT`, `CALL`, and `ENDCALL`, and the corresponding `'softLeft'`, `'softRight'`, `'call'`, and `'endCall'` keys.
 - Scancodes `WAKE`, `CHANNEL_INCREMENT`, `CHANNEL_DECREMENT`, `MEDIA_PAUSE`, `MEDIA_RECORD`, `MEDIA_PLAY_PAUSE`, and `AC_NEW` through `AC_PROPERTIES`, and the corresponding `'wake'`, `'channelUp'`, `'channelDown'`, `'mediaPause'`, `'mediaRecord'`, `'mediaPlayPause'`, `'new'`, `'open'`, `'close'`, `'exit'`, `'save'`, `'print'`, and `'properties'` keys.
 - The keys SDL3 reports through its extended keycodes: `'compose'`, `'meta'`, `'hyper'`, and `'leftTab'`. They used to come out as `null`.
+- Mouse and finger events have a `pen` flag, set when SDL synthesized the event from pen input.
 - Window event `'fingerCancel'`, fired when the system cancels a touch instead of lifting the finger. SDL3 reports these separately from `fingerUp`, and they used to be dropped.
 
 ### Fixed
@@ -122,6 +123,7 @@ Touch:
 
 - Touch events no longer crash event handling. Events synthesized from the mouse arrive with a `null` `device`, and events for a device that disconnected before they were polled are dropped.
 - `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it. Device objects remain valid across reads, like the sensor device objects, so they can be compared with the `device` of touch events, and the returned list is a copy, so modifying it no longer corrupts the library's internal state.
+- `sdl.touch.devices` no longer lists the virtual touch devices SDL creates for touch events it synthesizes from the mouse and pen, and finger events synthesized from a pen arrive with a `null` `device`, like the ones synthesized from the mouse.
 
 Joysticks and gamepads:
 

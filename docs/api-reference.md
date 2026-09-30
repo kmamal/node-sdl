@@ -774,6 +774,7 @@ Fired when text is entered via the keyboard.
 - `x: <number>` The mouse's x position when the event happened, relative to the window.
 - `y: <number>` The mouse's y position when the event happened, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was pressed.
 
 Fired when a mouse button is pressed.
@@ -783,6 +784,7 @@ Fired when a mouse button is pressed.
 - `x: <number>` The mouse's x position when the event happened, relative to the window.
 - `y: <number>` The mouse's y position when the event happened, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was released.
 
 Fired when a mouse button is released.
@@ -794,6 +796,7 @@ Fired when a mouse button is released.
 - `dx: <number>` The mouse's x movement, relative to its last position.
 - `dy: <number>` The mouse's y movement, relative to its last position.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
 Fired when the mouse moves.
 
@@ -802,6 +805,7 @@ Fired when the mouse moves.
 - `x: <number>` The mouse's x position when the event happened, relative to the window.
 - `y: <number>` The mouse's y position when the event happened, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `dx: <number>` The wheel's x movement, relative to its last position.
 - `dy: <number>` The wheel's y movement, relative to its last position.
 - `flipped: <boolean>` Is `true` if the underlying platform reverses the mouse wheel's scroll direction. Multiply `dx` and `dy` by `-1` to get the correct values.
@@ -810,29 +814,31 @@ Fired when the mouse wheel is scrolled.
 
 ### Event: 'fingerDown'
 
-- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse or pen event.
 - `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
 Fired when a finger is presed to the touch surface.
 
 ### Event: 'fingerUp'
 
-- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse or pen event.
 - `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
 Fired when a finger is lifted from the touch surface.
 
 ### Event: 'fingerMove'
 
-- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse or pen event.
 - `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
@@ -840,17 +846,19 @@ Fired when a finger is lifted from the touch surface.
 - `dy: <number>` The finger's y movement, relative to its last position, normalized in the range from `-1` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
 Fired when a finger moves on the touch surface.
 
 ### Event: 'fingerCancel'
 
-- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse event.
+- `device: <object>|<null>`: An object from [`sdl.touch.devices`](#sdltouchdevices) indicating the touch device that caused the event, or `null` if the event was caused by a mouse or pen event.
 - `fingerId: <bigint>` The id of the finger that coused the event.
 - `x: <number>` The finger's x position when the event happened, normalized in the range from `0` to `1`.
 - `y: <number>` The finger's y position when the event happened, normalized in the range from `0` to `1`.
 - `pressure: <number>` The finger's pressure when the event happened, normalized in the range from `0` to `1`.
 - `mouse: <boolean>` Is `true` if the event was caused by a mouse event.
+- `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
 Fired when the system cancels a touch, for example when it takes over the gesture or the window loses touch focus.
 No `fingerUp` event follows, so treat this as the end of the finger's gesture.

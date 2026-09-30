@@ -20,11 +20,13 @@ touch::getDevices(const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	Napi::Array devices = Napi::Array::New(env, num_devices);
+	Napi::Array devices = Napi::Array::New(env);
 
 	try {
+		int num_returned = 0;
 		for (int i = 0; i < num_devices; i++) {
 			SDL_TouchID id = touch_ids[i];
+			if (id == SDL_MOUSE_TOUCHID || id == SDL_PEN_TOUCHID) { continue; }
 
 			const char *_name = SDL_GetTouchDeviceName(id);
 			Napi::Value name;
@@ -52,7 +54,7 @@ touch::getDevices(const Napi::CallbackInfo &info)
 			device.Set("name", name);
 			device.Set("type", type);
 
-			devices.Set(i, device);
+			devices.Set(num_returned++, device);
 		}
 	}
 	catch (...) {

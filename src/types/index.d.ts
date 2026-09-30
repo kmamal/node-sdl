@@ -74,6 +74,7 @@ export namespace Events {
 			readonly x: number
 			readonly y: number
 			readonly touch: boolean
+			readonly pen: boolean
 		}
 
 		export interface MouseMove extends MouseEvent {
@@ -100,6 +101,7 @@ export namespace Events {
 			readonly device: Sdl.Touch.Device | null
 			readonly fingerId: bigint
 			readonly mouse: boolean
+			readonly pen: boolean
 			readonly x: number
 			readonly y: number
 			readonly pressure: number

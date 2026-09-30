@@ -216,9 +216,9 @@ const handleEvent = (event) => {
 					const { touchId } = event
 					delete event.touchId
 
-					// Events synthesized from the mouse have null touch device
+					// Events synthesized from the mouse or pen have null touch device
 					let device = null
-					if (!event.mouse) {
+					if (!event.mouse && !event.pen) {
 						device = Globals.touchDevices.find(({ id }) => id === touchId)
 						if (!device) {
 							try { refreshTouchDevices() }

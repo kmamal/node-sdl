@@ -313,6 +313,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("targetId", event.motion.windowID);
 			packed.Set("type", events::types::MOUSE_MOVE);
 			packed.Set("touch", event.motion.which == SDL_TOUCH_MOUSEID);
+			packed.Set("pen", event.motion.which == SDL_PEN_MOUSEID);
 			packed.Set("x", event.motion.x);
 			packed.Set("y", event.motion.y);
 			packed.Set("dx", event.motion.xrel);
@@ -330,6 +331,7 @@ events::dispatchEvent(const SDL_Event &event)
 					: events::types::MOUSE_BUTTON_UP
 			);
 			packed.Set("touch", event.button.which == SDL_TOUCH_MOUSEID);
+			packed.Set("pen", event.button.which == SDL_PEN_MOUSEID);
 			packed.Set("button", event.button.button);
 			packed.Set("x", event.button.x);
 			packed.Set("y", event.button.y);
@@ -340,6 +342,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("targetId", event.wheel.windowID);
 			packed.Set("type", events::types::MOUSE_WHEEL);
 			packed.Set("touch", event.wheel.which == SDL_TOUCH_MOUSEID);
+			packed.Set("pen", event.wheel.which == SDL_PEN_MOUSEID);
 			packed.Set("x", event.wheel.mouse_x);
 			packed.Set("y", event.wheel.mouse_y);
 			packed.Set("dx", event.wheel.x);
@@ -359,6 +362,7 @@ events::dispatchEvent(const SDL_Event &event)
 					? events::types::FINGER_DOWN
 					: events::types::FINGER_CANCEL);
 			packed.Set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
+			packed.Set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
 			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchID));
 			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerID));
 			packed.Set("x", event.tfinger.x);
@@ -371,6 +375,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::FINGER_MOVE);
 			packed.Set("targetId", event.tfinger.windowID);
 			packed.Set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
+			packed.Set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
 			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchID));
 			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerID));
 			packed.Set("x", event.tfinger.x);
