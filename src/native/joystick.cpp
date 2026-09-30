@@ -110,6 +110,8 @@ _packDevice (Napi::Env &env, SDL_JoystickID id)
 			gamepad_type = env.Null();
 	}
 
+	SDL_ClearError();
+
 	Napi::Object device = Napi::Object::New(env);
 	device.Set("id", id);
 	device.Set("name", name);
@@ -209,6 +211,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 	int id = info[0].As<Napi::Number>().Int32Value();
 
+	SDL_ClearError();
 	SDL_Joystick *joystick = SDL_OpenJoystick(id);
 	if (joystick == nullptr) {
 		std::ostringstream message;

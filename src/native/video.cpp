@@ -13,9 +13,14 @@ static Napi::Value
 _packDisplay (Napi::Env &env, SDL_DisplayID display_id)
 {
 	const char *_name = SDL_GetDisplayName(display_id);
-	Napi::Value name = _name != nullptr
-		? Napi::String::New(env, _name)
-		: env.Null();
+	Napi::Value name;
+	if (_name != nullptr) {
+		name = Napi::String::New(env, _name);
+	}
+	else {
+		SDL_ClearError();
+		name = env.Null();
+	}
 
 	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(display_id);
 	if (mode == nullptr) {
@@ -58,9 +63,14 @@ _packDisplay (Napi::Env &env, SDL_DisplayID display_id)
 
 	SDL_DisplayOrientation _orientation = SDL_GetCurrentDisplayOrientation(display_id);
 	auto orientation_entry = video::orientations.find(_orientation);
-	Napi::Value orientation = orientation_entry != video::orientations.end()
-		? Napi::String::New(env, orientation_entry->second)
-		: env.Null();
+	Napi::Value orientation;
+	if (orientation_entry != video::orientations.end()) {
+		orientation = Napi::String::New(env, orientation_entry->second);
+	}
+	else {
+		SDL_ClearError();
+		orientation = env.Null();
+	}
 
 	auto format_entry = video::formats.find(mode->format);
 	Napi::Value format = format_entry != video::formats.end()

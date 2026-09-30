@@ -178,6 +178,7 @@ Validation and errors:
 - Enum values this build of the library doesn't know (a joystick or gamepad type, sensor type, power state, display orientation, display pixel format, touch device type, hat position, or gamepad axis or button name introduced by a newer runtime SDL) are now reported as `null` instead of an empty string.
 - SDL errors are now detected reliably, through SDL3's boolean return values or, where a call has none, the error message contents, instead of comparing `SDL_GetError()` pointers, which silently missed all errors when linked against an SDL build that returns a single static buffer. Stale SDL errors no longer cause spurious throws (and lost data) in `dequeue()`, `resize` events, and joystick/gamepad opening, and window methods called on a destroyed window now fail with a clear "invalid window id" error instead of appending whatever stale error text an earlier unrelated call had left behind.
 - `sdl.video.minBufferSize()` now validates `stride` and `height` instead of returning `NaN`.
+- Values SDL can't determine (a joystick without a device path, such as a virtual joystick; a display, touch device, or sensor that vanishes while being queried; an unknown power state or key name) no longer leave SDL's error pending. It used to be picked up by later calls, which reported it as a spurious "SDL silent error" when opening a joystick or gamepad or adding gamepad mappings.
 
 Native resource handling:
 

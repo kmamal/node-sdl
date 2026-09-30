@@ -95,6 +95,7 @@ gamepad::addMappings (const Napi::CallbackInfo &info)
 
 	for (int i = 0; i < (int) mappings.Length(); i++) {
 		std::string mapping = mappings.Get(i).As<Napi::String>().Utf8Value();
+		SDL_ClearError();
 		if (SDL_AddGamepadMapping(mapping.c_str()) == -1) {
 			std::ostringstream message;
 			message << "SDL_AddGamepadMapping(" << mapping << ") error: " << SDL_GetError();
@@ -118,6 +119,7 @@ gamepad::open (const Napi::CallbackInfo &info)
 
 	int id = info[0].As<Napi::Number>().Int32Value();
 
+	SDL_ClearError();
 	SDL_Gamepad *gamepad = SDL_OpenGamepad(id);
 	if (gamepad == nullptr) {
 		std::ostringstream message;

@@ -22,7 +22,10 @@ keyboard::packKey(Napi::Env &env, SDL_Keycode keycode)
 	}
 
 	const char *name = SDL_GetKeyName(keycode);
-	if (name[0] == '\0') { return env.Null(); }
+	if (name[0] == '\0') {
+		SDL_ClearError();
+		return env.Null();
+	}
 	return Napi::String::New(env, name);
 }
 

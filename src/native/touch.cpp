@@ -27,15 +27,25 @@ touch::getDevices(const Napi::CallbackInfo &info)
 			SDL_TouchID id = touch_ids[i];
 
 			const char *_name = SDL_GetTouchDeviceName(id);
-			Napi::Value name = _name != nullptr
-				? Napi::String::New(env, _name)
-				: env.Null();
+			Napi::Value name;
+			if (_name != nullptr) {
+				name = Napi::String::New(env, _name);
+			}
+			else {
+				SDL_ClearError();
+				name = env.Null();
+			}
 
 			SDL_TouchDeviceType _type = SDL_GetTouchDeviceType(id);
 			auto type_entry = device_types.find(_type);
-			Napi::Value type = type_entry != device_types.end()
-				? Napi::String::New(env, type_entry->second)
-				: env.Null();
+			Napi::Value type;
+			if (type_entry != device_types.end()) {
+				type = Napi::String::New(env, type_entry->second);
+			}
+			else {
+				SDL_ClearError();
+				type = env.Null();
+			}
 
 			Napi::Object device = Napi::Object::New(env);
 			device.Set("id", Napi::BigInt::New(env, id));

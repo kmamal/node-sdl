@@ -30,6 +30,7 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 			SDL_SensorID id = sensor_ids[i];
 
 			SDL_SensorType _type = SDL_GetSensorTypeForID(id);
+			if (_type == SDL_SENSOR_INVALID) { SDL_ClearError(); }
 			auto type_entry = sensor::types.find(_type);
 			Napi::Value type = type_entry != sensor::types.end()
 				? Napi::String::New(env, type_entry->second)
@@ -40,9 +41,14 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 				: env.Null();
 
 			const char *_name = SDL_GetSensorNameForID(id);
-			Napi::Value name = _name != nullptr
-				? Napi::String::New(env, _name)
-				: env.Null();
+			Napi::Value name;
+			if (_name != nullptr) {
+				name = Napi::String::New(env, _name);
+			}
+			else {
+				SDL_ClearError();
+				name = env.Null();
+			}
 
 			Napi::Object device = Napi::Object::New(env);
 			device.Set("id", id);
