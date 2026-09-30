@@ -278,9 +278,8 @@ const handleEvent = (event) => {
 						const ball = joystickInstance._balls[event.ball]
 						ball.x += event.dx
 						ball.y += event.dy
-						event.x = ball.x
-						event.y = ball.y
-						tryEmit(joystickInstance, type, event)
+						// Each instance accumulates its own x and y, so each gets its own copy of the event
+						tryEmit(joystickInstance, type, { ...event, x: ball.x, y: ball.y })
 					}
 				} break
 

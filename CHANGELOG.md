@@ -127,6 +127,7 @@ Touch:
 
 Joysticks and gamepads:
 
+- Each joystick instance of a device now receives its own copy of `ballMotion` events. Instances used to share one event object whose `x`/`y` were overwritten for each instance in turn, so a listener that kept the event or read it later saw another instance's ball position.
 - Unplugging a device no longer mis-identifies the remaining ones. The device lists used to be rebuilt by matching devices on list position (or on name for audio), so removing a non-last joystick, gamepad, display, or audio device made cached device objects silently morph into other devices and made `deviceRemove`/`displayRemove` events report the wrong device. Every device list is now maintained from SDL's per-device hot-plug events, keyed by the device's stable id. As a side effect, `sdl.audio.devices` is no longer sorted by name — devices now stay in SDL's enumeration order, like every other device list.
 - `openDevice()` no longer risks opening the wrong physical device when another device's unplugging hasn't been processed yet. Devices are now opened by their stable id, which SDL never reuses, and pending device events are flushed (or, for sensors, the device list refetched) before the device is validated and opened.
 - Closing a joystick or gamepad instance from an event listener no longer crashes the process when more events for that instance are still in the queue.
