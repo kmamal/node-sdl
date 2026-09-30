@@ -1870,7 +1870,7 @@ Fired when one of the joystick's buttons is released.
 ### Event: 'hatMotion'
 
 - `hat: <number>` The index of the hat that was moved.
-- `value: `[`<HatPosition>`](#hat-positions) The new hat position.
+- `value: `[`<HatPosition>`](#hat-positions)`|<null>` The new hat position, or `null` if SDL reports a position that isn't one of the known ones.
 
 Fired when one of the joystick's hats is moved.
 
@@ -1935,9 +1935,9 @@ Each value in the array is either `true` if the corresponding button is pressed,
 
 ### joystickInstance.hats
 
-- [`<HatPosition>`](#hat-positions)`[]`
+- [`<HatPosition>`](#hat-positions)`|<null>[]`
 
-An array of values, each corresponding to the position of one of the joystick's hats.
+An array of values, each corresponding to the position of one of the joystick's hats, or `null` if SDL reports a position that isn't one of the known ones.
 
 ### joystickInstance.power
 

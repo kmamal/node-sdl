@@ -234,7 +234,7 @@ export namespace Events {
 		export interface HatMotion extends JoystickEvent {
 			readonly type: 'hatMotion'
 			readonly hat: number
-			readonly value: Sdl.Joystick.HatPosition
+			readonly value: Sdl.Joystick.HatPosition | null
 		}
 
 		export interface PowerUpdate extends JoystickEvent {
@@ -1118,7 +1118,7 @@ export namespace Sdl {
 
 			readonly axes: number[]
 			readonly balls: BallPosition[]
-			readonly hats: HatPosition[]
+			readonly hats: (HatPosition | null)[]
 			readonly buttons: boolean[]
 
 			readonly power: PowerInfo
