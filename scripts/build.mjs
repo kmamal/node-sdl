@@ -29,7 +29,7 @@ if (process.env.CROSS_COMPILE_ARCH) {
 }
 
 let parallelFlag = '-j max'
-if (process.env.NO_PARALLEL) {
+if (C.noParallel) {
 	parallelFlag = ''
 }
 
