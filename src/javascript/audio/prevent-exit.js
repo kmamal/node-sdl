@@ -37,7 +37,7 @@ process.on('beforeExit', (code) => {
 	if (duration) {
 		// Keeps Node.js alive while audio is playing
 		resetTimeout()
-		timeout = setTimeout(() => { timeout = null }, duration * 1e3)
+		timeout = setTimeout(() => { timeout = null }, Math.min(duration * 1e3, 2 ** 31 - 1))
 	}
 })
 
