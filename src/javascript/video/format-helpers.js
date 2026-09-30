@@ -86,7 +86,7 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 	yvyu: yuv(2, false),
 	nv12: yuv(1, true),
 	nv21: yuv(1, true),
-	p010: yuv(2, true, false),
+	p010: { ...yuv(2, true, false), minStride: minStridePacked },
 })
 
 const getFormatHelpers = (format) => {
