@@ -547,7 +547,7 @@ export namespace Sdl {
 			readonly orientation: Orientation | null
 		}
 
-		export class Window extends EventEmitter {
+		export interface Window extends EventEmitter {
 			on (event: 'show', listener: (event: Events.Window.Show) => void): this
 			on (event: 'hide', listener: (event: Events.Window.Hide) => void): this
 			on (event: 'expose', listener: (event: Events.Window.Expose) => void): this
@@ -1101,7 +1101,7 @@ export namespace Sdl {
 			readonly player: number | null
 		}
 
-		export class JoystickInstance extends EventEmitter {
+		export interface JoystickInstance extends EventEmitter {
 			on (event: 'axisMotion', listener: (event: Events.Joystick.AxisMotion) => void): this
 			on (event: 'ballMotion', listener: (event: Events.Joystick.BallMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Joystick.ButtonDown) => void): this
@@ -1228,7 +1228,7 @@ export namespace Sdl {
 			readonly mapping: string | null
 		}
 
-		export class GamepadInstance extends EventEmitter {
+		export interface GamepadInstance extends EventEmitter {
 			on (event: 'axisMotion', listener: (event: Events.Gamepad.AxisMotion) => void): this
 			on (event: 'buttonDown', listener: (event: Events.Gamepad.ButtonDown) => void): this
 			on (event: 'buttonUp', listener: (event: Events.Gamepad.ButtonUp) => void): this
@@ -1311,7 +1311,7 @@ export namespace Sdl {
 			readonly z: number
 		}
 
-		export class SensorInstance extends EventEmitter {
+		export interface SensorInstance extends EventEmitter {
 			on (event: 'update', listener: (event: Events.Sensor.Update) => void): this
 			on (event: 'close', listener: (event: Events.Sensor.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Sensor.Any) => void): this
@@ -1366,7 +1366,7 @@ export namespace Sdl {
 			readonly buffered?: number
 		}
 
-		export class AudioStream extends EventEmitter {
+		export interface AudioStream extends EventEmitter {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
@@ -1395,12 +1395,12 @@ export namespace Sdl {
 			close (): void
 		}
 
-		export class AudioPlaybackStream extends AudioStream {
+		export interface AudioPlaybackStream extends AudioStream {
 			readonly queued: number
 			putData (buffer: Buffer, bytes?: number): void
 		}
 
-		export class AudioRecordingStream extends AudioStream {
+		export interface AudioRecordingStream extends AudioStream {
 			readonly available: number
 			getData (buffer: Buffer, bytes?: number): number
 		}

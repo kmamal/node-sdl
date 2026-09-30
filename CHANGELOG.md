@@ -233,6 +233,7 @@ Docs, types, and loading:
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
 - The `sdl.info` sample in the API reference now shows SDL3 data instead of SDL2's.
 - The docs now give the gamepad device `type` as `<GamepadType>`, like the TS declarations.
+- `Window`, `JoystickInstance`, `GamepadInstance`, `SensorInstance`, and the `AudioStream` classes are now declared as interfaces instead of classes. The types used to declare a runtime `Sdl` export with constructible classes, so code like `x instanceof Sdl.Video.Window` compiled but crashed, since the library exports no such value and the classes can't be constructed directly.
 
 Building from source:
 
