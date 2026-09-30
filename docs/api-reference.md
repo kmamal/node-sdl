@@ -294,23 +294,23 @@ To initialize SDL with video/audio drivers other than the default ones, set the 
 Note that the `current` video or audio driver may be `null`.
 This usually happens on systems that don't have any compatible devices, such as on a CI pipeline.
 
-Sample data for Ubuntu:
+Sample data for Linux:
 
 ```js
 {
   version: {
-    compile: { major: 2, minor: 0, patch: 10 },
-    runtime: { major: 2, minor: 0, patch: 10 },
+    compile: { major: 3, minor: 4, patch: 14 },
+    runtime: { major: 3, minor: 4, patch: 14 },
   },
   platform: 'Linux',
   drivers: {
     video: {
-      all: [ 'x11', 'wayland', 'dummy' ],
+      all: [ 'wayland', 'x11', 'kmsdrm', 'offscreen', 'dummy', 'evdev' ],
       current: 'x11',
     },
     audio: {
-      all: [ 'pulseaudio', 'alsa', 'sndio', 'dsp', 'disk', 'dummy' ],
-      current: 'pulseaudio',
+      all: [ 'pipewire', 'pulseaudio', 'alsa', 'sndio', 'jack', 'disk', 'dummy' ],
+      current: 'pipewire',
     },
   },
   initialized: {
