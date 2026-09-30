@@ -484,6 +484,7 @@ events::dispatchEvent(const SDL_Event &event)
 			}
 
 			packed.Set("targetId", gamepad_id);
+			packed.Set("device", joystick::_getDevice(env, gamepad_id));
 			gamepad::getState(env, gamepad, packed);
 			break;
 		}

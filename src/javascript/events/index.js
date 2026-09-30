@@ -384,10 +384,14 @@ const handleEvent = (event) => {
 				} break
 
 				case 'remap': {
-					const { axes, buttons, buttonLabels } = event
+					const { device, axes, buttons, buttonLabels } = event
+					delete event.device
 					delete event.axes
 					delete event.buttons
 					delete event.buttonLabels
+
+					const gamepadDevice = Globals.gamepadDevices.find(({ id }) => id === targetId)
+					if (gamepadDevice) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
 
 					for (const gamepadInstance of collection) {
 						Object.assign(gamepadInstance._axes, axes)

@@ -101,9 +101,12 @@ T.test("sdl::gamepad", async (t) => {
 	t.equal(Object.keys(instance.buttonLabels), [ 'south', 'east', 'west', 'north' ])
 
 	const newMapping = device.mapping.replace(device.name, 'foobar')
+	let remapName = null
+	instance.once('remap', () => { remapName = instance.device.name })
 	sdl.gamepad.addMappings([ newMapping ])
 	t.equal(instance.device, device)
 	t.equal(instance.device.name, 'foobar')
+	t.equal(remapName, 'foobar')
 
 	t.equal(instance.closed, false)
 	instance.close()

@@ -25,8 +25,6 @@ const gamepad = new class extends EventsViaPoll {
 
 		try { Bindings.gamepad_addMappings(mappings) }
 		finally {
-			Globals.events.poll()
-
 			// Updated mappings change existing joystick and gamepad devices without an event
 			const devices = Bindings.joystick_getDevices()
 			for (const joystickDevice of Globals.joystickDevices) {
@@ -37,6 +35,8 @@ const gamepad = new class extends EventsViaPoll {
 				const device = devices.find(({ id }) => id === gamepadDevice.id)
 				if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
 			}
+
+			Globals.events.poll()
 		}
 	}
 }()
