@@ -22,7 +22,7 @@ _getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
 
 
 static Napi::Value
-_packDevice (Napi::Env &env, SDL_AudioDeviceID id, bool is_recording)
+_packDevice (Napi::Env &env, SDL_AudioDeviceID id)
 {
 	const char *name = SDL_GetAudioDeviceName(id);
 	if (name == nullptr) {
@@ -38,9 +38,9 @@ _packDevice (Napi::Env &env, SDL_AudioDeviceID id, bool is_recording)
 }
 
 Napi::Value
-audio::_getDevice(Napi::Env &env, SDL_AudioDeviceID id, bool is_recording)
+audio::_getDevice(Napi::Env &env, SDL_AudioDeviceID id)
 {
-	return _packDevice(env, id, is_recording);
+	return _packDevice(env, id);
 }
 
 Napi::Array
@@ -62,7 +62,7 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 	try {
 		int num_returned = 0;
 		for (int i = 0; i < num_devices; i++) {
-			Napi::Value device = _packDevice(env, device_ids[i], is_recording);
+			Napi::Value device = _packDevice(env, device_ids[i]);
 			if (device.IsNull()) { continue; }
 			devices.Set(num_returned++, device);
 		}

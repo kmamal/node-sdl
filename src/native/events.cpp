@@ -107,7 +107,7 @@ _windowEventType (Uint32 type)
 }
 
 static bool
-_packWindowEvent (Napi::Env &env, const SDL_Event &event, Napi::Object &packed)
+_packWindowEvent (const SDL_Event &event, Napi::Object &packed)
 {
 	const std::string *type = _windowEventType(event.type);
 	if (type == nullptr) { return false; }
@@ -161,7 +161,7 @@ events::dispatchEvent(const SDL_Event &event)
 	Napi::Object packed = Napi::Object::New(env);
 
 	if (event.type >= SDL_EVENT_WINDOW_FIRST && event.type <= SDL_EVENT_WINDOW_LAST) {
-		if (!_packWindowEvent(env, event, packed)) { return false; }
+		if (!_packWindowEvent(event, packed)) { return false; }
 	}
 	else switch (event.type) {
 		case SDL_EVENT_QUIT: {
@@ -526,7 +526,7 @@ events::dispatchEvent(const SDL_Event &event)
 		case SDL_EVENT_AUDIO_DEVICE_ADDED: {
 			bool is_recording = event.adevice.recording;
 
-			Napi::Value device = audio::_getDevice(env, event.adevice.which, is_recording);
+			Napi::Value device = audio::_getDevice(env, event.adevice.which);
 			if (device.IsNull()) { return false; }
 
 			packed.Set("target", events::targets::AUDIO_DEVICE);
