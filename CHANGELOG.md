@@ -235,6 +235,7 @@ Docs, types, and loading:
 - The docs now give the gamepad device `type` as `<GamepadType>`, like the TS declarations.
 - `Window`, `JoystickInstance`, `GamepadInstance`, `SensorInstance`, and the `AudioStream` classes are now declared as interfaces instead of classes. The types used to declare a runtime `Sdl` export with constructible classes, so code like `x instanceof Sdl.Video.Window` compiled but crashed, since the library exports no such value and the classes can't be constructed directly.
 - Joystick hat positions (`joystickInstance.hats` and the `value` of `hatMotion` events) are now documented and typed as nullable, matching the implementation, which reports `null` for positions SDL doesn't define.
+- The docs and types now use the same parameter names as the implementation and its error messages: `lowFreqRumble`/`highFreqRumble` for `rumble()`, `leftRumble`/`rightRumble` for `rumbleTriggers()`, and `player` for `setPlayer()`.
 
 Building from source:
 

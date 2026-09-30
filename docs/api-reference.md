@@ -150,15 +150,15 @@
     - [joystickInstance.buttons](#joystickinstancebuttons)
     - [joystickInstance.hats](#joystickinstancehats)
     - [joystickInstance.power](#joystickinstancepower)
-    - [joystickInstance.setPlayer(index)](#joystickinstancesetplayerindex)
+    - [joystickInstance.setPlayer(player)](#joystickinstancesetplayerplayer)
     - [joystickInstance.resetPlayer()](#joystickinstanceresetplayer)
     - [joystickInstance.hasLed](#joystickinstancehasled)
     - [joystickInstance.setLed(red, green, blue)](#joystickinstancesetledred-green-blue)
     - [joystickInstance.hasRumble](#joystickinstancehasrumble)
-    - [joystickInstance.rumble([low[, high[, duration]]])](#joystickinstancerumblelow-high-duration)
+    - [joystickInstance.rumble([lowFreqRumble[, highFreqRumble[, duration]]])](#joystickinstancerumblelowfreqrumble-highfreqrumble-duration)
     - [joystickInstance.stopRumble()](#joystickinstancestoprumble)
     - [joystickInstance.hasRumbleTriggers](#joystickinstancehasrumbletriggers)
-    - [joystickInstance.rumbleTriggers([left[, right[, duration]]])](#joystickinstancerumbletriggersleft-right-duration)
+    - [joystickInstance.rumbleTriggers([leftRumble[, rightRumble[, duration]]])](#joystickinstancerumbletriggersleftrumble-rightrumble-duration)
     - [joystickInstance.stopRumbleTriggers()](#joystickinstancestoprumbletriggers)
     - [joystickInstance.closed](#joystickinstanceclosed)
     - [joystickInstance.close()](#joystickinstanceclose)
@@ -184,15 +184,15 @@
     - [gamepadInstance.buttons](#gamepadinstancebuttons)
     - [gamepadInstance.buttonLabels](#gamepadinstancebuttonlabels)
     - [gamepadInstance.power](#gamepadinstancepower)
-    - [gamepadInstance.setPlayer(index)](#gamepadinstancesetplayerindex)
+    - [gamepadInstance.setPlayer(player)](#gamepadinstancesetplayerplayer)
     - [gamepadInstance.resetPlayer()](#gamepadinstanceresetplayer)
     - [gamepadInstance.hasLed](#gamepadinstancehasled)
     - [gamepadInstance.setLed(red, green, blue)](#gamepadinstancesetledred-green-blue)
     - [gamepadInstance.hasRumble](#gamepadinstancehasrumble)
-    - [gamepadInstance.rumble([low[, high[, duration]]])](#gamepadinstancerumblelow-high-duration)
+    - [gamepadInstance.rumble([lowFreqRumble[, highFreqRumble[, duration]]])](#gamepadinstancerumblelowfreqrumble-highfreqrumble-duration)
     - [gamepadInstance.stopRumble()](#gamepadinstancestoprumble)
     - [gamepadInstance.hasRumbleTriggers](#gamepadinstancehasrumbletriggers)
-    - [gamepadInstance.rumbleTriggers([left[, right[, duration]]])](#gamepadinstancerumbletriggersleft-right-duration)
+    - [gamepadInstance.rumbleTriggers([leftRumble[, rightRumble[, duration]]])](#gamepadinstancerumbletriggersleftrumble-rightrumble-duration)
     - [gamepadInstance.stopRumbleTriggers()](#gamepadinstancestoprumbletriggers)
     - [gamepadInstance.closed](#gamepadinstanceclosed)
     - [gamepadInstance.close()](#gamepadinstanceclose)
@@ -1947,9 +1947,9 @@ An array of values, each corresponding to the position of one of the joystick's 
 
 The current power info of the joystick device.
 
-### joystickInstance.setPlayer(index)
+### joystickInstance.setPlayer(player)
 
-- `index: <number>` The player index to assign to the joystick. Must be a non-negative 32-bit integer.
+- `player: <number>` The player index to assign to the joystick. Must be a non-negative 32-bit integer.
 
 Sets the player index of the joystick, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
@@ -1980,10 +1980,10 @@ Throws if the joystick has no LED (see [`joystickInstance.hasLed`](#joystickinst
 Is `true` if the joystick has rumble motors.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
-### joystickInstance.rumble([low[, high[, duration]]])
+### joystickInstance.rumble([lowFreqRumble[, highFreqRumble[, duration]]])
 
-- `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
-- `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+- `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+- `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
 Makes the joystick rumble for a set `duration`, or until stopped.
@@ -1995,7 +1995,7 @@ Passing `0` for both intensities stops the rumble.
 ### joystickInstance.stopRumble()
 
 Stops the joystick rumbling.
-Equivalent to [`joystickInstance.rumble(0, 0)`](#joystickinstancerumblelow-high-duration).
+Equivalent to [`joystickInstance.rumble(0, 0)`](#joystickinstancerumblelowfreqrumble-highfreqrumble-duration).
 
 ### joystickInstance.hasRumbleTriggers
 
@@ -2004,10 +2004,10 @@ Equivalent to [`joystickInstance.rumble(0, 0)`](#joystickinstancerumblelow-high-
 Is `true` if the joystick has rumble motors on the triggers.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
-### joystickInstance.rumbleTriggers([left[, right[, duration]]])
+### joystickInstance.rumbleTriggers([leftRumble[, rightRumble[, duration]]])
 
-- `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
-- `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+- `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+- `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
 Makes the joystick triggers rumble for a set `duration`, or until stopped.
@@ -2019,7 +2019,7 @@ Passing `0` for both intensities stops the rumble.
 ### joystickInstance.stopRumbleTriggers()
 
 Stops the joystick trigger rumbling.
-Equivalent to [`joystickInstance.rumbleTriggers(0, 0)`](#joystickinstancerumbletriggersleft-right-duration).
+Equivalent to [`joystickInstance.rumbleTriggers(0, 0)`](#joystickinstancerumbletriggersleftrumble-rightrumble-duration).
 
 ### joystickInstance.closed
 
@@ -2301,9 +2301,9 @@ Possible values are `null` if the label is unknown, or one of:
 
 The current power info of the gamepad device.
 
-### gamepadInstance.setPlayer(index)
+### gamepadInstance.setPlayer(player)
 
-- `index: <number>` The player index to assign to the gamepad. Must be a non-negative 32-bit integer.
+- `player: <number>` The player index to assign to the gamepad. Must be a non-negative 32-bit integer.
 
 Sets the player index of the gamepad, and updates `player` on the device's objects in both [`sdl.joystick.devices`](#sdljoystickdevices) and [`sdl.gamepad.devices`](#sdlgamepaddevices).
 
@@ -2334,10 +2334,10 @@ Throws if the gamepad has no LED (see [`gamepadInstance.hasLed`](#gamepadinstanc
 Is `true` if the gamepad has rumble motors.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
-### gamepadInstance.rumble([low[, high[, duration]]])
+### gamepadInstance.rumble([lowFreqRumble[, highFreqRumble[, duration]]])
 
-- `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
-- `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
+- `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
+- `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
 Makes the gamepad rumble for a set `duration`, or until stopped.
@@ -2349,7 +2349,7 @@ Passing `0` for both intensities stops the rumble.
 ### gamepadInstance.stopRumble()
 
 Stops the gamepad rumbling.
-Equivalent to [`gamepadInstance.rumble(0, 0)`](#gamepadinstancerumblelow-high-duration).
+Equivalent to [`gamepadInstance.rumble(0, 0)`](#gamepadinstancerumblelowfreqrumble-highfreqrumble-duration).
 
 ### gamepadInstance.hasRumbleTriggers
 
@@ -2358,10 +2358,10 @@ Equivalent to [`gamepadInstance.rumble(0, 0)`](#gamepadinstancerumblelow-high-du
 Is `true` if the gamepad has rumble motors on the triggers.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
-### gamepadInstance.rumbleTriggers([left[, right[, duration]]])
+### gamepadInstance.rumbleTriggers([leftRumble[, rightRumble[, duration]]])
 
-- `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
-- `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
+- `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
+- `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
 Makes the gamepad triggers rumble for a set `duration`, or until stopped.
@@ -2373,7 +2373,7 @@ Passing `0` for both intensities stops the rumble.
 ### gamepadInstance.stopRumbleTriggers()
 
 Stops the gamepad trigger rumbling.
-Equivalent to [`gamepadInstance.rumbleTriggers(0, 0)`](#gamepadinstancerumbletriggersleft-right-duration).
+Equivalent to [`gamepadInstance.rumbleTriggers(0, 0)`](#gamepadinstancerumbletriggersleftrumble-rightrumble-duration).
 
 ### gamepadInstance.closed
 

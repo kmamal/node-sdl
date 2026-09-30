@@ -1123,7 +1123,7 @@ export namespace Sdl {
 
 			readonly power: PowerInfo
 
-			setPlayer (index: number): void
+			setPlayer (player: number): void
 			resetPlayer (): void
 
 			readonly hasLed: boolean
@@ -1255,7 +1255,7 @@ export namespace Sdl {
 
 			readonly power: Joystick.PowerInfo
 
-			setPlayer (index: number): void
+			setPlayer (player: number): void
 			resetPlayer (): void
 
 			readonly hasLed: boolean
