@@ -1129,11 +1129,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1261,11 +1261,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean

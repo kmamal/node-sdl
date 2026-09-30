@@ -124,15 +124,17 @@ class JoystickInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumble
 	}
-	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = 1e3) {
+	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isFinite(lowFreqRumble)) { throw Object.assign(new Error("lowFreqRumble must be a number"), { lowFreqRumble }) }
 		if (lowFreqRumble < 0 || lowFreqRumble > 1) { throw Object.assign(new Error("lowFreqRumble must be between 0 and 1"), { lowFreqRumble }) }
 		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
-		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration !== null) {
+			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
+			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		}
 
 		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
 
@@ -153,15 +155,17 @@ class JoystickInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumbleTriggers
 	}
-	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = 1e3) {
+	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isFinite(leftRumble)) { throw Object.assign(new Error("leftRumble must be a number"), { leftRumble }) }
 		if (leftRumble < 0 || leftRumble > 1) { throw Object.assign(new Error("leftRumble must be between 0 and 1"), { leftRumble }) }
 		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
-		if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-		if (duration < 0 || duration > 65535) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		if (duration !== null) {
+			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
+			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+		}
 
 		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }
 

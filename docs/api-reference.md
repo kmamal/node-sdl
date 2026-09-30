@@ -1968,9 +1968,9 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
-Makes the joystick rumble for a set `duration`.
+Makes the joystick rumble for a set `duration`, or until stopped.
 Throws if the joystick has no rumble motors (see [`joystickInstance.hasRumble`](#joystickinstancehasrumble)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
@@ -1992,9 +1992,9 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
-Makes the joystick triggers rumble for a set `duration`.
+Makes the joystick triggers rumble for a set `duration`, or until stopped.
 Throws if the joystick has no trigger rumble motors (see [`joystickInstance.hasRumbleTriggers`](#joystickinstancehasrumbletriggers)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
@@ -2314,9 +2314,9 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `low: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `high: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
-Makes the gamepad rumble for a set `duration`.
+Makes the gamepad rumble for a set `duration`, or until stopped.
 Throws if the gamepad has no rumble motors (see [`gamepadInstance.hasRumble`](#gamepadinstancehasrumble)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
@@ -2338,9 +2338,9 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `left: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `right: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>` The duration of the rumble, in ms. Must be an integer between `0` and `65535`. Default: `1e3`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
 
-Makes the gamepad triggers rumble for a set `duration`.
+Makes the gamepad triggers rumble for a set `duration`, or until stopped.
 Throws if the gamepad has no trigger rumble motors (see [`gamepadInstance.hasRumbleTriggers`](#gamepadinstancehasrumbletriggers)).
 Calling this function again before `duration` has run out overrides the previous call.
 The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.

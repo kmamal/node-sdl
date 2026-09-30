@@ -13,15 +13,17 @@ const effects = {
 }
 
 const clearEffectTimeout = (effect, id) => {
-	clearTimeout(effect.timeouts.get(id))
+	for (const timer of effect.timeouts.get(id) ?? []) { clearTimeout(timer) }
 	effect.timeouts.delete(id)
 }
+
+const MAX_DURATION = 0xFFFF
 
 const startEffect = (kind, id, a, b, duration) => {
 	const effect = effects[kind]
 	a = Math.round(a * 0xFFFF)
 	b = Math.round(b * 0xFFFF)
-	effect.call(id, a, b, duration)
+	effect.call(id, a, b, MAX_DURATION)
 
 	clearEffectTimeout(effect, id)
 
@@ -29,14 +31,24 @@ const startEffect = (kind, id, a, b, duration) => {
 	if (a === 0 && b === 0) { return }
 
 	// Keeps Node.js alive while rumbling
-	effect.timeouts.set(id, setTimeout(() => {
-		effect.timeouts.delete(id)
-		try {
-			effect.call(id, 0, 0, 0)
-			Globals.events.poll()
-		}
-		catch (_) {}
-	}, duration))
+	const timers = []
+	if (duration === null || duration > MAX_DURATION) {
+		timers.push(setInterval(() => {
+			try { effect.call(id, a, b, MAX_DURATION) }
+			catch (_) { clearEffectTimeout(effect, id) }
+		}, 30e3))
+	}
+	if (duration !== null) {
+		timers.push(setTimeout(() => {
+			clearEffectTimeout(effect, id)
+			try {
+				effect.call(id, 0, 0, 0)
+				Globals.events.poll()
+			}
+			catch (_) {}
+		}, duration))
+	}
+	effect.timeouts.set(id, timers)
 }
 
 const stopEffect = (kind, id) => {
