@@ -198,6 +198,7 @@ Docs, types, and loading:
 - The docs now state the constraints the API enforces on rumble `duration`, audio `frequency`, the `bytes` argument of `putData()`/`getData()`, and window positions and sizes.
 - The docs now also state the 32-bit limits on player indices, audio `frequency`, and the `bytes` argument of `putData()`/`getData()`, the limits on image `width`, `height`, and `stride`, and the allowed range of the cursor hotspot.
 - The docs no longer describe the `'close'` event of windows, instances, and streams as firing before the object is destroyed or closed. It fires afterwards, once the object already reports `destroyed`/`closed`.
+- The `readSample()`/`writeSample()` docs no longer claim that `'f32'` is equivalent to `readFloatLE()`/`writeFloatLE()`. `'f32'` is in native byte order, so that only holds on little-endian machines.
 - The docs no longer claim that `vsync` requires `accelerated`. SDL3 supports vsync with the software renderer too.
 - The docs now say that `createWindow()` defaults to the primary display, which isn't necessarily `sdl.video.displays[0]`, and the types accept `null` for its `display`, `width`, and `height` options.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.

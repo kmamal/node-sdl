@@ -2554,7 +2554,9 @@ This function is also available from `@kmamal/sdl/helpers`.
 - Returns: `<number>` The value of the sample read.
 
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format argument.
-For example, a call to `sdl.audio.readSample('f32', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+For example, a call to `sdl.audio.readSample('f32le', buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+
+The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
 
 This function is also available from `@kmamal/sdl/helpers`.
 
@@ -2567,7 +2569,8 @@ This function is also available from `@kmamal/sdl/helpers`.
 - Returns: `<number>` The updated `offset`.
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format argument.
-For example, a call to `sdl.audio.writeSample('f32', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+For example, a call to `sdl.audio.writeSample('f32le', buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
 
 This function is also available from `@kmamal/sdl/helpers`.
 
@@ -2801,7 +2804,7 @@ The sample value that corresponds to silence, based on the format the stream was
 - Returns: `<number>` The value of the sample read.
 
 Helper function which calls the appropriate `read*` method of `Buffer` based on the format the stream was opened with.
-For example, for a stream opened with the `'f32'` sample format, a call to `audioStream.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
+For example, for a stream opened with the `'f32le'` sample format, a call to `audioStream.readSample(buffer, offset)` would be equivalent to `buffer.readFloatLE(offset)`.
 
 ### audioStream.writeSample(buffer, value[, offset])
 
@@ -2811,7 +2814,7 @@ For example, for a stream opened with the `'f32'` sample format, a call to `audi
 - Returns: `<number>` The updated `offset`.
 
 Helper function which calls the appropriate `write*` method of `Buffer` based on the format the stream was opened with.
-For example, for a stream opened with the `'f32'` sample format, a call to `audioStream.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
+For example, for a stream opened with the `'f32le'` sample format, a call to `audioStream.writeSample(buffer, value, offset)` would be equivalent to `buffer.writeFloatLE(value, offset)`.
 
 ### audioStream.playing
 
