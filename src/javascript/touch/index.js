@@ -1,15 +1,11 @@
-const Globals = require('../globals')
-const Bindings = require('../bindings')
+const { refreshDevices } = require('./devices')
 
 
-Globals.touchDevices = Bindings.touch_getDevices()
+refreshDevices()
 
 
 const touch = {
-	get devices () {
-		Globals.touchDevices = Bindings.touch_getDevices()
-		return Globals.touchDevices
-	},
+	get devices () { return [ ...refreshDevices() ] },
 }
 
 module.exports = { touch }

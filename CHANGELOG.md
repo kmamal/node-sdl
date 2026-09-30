@@ -111,7 +111,7 @@ Mouse and keyboard:
 Touch:
 
 - Touch events no longer crash event handling. Events synthesized from the mouse arrive with a `null` `device`, and events for a device that disconnected before they were polled are dropped.
-- `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it.
+- `sdl.touch.devices` now refetches the device list on every read. It used to return the list from module load time forever, since SDL emits no touch hot-plug events that could refresh it. Device objects remain valid across reads, like the sensor device objects, so they can be compared with the `device` of touch events, and the returned list is a copy, so modifying it no longer corrupts the library's internal state.
 
 Joysticks and gamepads:
 

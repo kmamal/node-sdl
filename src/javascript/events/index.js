@@ -10,6 +10,7 @@ const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('../gam
 const { audio: audioModule } = require('../audio')
 const { make: makeAudioDevice, update: updateAudioDevice } = require('../audio/device')
 const { clipboard: clipboardModule } = require('../clipboard')
+const { refreshDevices: refreshTouchDevices } = require('../touch/devices')
 
 
 const tryEmit = (emitter, type, event) => {
@@ -211,7 +212,7 @@ const handleEvent = (event) => {
 					if (!event.mouse) {
 						device = Globals.touchDevices.find(({ id }) => id === touchId)
 						if (!device) {
-							try { Globals.touchDevices = Bindings.touch_getDevices() }
+							try { refreshTouchDevices() }
 							catch (_) { return }
 							device = Globals.touchDevices.find(({ id }) => id === touchId)
 							if (!device) { return }
