@@ -636,8 +636,8 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
   - `borderless: <boolean>` Set to `true` to completely hide the window's borders and title bar. Default: `false`
   - `alwaysOnTop: <boolean>` Set to `true` to always show the window above others. Default: `false`
-  - `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`
-  - `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`
+  - `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`. Can't be set together with `opengl` or `webgpu`.
+  - `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`. Can't be set together with `opengl` or `webgpu`.
   - `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
   - `webgpu: <boolean>` Set to `true` to create an WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
 - Returns: [`<Window>`](#class-window) an object representing the new window.
@@ -649,7 +649,7 @@ The following restrictions apply:
 - The `display` option is mutually exclusive with the `x` and `y` options.
 - The `resizable` and `borderless` options are mutually exclusive.
 - The `opengl` and `webgpu` options are mutually exclusive.
-- The `accelerated` and `vsync` options have no effect if either `opengl` or `webgpu` is also specified.
+- The `accelerated` and `vsync` options are mutually exclusive with the `opengl` and `webgpu` options, since OpenGL and WebGPU windows have no SDL renderer.
 
 If you set the `opengl` or `webgpu` options, then you must use OpenGL/WebGPU calls to render to the window.
 Calls to [`render()`](#windowrenderwidth-height-stride-format-buffer-options) will fail.
@@ -1035,9 +1035,10 @@ Such a window is always be shown above other windows.
 
 ### window.accelerated
 
-- `<boolean>`
+- `<boolean>|<null>`
 
 Is `true` if the window is using hardware accelerated rendering.
+Is `null` if you have set the `opengl` or `webgpu` options, since such windows have no SDL renderer.
 
 ### window.setAccelerated(accelerated)
 
@@ -1051,9 +1052,10 @@ If SDL can't create a renderer, not even a software one, this throws and leaves 
 
 ### window.vsync
 
-- `<boolean>`
+- `<boolean>|<null>`
 
 Is `true` if the window is using vsync.
+Is `null` if you have set the `opengl` or `webgpu` options, since such windows have no SDL renderer.
 Vsync synchronizes the window's frame rate with the display's refresh rate to prevent tearing.
 
 ### window.setVsync(vsync)

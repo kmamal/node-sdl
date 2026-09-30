@@ -53,11 +53,14 @@ class Window extends EventsViaPoll {
 			resizable = false,
 			borderless = false,
 			alwaysOnTop = false,
-			accelerated = true,
-			vsync = true,
+			accelerated,
+			vsync,
 			opengl = false,
 			webgpu = false,
 		} = options
+
+		const hasAccelerated = accelerated !== undefined
+		const hasVsync = vsync !== undefined
 
 		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
 		if (display !== null && typeof display !== 'object') { throw Object.assign(new Error("display must be an object"), { display }) }
@@ -78,13 +81,15 @@ class Window extends EventsViaPoll {
 		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
 		if (typeof alwaysOnTop !== 'boolean') { throw Object.assign(new Error("alwaysOnTop must be a boolean"), { alwaysOnTop }) }
-		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
-		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
+		if (hasAccelerated && typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		if (hasVsync && typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
 		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
 		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
+		if (opengl && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("opengl and accelerated/vsync are mutually exclusive"), { opengl, accelerated, vsync }) }
+		if (webgpu && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("webgpu and accelerated/vsync are mutually exclusive"), { webgpu, accelerated, vsync }) }
 
 		let displayId = 0
 		if (display) {
@@ -105,8 +110,8 @@ class Window extends EventsViaPoll {
 			resizable,
 			borderless,
 			alwaysOnTop,
-			accelerated,
-			vsync,
+			accelerated ?? true,
+			vsync ?? true,
 			opengl,
 			webgpu,
 		)

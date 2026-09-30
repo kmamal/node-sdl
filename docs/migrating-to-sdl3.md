@@ -230,6 +230,19 @@ Wrap the call in `try`/`catch` if your program also runs on Wayland.
 Like `setFullscreen()` and the other state changes, they submit a request, and the properties update from the `move` and `resize` events once the windowing system has applied it, reporting what the window actually took.
 Listen for those events, or poll, instead of reading the properties right after the call.
 
+### OpenGL and WebGPU windows have no renderer settings
+
+OpenGL and WebGPU windows have no SDL renderer, so `createWindow()` now throws if `accelerated` or `vsync` is given together with `opengl` or `webgpu`, instead of ignoring it.
+For such windows, `window.accelerated` and `window.vsync` are `null`.
+
+```js
+// Before
+sdl.video.createWindow({ opengl: true, vsync: false })
+
+// After
+sdl.video.createWindow({ opengl: true })
+```
+
 ## Audio
 
 SDL3 separates playback from recording devices and works with audio streams, and the JS API now mirrors that.

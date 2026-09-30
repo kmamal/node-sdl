@@ -121,10 +121,11 @@ window::create (const Napi::CallbackInfo &info)
 	bool is_resizable = info[8].As<Napi::Boolean>().Value();
 	bool is_borderless = info[9].As<Napi::Boolean>().Value();
 	bool is_always_on_top = info[10].As<Napi::Boolean>().Value();
-	bool is_accelerated = info[11].As<Napi::Boolean>().Value();
-	bool is_vsync = info[12].As<Napi::Boolean>().Value();
 	bool is_opengl = info[13].As<Napi::Boolean>().Value();
 	bool is_webgpu = info[14].As<Napi::Boolean>().Value();
+	bool has_renderer = !is_opengl && !is_webgpu;
+	bool is_accelerated = has_renderer && info[11].As<Napi::Boolean>().Value();
+	bool is_vsync = has_renderer && info[12].As<Napi::Boolean>().Value();
 
 	Uint64 desired_flags = 0
 		| SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY
@@ -336,8 +337,14 @@ window::create (const Napi::CallbackInfo &info)
 		result.Set("resizable", is_resizable);
 		result.Set("borderless", is_borderless);
 		result.Set("alwaysOnTop", is_always_on_top);
-		result.Set("accelerated", is_accelerated);
-		result.Set("vsync", is_vsync);
+		if (has_renderer) {
+			result.Set("accelerated", is_accelerated);
+			result.Set("vsync", is_vsync);
+		}
+		else {
+			result.Set("accelerated", env.Null());
+			result.Set("vsync", env.Null());
+		}
 		result.Set("native", native);
 
 		return result;

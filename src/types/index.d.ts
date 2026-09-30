@@ -580,10 +580,10 @@ export namespace Sdl {
 
 			readonly alwaysOnTop: boolean
 
-			readonly accelerated: boolean
+			readonly accelerated: boolean | null
 			setAccelerated (accelerated: boolean): void
 
-			readonly vsync: boolean
+			readonly vsync: boolean | null
 			setVsync (vsync: boolean): void
 
 			readonly opengl: boolean

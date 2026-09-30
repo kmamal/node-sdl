@@ -209,3 +209,20 @@ T.test("sdl::window", async (t) => {
 
 	t.equal(sdl.video.windows.length, 0)
 })
+
+T.test("sdl::window opengl/webgpu have no renderer", async (t) => {
+	t.throws(() => { sdl.video.createWindow({ opengl: true, accelerated: true }) })
+	t.throws(() => { sdl.video.createWindow({ opengl: true, vsync: false }) })
+	t.throws(() => { sdl.video.createWindow({ webgpu: true, accelerated: false }) })
+	t.throws(() => { sdl.video.createWindow({ webgpu: true, vsync: true }) })
+	t.equal(sdl.video.windows.length, 0)
+
+	const window = sdl.video.createWindow({ opengl: true, visible: false })
+	t.equal(window.accelerated, null)
+	t.equal(window.vsync, null)
+	t.throws(() => { window.setAccelerated(true) })
+	t.throws(() => { window.setVsync(true) })
+	window.destroy()
+
+	t.equal(sdl.video.windows.length, 0)
+})
