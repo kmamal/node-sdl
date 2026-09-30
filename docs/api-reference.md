@@ -630,8 +630,8 @@ The window that the mouse is hovered over, or `null` if the mouse is not over a 
   - `display: <object>` An object from `sdl.video.displays` to specify in which display the window should appear (if you have multiple displays), or `null` for the primary display. Default: `null`
   - `x: <number>` The x position in which the window should appear relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
   - `y: <number>` The y position in which the window should appear relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
-  - `width: <number>` The width of the window. Must be a positive 32-bit integer. Default: `640`
-  - `height: <number>` The height of the window. Must be a positive 32-bit integer. Default: `480`
+  - `width: <number>` The width of the window, or `null` for the default of `640`. Must be a positive 32-bit integer. Default: `null`
+  - `height: <number>` The height of the window, or `null` for the default of `480`. Must be a positive 32-bit integer. Default: `null`
   - `visible: <boolean>` Set to `false` to create a hidden window that will only be shown when you call [`window.show()`](#windowshowshow). Default: `true`
   - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
@@ -1623,8 +1623,8 @@ The position of the mouse on the screen.
 
 ### sdl.mouse.setPosition(x, y)
 
-- `x: <number>` The new x position of the mouse, relative to the screen.
-- `y: <number>` The new y position of the mouse, relative to the screen.
+- `x: <number>` The new x position of the mouse, relative to the screen. May be fractional.
+- `y: <number>` The new y position of the mouse, relative to the screen. May be fractional.
 
 Moves the mouse to the specified position.
 

@@ -236,6 +236,7 @@ Docs, types, and loading:
 - `Window`, `JoystickInstance`, `GamepadInstance`, `SensorInstance`, and the `AudioStream` classes are now declared as interfaces instead of classes. The types used to declare a runtime `Sdl` export with constructible classes, so code like `x instanceof Sdl.Video.Window` compiled but crashed, since the library exports no such value and the classes can't be constructed directly.
 - Joystick hat positions (`joystickInstance.hats` and the `value` of `hatMotion` events) are now documented and typed as nullable, matching the implementation, which reports `null` for positions SDL doesn't define.
 - The docs and types now use the same parameter names as the implementation and its error messages: `lowFreqRumble`/`highFreqRumble` for `rumble()`, `leftRumble`/`rightRumble` for `rumbleTriggers()`, and `player` for `setPlayer()`.
+- The docs now state that `sdl.mouse.setPosition()` accepts fractional coordinates and that `createWindow()` accepts `null` for `width` and `height`.
 
 Building from source:
 
