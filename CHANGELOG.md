@@ -106,6 +106,7 @@ Mouse and keyboard:
 - The right GUI key now reports the documented `'gui'` key name instead of `'gUI'`.
 - The GUI keys on Windows and the GUI and Alt keys on macOS now report the platform's names for them, `'windows'`, `'command'`, and `'option'`, instead of `null`. `sdl.keyboard.getScancode()` accepts these names on the corresponding platforms.
 - `sdl.keyboard.getScancode()` now resolves single-character keys such as `','` and `'0'` to the main keyboard keys instead of the keypad ones.
+- Keys whose character lies outside the Basic Multilingual Plane (such as emoji) are now reported as that character instead of `null`, and `sdl.keyboard.getScancode()` accepts them instead of throwing "invalid key".
 - `sdl.info.platform` is `'macOS'` on macOS, following SDL3's platform name. It used to be documented and typed as `'Mac OS X'`, which SDL3 no longer reports.
 - Keys whose SDL3 default name differs from the X11 one (`'+/-'`, `'modeSwitch'`, `'('`, `')'`, and the menu key) are recognized again on every platform. Their default names had been dropped from the key table during the migration, so they came out as `null` outside X11.
 - `sdl.keyboard.getKey()` now agrees with the `key` of keyboard events on layouts where SDL's keycode options apply. On AZERTY the number row maps to `'1'`…`'0'` instead of `'&'`, `'é'`, …, and on non-Latin layouts the letter keys map to `'a'`…`'z'`, as they do in events.

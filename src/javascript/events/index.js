@@ -2,7 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { video: videoModule } = require('../video')
 const { keyboard: keyboardModule } = require('../keyboard')
-const { mapping } = require('../keyboard/key-mapping')
+const { mapping, isCharacter } = require('../keyboard/key-mapping')
 const { joystick: joystickModule } = require('../joystick')
 const { make: makeJoystickDevice } = require('../joystick/device')
 const { gamepad: gamepadModule } = require('../gamepad')
@@ -197,7 +197,7 @@ const handleEvent = (event) => {
 				case 'keyDown':
 				case 'keyUp': {
 					const { key } = event
-					event.key = mapping[key] ?? (key?.length === 1 ? key : null)
+					event.key = mapping[key] ?? (isCharacter(key) ? key : null)
 				} break
 
 				case 'fingerDown':

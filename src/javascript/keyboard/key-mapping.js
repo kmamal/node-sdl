@@ -223,6 +223,8 @@ const mapping = Object.assign(Object.create(null), {
 
 const reverseMapping = Object.create(null)
 
+const isCharacter = (key) => key !== null && [ ...key ].length === 1
+
 for (const [ key, value ] of Object.entries(mapping)) {
 	maybeSkip: {
 		const existing = reverseMapping[value]
@@ -243,7 +245,7 @@ for (const [ key, value ] of Object.entries(mapping)) {
 // Single-character keys are valid SDL key names.
 // Prefer bare key when it has a lower scancode.
 for (const [ value, key ] of Object.entries(reverseMapping)) {
-	if (value.length !== 1) { continue }
+	if (!isCharacter(value)) { continue }
 
 	const valueScancode = Bindings.keyboard_getScancode(value)
 	if (valueScancode === null) { continue }
@@ -257,4 +259,5 @@ for (const [ value, key ] of Object.entries(reverseMapping)) {
 module.exports = {
 	mapping,
 	reverseMapping,
+	isCharacter,
 }

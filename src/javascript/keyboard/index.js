@@ -2,7 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { mapping, reverseMapping } = require('./key-mapping')
+const { mapping, reverseMapping, isCharacter } = require('./key-mapping')
 
 const validEvents = [ 'keymapChange' ]
 
@@ -16,13 +16,13 @@ const keyboard = new class extends EventsViaPoll {
 		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("invalid scancode"), { scancode }) }
 
 		const _key = Bindings.keyboard_getKey(scancode)
-		return mapping[_key] ?? (_key?.length === 1 ? _key : null)
+		return mapping[_key] ?? (isCharacter(_key) ? _key : null)
 	}
 
 	getScancode (key) {
 		if (typeof key !== 'string') { throw Object.assign(new Error("key must be a string"), { key }) }
 
-		const _key = reverseMapping[key] ?? (key.length === 1 ? key : null)
+		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
 
 		return Bindings.keyboard_getScancode(_key)
