@@ -161,6 +161,7 @@ Audio:
 - `playbackStream.queued` no longer reports negative values for queues over 2 GiB.
 - `putData()` now rejects a `bytes` count that isn't a whole number of sample frames with a validation error, instead of a raw native error from SDL.
 - A `close` listener that throws no longer leaves a playback stream's keep-alive timer running after the stream is closed.
+- `stream.playing` is now `false` once the stream is closed, including when it is closed because its device was removed.
 - `readSample()` and `writeSample()` now reject non-`Buffer` arguments with a validation error instead of silently operating on array-likes.
 - `zeroSampleValue` for `u8` now matches SDL's silence value (`128`) instead of being one below it.
 - Plugging or unplugging an audio device no longer fires spurious `deviceAdd`/`deviceRemove` events for unrelated devices.

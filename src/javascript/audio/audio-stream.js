@@ -105,6 +105,7 @@ class AudioStream extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
 		this._closed = true
+		this._playing = false
 
 		Globals.audioStreams.delete(this._id)
 
