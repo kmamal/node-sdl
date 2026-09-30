@@ -27,7 +27,7 @@ process.on('beforeExit', (code) => {
 			device = Bindings.audio_getDeviceFormat(stream.id)
 		}
 		catch (_) { }
-		if (!queued) { continue }
+		if (!queued || !device) { continue }
 
 		const { channels, frequency, bytesPerSample } = stream
 		const bytesPerSecond = channels * frequency * bytesPerSample
