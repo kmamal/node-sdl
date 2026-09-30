@@ -60,9 +60,11 @@ const releaseDevice = (id) => {
 }
 
 const setPlayer = (id, player) => {
-	const actual = Bindings.joystick_setPlayer(id, player)
+	Bindings.joystick_setPlayer(id, player)
+	const devices = Bindings.joystick_getDevices()
 	for (const device of [ ...Globals.joystickDevices, ...Globals.gamepadDevices ]) {
-		if (device.id === id) { device.player = actual }
+		const updated = devices.find(({ id: _id }) => _id === device.id)
+		if (updated) { device.player = updated.player }
 	}
 }
 

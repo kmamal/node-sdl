@@ -418,10 +418,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	int _player = SDL_GetJoystickPlayerIndex(joystick);
-	return _player != -1
-		? Napi::Number::New(env, _player)
-		: env.Null();
+	return env.Undefined();
 }
 
 Napi::Value
