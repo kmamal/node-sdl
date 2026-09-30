@@ -20,7 +20,7 @@ class AudioRecordingStream extends AudioStream {
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		bytes ??= buffer.length
 		if (!Number.isInteger(bytes)) { throw Object.assign(new Error("bytes must be an integer"), { bytes }) }
-		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("invalid bytes"), { bytes }) }
+		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("bytes must be a non-negative 32-bit integer"), { bytes }) }
 		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
 
 		if (bytes === 0) { return 0 }

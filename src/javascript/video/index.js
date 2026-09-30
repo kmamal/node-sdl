@@ -49,9 +49,9 @@ const video = new class extends EventsViaPoll {
 	minBufferSize (format, stride, height) {
 		const helpers = getFormatHelpers(format)
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (stride < 0) { throw Object.assign(new Error("invalid stride"), { stride }) }
+		if (stride < 0) { throw Object.assign(new Error("stride must be non-negative"), { stride }) }
 		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height < 0) { throw Object.assign(new Error("invalid height"), { height }) }
+		if (height < 0) { throw Object.assign(new Error("height must be non-negative"), { height }) }
 		return helpers.minBufferSize(stride, height)
 	}
 }()

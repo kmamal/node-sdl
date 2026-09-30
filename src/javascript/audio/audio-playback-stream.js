@@ -21,7 +21,7 @@ class AudioPlaybackStream extends AudioStream {
 		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 		bytes ??= buffer.length
 		if (!Number.isInteger(bytes)) { throw Object.assign(new Error("bytes must be an integer"), { bytes }) }
-		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("invalid bytes"), { bytes }) }
+		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("bytes must be a non-negative 32-bit integer"), { bytes }) }
 		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
 		const frameSize = this._channels * this._bytesPerSample
 		if (bytes % frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${frameSize}`), { bytes }) }

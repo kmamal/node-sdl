@@ -21,14 +21,14 @@ class AudioStream extends EventsViaPoll {
 		} = options
 
 		if (!Number.isInteger(channels)) { throw Object.assign(new Error("channels must be an integer"), { channels }) }
-		if (channels < 1 || channels > 8) { throw Object.assign(new Error("invalid channels"), { channels }) }
+		if (channels < 1 || channels > 8) { throw Object.assign(new Error("channels must be between 1 and 8"), { channels }) }
 		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }
-		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("invalid frequency"), { frequency }) }
+		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("frequency must be a positive 32-bit integer"), { frequency }) }
 		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
 		if (!Number.isInteger(buffered)) { throw Object.assign(new Error("buffered must be an integer"), { buffered }) }
-		if (buffered <= 0) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
-		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
-		if (buffered > 2 ** 15) { throw Object.assign(new Error("invalid buffered"), { buffered }) }
+		if (buffered <= 0) { throw Object.assign(new Error("buffered must be positive"), { buffered }) }
+		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("buffered must be a power of 2"), { buffered }) }
+		if (buffered > 2 ** 15) { throw Object.assign(new Error("buffered must be at most 32768"), { buffered }) }
 
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }

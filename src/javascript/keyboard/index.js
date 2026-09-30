@@ -13,7 +13,7 @@ const keyboard = new class extends EventsViaPoll {
 
 	getKey (scancode) {
 		if (!Number.isInteger(scancode)) { throw Object.assign(new Error("scancode must be an integer"), { scancode }) }
-		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("invalid scancode"), { scancode }) }
+		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("scancode must be between 0 and 511"), { scancode }) }
 
 		const _key = Bindings.keyboard_getKey(scancode)
 		return mapping[_key] ?? (isCharacter(_key) ? _key : null)

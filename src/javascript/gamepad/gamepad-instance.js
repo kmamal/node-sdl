@@ -18,7 +18,7 @@ class GamepadInstance extends EventsViaPoll {
 		super(validEvents)
 
 		Globals.events.poll()
-		if (!Globals.gamepadDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+		if (!Globals.gamepadDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.gamepad.devices"), { device }) }
 
 		const result = Bindings.gamepad_open(device.id)
 
@@ -86,7 +86,7 @@ class GamepadInstance extends EventsViaPoll {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
 		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
-		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("invalid player"), { player }) }
+		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("player must be a non-negative 32-bit integer"), { player }) }
 
 		setPlayer(this._device.id, player)
 	}
@@ -133,7 +133,7 @@ class GamepadInstance extends EventsViaPoll {
 		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
 		if (duration !== null) {
 			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("duration must be a positive 32-bit integer"), { duration }) }
 		}
 
 		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
@@ -164,7 +164,7 @@ class GamepadInstance extends EventsViaPoll {
 		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
 		if (duration !== null) {
 			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("invalid duration"), { duration }) }
+			if (duration < 1 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("duration must be a positive 32-bit integer"), { duration }) }
 		}
 
 		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }

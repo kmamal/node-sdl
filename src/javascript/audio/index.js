@@ -32,7 +32,7 @@ const makeModule = (type, Stream) => new class extends EventsViaPoll {
 		Globals.events.poll()
 		const list = Globals.audioDevices[type]
 		if (device === null) { device = list[0] }
-		else if (!list.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+		else if (!list.includes(device)) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device }) }
 
 		return new Stream(device, options)
 	}

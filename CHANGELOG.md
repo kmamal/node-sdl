@@ -33,6 +33,7 @@ See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/mi
 - **Breaking:** `window.setPosition()`, `window.setSize()`, and `window.setSizeInPixels()` follow the same asynchronous model: `x`, `y`, `width`, `height`, `pixelWidth`, and `pixelHeight` update from the `move` and `resize` events once the windowing system has applied the change, instead of being set to the requested values right away. The requested values were often never taken, for example on fullscreen and maximized windows, or under window managers that adjust or refuse the request. Code that read those properties right after the call should listen for the `move`/`resize` events or poll instead.
 - **Breaking:** The `duration` of `rumble()` and `rumbleTriggers()` now defaults to `null`, which rumbles until stopped, instead of `1e3`; pass `1e3` explicitly for the old behavior. A duration of `0` is now rejected; it used to stop the rumble right away.
 - **Breaking:** `createWindow()` now throws if the `accelerated` or `vsync` option is given together with `opengl` or `webgpu`, instead of silently ignoring it. OpenGL and WebGPU windows have no SDL renderer, so `window.accelerated` and `window.vsync` are now `null` for them instead of echoing the options.
+- Range errors now state the violated constraint (e.g. "width must be a positive 32-bit integer", "device must be from sdl.joystick.devices") instead of a generic "invalid width" or "invalid device".
 
 ### Added
 

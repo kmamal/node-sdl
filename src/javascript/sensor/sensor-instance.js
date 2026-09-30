@@ -13,7 +13,7 @@ class SensorInstance extends EventsViaPoll {
 		super(validEvents)
 
 		refreshDevices()
-		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("invalid device"), { device }) }
+		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device }) }
 
 		Bindings.sensor_open(device.id)
 
