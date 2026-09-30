@@ -617,7 +617,7 @@ export namespace Sdl {
 					y: number,
 					width: number,
 					height: number,
-				}
+				} | null
 			}): void
 
 			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void

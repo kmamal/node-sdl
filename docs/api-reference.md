@@ -1176,7 +1176,7 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
-  - `dstRect: <object>` Where exactly on the window to draw the image. Default: whole window.
+  - `dstRect: <object>|<null>` Where exactly on the window to draw the image. Default: `null`, meaning the whole window.
     - `x, y, width, height: <rect>` The components of the rectangle. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
 
 Displays an image in the window.
