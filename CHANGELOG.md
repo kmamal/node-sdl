@@ -139,6 +139,7 @@ Joysticks and gamepads:
 - A joystick or gamepad disconnecting mid-rumble no longer crashes the process when the rumble auto-stop timer fires.
 - Rumble and LED intensities are now rounded to the nearest hardware step instead of truncated, so values just below a step (such as `0.9999`) no longer land one step low.
 - `sdl.gamepad.addMappings()` now refreshes the device lists even when one of the mappings is invalid, so the devices made available by the mappings before it are reported.
+- `sdl.gamepad.addMappings()` now also refreshes the objects in `sdl.joystick.devices`. A joystick that a new mapping turns into a gamepad used to keep reporting its old `type` (such as `null`) instead of `'gamepad'`.
 - `joystickInstance.setPlayer()`/`resetPlayer()` (and the gamepad equivalents) now update `player` on the device's objects in both `sdl.joystick.devices` and `sdl.gamepad.devices`, and throw if SDL refuses the assignment.
 - `setPlayer()` now also updates `player` on the device that previously held the requested index, which SDL moves to a free slot. It used to keep reporting its old index, so two devices reported the same player.
 - `rumble()` and `rumbleTriggers()` no longer keep the process alive for an effect SDL never started when the intensities round to zero.

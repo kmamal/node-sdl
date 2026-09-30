@@ -112,3 +112,39 @@ T.test("sdl::gamepad", async (t) => {
 	virtualJoystick.destroy()
 	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
 })
+
+T.test("sdl::gamepad.addMappings updates joystick devices", async (t) => {
+	t.timeout(3e3)
+
+	const virtualJoystick = E.uinput.createDevice({
+		name: 'Unmapped Joystick',
+		events: [
+			{
+				type: E.EV_KEY,
+				codes: [ E.BTN_TRIGGER, E.BTN_THUMB ],
+			},
+			{
+				type: E.EV_ABS,
+				codes: [
+					{ code: E.ABS_X, min: -100, max: +100 },
+					{ code: E.ABS_Y, min: -100, max: +100 },
+				],
+			},
+		],
+	})
+	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
+
+	t.equal(sdl.joystick.devices.length, 1)
+	t.equal(sdl.gamepad.devices.length, 0)
+
+	const device = sdl.joystick.devices[0]
+	t.equal(device.type, null)
+
+	sdl.gamepad.addMappings([ `${device.guid},Unmapped Joystick,a:b0,b:b1,leftx:a0,lefty:a1,platform:Linux,` ])
+	t.equal(sdl.gamepad.devices.length, 1)
+	t.equal(sdl.joystick.devices[0], device)
+	t.equal(device.type, 'gamepad')
+
+	virtualJoystick.destroy()
+	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
+})
