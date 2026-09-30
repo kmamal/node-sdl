@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@kmamal/evdev": "0.0.8",
-    "@kmamal/testing": "0.0.33",
+    "@kmamal/testing": "0.0.34",
     "@types/node": "26.3.0",
     "node-addon-api": "8.9.2",
     "node-gyp": "13.0.2"
