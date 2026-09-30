@@ -515,7 +515,7 @@ Fired when a display's `usable` region changes, for example when a dock or taskb
 - Returns: `<number>` The number of bytes.
 
 Helper function which maps each pixel format to the number of bytes each of its pixels takes up.
-For planar YUV formats this refers to the Y plane, so it is `1`.
+For planar YUV formats this refers to the Y plane, so it is `1`, except for `'p010'` where it is `2`.
 
 This function is also available from `@kmamal/sdl/helpers`.
 
@@ -1177,7 +1177,7 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
   - `dstRect: <object>|<null>` Where exactly on the window to draw the image. Default: `null`, meaning the whole window.
-    - `x, y, width, height: <rect>` The components of the rectangle. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
+    - `x, y, width, height: <rect>` The components of the rectangle, in pixels. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
 
 Displays an image in the window.
 The `'p010'` pixel format can't be rendered and is rejected.
@@ -2688,7 +2688,7 @@ When the `'deviceRemove'` event is emitted, all streams that were opened from th
 
 A list of all the detected recording devices.
 The first entry is always the default device, whose `id` is `null`.
-Opening a stream on it is the same as calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device: the stream plays on whichever device the system currently considers the default, and follows the system default when it changes.
+Opening a stream on it is the same as calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device: the stream records from whichever device the system currently considers the default, and follows the system default when it changes.
 Sample output for PulseAudio:
 
 ```js
@@ -2726,7 +2726,7 @@ See also the section on [audio data](#audio-data).
 
 The `buffered` option specifies the "delay" between the application and the audio driver.
 With smaller values you have smaller delays, but you also have to read data more frequently.
-Applications such as virtual instruments that need to play audio in reaction to user input should set `buffered` to a lower value.
+Applications such as voice chat or live audio processing that need to react to recorded audio quickly should set `buffered` to a lower value.
 SDL sizes the driver's buffer when it first opens the device, so the option has no effect on a device that already has streams open, and the driver may also pick a different size.
 Read `buffered` on the stream's [`device`](#audiostreamdevice) for the size in effect.
 
