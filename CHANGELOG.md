@@ -217,6 +217,11 @@ Docs, types, and loading:
 - The docs now say that `createWindow()` defaults to the primary display, which isn't necessarily `sdl.video.displays[0]`, and the types accept `null` for its `display`, `width`, and `height` options.
 - The library no longer fails to load on systems where the audio or video subsystem can't be initialized, such as headless servers.
 
+Building from source:
+
+- Building SDL from source (the fallback when no prebuilt SDL is available) no longer drops SDL's license from `dist/`, and a missing license now fails the build instead of being silently skipped.
+- Building SDL from source no longer crashes on Windows.
+
 ## [v0.11.13] - 2025-08-30
 
 ### Fixed

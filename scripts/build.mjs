@@ -67,7 +67,7 @@ await Promise.all([
 		Fs.promises.cp(
 			Path.join(C.dir.sdl, 'LICENSE.txt'),
 			Path.join(C.dir.dist, 'LICENSE.SDL.txt'),
-		).catch(() => {}),
+		),
 	],
 ])
 

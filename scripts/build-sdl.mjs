@@ -2,6 +2,7 @@ import Fs from 'node:fs'
 import Path from 'node:path'
 import Zlib from 'node:zlib'
 import Stream from 'node:stream'
+import { pathToFileURL } from 'node:url'
 import C from './util/common.js'
 import { unpackTar } from 'modern-tar/fs'
 
@@ -21,7 +22,7 @@ await Stream.promises.pipeline(
 )
 
 const sdlRoot = Path.join(C.dir.sdl, `${C.sdl.repo}-${C.sdl.version}`)
-await import(Path.join(sdlRoot, '/scripts/build.mjs'))
+await import(pathToFileURL(Path.join(sdlRoot, 'scripts/build.mjs')).href)
 const sdlDist = Path.join(sdlRoot, 'dist')
 await Promise.all([
 	Fs.promises.cp(
@@ -36,5 +37,9 @@ await Promise.all([
 			recursive: true,
 			verbatimSymlinks: true,
 		},
+	),
+	Fs.promises.cp(
+		Path.join(sdlDist, 'LICENSE.txt'),
+		Path.join(C.dir.sdl, 'LICENSE.txt'),
 	),
 ])
