@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.0] - 2026-10-01
+
 See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough of the breaking changes.
 
 ### Changed
@@ -303,7 +305,8 @@ Building from source:
 
 - Started keeping this changelog.
 
-[unreleased]: https://github.com/kmamal/node-sdl/compare/v0.11.13...HEAD
+[unreleased]: https://github.com/kmamal/node-sdl/compare/v1.0.0...HEAD
+[v1.0.0]: https://github.com/kmamal/node-sdl/compare/v0.11.13...v1.0.0
 [v0.11.13]: https://github.com/kmamal/node-sdl/compare/v0.11.12...v0.11.13
 [v0.11.12]: https://github.com/kmamal/node-sdl/compare/v0.11.11...v0.11.12
 [v0.11.11]: https://github.com/kmamal/node-sdl/compare/v0.11.10...v0.11.11
