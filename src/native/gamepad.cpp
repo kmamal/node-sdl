@@ -35,54 +35,54 @@ gamepad::getSteamHandle (Napi::Env &env, SDL_Gamepad *gamepad)
 void
 gamepad::getState (Napi::Env &env, SDL_Gamepad *gamepad, Napi::Object dst)
 {
-	Napi::Object axes = Napi::Object::New(env);
-	axes.Set("leftStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX));
-	axes.Set("leftStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY));
-	axes.Set("rightStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX));
-	axes.Set("rightStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY));
-	axes.Set("leftTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER));
-	axes.Set("rightTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER));
+	Napi::Object axes_obj = Napi::Object::New(env);
+	axes_obj.Set("leftStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX));
+	axes_obj.Set("leftStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY));
+	axes_obj.Set("rightStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX));
+	axes_obj.Set("rightStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY));
+	axes_obj.Set("leftTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER));
+	axes_obj.Set("rightTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER));
 
-	Napi::Object buttons = Napi::Object::New(env);
-	buttons.Set("dpadLeft", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_LEFT));
-	buttons.Set("dpadRight", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT));
-	buttons.Set("dpadUp", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_UP));
-	buttons.Set("dpadDown", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_DOWN));
-	buttons.Set("south", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_SOUTH));
-	buttons.Set("east", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_EAST));
-	buttons.Set("west", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_WEST));
-	buttons.Set("north", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_NORTH));
-	buttons.Set("guide", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_GUIDE));
-	buttons.Set("back", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_BACK));
-	buttons.Set("start", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_START));
-	buttons.Set("leftStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_STICK));
-	buttons.Set("rightStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_STICK));
-	buttons.Set("leftShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER));
-	buttons.Set("rightShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER));
-	buttons.Set("rightPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1));
-	buttons.Set("leftPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE1));
-	buttons.Set("rightPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2));
-	buttons.Set("leftPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE2));
-	buttons.Set("misc1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC1));
-	buttons.Set("misc2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC2));
-	buttons.Set("misc3", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC3));
-	buttons.Set("misc4", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC4));
-	buttons.Set("misc5", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC5));
-	buttons.Set("misc6", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC6));
-	buttons.Set("touchpad", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD));
+	Napi::Object buttons_obj = Napi::Object::New(env);
+	buttons_obj.Set("dpadLeft", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_LEFT));
+	buttons_obj.Set("dpadRight", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT));
+	buttons_obj.Set("dpadUp", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_UP));
+	buttons_obj.Set("dpadDown", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_DOWN));
+	buttons_obj.Set("south", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_SOUTH));
+	buttons_obj.Set("east", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_EAST));
+	buttons_obj.Set("west", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_WEST));
+	buttons_obj.Set("north", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_NORTH));
+	buttons_obj.Set("guide", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_GUIDE));
+	buttons_obj.Set("back", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_BACK));
+	buttons_obj.Set("start", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_START));
+	buttons_obj.Set("leftStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_STICK));
+	buttons_obj.Set("rightStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_STICK));
+	buttons_obj.Set("leftShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER));
+	buttons_obj.Set("rightShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER));
+	buttons_obj.Set("rightPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1));
+	buttons_obj.Set("leftPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE1));
+	buttons_obj.Set("rightPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2));
+	buttons_obj.Set("leftPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE2));
+	buttons_obj.Set("misc1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC1));
+	buttons_obj.Set("misc2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC2));
+	buttons_obj.Set("misc3", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC3));
+	buttons_obj.Set("misc4", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC4));
+	buttons_obj.Set("misc5", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC5));
+	buttons_obj.Set("misc6", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC6));
+	buttons_obj.Set("touchpad", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD));
 
-	Napi::Object button_labels = Napi::Object::New(env);
+	Napi::Object button_labels_obj = Napi::Object::New(env);
 	for (auto button : { SDL_GAMEPAD_BUTTON_SOUTH, SDL_GAMEPAD_BUTTON_EAST, SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH }) {
 		auto label_entry = gamepad::button_labels.find(SDL_GetGamepadButtonLabel(gamepad, button));
 		Napi::Value label = label_entry != gamepad::button_labels.end()
 			? Napi::String::New(env, label_entry->second)
 			: env.Null();
-		button_labels.Set(gamepad::buttons[button], label);
+		button_labels_obj.Set(gamepad::buttons[button], label);
 	}
 
-	dst.Set("axes", axes);
-	dst.Set("buttons", buttons);
-	dst.Set("buttonLabels", button_labels);
+	dst.Set("axes", axes_obj);
+	dst.Set("buttons", buttons_obj);
+	dst.Set("buttonLabels", button_labels_obj);
 }
 
 
