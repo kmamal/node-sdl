@@ -7,6 +7,21 @@ const { make: makeJoystickDevice } = require('../joystick/device')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
+// Updated mappings change existing joystick and gamepad devices without an event
+const refreshDevices = () => {
+	const devices = Bindings.joystick_getDevices()
+	for (const joystickDevice of Globals.joystickDevices) {
+		const device = devices.find(({ id }) => id === joystickDevice.id)
+		if (device) { Object.assign(joystickDevice, makeJoystickDevice(device)) }
+	}
+	for (const gamepadDevice of Globals.gamepadDevices) {
+		const device = devices.find(({ id }) => id === gamepadDevice.id)
+		if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
+	}
+
+	Globals.events.poll()
+}
+
 const gamepad = new class extends EventsViaPoll {
 	constructor () { super(validEvents) }
 
@@ -24,20 +39,12 @@ const gamepad = new class extends EventsViaPoll {
 		}
 
 		try { Bindings.gamepad_addMappings(mappings) }
-		finally {
-			// Updated mappings change existing joystick and gamepad devices without an event
-			const devices = Bindings.joystick_getDevices()
-			for (const joystickDevice of Globals.joystickDevices) {
-				const device = devices.find(({ id }) => id === joystickDevice.id)
-				if (device) { Object.assign(joystickDevice, makeJoystickDevice(device)) }
-			}
-			for (const gamepadDevice of Globals.gamepadDevices) {
-				const device = devices.find(({ id }) => id === gamepadDevice.id)
-				if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
-			}
-
-			Globals.events.poll()
+		catch (error) {
+			try { refreshDevices() }
+			catch (_) { }
+			throw error
 		}
+		refreshDevices()
 	}
 }()
 
