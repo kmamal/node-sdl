@@ -26,7 +26,7 @@ for (;;) {
 	}
 
 	// Copy new samples
-	const discarded = buffer.slice(0, available)
+	const discarded = Buffer.from(buffer.slice(0, available))
 	playbackStream.putData(discarded)
 	buffer.copy(buffer, 0, available)
 	recordingStream.getData(buffer.slice(-available))
