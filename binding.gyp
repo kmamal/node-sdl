@@ -31,7 +31,7 @@
             'cflags': ['-Werror', '-Wall', '-Wextra'],
             'conditions': [
                 [
-                    'OS == "linux"', {
+                    'OS == "linux" or OS == "freebsd" or OS == "openbsd" or OS == "netbsd"', {
                         'cflags': ['-D_REENTRANT'],
                         'cflags_cc': ['-std=c++17'],
                         'include_dirs': ['$(SDL_INC)'],

@@ -21,7 +21,11 @@ getWindow (Napi::Env &env, int window_id)
 	return window;
 }
 
-#if defined(SDL_PLATFORM_LINUX)
+#if defined(SDL_PLATFORM_LINUX) || defined(SDL_PLATFORM_FREEBSD) || defined(SDL_PLATFORM_OPENBSD) || defined(SDL_PLATFORM_NETBSD)
+	#define PLATFORM_LINUX_OR_BSD
+#endif
+
+#if defined(PLATFORM_LINUX_OR_BSD)
 	struct LinuxNativeData {
 		uint64_t subsystem; // 1 = x11, 2 = wayland
 		void *display;      // Display*   | wl_display*
@@ -171,7 +175,7 @@ window::create (const Napi::CallbackInfo &info)
 			SDL_ClearError();
 		}
 
-		#if defined(SDL_PLATFORM_LINUX)
+		#if defined(PLATFORM_LINUX_OR_BSD)
 			const char *video_driver = SDL_GetCurrentVideoDriver();
 			bool is_x11 = false;
 			if (has_wm_info) {
@@ -196,7 +200,7 @@ window::create (const Napi::CallbackInfo &info)
 		Napi::Value native_handle;
 		if (has_wm_info) {
 			NativeWindowHandle _native_handle;
-			#if defined(SDL_PLATFORM_LINUX)
+			#if defined(PLATFORM_LINUX_OR_BSD)
 				if (is_x11) {
 					_native_handle = {
 						1,
@@ -233,7 +237,7 @@ window::create (const Napi::CallbackInfo &info)
 			}
 
 			GL_NativeWindow native_gl;
-			#if defined(SDL_PLATFORM_LINUX)
+			#if defined(PLATFORM_LINUX_OR_BSD)
 				if (is_x11) {
 					native_gl = {
 						1,
@@ -265,7 +269,7 @@ window::create (const Napi::CallbackInfo &info)
 			}
 
 			GPU_NativeData native_gpu;
-			#if defined(SDL_PLATFORM_LINUX)
+			#if defined(PLATFORM_LINUX_OR_BSD)
 				if (is_x11) {
 					native_gpu = {
 						1,
