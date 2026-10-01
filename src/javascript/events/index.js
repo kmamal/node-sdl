@@ -507,12 +507,12 @@ const stopPolling = () => {
 	pollInterval = null
 }
 
-switchToPollingSlow()
-poll()
-
 Globals.events = {
 	poll,
 	switchToPollingFast,
 	switchToPollingSlow,
 	stopPolling,
 }
+
+switchToPollingSlow()
+poll()
