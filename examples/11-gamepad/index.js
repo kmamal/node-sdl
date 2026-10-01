@@ -7,6 +7,9 @@ let ctx
 
 const instances = new Set()
 
+let requestedWidth = null
+let requestedHeight = null
+
 const resize = (event) => {
 	if (window.destroyed) { return }
 
@@ -104,12 +107,13 @@ const render = () => {
 	maxY += 20
 	maxX += 20
 
-	if (maxX !== W || maxY !== H) {
-		window.setSizeInPixels(maxX, maxY)
-		return
-	}
-
 	window.render(W, H, W * 4, 'rgba32', canvas.data())
+
+	if (maxX !== requestedWidth || maxY !== requestedHeight) {
+		requestedWidth = maxX
+		requestedHeight = maxY
+		window.setSizeInPixels(maxX, maxY)
+	}
 }
 
 const openGamepad = (device) => {

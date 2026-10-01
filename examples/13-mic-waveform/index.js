@@ -77,7 +77,7 @@ while (!window.destroyed) {
 		}
 		ctx.restore()
 
-		window.render(width, height, width * 4, 'bgra32', canvas.data())
+		window.render(width, height, width * 4, 'rgba32', canvas.data())
 	}
 
 	await setTimeout(0)

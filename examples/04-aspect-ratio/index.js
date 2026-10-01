@@ -17,15 +17,15 @@ const viewport = {
 const resize = () => {
 	if (window.destroyed) { return }
 
-	const factorX = Math.floor(window.width / image.width)
-	const factorY = Math.floor(window.height / image.height)
+	const factorX = Math.floor(window.pixelWidth / image.width)
+	const factorY = Math.floor(window.pixelHeight / image.height)
 	const factor = Math.min(factorX, factorY)
 
 	viewport.width = factor * image.width
 	viewport.height = factor * image.height
 
-	viewport.x = Math.floor((window.width - viewport.width) / 2)
-	viewport.y = Math.floor((window.height - viewport.height) / 2)
+	viewport.x = Math.floor((window.pixelWidth - viewport.width) / 2)
+	viewport.y = Math.floor((window.pixelHeight - viewport.height) / 2)
 
 	render()
 }

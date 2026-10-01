@@ -34,7 +34,10 @@ const render = async () => {
 			const time = (Date.now() - startTime) / 1e3
 			const index = Math.floor(time * framerate)
 
-			if (index === lastIndex) { continue }
+			if (index === lastIndex) {
+				await setTimeout(0)
+				continue
+			}
 
 			if (index >= video.length) {
 				startTime = null

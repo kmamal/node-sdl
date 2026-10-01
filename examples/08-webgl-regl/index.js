@@ -47,11 +47,11 @@ let tic = Date.now()
 let toc
 let frames = 0
 
-const resize = ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
+const resize = ({ pixelWidth: pw, pixelHeight: ph }) => {
 	if (window.destroyed) { return }
 
 	ext.resize(pw, ph)
-	gl.viewport(0, 0, w, h)
+	gl.viewport(0, 0, pw, ph)
 	gl.swap()
 
 	render()

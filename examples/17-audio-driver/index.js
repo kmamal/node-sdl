@@ -71,10 +71,9 @@ const buttons = [
 let processing = false
 
 const handleClick = async (event) => {
+	if (event.button !== 1) { return }
 	if (processing) { return }
 	processing = true
-
-	if (event.button !== 1) { return }
 
 	for (const button of buttons) {
 		const { rect: { x, y, w, h } } = button

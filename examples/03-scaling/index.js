@@ -11,11 +11,11 @@ let offset = 0
 buffer[offset++] = 255 // R
 buffer[offset++] = 0   // G
 buffer[offset++] = 0   // B
-// Top right pixel blue
+// Top right pixel green
 buffer[offset++] = 0   // R
 buffer[offset++] = 255 // G
 buffer[offset++] = 0   // B
-// Bottom left pixel green
+// Bottom left pixel blue
 buffer[offset++] = 0   // R
 buffer[offset++] = 0   // G
 buffer[offset++] = 255 // B
@@ -27,7 +27,7 @@ buffer[offset++] = 0   // B
 const render = () => {
 	if (window.destroyed) { return }
 
-	window.render(width, height, stride, 'rgb24', buffer, 'linear')
+	window.render(width, height, stride, 'rgb24', buffer, { scaling: 'linear' })
 }
 
 window
