@@ -84,6 +84,7 @@ Windows and events:
 - Closing the last window via its close button no longer fires `beforeClose` twice. SDL used to follow the window's close event with a quit event, and the quit handling asked the same window to close again, so a listener that called `prevent()` was bypassed on the second round.
 - Windows now report their actual size on creation (a fullscreen window no longer reports the default 640x480).
 - The initial `resize` event is no longer delivered to windows destroyed in the same tick they were created.
+- Windows created with `visible: false` no longer receive an initial `expose` event. They get one from SDL once they are shown.
 - `window.setSizeInPixels()` now converts the size using the window's actual pixel density and rounds to the nearest size in points, instead of deriving the ratio from the window's rounded current sizes. It used to reject almost every size on displays with a fractional scale (at 150%, even `1920×1080` threw "must be a multiple of 1.5005…").
 - `setResizable()` and `setBorderless()` now enforce the same mutual exclusivity that `createWindow()` does, instead of letting the invariant be bypassed after creation.
 - `window.render()` now throws if updating the texture fails instead of silently presenting stale contents.

@@ -172,12 +172,14 @@ class Window extends EventsViaPoll {
 				})
 			}
 			catch (error) { this.emit('error', error) }
-			try {
-				this.emit('expose', {
-					type: 'expose',
-				})
+			if (this._visible) {
+				try {
+					this.emit('expose', {
+						type: 'expose',
+					})
+				}
+				catch (error) { this.emit('error', error) }
 			}
-			catch (error) { this.emit('error', error) }
 		})
 	}
 
