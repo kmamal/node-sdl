@@ -176,6 +176,7 @@ Sensors:
 
 Audio:
 
+- Audio devices now report their sample format with an explicit byte order (such as `'s16le'`) instead of the native-byte-order alias (`'s16'`). The aliases share SDL's enum values with the explicit formats and were overwriting them in the lookup table.
 - The keep-alive timer that lets queued audio finish playing before the process exits now computes the device buffer's duration correctly, at the device's own sample rate rather than the stream's. A stream opened at a higher rate than its device could exit before the end of its audio had played.
 - The keep-alive timer for queued audio no longer overflows when the queue holds more than about 24.8 days of audio, which used to make the process spin on a 1 ms timer.
 - Closing or pausing a playback stream while Node.js is waiting for its queued audio to drain no longer keeps the process alive for the full queued duration.

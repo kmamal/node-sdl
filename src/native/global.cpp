@@ -277,9 +277,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	audio::formats[SDL_AUDIO_S32BE] = "s32be";
 	audio::formats[SDL_AUDIO_F32LE] = "f32le";
 	audio::formats[SDL_AUDIO_F32BE] = "f32be";
-	audio::formats[SDL_AUDIO_S16] = "s16";
-	audio::formats[SDL_AUDIO_S32] = "s32";
-	audio::formats[SDL_AUDIO_F32] = "f32";
 
 	// power::states[SDL_POWERSTATE_UNKNOWN] = nullptr;
 	power::states[SDL_POWERSTATE_NO_BATTERY] = "noBattery";
