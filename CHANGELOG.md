@@ -98,6 +98,7 @@ Windows and events:
 - A `blur` or `leave` event no longer clears `sdl.video.focused`/`sdl.video.hovered` when another window has already gained focus or hover.
 - `sdl.video.focused` and `sdl.video.hovered` now pump events first, like the per-window getters, instead of returning stale values.
 - Attaching a listener to a destroyed window or a closed instance or stream now throws right away, as documented, instead of being silently accepted and dropped at the end of the tick.
+- On macOS, `webgpu` windows now install their Metal layer before making the view layer-backed, the order AppKit requires for a view to host its own layer. The layer could otherwise be replaced by AppKit and stop showing the rendered frames.
 
 Displays:
 
