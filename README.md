@@ -5,11 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > [!NOTE]
-> This version has migrated from SDL2 to SDL3.
-> Most of the API is unchanged, but there are a number of breaking changes.
-> See the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for the full list.
+> This version migrated from SDL2 to SDL3.
+> Most of the API is unchanged, but several changes break compatibility.
+> The [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) lists them all.
 
-SDL bindings for Node.js. Provides access to systems that are not normally available to Node.js applications:
+SDL bindings for Node.js. Gives applications access to systems that Node.js does not normally provide:
 
 - 💻 Window management
 - ⌨ Keyboard
@@ -22,33 +22,33 @@ SDL bindings for Node.js. Provides access to systems that are not normally avail
 - 🔋 Battery status
 - 🧭 Sensors
 
-Also allows using Canvas2D, WebGL, and WebGPU without a browser, through these libraries:
+The bindings also let you use Canvas2D, WebGL, and WebGPU without a browser, through these libraries:
 
-- __Canvas2D:__ [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, this is the fastest library out of the many available on npm.
-- __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). This is a fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) that I've modified to render directly to SDL windows.
-- __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). This is a fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) that I've modified to render directly to SDL windows.
+- __Canvas2D:__ [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, it is the fastest of the many canvas libraries on npm.
+- __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). I forked [headless-gl](https://github.com/stackgl/headless-gl#readme) and modified it to render directly to SDL windows.
+- __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). I forked [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) and modified it to render directly to SDL windows.
 
-Officially supports Linux (X11 & Wayland), Mac, and Windows.
-Should theoretically work on any system supported by both SDL and Node.js, but I haven't tried any others.
-Prebuilt binaries are available for x64 & arm architectures, on all supported platforms.
+The package officially supports Linux (X11 and Wayland), Mac, and Windows.
+It should work on any system that both SDL and Node.js support, but I haven't tried others.
+Prebuilt binaries exist for x64 and arm architectures on all supported platforms.
 
 ## Installation
 
-This package is self-contained. Just run:
+The package is self-contained. Just run:
 
 ```bash
 npm install @kmamal/sdl
 ```
 
-You do __not__ have to manually install any other libs or DLLs to your system. A compatible version of SDL will be automatically downloaded by the install script and placed inside `node_modules` along with this lib's prebuilt binding binaries.
+You do __not__ need to install any other libraries or DLLs yourself. The install script downloads a compatible version of SDL and places it inside `node_modules`, next to the package's prebuilt binding binaries.
 
-In future versions of npm you will have to manually approve scripts before they can run. You can do this via:
+Future versions of npm will require you to approve scripts before they run. Approve this package's script with:
 
 ```bash
 npm install-scripts approve @kmamal/sdl
 ```
 
-If the install script fails, have a look at the instructions for [building the package manually](#building-from-source)
+If the install script fails, follow the instructions for [building the package manually](https://github.com/kmamal/node-sdl/tree/master/docs/building-from-source.md).
 
 ## Examples
 
@@ -136,7 +136,7 @@ renderer.swap()
 
 # Documentation
 
-Link to the full [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-reference.md).
+The full [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-reference.md) documents every function.
 
-The repo contains a [folder full of examples](https://github.com/kmamal/node-sdl/tree/master/examples#readme) to get you started.
+To get started, browse the [examples](https://github.com/kmamal/node-sdl/tree/master/examples#readme) in the repo.
 

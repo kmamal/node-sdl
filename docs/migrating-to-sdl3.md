@@ -1,9 +1,9 @@
 # Migrating to SDL3
 
 This version of `@kmamal/sdl` builds against SDL3 instead of SDL2.
-Most of the JS API is unchanged, but SDL3 renamed, removed, or reshaped a number of things, and this library follows it rather than emulating the old shapes.
-This guide lists every breaking change, grouped by subsystem, with the old and new code side by side.
-See the [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-reference.md) for the full documentation of the new API and the [Changelog](https://github.com/kmamal/node-sdl/tree/master/CHANGELOG.md) for everything else that changed.
+Most of the JS API is unchanged, but SDL3 renamed, removed, or reshaped several things, and this library follows SDL3 instead of emulating the old shapes.
+This guide lists every breaking change by subsystem and shows the old and new code side by side.
+The [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-reference.md) documents the new API in full, and the [Changelog](https://github.com/kmamal/node-sdl/tree/master/CHANGELOG.md) lists everything else that changed.
 
 ## Contents
 
@@ -21,11 +21,11 @@ See the [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-
 ## Requirements
 
 - Node.js 22 or newer is required.
-- On Linux, `window.native.handle` now holds a tagged `{ subsystem, display, window }` struct instead of a bare X11 window id, and the payloads handed to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and [@kmamal/gpu](https://github.com/kmamal/gpu#readme) changed the same way. Older versions of those packages can't consume the new payload, so upgrade them together with this one.
+- On Linux, `window.native.handle` now holds a tagged `{ subsystem, display, window }` struct instead of a bare X11 window id. The payloads that go to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and [@kmamal/gpu](https://github.com/kmamal/gpu#readme) changed the same way. Older versions of those packages can't consume the new payload, so upgrade them together with this one.
 
 ## Gamepads (formerly controllers)
 
-SDL3 renamed game controllers to gamepads, and this library follows.
+SDL3 renamed game controllers to gamepads, and this library follows that change.
 
 | Before | After |
 | --- | --- |
@@ -44,8 +44,8 @@ const instance = sdl.gamepad.openDevice(sdl.gamepad.devices[0])
 
 ### Axes and buttons are named by position
 
-SDL3 names gamepad buttons by their physical position instead of by the labels printed on an Xbox controller.
-The names of `gamepadInstance.buttons` and the `button` property of `buttonDown` and `buttonUp` events changed accordingly:
+SDL3 names gamepad buttons by their physical position instead of by the labels on an Xbox controller.
+The names in `gamepadInstance.buttons` and in the `button` property of `buttonDown` and `buttonUp` events changed to match:
 
 | Before | After |
 | --- | --- |
@@ -63,17 +63,17 @@ if (instance.buttons.a) { jump() }
 if (instance.buttons.south) { jump() }
 ```
 
-To show the user which physical button that is, use the new `gamepadInstance.buttonLabels`, which reports the label printed on each face button (`'a'`, `'cross'`, ...):
+To tell the user which physical button to press, use the new `gamepadInstance.buttonLabels`, which reports the label printed on each face button (`'a'`, `'cross'`, ...):
 
 ```js
 console.log(`Press ${instance.buttonLabels.south} to jump`)
 ```
 
-Mapping strings are not affected. They still use `a:`, `b:`, `x:`, `y:` and friends, so existing mappings and the community database keep working with `sdl.gamepad.addMappings()`.
+Mapping strings keep their format. They still use `a:`, `b:`, `x:`, `y:` and the rest, so existing mappings and the community database keep working with `sdl.gamepad.addMappings()`.
 
 ### Gamepad types
 
-The types `'virtual'`, `'amazonLuna'`, `'googleStadia'`, and `'nvidiaShield'` no longer exist. SDL3 reports such devices as generic gamepads, which now show up as the new `'standard'` type instead of `null`.
+The types `'virtual'`, `'amazonLuna'`, `'googleStadia'`, and `'nvidiaShield'` no longer exist. SDL3 reports such devices as generic gamepads, which now have the new `'standard'` type instead of `null`.
 The `'gamecube'` type is new.
 
 ### Power
@@ -94,14 +94,25 @@ if (state === 'battery' && percent !== null && percent <= 20) { warn() }
 
 ### Rumble durations
 
-`rumble()` and `rumbleTriggers()` now throw for durations above `65535` ms, the maximum SDL supports.
-They used to be silently clamped.
+The `duration` of `rumble()` and `rumbleTriggers()` now defaults to `null`, which rumbles until you stop it, instead of `1e3`.
+Pass `1e3` explicitly to keep the old behavior.
+The functions now reject a duration of `0`. It used to stop the rumble right away, but `stopRumble()` and `stopRumbleTriggers()` now do that job.
+
+```js
+// Before
+instance.rumble()
+instance.rumble(1, 1, 0)
+
+// After
+instance.rumble(1, 1, 1e3)
+instance.stopRumble()
+```
 
 ## Joysticks
 
 - `power` and the `powerUpdate` event changed exactly as described for [gamepads](#power).
-- Axis values are now normalized relative to the axis's true center, like gamepad axes, instead of relative to whatever value the axis had when the device was opened. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
-- `rumble()` and `rumbleTriggers()` reject durations above `65535` ms, as for gamepads.
+- Axis values are now normalized relative to the axis's true center, like gamepad axes, instead of relative to the value the axis had when you opened the device. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
+- The `duration` of `rumble()` and `rumbleTriggers()` defaults to `null` and rejects `0`, as [gamepads](#rumble-durations) do.
 - Device types and hat positions follow SDL3's names in camel case: `'gamecontroller'` is `'gamepad'`, and `'arcadestick'`, `'flightstick'`, `'dancepad'`, `'drumkit'`, and `'arcadepad'` are `'arcadeStick'`, `'flightStick'`, `'dancePad'`, `'drumKit'`, and `'arcadePad'`. The diagonal hat positions `'rightup'`, `'rightdown'`, `'leftup'`, and `'leftdown'` are `'rightUp'`, `'rightDown'`, `'leftUp'`, and `'leftDown'`.
 
 ## Keyboard
@@ -154,7 +165,7 @@ SDL3 dropped these scancodes, so they are gone from `sdl.keyboard.SCANCODE` alon
 ### Displays have ids
 
 Display objects carry a stable `id`.
-Hot-plug events and `createWindow({ display })` go by that id, and the `display` option must be one of the actual objects in `sdl.video.displays`:
+Hot-plug events and `createWindow({ display })` identify displays by that id, so the `display` option must be one of the objects in `sdl.video.displays`:
 
 ```js
 // Before: matched by name and position, a copy worked
@@ -164,11 +175,11 @@ sdl.video.createWindow({ display: { ...sdl.video.displays[1] } })
 sdl.video.createWindow({ display: sdl.video.displays[1] })
 ```
 
-A display that is disconnected and reconnected is a new device with a new id, so you will receive a `displayRemove` followed by a `displayAdd` rather than the old object being updated in place.
+A display that you disconnect and reconnect is a new device with a new id. You receive a `displayRemove` followed by a `displayAdd`, and the library does not update the old object in place.
 
 ### `dpi` is replaced by `scale`
 
-SDL3 has no dpi query. Display objects report `scale` instead: the display's content scale, where `1` is the 96dpi baseline.
+SDL3 has no dpi query, so display objects report `scale` instead. This is the display's content scale, where `1` is the 96dpi baseline.
 
 ```js
 // Before
@@ -178,18 +189,18 @@ const { horizontal } = display.dpi
 const pixelsPerInch = 96 * display.scale
 ```
 
-The new `displayScaleChange`, `displayModeChange`, and `displayUsableChange` events on `sdl.video` report when `scale`, the current mode, or the usable region change.
+The new `displayScaleChange`, `displayModeChange`, and `displayUsableChange` events on `sdl.video` tell you when `scale`, the current mode, or the usable region changes.
 
 ## Windows
 
 ### Fractional coordinates
 
-Mouse positions are floating point in SDL3. The `x` and `y` on `mouseMove`, `mouseButtonDown`, `mouseButtonUp`, and `mouseWheel` events and in `sdl.mouse.position` may be fractional on high-DPI displays and on backends that report sub-pixel pointer positions, so round them where you need integers.
-`sdl.mouse.setPosition()` and the `dstRect` option of `window.render()` accept fractional values in return.
+SDL3 reports mouse positions as floating point numbers. The `x` and `y` on `mouseMove`, `mouseButtonDown`, `mouseButtonUp`, and `mouseWheel` events, and in `sdl.mouse.position`, may be fractional on high-DPI displays and on backends that report sub-pixel pointer positions, so round them wherever you need integers.
+In return, `sdl.mouse.setPosition()` and the `dstRect` option of `window.render()` accept fractional values.
 
 ### Pixel format names
 
-Pixel formats follow SDL3's names, which spell out the unused byte as `x`:
+Pixel formats follow SDL3's names, which mark the unused byte with an `x`:
 
 | Before | After |
 | --- | --- |
@@ -197,20 +208,20 @@ Pixel formats follow SDL3's names, which spell out the unused byte as `x`:
 | `'rgb555'`, `'bgr555'` | `'xrgb1555'`, `'xbgr1555'` |
 | `'rgb888'`, `'bgr888'` | `'xrgb8888'`, `'xbgr8888'` |
 
-This affects `window.render()`, `window.setIcon()`, `sdl.mouse.setCursorImage()`, the pixel-format helpers, and the `format` reported by displays.
-All other pixel format names, including the `'rgba32'` family of byte-order aliases, are unchanged.
-SDL3's additional formats are available as well: `'xbgr4444'`, the `'2101010'` variants, the 16-bit-per-channel integer and float formats (`'rgba64'`, `'rgba64f'`, ...), the 32-bit float formats (`'rgba128f'`, ...), the `'xrgb32'` family of aliases, and `'p010'`.
+The new names affect `window.render()`, `window.setIcon()`, `sdl.mouse.setCursorImage()`, the pixel-format helpers, and the `format` that displays report.
+All other pixel format names keep their spelling, including the `'rgba32'` family of byte-order aliases.
+You can also use SDL3's additional formats: `'xbgr4444'`, the `'2101010'` variants, the 16-bit-per-channel integer and float formats (`'rgba64'`, `'rgba64f'`, ...), the 32-bit float formats (`'rgba128f'`, ...), the `'xrgb32'` family of aliases, and `'p010'`.
 
 ### Removed X11-only options
 
-The `createWindow()` options `skipTaskbar`, `popupMenu`, `tooltip`, and `utility` are removed, along with the matching `window` getters.
-SDL3 requires a parent window for popup menus and tooltips, which the library doesn't support, and hides the taskbar entry only through the utility flag.
-Passing these options no longer has any effect.
+The `createWindow()` options `skipTaskbar`, `popupMenu`, `tooltip`, and `utility` and the matching `window` getters are gone.
+SDL3 requires a parent window for popup menus and tooltips, which the library doesn't support, and it hides the taskbar entry only through the utility flag.
+Passing these options now has no effect.
 
 ### Removed `'best'` scaling
 
-The `scaling: 'best'` option of `window.render()` is gone, since SDL3 only offers `'nearest'` and `'linear'`.
-Passing it now throws.
+The `scaling: 'best'` option of `window.render()` is gone, because SDL3 offers only `'nearest'` and `'linear'`.
+Passing it now throws an error.
 
 ```js
 // Before
@@ -222,17 +233,18 @@ window.render(w, h, stride, format, buffer, { scaling: 'linear' })
 
 ### Window setters are asynchronous and report failures
 
-`window.setPosition()` now throws when the windowing system can't position the window, which is always the case for regular windows under Wayland.
+`window.setPosition()` now throws when the windowing system can't position the window, which always happens for regular windows under Wayland.
 It used to fail silently and leave `x` and `y` reporting the requested position.
 Wrap the call in `try`/`catch` if your program also runs on Wayland.
 
 `setPosition()`, `setSize()`, and `setSizeInPixels()` no longer set `x`, `y`, `width`, `height`, `pixelWidth`, and `pixelHeight` to the requested values.
-Like `setFullscreen()` and the other state changes, they submit a request, and the properties update from the `move` and `resize` events once the windowing system has applied it, reporting what the window actually took.
+Like `setFullscreen()` and the other state changes, they submit a request.
+Once the windowing system applies the request, the `move` and `resize` events update the properties to the values the window actually took.
 Listen for those events, or poll, instead of reading the properties right after the call.
 
 ### OpenGL and WebGPU windows have no renderer settings
 
-OpenGL and WebGPU windows have no SDL renderer, so `createWindow()` now throws if `accelerated` or `vsync` is given together with `opengl` or `webgpu`, instead of ignoring it.
+OpenGL and WebGPU windows have no SDL renderer, so `createWindow()` now throws if you pass `accelerated` or `vsync` together with `opengl` or `webgpu`, instead of ignoring the option.
 For such windows, `window.accelerated` and `window.vsync` are `null`.
 
 ```js
@@ -245,7 +257,7 @@ sdl.video.createWindow({ opengl: true })
 
 ## Audio
 
-SDL3 separates playback from recording devices and works with audio streams, and the JS API now mirrors that.
+SDL3 separates playback devices from recording devices and works with audio streams, and the JS API now mirrors both changes.
 
 ### Separate playback and recording modules
 
@@ -264,8 +276,8 @@ const stream = sdl.audio.playback.openDevice(devices[0], { channels: 2 })
 sdl.audio.playback.on('deviceAdd', ({ device }) => { ... })
 ```
 
-Each list now starts with an entry for the default device, whose `id` and `name` are `null`, so the first real device is at index `1`.
-To open the default device, pass that entry, no device, or `null` instead of an object with only a `type`:
+Each list now starts with an entry for the default device, whose `id` and `name` are `null`, so the first real device sits at index `1`.
+To open the default device, pass that entry, no device, or `null`, instead of an object with only a `type`:
 
 ```js
 // Before
@@ -276,9 +288,9 @@ const stream = sdl.audio.playback.openDevice(null, options)
 const stream = sdl.audio.playback.openDevice()
 ```
 
-Opening arbitrary driver-specific device names (such as a hostname for a remote audio server) is no longer possible, since SDL3 only opens devices it has enumerated.
-The sample-format helpers (`sdl.audio.bytesPerSample()` and friends) are unchanged.
-Streams can now be opened with any number of channels from 1 to 8, adding the 2.1, 4.1, 6.1, and 7.1 layouts.
+You can no longer open arbitrary driver-specific device names, such as a hostname for a remote audio server, because SDL3 opens only the devices it has enumerated.
+The sample-format helpers (`sdl.audio.bytesPerSample()` and the others) are unchanged.
+You can now open streams with any number of channels from 1 to 8, which adds the 2.1, 4.1, 6.1, and 7.1 layouts.
 
 ### Instances are streams
 
@@ -293,8 +305,8 @@ Streams can now be opened with any number of channels from 1 to 8, adding the 2.
 | `audioInstance.buffered` | `audioStream.device.buffered` |
 
 `playbackStream.queued` keeps its name.
-`audioStream.device` is now the default-device entry for streams opened on the default device, where it used to echo back the `{ type }` object you passed in.
-The driver's buffer size moved to the device because it belongs to the device, not the stream: SDL converts between each stream's format and the device's, and the device's `format`, `channels`, `frequency`, and `buffered` are available on its object while streams are open on it.
+For streams opened on the default device, `audioStream.device` is now the default-device entry. It used to echo back the `{ type }` object you passed in.
+The driver's buffer size moved to the device, because it belongs to the device and not to the stream. SDL converts between each stream's format and the device's, and while streams are open on a device, its object exposes the `format`, `channels`, `frequency`, and `buffered` of the device.
 
 ```js
 // Before
@@ -310,7 +322,7 @@ playbackStream.putData(buffer)
 
 ### Sample format names
 
-Sample formats follow SDL3's names. The endianness suffixes are `le` and `be`, and the unsuffixed names now mean native byte order (which SDL3's `SDL_AUDIO_S16`, `SDL_AUDIO_S32`, and `SDL_AUDIO_F32` also do) instead of being aliases for little-endian:
+Sample formats follow SDL3's names. The endianness suffixes are `le` and `be`, and the unsuffixed names now mean native byte order, as SDL3's `SDL_AUDIO_S16`, `SDL_AUDIO_S32`, and `SDL_AUDIO_F32` do, instead of aliasing little-endian:
 
 | Before | After |
 | --- | --- |
@@ -319,15 +331,15 @@ Sample formats follow SDL3's names. The endianness suffixes are `le` and `be`, a
 | `'f32lsb'`, `'f32msb'` | `'f32le'`, `'f32be'` |
 | `'s16sys'`, `'s32sys'`, `'f32sys'` | `'s16'`, `'s32'`, `'f32'` |
 
-On the little-endian machines this library supports, `'s16'`, `'s32'`, and `'f32'` describe the same layout as before.
+On the little-endian machines this library supports, `'s16'`, `'s32'`, and `'f32'` keep their old layout.
 
-The unsigned 16-bit sample formats `'u16'`, `'u16lsb'`, `'u16msb'`, and `'u16sys'` are gone. SDL3 removed them.
+SDL3 removed the unsigned 16-bit sample formats `'u16'`, `'u16lsb'`, `'u16msb'`, and `'u16sys'`, so they are gone.
 Use `'s16'` or one of the 32-bit formats instead.
 
 ## Touch
 
 Touch device `id`s and the `fingerId` on `fingerDown`, `fingerUp`, and `fingerMove` events are now `bigint`s.
-They are 64-bit values in SDL, which a JS `number` can't always represent exactly.
+SDL stores them as 64-bit values, which a JS `number` can't always represent exactly.
 
 ```js
 // Before
@@ -339,11 +351,11 @@ if (event.fingerId === 0n) { ... }
 
 ## Sensors
 
-`sensorInstance.data` no longer has a `timestamp` property. SDL3 removed the timestamped sensor read it came from.
+`sensorInstance.data` no longer has a `timestamp` property, because SDL3 removed the timestamped sensor read that supplied it.
 
 ## Mouse
 
-Cursor names follow SDL3's names, which describe the cursor's purpose rather than its shape:
+Cursor names follow SDL3's names, which describe a cursor's purpose instead of its shape:
 
 | Before | After |
 | --- | --- |
@@ -356,4 +368,4 @@ Cursor names follow SDL3's names, which describe the cursor's purpose rather tha
 | `'no'` | `'notAllowed'` |
 | `'hand'` | `'pointer'` |
 
-`'wait'` and `'crosshair'` are unchanged. The eight single-edge and corner resize cursors SDL3 added (`'nResize'`, `'neResize'`, ...) are new, as are the `X1` and `X2` entries of `sdl.mouse.BUTTON`.
+`'wait'` and `'crosshair'` are unchanged. SDL3 added eight single-edge and corner resize cursors (`'nResize'`, `'neResize'`, ...) and the `X1` and `X2` entries of `sdl.mouse.BUTTON`.

@@ -223,6 +223,7 @@ Native resource handling:
 
 Docs, types, and loading:
 
+- The migration guide no longer claims that rumble durations above `65535` ms throw. It now describes the actual change to `rumble()` and `rumbleTriggers()`: `duration` defaults to `null`, and `0` is rejected.
 - Many fixes to the TypeScript declarations to match the implementation. Every event-emitting object is now declared as an `EventEmitter` (so `once()`, `off()`, `removeAllListeners()`, e.t.c. type-check), the `'error'` event is declared, the `sdl.video` pixel-format helpers and the new mouse members are included, and the whole `@kmamal/sdl/helpers` sub-module is covered instead of only its `audio` part.
 - The virtual key `'clear/again'` is now included in the API reference's virtual-key list. It was the only key value the mapping could produce that the docs omitted.
 - `window.native.subsystem` is now `null` on Windows and macOS instead of absent, and is no longer optional in the types.
@@ -246,6 +247,7 @@ Docs, types, and loading:
 
 Building from source:
 
+- The native addon now compiles on FreeBSD, OpenBSD, and NetBSD, whose X11 and Wayland windowing is the same as on Linux. The platform checks in `window.cpp` and `binding.gyp` only matched Linux, so builds on the BSDs failed.
 - Building SDL from source (the fallback when no prebuilt SDL is available) no longer drops SDL's license from `dist/`, and a missing license now fails the build instead of being silently skipped.
 - Building SDL from source no longer crashes on Windows.
 - The native addon now compiles on Windows under SDL3, which no longer pulls in the declarations of `HWND` and `HINSTANCE`.
