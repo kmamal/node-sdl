@@ -578,7 +578,7 @@ events::dispatchEvent(const SDL_Event &event)
 struct WatchDispatchedEvent {
 	Uint64 timestamp;
 	Uint32 window_id;
-	Uint32 window_event;
+	SDL_EventType window_event;
 	Sint32 data1;
 	Sint32 data2;
 };

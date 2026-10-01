@@ -71,6 +71,7 @@
                                 'AdditionalOptions': ['-std:c++17'],
                                 'WarningLevel': '4',
                                 'WarnAsError': 'true',
+                                'DisableSpecificWarnings': ['4127'],
                             },
                         },
                         'include_dirs': ['<!(echo %SDL_INC%)'],
