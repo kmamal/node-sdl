@@ -34,7 +34,7 @@ T.test("sdl::video", (t) => {
 		}
 
 		if (display.orientation !== null) {
-			t.ok(typeof display.orientation, 'string')
+			t.equal(typeof display.orientation, 'string')
 		}
 	}
 })

@@ -11,6 +11,6 @@ T.test("sdl::power", (t) => {
 
 	if (sdl.power.info.percent !== null) {
 		t.equal(typeof sdl.power.info.percent, 'number')
-		t.ok(0 <= sdl.power.info.percent <= 100)
+		t.ok(0 <= sdl.power.info.percent && sdl.power.info.percent <= 100)
 	}
 })
