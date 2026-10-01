@@ -12,5 +12,9 @@
   },
   "devDependencies": {
     "@kmamal/packager": "*"
+  },
+  "allowScripts": {
+    "@kmamal/sdl": true,
+    "ffmpeg-static": true
   }
 }

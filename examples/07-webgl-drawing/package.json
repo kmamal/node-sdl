@@ -8,6 +8,7 @@
     "@kmamal/sdl": "*"
   },
   "allowScripts": {
+    "@kmamal/gl": true,
     "@kmamal/sdl": true
   }
 }

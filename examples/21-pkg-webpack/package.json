@@ -14,5 +14,8 @@
     "@yao-pkg/pkg": "*",
     "webpack": "*",
     "webpack-cli": "*"
+  },
+  "allowScripts": {
+    "@kmamal/sdl": true
   }
 }
