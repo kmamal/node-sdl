@@ -20,6 +20,8 @@ const clearEffectTimeout = (effect, id) => {
 const MAX_DURATION = 0xFFFF
 
 const startEffect = (kind, id, a, b, duration) => {
+	if (duration === 0) { return stopEffect(kind, id) }
+
 	const effect = effects[kind]
 	a = Math.round(a * 0xFFFF)
 	b = Math.round(b * 0xFFFF)
