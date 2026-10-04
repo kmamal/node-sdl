@@ -28,7 +28,7 @@ gamepad::getSteamHandle (Napi::Env &env, SDL_Gamepad *gamepad)
 {
 	Uint64 _steam_handle = SDL_GetGamepadSteamHandle(gamepad);
 	return _steam_handle != 0
-		? Napi::Buffer<Uint64>::Copy(env, &_steam_handle, 1)
+		? Napi::BigInt::New(env, _steam_handle)
 		: env.Null();
 }
 

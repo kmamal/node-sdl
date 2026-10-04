@@ -294,7 +294,7 @@ export namespace Events {
 
 		export interface SteamHandleUpdate extends GamepadEvent {
 			readonly type: 'steamHandleUpdate'
-			readonly steamHandle: Buffer | null
+			readonly steamHandle: bigint | null
 		}
 
 		export interface Remap extends GamepadEvent { readonly type: 'remap' }
@@ -1245,7 +1245,7 @@ export namespace Sdl {
 			readonly device: Device
 			readonly firmwareVersion: number | null
 			readonly serialNumber: string | null
-			readonly steamHandle: Buffer | null
+			readonly steamHandle: bigint | null
 
 			readonly axes: { readonly [axis in Axis]: number }
 			readonly buttons: { readonly [button in Button]: boolean }
