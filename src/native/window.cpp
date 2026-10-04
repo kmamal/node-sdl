@@ -58,7 +58,7 @@ updateRenderer(
 	Napi::Env &env,
 	SDL_Window *window,
 	bool *is_accelerated,
-	bool *is_vsync
+	int *vsync
 ) {
 	int window_id = SDL_GetWindowID(window);
 	// Not likely to fail.
@@ -82,20 +82,20 @@ updateRenderer(
 
 	if (renderer == nullptr) {
 		std::ostringstream message;
-		message << "SDL_CreateRenderer(" << window_id << ", " << *is_accelerated << ", " << *is_vsync << ") error: " << SDL_GetError();
+		message << "SDL_CreateRenderer(" << window_id << ", " << *is_accelerated << ", " << *vsync << ") error: " << SDL_GetError();
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
 
-	if (!SDL_SetRenderVSync(renderer, *is_vsync ? 1 : 0)) { SDL_ClearError(); }
+	if (!SDL_SetRenderVSync(renderer, *vsync)) { SDL_ClearError(); }
 
 	const char *renderer_name = SDL_GetRendererName(renderer);
 	if (renderer_name == nullptr) { SDL_ClearError(); }
 	else { *is_accelerated = SDL_strcmp(renderer_name, SDL_SOFTWARE_RENDERER) != 0; }
 
-	int vsync;
-	if (!SDL_GetRenderVSync(renderer, &vsync)) { SDL_ClearError(); }
-	else { *is_vsync = vsync != 0; }
+	int actual_vsync;
+	if (!SDL_GetRenderVSync(renderer, &actual_vsync)) { SDL_ClearError(); }
+	else { *vsync = actual_vsync; }
 }
 
 
@@ -119,7 +119,7 @@ window::create (const Napi::CallbackInfo &info)
 	bool is_webgpu = info[14].As<Napi::Boolean>().Value();
 	bool has_renderer = !is_opengl && !is_webgpu;
 	bool is_accelerated = has_renderer && info[11].As<Napi::Boolean>().Value();
-	bool is_vsync = has_renderer && info[12].As<Napi::Boolean>().Value();
+	int vsync = has_renderer ? info[12].As<Napi::Number>().Int32Value() : 0;
 
 	Uint64 desired_flags = 0
 		| SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY
@@ -294,7 +294,7 @@ window::create (const Napi::CallbackInfo &info)
 			native.Set("gpu", Napi::Buffer<GPU_NativeData>::Copy(env, &native_gpu, 1));
 		}
 		else {
-			updateRenderer(env, window, &is_accelerated, &is_vsync);
+			updateRenderer(env, window, &is_accelerated, &vsync);
 		}
 
 		if (is_visible && !SDL_ShowWindow(window)) {
@@ -339,7 +339,7 @@ window::create (const Napi::CallbackInfo &info)
 		result.Set("alwaysOnTop", is_always_on_top);
 		if (has_renderer) {
 			result.Set("accelerated", is_accelerated);
-			result.Set("vsync", is_vsync);
+			result.Set("vsync", vsync);
 		}
 		else {
 			result.Set("accelerated", env.Null());
@@ -538,15 +538,15 @@ window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
 	bool is_accelerated = info[1].As<Napi::Boolean>().Value();
-	bool is_vsync = info[2].As<Napi::Boolean>().Value();
+	int vsync = info[2].As<Napi::Number>().Int32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	updateRenderer(env, window, &is_accelerated, &is_vsync);
+	updateRenderer(env, window, &is_accelerated, &vsync);
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("accelerated", is_accelerated);
-	result.Set("vsync", is_vsync);
+	result.Set("vsync", vsync);
 
 	return result;
 }

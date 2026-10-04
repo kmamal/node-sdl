@@ -620,14 +620,14 @@ export namespace Sdl {
 			readonly accelerated: boolean | null
 			setAccelerated (accelerated: boolean): void
 
-			readonly vsync: boolean | null
-			setVsync (vsync: boolean): void
+			readonly vsync: number | null
+			setVsync (vsync: number): void
 
 			readonly opengl: boolean
 			readonly webgpu: boolean
 			readonly native: {
-				handle: Buffer | null,
-				subsystem: 'x11' | 'wayland' | null,
+				readonly handle: Buffer | null,
+				readonly subsystem: 'x11' | 'wayland' | null,
 			}
 
 			readonly maximized: boolean
@@ -698,7 +698,7 @@ export namespace Sdl {
 				borderless?: boolean
 				alwaysOnTop?: boolean
 				accelerated?: boolean
-				vsync?: boolean
+				vsync?: number
 				opengl?: boolean
 				webgpu?: boolean
 			}): Window

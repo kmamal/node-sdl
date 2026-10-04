@@ -82,7 +82,10 @@ class Window extends EventsViaPoll {
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
 		if (typeof alwaysOnTop !== 'boolean') { throw Object.assign(new Error("alwaysOnTop must be a boolean"), { alwaysOnTop }) }
 		if (hasAccelerated && typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
-		if (hasVsync && typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
+		if (hasVsync) {
+			if (!Number.isInteger(vsync)) { throw Object.assign(new Error("vsync must be an integer"), { vsync }) }
+			if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
+		}
 		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
 		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
 		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
@@ -111,7 +114,7 @@ class Window extends EventsViaPoll {
 			borderless,
 			alwaysOnTop,
 			accelerated ?? true,
-			vsync ?? true,
+			vsync ?? 1,
 			opengl,
 			webgpu,
 		)
@@ -378,7 +381,8 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call setVsync in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setVsync in webgpu mode") }
 
-		if (typeof vsync !== 'boolean') { throw Object.assign(new Error("vsync must be a boolean"), { vsync }) }
+		if (!Number.isInteger(vsync)) { throw Object.assign(new Error("vsync must be an integer"), { vsync }) }
+		if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
 
 		const result = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
 		this._accelerated = result.accelerated
