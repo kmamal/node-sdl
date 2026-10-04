@@ -37,15 +37,16 @@ class AudioStream extends EventsViaPoll {
 
 		this._id = id
 		this._recording = recording
+		const helper = AudioFormatHelpers[format]
+
 		this._device = device
 		this._channels = channels
-		this._format = format
+		this._format = helper.name
 		this._frequency = frequency
 
 		this._playing = false
 		this._closed = false
 
-		const helper = AudioFormatHelpers[this._format]
 		this._bytesPerSample = helper.bytesPerSample
 		this._minSampleValue = helper.minSampleValue
 		this._maxSampleValue = helper.maxSampleValue

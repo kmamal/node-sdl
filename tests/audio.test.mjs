@@ -1,5 +1,8 @@
 import T from '@kmamal/testing'
+import Os from 'node:os'
 import sdl from '../src/javascript/index.js'
+
+const native = (format) => `${format}${Os.endianness().toLowerCase()}`
 
 T.test("sdl::audio", async (t) => {
 	t.timeout(3e3)
@@ -67,8 +70,8 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream1.frequency, 48e3)
 		t.equal(stream2.frequency, 44100)
 
-		t.equal(stream1.format, 'f32')
-		t.equal(stream2.format, 's16')
+		t.equal(stream1.format, native('f32'))
+		t.equal(stream2.format, native('s16'))
 
 		t.equal(stream1.bytesPerSample, 4)
 		t.equal(stream2.bytesPerSample, 2)
@@ -157,8 +160,8 @@ T.test("sdl::audio", async (t) => {
 		t.equal(stream1.frequency, 48e3)
 		t.equal(stream2.frequency, 44100)
 
-		t.equal(stream1.format, 'f32')
-		t.equal(stream2.format, 's16')
+		t.equal(stream1.format, native('f32'))
+		t.equal(stream2.format, native('s16'))
 
 
 		t.equal(stream1.playing, false)

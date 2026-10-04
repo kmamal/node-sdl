@@ -46,6 +46,13 @@ const video = new class extends EventsViaPoll {
 	isYuv (format) { return getFormatHelpers(format).isYuv }
 	isPlanarYuv (format) { return getFormatHelpers(format).isPlanarYuv }
 
+	minStride (format, width) {
+		const helpers = getFormatHelpers(format)
+		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
+		if (width < 0) { throw Object.assign(new Error("width must be non-negative"), { width }) }
+		return helpers.minStride(width)
+	}
+
 	minBufferSize (format, stride, height) {
 		const helpers = getFormatHelpers(format)
 		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }

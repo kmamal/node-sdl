@@ -1,3 +1,4 @@
+const Os = require('node:os')
 
 const minStride = (bytesPerPixel) => (width) => width * bytesPerPixel
 const minStridePacked = (width) => 4 * Math.ceil(width / 2)
@@ -9,18 +10,18 @@ const rgb = (bytesPerPixel) => ({
 	bytesPerPixel,
 	isYuv: false,
 	isPlanarYuv: false,
-	isRenderable: true,
 	minStride: minStride(bytesPerPixel),
 	minBufferSize,
+	isRenderable: true,
 })
 
 const yuv = (bytesPerPixel, isPlanarYuv, isRenderable = true) => ({
 	bytesPerPixel,
 	isYuv: true,
 	isPlanarYuv,
-	isRenderable,
 	minStride: isPlanarYuv ? minStride(bytesPerPixel) : minStridePacked,
 	minBufferSize: isPlanarYuv ? minBufferSizePlanar : minBufferSize,
+	isRenderable,
 })
 
 const VideoFormatHelpers = Object.assign(Object.create(null), {
@@ -71,14 +72,6 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 	argb128f: rgb(16),
 	bgra128f: rgb(16),
 	abgr128f: rgb(16),
-	rgba32: rgb(4),
-	argb32: rgb(4),
-	bgra32: rgb(4),
-	abgr32: rgb(4),
-	rgbx32: rgb(4),
-	xrgb32: rgb(4),
-	bgrx32: rgb(4),
-	xbgr32: rgb(4),
 	yv12: yuv(1, true),
 	iyuv: yuv(1, true),
 	yuy2: yuv(2, false),
@@ -88,6 +81,31 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 	nv21: yuv(1, true),
 	p010: { ...yuv(2, true, false), minStride: minStridePacked },
 })
+
+for (const [ key, value ] of Object.entries(VideoFormatHelpers)) {
+	value.name = key
+}
+
+if (Os.endianness() === 'LE') {
+	VideoFormatHelpers.rgba32 = VideoFormatHelpers.abgr8888
+	VideoFormatHelpers.argb32 = VideoFormatHelpers.bgra8888
+	VideoFormatHelpers.bgra32 = VideoFormatHelpers.argb8888
+	VideoFormatHelpers.abgr32 = VideoFormatHelpers.rgba8888
+	VideoFormatHelpers.rgbx32 = VideoFormatHelpers.xbgr8888
+	VideoFormatHelpers.xrgb32 = VideoFormatHelpers.bgrx8888
+	VideoFormatHelpers.bgrx32 = VideoFormatHelpers.xrgb8888
+	VideoFormatHelpers.xbgr32 = VideoFormatHelpers.rgbx8888
+}
+else {
+	VideoFormatHelpers.rgba32 = VideoFormatHelpers.rgba8888
+	VideoFormatHelpers.argb32 = VideoFormatHelpers.argb8888
+	VideoFormatHelpers.bgra32 = VideoFormatHelpers.bgra8888
+	VideoFormatHelpers.abgr32 = VideoFormatHelpers.abgr8888
+	VideoFormatHelpers.rgbx32 = VideoFormatHelpers.rgbx8888
+	VideoFormatHelpers.xrgb32 = VideoFormatHelpers.xrgb8888
+	VideoFormatHelpers.bgrx32 = VideoFormatHelpers.bgrx8888
+	VideoFormatHelpers.xbgr32 = VideoFormatHelpers.xbgr8888
+}
 
 const getFormatHelpers = (format) => {
 	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }

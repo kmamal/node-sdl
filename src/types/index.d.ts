@@ -505,14 +505,6 @@ export namespace Sdl {
 			| 'argb128f'
 			| 'bgra128f'
 			| 'abgr128f'
-			| 'rgba32'
-			| 'argb32'
-			| 'bgra32'
-			| 'abgr32'
-			| 'rgbx32'
-			| 'xrgb32'
-			| 'bgrx32'
-			| 'xbgr32'
 			| 'yv12'
 			| 'iyuv'
 			| 'yuy2'
@@ -521,6 +513,16 @@ export namespace Sdl {
 			| 'nv12'
 			| 'nv21'
 			| 'p010'
+
+		export type FormatAlias
+			= 'rgba32'
+			| 'argb32'
+			| 'bgra32'
+			| 'abgr32'
+			| 'rgbx32'
+			| 'xrgb32'
+			| 'bgrx32'
+			| 'xbgr32'
 
 		export type Scaling
 			= 'nearest'
@@ -646,7 +648,7 @@ export namespace Sdl {
 			setRelativeMouseMode (relative?: boolean): void
 			unsetRelativeMouseMode (): void
 
-			render (width: number, height: number, stride: number, format: Format, buffer: Buffer, options?: {
+			render (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer, options?: {
 				scaling?: Scaling,
 				dstRect?: {
 					x: number,
@@ -656,7 +658,7 @@ export namespace Sdl {
 				} | null
 			}): void
 
-			setIcon (width: number, height: number, stride: number, format: Format, buffer: Buffer): void
+			setIcon (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer): void
 
 			flash (untilFocused?: boolean): void
 			stopFlashing (): void
@@ -701,10 +703,11 @@ export namespace Sdl {
 				webgpu?: boolean
 			}): Window
 
-			bytesPerPixel (format: Format): number
-			isYuv (format: Format): boolean
-			isPlanarYuv (format: Format): boolean
-			minBufferSize (format: Format, stride: number, height: number): number
+			bytesPerPixel (format: Format | FormatAlias): number
+			isYuv (format: Format | FormatAlias): boolean
+			isPlanarYuv (format: Format | FormatAlias): boolean
+			minStride (format: Format | FormatAlias, width: number): number
+			minBufferSize (format: Format | FormatAlias, stride: number, height: number): number
 		}
 	}
 
@@ -1023,7 +1026,7 @@ export namespace Sdl {
 
 			setCursor (cursor: Cursor): void
 			resetCursor (): void
-			setCursorImage (width: number, height: number, stride: number, format: Video.Format, buffer: Buffer, x: number, y: number): void
+			setCursorImage (width: number, height: number, stride: number, format: Video.Format | Video.FormatAlias, buffer: Buffer, x: number, y: number): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void
@@ -1342,11 +1345,14 @@ export namespace Sdl {
 			| 'u8'
 			| 's16le'
 			| 's16be'
-			| 's16'
 			| 's32le'
 			| 's32be'
 			| 's32'
 			| 'f32le'
+
+		export type FormatAlias
+			= 's16'
+			| 's32'
 			| 'f32be'
 			| 'f32'
 
@@ -1362,7 +1368,7 @@ export namespace Sdl {
 		export interface StreamOptions {
 			readonly channels?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 			readonly frequency?: number
-			readonly format?: Format
+			readonly format?: Format | FormatAlias
 			readonly buffered?: number
 		}
 
@@ -1420,12 +1426,12 @@ export namespace Sdl {
 			readonly playback: DeviceModule<AudioPlaybackStream>
 			readonly recording: DeviceModule<AudioRecordingStream>
 
-			bytesPerSample (format: Format): number
-			minSampleValue (format: Format): number
-			maxSampleValue (format: Format): number
-			zeroSampleValue (format: Format): number
-			readSample (format: Format, buffer: Buffer, offset?: number): number
-			writeSample (format: Format, buffer: Buffer, value: number, offset?: number): number
+			bytesPerSample (format: Format | FormatAlias): number
+			minSampleValue (format: Format | FormatAlias): number
+			maxSampleValue (format: Format | FormatAlias): number
+			zeroSampleValue (format: Format | FormatAlias): number
+			readSample (format: Format | FormatAlias, buffer: Buffer, offset?: number): number
+			writeSample (format: Format | FormatAlias, buffer: Buffer, value: number, offset?: number): number
 		}
 	}
 

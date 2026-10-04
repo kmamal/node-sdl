@@ -5,12 +5,13 @@ export namespace SdlHelpers {
 
 	export namespace Video {
 
-		export type Format = Sdl.Video.Format
+		export type Format = Sdl.Video.Format | Sdl.Video.FormatAlias
 
 		interface Module {
 			bytesPerPixel (format: Format): number
 			isYuv (format: Format): boolean
 			isPlanarYuv (format: Format): boolean
+			minStride (format: Format, width: number): number
 			minBufferSize (format: Format, stride: number, height: number): number
 		}
 
@@ -42,7 +43,7 @@ export namespace SdlHelpers {
 
 	export namespace Audio {
 
-		export type Format = Sdl.Audio.Format
+		export type Format = Sdl.Audio.Format | Sdl.Audio.FormatAlias
 
 		interface Module {
 			bytesPerSample (format: Format): number

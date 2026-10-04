@@ -64,6 +64,10 @@ const AudioFormatHelpers = Object.assign(Object.create(null), {
 	},
 })
 
+for (const [ key, value ] of Object.entries(AudioFormatHelpers)) {
+	value.name = key
+}
+
 if (Os.endianness() === 'LE') {
 	AudioFormatHelpers.s16 = AudioFormatHelpers.s16le
 	AudioFormatHelpers.s32 = AudioFormatHelpers.s32le
