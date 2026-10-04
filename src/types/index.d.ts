@@ -1347,13 +1347,12 @@ export namespace Sdl {
 			| 's16be'
 			| 's32le'
 			| 's32be'
-			| 's32'
 			| 'f32le'
+			| 'f32be'
 
 		export type FormatAlias
 			= 's16'
 			| 's32'
-			| 'f32be'
 			| 'f32'
 
 		export interface Device {
