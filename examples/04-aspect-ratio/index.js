@@ -20,6 +20,7 @@ const resize = () => {
 	const factorX = Math.floor(window.pixelWidth / image.width)
 	const factorY = Math.floor(window.pixelHeight / image.height)
 	const factor = Math.min(factorX, factorY)
+	if (factor === 0) { return }
 
 	viewport.width = factor * image.width
 	viewport.height = factor * image.height
