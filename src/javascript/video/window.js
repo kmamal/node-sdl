@@ -157,32 +157,34 @@ class Window extends EventsViaPoll {
 		// Manually emit some initial events for convenience
 		process.nextTick(() => {
 			if (this._destroyed) { return }
-			try {
-				this.emit('move', {
-					x: this._x,
-					y: this._y,
-					type: 'move',
-				})
-			}
-			catch (error) { this.emit('error', error) }
-			try {
-				this.emit('resize', {
-					width: this._width,
-					height: this._height,
-					pixelWidth: this._pixelWidth,
-					pixelHeight: this._pixelHeight,
-					type: 'resize',
-				})
-			}
-			catch (error) { this.emit('error', error) }
-			if (this._visible) {
+			Globals.events.withoutPolling(() => {
 				try {
-					this.emit('expose', {
-						type: 'expose',
+					this.emit('move', {
+						x: this._x,
+						y: this._y,
+						type: 'move',
 					})
 				}
 				catch (error) { this.emit('error', error) }
-			}
+				try {
+					this.emit('resize', {
+						width: this._width,
+						height: this._height,
+						pixelWidth: this._pixelWidth,
+						pixelHeight: this._pixelHeight,
+						type: 'resize',
+					})
+				}
+				catch (error) { this.emit('error', error) }
+				if (this._visible) {
+					try {
+						this.emit('expose', {
+							type: 'expose',
+						})
+					}
+					catch (error) { this.emit('error', error) }
+				}
+			})
 		})
 	}
 
@@ -587,21 +589,25 @@ class Window extends EventsViaPoll {
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("window is destroyed"), { id: this._id }))
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
+		Globals.events.withoutPolling(() => {
+			try { this.emit('close', { type: 'close' }) }
+			catch (error) { this.emit('error', error) }
+		})
 	}
 
 	destroyGently () {
 		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
 
 		let shouldPrevent = false
-		try {
-			this.emit('beforeClose', {
-				type: 'beforeClose',
-				prevent: () => { shouldPrevent = true },
-			})
-		}
-		catch (error) { this.emit('error', error) }
+		Globals.events.withoutPolling(() => {
+			try {
+				this.emit('beforeClose', {
+					type: 'beforeClose',
+					prevent: () => { shouldPrevent = true },
+				})
+			}
+			catch (error) { this.emit('error', error) }
+		})
 		if (shouldPrevent) { return }
 
 		// A listener may have already destroyed the window

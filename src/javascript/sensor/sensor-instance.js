@@ -59,8 +59,10 @@ class SensorInstance extends EventsViaPoll {
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("instance is closed"), { id: this._device.id }))
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
+		Globals.events.withoutPolling(() => {
+			try { this.emit('close', { type: 'close' }) }
+			catch (error) { this.emit('error', error) }
+		})
 	}
 }
 

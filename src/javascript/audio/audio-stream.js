@@ -119,8 +119,10 @@ class AudioStream extends EventsViaPoll {
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("stream is closed"), { id: this._id }))
 
-		try { this.emit('close', { type: 'close' }) }
-		catch (error) { this.emit('error', error) }
+		Globals.events.withoutPolling(() => {
+			try { this.emit('close', { type: 'close' }) }
+			catch (error) { this.emit('error', error) }
+		})
 	}
 }
 

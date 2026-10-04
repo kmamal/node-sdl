@@ -489,6 +489,12 @@ const poll = () => {
 	finally { polling = false }
 }
 
+const withoutPolling = (fn) => {
+	const prevValue = polling
+	try { fn() }
+	finally { polling = prevValue }
+}
+
 let pollInterval = null
 
 const switchToPollingFast = () => {
@@ -509,6 +515,7 @@ const stopPolling = () => {
 
 Globals.events = {
 	poll,
+	withoutPolling,
 	switchToPollingFast,
 	switchToPollingSlow,
 	stopPolling,
