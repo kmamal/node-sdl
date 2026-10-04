@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > [!NOTE]
-> This version migrated from SDL2 to SDL3.
+> Version 1.0.0 has migrated from SDL2 to SDL3.
 > Most of the API is unchanged, but several changes break compatibility.
 > The [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) lists them all.
 

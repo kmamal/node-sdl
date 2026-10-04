@@ -19,6 +19,7 @@
   - [sdl.video.bytesPerPixel(format)](#sdlvideobytesperpixelformat)
   - [sdl.video.isYuv(format)](#sdlvideoisyuvformat)
   - [sdl.video.isPlanarYuv(format)](#sdlvideoisplanaryuvformat)
+  - [sdl.video.minStride(format, width)](#sdlvideominstrideformat-width)
   - [sdl.video.minBufferSize(format, stride, height)](#sdlvideominbuffersizeformat-stride-height)
   - [sdl.video.displays](#sdlvideodisplays)
   - [sdl.video.windows](#sdlvideowindows)
@@ -325,7 +326,7 @@ Sample data for Linux:
 }
 ```
 
-### Event Emitters
+### Event emitters
 
 Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.gamepad`, `sdl.audio.playback`, `sdl.audio.recording`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances and audio streams) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, etc. all work.
 Each object accepts only the event names listed in this document.
@@ -461,6 +462,9 @@ String values that describe how a Buffer stores the pixels of an image.
 | `'nv21'`        | `SDL_PIXELFORMAT_NV21`              | planar mode: Y + V/U interleaved (2 planes)                                                  |
 | `'p010'`        | `SDL_PIXELFORMAT_P010`              | planar mode: 10-bit Y + U/V interleaved in 16-bit samples (2 planes), rejected by `window.render()` |
 
+The byte-order aliases (`'rgba32'` through `'xbgr32'`) are accepted wherever you pass a pixel format in, as a convenience.
+Every pixel format the library reports, such as a display's `format`, is one of the other, explicit names.
+
 ### Event: 'displayAdd'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
@@ -537,6 +541,19 @@ This function is also available from `@kmamal/sdl/helpers`.
 - Returns: `<boolean>` Is `true` if the format is a planar YUV format.
 
 Helper function that tells planar YUV formats (where the Y, U, and V components are stored in separate planes) apart from all others.
+
+This function is also available from `@kmamal/sdl/helpers`.
+
+### sdl.video.minStride(format, width)
+
+- `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
+- `width: <number>` The width of the image in pixels. Must be a non-negative integer.
+- Returns: `<number>` The minimum number of bytes.
+
+Helper function that computes the smallest `stride` that can hold a row of an image with the given format and width.
+For most formats this is just `width * bytesPerPixel`.
+For the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'` it is `4 * Math.ceil(width / 2)`.
+The functions that accept [image data](#image-data) throw if the stride you give them is smaller than this.
 
 This function is also available from `@kmamal/sdl/helpers`.
 
@@ -638,7 +655,7 @@ The window under the mouse, or `null` if the mouse is not over a window.
   - `borderless: <boolean>` Set to `true` to hide the window's borders and title bar completely. Default: `false`
   - `alwaysOnTop: <boolean>` Set to `true` to always show the window above others. Default: `false`
   - `accelerated: <boolean>` Set to `false` to disable hardware accelerated rendering. Default: `true`. Can't be set together with `opengl` or `webgpu`.
-  - `vsync: <boolean>` Set to `false` to disable frame rate synchronization. Default: `true`. Can't be set together with `opengl` or `webgpu`.
+  - `vsync: <number>` The vsync interval. See [`window.vsync`](#windowvsync). Default: `1`. Can't be set together with `opengl` or `webgpu`.
   - `opengl: <boolean>` Set to `true` to create an OpenGL-compatible window (for use with [@kmamal/gl](https://github.com/kmamal/headless-gl#readme)). Default: `false`
   - `webgpu: <boolean>` Set to `true` to create a WebGPU-compatible window (for use with [@kmamal/gpu](https://github.com/kmamal/gpu#readme)). Default: `false`
 - Returns: [`<Window>`](#class-window) An object that represents the new window.
@@ -1064,15 +1081,20 @@ Until a later call to `setAccelerated()` or `setVsync()` succeeds, [`render()`](
 
 ### window.vsync
 
-- `<boolean>|<null>`
+- `<number>|<null>`
 
-Is `true` if the window is using vsync.
-Is `null` if you set the `opengl` or `webgpu` options, since such windows have no SDL renderer.
+The window's vsync interval.
 Vsync synchronizes the window's frame rate with the display's refresh rate to prevent tearing.
+A value of `1` presents a frame on every vertical refresh, `2` on every second refresh, and so on.
+A value of `0` disables vsync, and `-1` requests adaptive vsync, which syncs to the refresh rate but tears instead of waiting when a frame is late.
+Is `null` if you set the `opengl` or `webgpu` options, since such windows have no SDL renderer.
+
+Not every driver supports every value.
+If a value isn't supported, the property reports the value the renderer actually uses.
 
 ### window.setVsync(vsync)
 
-- `vsync: <boolean>` The new value of the property.
+- `vsync: <number>` The new value of the property. Must be `-1` or a non-negative 32-bit integer.
 
 Changes the window's vsync property.
 
@@ -1206,7 +1228,6 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
     - `x, y, width, height: <rect>` The components of the rectangle, in pixels. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
 
 Displays an image in the window.
-`render()` rejects the `'p010'` pixel format, which it can't render.
 
 By default the image covers the entire surface of the window.
 To choose where on the window the image appears, pass the optional `dstRect` parameter.
@@ -1224,13 +1245,17 @@ Possible values are:
 If you created the window with the `opengl` or `webgpu` option, you must render to it with OpenGL or WebGPU calls instead.
 Calls to `render()` fail.
 
+`render()` rejects the `'p010'` pixel format, which it can't render.
+
 ### window.setIcon(width, height, stride, format, buffer)
 
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display as the icon of the window.
 
 Sets the window's icon, which the system usually displays in the title bar and the taskbar.
-Accepts only RGB [pixel formats](#pixel-formats); YUV formats throw.
+
 Throws if the windowing system does not support setting the icon.
+
+Accepts only RGB [pixel formats](#pixel-formats); YUV formats throw.
 
 ### window.flash([untilFocused])
 
@@ -1829,7 +1854,7 @@ Sample output:
 
 Opens a joystick device and returns its instance.
 
-## class joystickInstance
+## class JoystickInstance
 
 The API does not expose the `JoystickInstance` class, so you can't (and shouldn't) use it with the `new` operator.
 Instead, [`sdl.joystick.openDevice()`](#sdljoystickopendevicedevice) returns objects of type `JoystickInstance`.
@@ -1987,13 +2012,14 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the joystick rumble for a set `duration`, or until stopped.
 Throws if the joystick has no rumble motors (see [`joystickInstance.hasRumble`](#joystickinstancehasrumble)).
 Calling this function again before `duration` runs out overrides the previous call.
-The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
-Passing `0` for both intensities stops the rumble.
+Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
+
+The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 
 ### joystickInstance.stopRumble()
 
@@ -2011,13 +2037,14 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the joystick triggers rumble for a set `duration`, or until stopped.
 Throws if the joystick has no trigger rumble motors (see [`joystickInstance.hasRumbleTriggers`](#joystickinstancehasrumbletriggers)).
 Calling this function again before `duration` runs out overrides the previous call.
-The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
-Passing `0` for both intensities stops the rumble.
+Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
+
+The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 
 ### joystickInstance.stopRumbleTriggers()
 
@@ -2186,7 +2213,7 @@ Fired when the gamepad's power info changes.
 
 ### Event: 'steamHandleUpdate'
 
-- `steamHandle: <Buffer>|<null>` The new steam handle.
+- `steamHandle: <bigint>|<null>` The new steam handle.
 
 Fired when the gamepad's [`steamHandle`](#gamepadinstancesteamhandle) changes.
 
@@ -2222,10 +2249,11 @@ The gamepad's serial number, or `null` if it is not available.
 
 ### gamepadInstance.steamHandle
 
-- `<Buffer>|<null>`
+- `<bigint>|<null>`
 
 The gamepad's steam handle, or `null` if it is not available.
-The `Buffer` contains an `InputHandle_t` for the gamepad, which you can use with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput).
+It is the `InputHandle_t` for the gamepad, which you can use with the [Steam Input API](https://partner.steamgames.com/doc/api/ISteamInput).
+It is a 64-bit value, which a JS `number` can't always represent exactly.
 
 ### gamepadInstance.axes
 
@@ -2342,13 +2370,14 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the gamepad rumble for a set `duration`, or until stopped.
 Throws if the gamepad has no rumble motors (see [`gamepadInstance.hasRumble`](#gamepadinstancehasrumble)).
 Calling this function again before `duration` runs out overrides the previous call.
-The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
-Passing `0` for both intensities stops the rumble.
+Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
+
+The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 
 ### gamepadInstance.stopRumble()
 
@@ -2366,13 +2395,14 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a positive 32-bit integer. Default: `null`
+- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the gamepad triggers rumble for a set `duration`, or until stopped.
 Throws if the gamepad has no trigger rumble motors (see [`gamepadInstance.hasRumbleTriggers`](#gamepadinstancehasrumbletriggers)).
 Calling this function again before `duration` runs out overrides the previous call.
-The motors belong to the device, so this also holds across instances: a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
-Passing `0` for both intensities stops the rumble.
+Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
+
+The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
 
 ### gamepadInstance.stopRumbleTriggers()
 
@@ -2564,6 +2594,9 @@ String values that name how a Buffer stores audio samples.
 | `'f32be'`  | `SDL_AUDIO_F32BE`               | 32-bit floating point samples in big-endian byte order    |
 | `'f32'`    | `SDL_AUDIO_F32`                 | 32-bit floating point samples in native byte order        |
 
+The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) are accepted wherever you pass a sample format in, as a convenience.
+Every sample format the library reports, such as a stream's or a device's `format`, is one of the explicit little-endian or big-endian names.
+
 ### sdl.audio.bytesPerSample(format)
 
 - `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
@@ -2663,8 +2696,7 @@ When this event fires, the library automatically closes all streams opened from 
   - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
 
 Lists all the detected playback devices.
-The first entry is always the default device, whose `id` is `null`.
-Opening a stream on it is the same as calling [`openDevice()`](#sdlaudioplaybackopendevicedevice-options) without a device: the stream plays on whichever device the system currently considers the default, and follows the system default when that changes.
+
 Sample output for PulseAudio:
 
 ```js
@@ -2674,6 +2706,8 @@ Sample output for PulseAudio:
 ]
 ```
 
+The first entry is always the default device, whose `id` is `null`.
+It represents letting the system choose for you which audio device to open.
 You can often open the default device even when the list shows no other devices:
 
 ```js
@@ -2741,8 +2775,7 @@ When this event fires, the library automatically closes all streams opened from 
   - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
 
 Lists all the detected recording devices.
-The first entry is always the default device, whose `id` is `null`.
-Opening a stream on it is the same as calling [`openDevice()`](#sdlaudiorecordingopendevicedevice-options) without a device: the stream records from whichever device the system currently considers the default, and follows the system default when that changes.
+
 Sample output for PulseAudio:
 
 ```js
@@ -2752,6 +2785,8 @@ Sample output for PulseAudio:
 ]
 ```
 
+The first entry is always the default device, whose `id` is `null`.
+It represents letting the system choose for you which audio device to open.
 You can often open the default device even when the list shows no other devices:
 
 ```js
@@ -2826,6 +2861,7 @@ The sampling frequency, in frames per second, that the stream opened with.
 - [`<SampleFormat>`](#sample-formats)
 
 The audio sample format that the stream opened with.
+This is always an explicit little-endian or big-endian name: a stream opened with `'f32'` reports `'f32le'` or `'f32be'`, depending on the machine's byte order.
 
 ### audioStream.bytesPerSample
 
@@ -2970,7 +3006,7 @@ Replaces the text contents of the clipboard.
 
 The current power information of the device.
 
-## Helpers
+## helpers
 
 Import the `@kmamal/sdl` library only from the main thread.
 If you import it from a `worker_thread`, you get an error.

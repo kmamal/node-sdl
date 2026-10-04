@@ -7,7 +7,6 @@ The [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-refe
 
 ## Contents
 
-- [Requirements](#requirements)
 - [Gamepads (formerly controllers)](#gamepads-formerly-controllers)
 - [Joysticks](#joysticks)
 - [Keyboard](#keyboard)
@@ -17,11 +16,6 @@ The [API Reference](https://github.com/kmamal/node-sdl/tree/master/docs/api-refe
 - [Touch](#touch)
 - [Sensors](#sensors)
 - [Mouse](#mouse)
-
-## Requirements
-
-- Node.js 22 or newer is required.
-- On Linux, `window.native.handle` now holds a tagged `{ subsystem, display, window }` struct instead of a bare X11 window id. The payloads that go to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and [@kmamal/gpu](https://github.com/kmamal/gpu#readme) changed the same way. Older versions of those packages can't consume the new payload, so upgrade them together with this one.
 
 ## Gamepads (formerly controllers)
 
@@ -79,7 +73,7 @@ The `'gamecube'` type is new.
 ### Power
 
 The power level strings (`'empty'`, `'low'`, `'medium'`, `'full'`, `'wired'`, `'max'`) are gone.
-`gamepadInstance.power` and the `powerUpdate` event now report SDL3's power info directly, in the same format as `sdl.power.info`:
+`gamepadInstance.power` and the `powerUpdate` event now report a charging state and a percentage, in the same format as `sdl.power.info`:
 
 ```js
 // Before
@@ -92,42 +86,10 @@ if (state === 'battery' && percent !== null && percent <= 20) { warn() }
 
 `state` is one of `'noBattery'`, `'battery'`, `'charging'`, `'charged'`, or `null` if unknown, and `percent` is a number or `null`.
 
-### Rumble durations
-
-The `duration` of `rumble()` and `rumbleTriggers()` now defaults to `null`, which rumbles until you stop it, instead of `1e3`.
-Pass `1e3` explicitly to keep the old behavior.
-The functions now reject a duration of `0`. It used to stop the rumble right away, but `stopRumble()` and `stopRumbleTriggers()` now do that job.
-
-```js
-// Before
-instance.rumble()
-instance.rumble(1, 1, 0)
-
-// After
-instance.rumble(1, 1, 1e3)
-instance.stopRumble()
-```
-
 ## Joysticks
 
 - `power` and the `powerUpdate` event changed exactly as described for [gamepads](#power).
-- Axis values are now normalized relative to the axis's true center, like gamepad axes, instead of relative to the value the axis had when you opened the device. Pedals and throttles that rest at one end of their range now read `1` or `-1` at rest instead of `0`, and axes that rest at their maximum no longer report `NaN`.
-- The `duration` of `rumble()` and `rumbleTriggers()` defaults to `null` and rejects `0`, as [gamepads](#rumble-durations) do.
 - Device types and hat positions follow SDL3's names in camel case: `'gamecontroller'` is `'gamepad'`, and `'arcadestick'`, `'flightstick'`, `'dancepad'`, `'drumkit'`, and `'arcadepad'` are `'arcadeStick'`, `'flightStick'`, `'dancePad'`, `'drumKit'`, and `'arcadePad'`. The diagonal hat positions `'rightup'`, `'rightdown'`, `'leftup'`, and `'leftdown'` are `'rightUp'`, `'rightDown'`, `'leftUp'`, and `'leftDown'`.
-
-## Keyboard
-
-### The space key
-
-The space key is reported as `' '`, like every other character-producing key, instead of `'space'`.
-
-```js
-// Before
-if (event.key === 'space') { ... }
-
-// After
-if (event.key === ' ') { ... }
-```
 
 ### Media keys
 
@@ -153,29 +115,12 @@ The media scancodes and keys follow SDL3's names:
 | `'audioRewind'` | `'mediaRewind'` |
 | `'audioFastForward'` | `'mediaFastForward'` |
 
-The `'eject'` and `'mediaSelect'` key names are unchanged.
-
 ### Removed scancodes and keys
 
 SDL3 dropped these scancodes, so they are gone from `sdl.keyboard.SCANCODE` along with the corresponding key names:
 `AUDIOMUTE`, `WWW`, `MAIL`, `CALCULATOR`, `COMPUTER`, `BRIGHTNESSDOWN`, `BRIGHTNESSUP`, `DISPLAYSWITCH`, `KBDILLUMTOGGLE`, `KBDILLUMDOWN`, `KBDILLUMUP`, `APP1`, `APP2`.
 
 ## Displays
-
-### Displays have ids
-
-Display objects carry a stable `id`.
-Hot-plug events and `createWindow({ display })` identify displays by that id, so the `display` option must be one of the objects in `sdl.video.displays`:
-
-```js
-// Before: matched by name and position, a copy worked
-sdl.video.createWindow({ display: { ...sdl.video.displays[1] } })
-
-// After: must be the object from the list
-sdl.video.createWindow({ display: sdl.video.displays[1] })
-```
-
-A display that you disconnect and reconnect is a new device with a new id. You receive a `displayRemove` followed by a `displayAdd`, and the library does not update the old object in place.
 
 ### `dpi` is replaced by `scale`
 
@@ -235,24 +180,27 @@ window.render(w, h, stride, format, buffer, { scaling: 'linear' })
 
 `window.setPosition()` now throws when the windowing system can't position the window, which always happens for regular windows under Wayland.
 It used to fail silently and leave `x` and `y` reporting the requested position.
-Wrap the call in `try`/`catch` if your program also runs on Wayland.
 
 `setPosition()`, `setSize()`, and `setSizeInPixels()` no longer set `x`, `y`, `width`, `height`, `pixelWidth`, and `pixelHeight` to the requested values.
 Like `setFullscreen()` and the other state changes, they submit a request.
 Once the windowing system applies the request, the `move` and `resize` events update the properties to the values the window actually took.
 Listen for those events, or poll, instead of reading the properties right after the call.
 
-### OpenGL and WebGPU windows have no renderer settings
+### `vsync` is an interval
 
-OpenGL and WebGPU windows have no SDL renderer, so `createWindow()` now throws if you pass `accelerated` or `vsync` together with `opengl` or `webgpu`, instead of ignoring the option.
-For such windows, `window.accelerated` and `window.vsync` are `null`.
+`vsync` is now an integer, as in SDL3, instead of a boolean.
+`1` presents a frame on every vertical refresh, `2` on every second refresh, and so on.
+`0` disables vsync, and `-1` requests adaptive vsync.
+The default is `1`.
 
 ```js
 // Before
-sdl.video.createWindow({ opengl: true, vsync: false })
+const window = sdl.video.createWindow({ vsync: false })
+window.setVsync(true)
 
 // After
-sdl.video.createWindow({ opengl: true })
+const window = sdl.video.createWindow({ vsync: 0 })
+window.setVsync(1)
 ```
 
 ## Audio
@@ -289,7 +237,7 @@ const stream = sdl.audio.playback.openDevice()
 ```
 
 You can no longer open arbitrary driver-specific device names, such as a hostname for a remote audio server, because SDL3 opens only the devices it has enumerated.
-The sample-format helpers (`sdl.audio.bytesPerSample()` and the others) are unchanged.
+
 You can now open streams with any number of channels from 1 to 8, which adds the 2.1, 4.1, 6.1, and 7.1 layouts.
 
 ### Instances are streams
@@ -305,8 +253,7 @@ You can now open streams with any number of channels from 1 to 8, which adds the
 | `audioInstance.buffered` | `audioStream.device.buffered` |
 
 `playbackStream.queued` keeps its name.
-For streams opened on the default device, `audioStream.device` is now the default-device entry. It used to echo back the `{ type }` object you passed in.
-The driver's buffer size moved to the device, because it belongs to the device and not to the stream. SDL converts between each stream's format and the device's, and while streams are open on a device, its object exposes the `format`, `channels`, `frequency`, and `buffered` of the device.
+For streams opened on the default device, `audioStream.device` is now the default-device entry.
 
 ```js
 // Before
@@ -320,6 +267,8 @@ recordingStream.getData(buffer.subarray(0, available))
 playbackStream.putData(buffer)
 ```
 
+The driver's buffer size moved to the device, because it belongs to the device and not to the stream. SDL converts between each stream's format and the device's, and while streams are open on a device, its object exposes the `format`, `channels`, `frequency`, and `buffered` of the device.
+
 ### Sample format names
 
 Sample formats follow SDL3's names. The endianness suffixes are `le` and `be`, and the unsuffixed names now mean native byte order, as SDL3's `SDL_AUDIO_S16`, `SDL_AUDIO_S32`, and `SDL_AUDIO_F32` do, instead of aliasing little-endian:
@@ -332,6 +281,7 @@ Sample formats follow SDL3's names. The endianness suffixes are `le` and `be`, a
 | `'s16sys'`, `'s32sys'`, `'f32sys'` | `'s16'`, `'s32'`, `'f32'` |
 
 On the little-endian machines this library supports, `'s16'`, `'s32'`, and `'f32'` keep their old layout.
+They are accepted as input only: `audioStream.format` reports the explicit name the stream resolved to, so a stream opened with `'f32'` reports `'f32le'` on such machines.
 
 SDL3 removed the unsigned 16-bit sample formats `'u16'`, `'u16lsb'`, `'u16msb'`, and `'u16sys'`, so they are gone.
 Use `'s16'` or one of the 32-bit formats instead.
