@@ -329,9 +329,9 @@ Sample data for Linux:
 ### Event emitters
 
 Objects that emit events (`sdl.video`, `sdl.keyboard`, `sdl.joystick`, `sdl.gamepad`, `sdl.audio.playback`, `sdl.audio.recording`, `sdl.clipboard`, [`Windows`](#class-window), and opened device instances and audio streams) are Node.js [`EventEmitters`](https://nodejs.org/api/events.html), so the usual `on()`, `once()`, `off()`, `removeAllListeners()`, etc. all work.
+
 Each object accepts only the event names listed in this document.
 Attaching a listener for any other event name throws.
-When you destroy a window or close an instance or stream, the library removes all of its listeners at the end of the current tick, and attaching new listeners to it throws.
 
 Every emitter also supports the special `'*'` event.
 Listeners registered for `'*'` receive every event the object emits, with the event's name as an extra first argument:
@@ -339,6 +339,8 @@ Listeners registered for `'*'` receive every event the object emits, with the ev
 ```js
 window.on('*', (type, event) => { console.log(type, event) })
 ```
+
+When you destroy a window or close an instance or stream, the library removes all of its listeners at the end of the current tick, and attaching new listeners to it throws.
 
 If one of your listeners throws, the library catches the exception and re-emits it as an `'error'` event on the same object.
 As with any `EventEmitter`, if there is no `'error'` listener the library rethrows the exception, which usually becomes an uncaught exception.
@@ -940,7 +942,8 @@ Moves the window to a new position on the screen.
 The call only submits a request to the windowing system.
 Once the window has actually moved, [`x`](#windowx) and [`y`](#windowy) update and a [`'move'`](#event-move) event fires.
 The windowing system may also adjust or ignore the request (for example while the window is fullscreen or maximized), in which case [`x`](#windowx) and [`y`](#windowy) report where the window actually is.
-Throws if the windowing system can't position windows at all, as is the case for regular windows under Wayland.
+
+Throws if the windowing system can't position windows at all.
 
 ### window.width
 
@@ -1038,6 +1041,7 @@ Users can resize a resizable window by dragging its borders.
 - `resizable: <boolean>` The new value of the property.
 
 Changes the window's resizable property.
+
 Throws if `resizable` is `true` and the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
 
 ### window.borderless
@@ -1052,6 +1056,7 @@ A borderless window has no borders or title bar.
 - `borderless: <boolean>` The new value of the property.
 
 Changes the window's borderless property.
+
 Throws if `borderless` is `true` and the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
 
 ### window.alwaysOnTop
@@ -1150,9 +1155,10 @@ Is `true` if the window is maximized.
 ### window.maximize()
 
 Maximizes the window.
-Throws if the window is not resizable.
 The call requests the change from the windowing system asynchronously, and the system may deny it.
 The `maximized` property updates if and when the change takes effect.
+
+Throws if the window is not resizable.
 
 ### window.minimized
 
@@ -1213,6 +1219,7 @@ Enables or disables relative mouse mode for the window.
 While the window has focus in relative mode, SDL hides the cursor, locks it inside the window, and reports mouse movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
 Use this for FPS-style camera controls.
 In relative mode, the `x` and `y` positions in mouse events carry no meaning.
+
 This function may fail on platforms that don't support raw mouse input.
 
 ### window.unsetRelativeMouseMode()
@@ -1597,6 +1604,7 @@ Assume that any earlier results from [`getKey()`](#sdlkeyboardgetkeyscancode) or
 
 Maps a scancode to the corresponding key based on the current keyboard mapping.
 Returns `null` if the scancode corresponds to no key in the current mapping.
+
 Throws if `scancode` is not an integer from `0` to `511`.
 
 ### sdl.keyboard.getScancode(key)
@@ -1607,6 +1615,7 @@ Throws if `scancode` is not an integer from `0` to `511`.
 Maps a key to the corresponding scancode based on the current keyboard mapping.
 Returns `null` if the key corresponds to no scancode in the current mapping.
 If multiple physical keys produce the same virtual key, this returns only the first one.
+
 Throws if `key` is not a valid [`Key`](#virtual-keys).
 
 ### sdl.keyboard.getState()
@@ -1698,6 +1707,7 @@ Switches back to the default cursor.
 
 Makes an image the mouse cursor.
 The hotspot is the pixel that counts as being under the mouse, so `x` must be from `0` to `width - 1` and `y` from `0` to `height - 1`.
+
 Accepts only RGB [pixel formats](#pixel-formats); YUV formats throw.
 
 ### sdl.mouse.showCursor([show])
@@ -1733,7 +1743,8 @@ To lock the cursor to the window for FPS-style camera controls, use [`window.set
 The request is global, not tied to a particular window.
 It stays in effect until you call `sdl.mouse.capture(false)`, and meanwhile SDL captures the mouse for whichever window it is over.
 If SDL releases the capture (see [`window.mouseCaptured`](#windowmousecaptured)) and the mouse later enters a different window, SDL captures that window instead.
-The call throws if no window has keyboard focus, or if the video driver doesn't support mouse capture (Wayland, for example).
+
+The call throws if no window has keyboard focus, or if the video driver doesn't support mouse capture.
 
 ### sdl.mouse.uncapture()
 
@@ -1999,6 +2010,7 @@ This can change while the instance is open, for example when SDL switches a cont
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the joystick's LED light.
+
 Throws if the joystick has no LED (see [`joystickInstance.hasLed`](#joystickinstancehasled)).
 
 ### joystickInstance.hasRumble
@@ -2015,11 +2027,12 @@ This can change while the instance is open, for example when SDL switches a cont
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the joystick rumble for a set `duration`, or until stopped.
-Throws if the joystick has no rumble motors (see [`joystickInstance.hasRumble`](#joystickinstancehasrumble)).
-Calling this function again before `duration` runs out overrides the previous call.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
 
+Calling this function again before `duration` runs out overrides the previous call.
 The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
+
+Throws if the joystick has no rumble motors (see [`joystickInstance.hasRumble`](#joystickinstancehasrumble)).
 
 ### joystickInstance.stopRumble()
 
@@ -2040,11 +2053,12 @@ This can change while the instance is open, for example when SDL switches a cont
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the joystick triggers rumble for a set `duration`, or until stopped.
-Throws if the joystick has no trigger rumble motors (see [`joystickInstance.hasRumbleTriggers`](#joystickinstancehasrumbletriggers)).
-Calling this function again before `duration` runs out overrides the previous call.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
 
+Calling this function again before `duration` runs out overrides the previous call.
 The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
+
+Throws if the joystick has no trigger rumble motors (see [`joystickInstance.hasRumbleTriggers`](#joystickinstancehasrumbletriggers)).
 
 ### joystickInstance.stopRumbleTriggers()
 
@@ -2357,6 +2371,7 @@ This can change while the instance is open, for example when SDL switches a cont
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the gamepad's LED light.
+
 Throws if the gamepad has no LED (see [`gamepadInstance.hasLed`](#gamepadinstancehasled)).
 
 ### gamepadInstance.hasRumble
@@ -2373,11 +2388,12 @@ This can change while the instance is open, for example when SDL switches a cont
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the gamepad rumble for a set `duration`, or until stopped.
-Throws if the gamepad has no rumble motors (see [`gamepadInstance.hasRumble`](#gamepadinstancehasrumble)).
-Calling this function again before `duration` runs out overrides the previous call.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
 
+Calling this function again before `duration` runs out overrides the previous call.
 The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
+
+Throws if the gamepad has no rumble motors (see [`gamepadInstance.hasRumble`](#gamepadinstancehasrumble)).
 
 ### gamepadInstance.stopRumble()
 
@@ -2398,11 +2414,12 @@ This can change while the instance is open, for example when SDL switches a cont
 - `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
 
 Makes the gamepad triggers rumble for a set `duration`, or until stopped.
-Throws if the gamepad has no trigger rumble motors (see [`gamepadInstance.hasRumbleTriggers`](#gamepadinstancehasrumbletriggers)).
-Calling this function again before `duration` runs out overrides the previous call.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
 
+Calling this function again before `duration` runs out overrides the previous call.
 The motors belong to the device, not the instance, so a call on any open [`JoystickInstance`](#class-joystickinstance) or [`GamepadInstance`](#class-gamepadinstance) of the same device overrides it, and closing the last open instance of the device stops it.
+
+Throws if the gamepad has no trigger rumble motors (see [`gamepadInstance.hasRumbleTriggers`](#gamepadinstancehasrumbletriggers)).
 
 ### gamepadInstance.stopRumbleTriggers()
 
