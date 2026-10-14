@@ -120,6 +120,7 @@ window::create (const Napi::CallbackInfo &info)
 	bool has_renderer = !is_opengl && !is_webgpu;
 	bool is_accelerated = has_renderer && info[11].As<Napi::Boolean>().Value();
 	int vsync = has_renderer ? info[12].As<Napi::Number>().Int32Value() : 0;
+	bool is_transparent = has_renderer && info[15].As<Napi::Boolean>().Value();
 
 	Uint64 desired_flags = 0
 		| SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY
@@ -129,6 +130,7 @@ window::create (const Napi::CallbackInfo &info)
 		| (is_always_on_top ? SDL_WINDOW_ALWAYS_ON_TOP : 0)
 		| (is_opengl ? SDL_WINDOW_OPENGL : 0)
 		| (is_webgpu ? GPU_WINDOW_FLAG : 0)
+		| (is_transparent ? SDL_WINDOW_TRANSPARENT : 0)
 		;
 
 	SDL_PropertiesID create_props = SDL_CreateProperties();
@@ -309,6 +311,7 @@ window::create (const Napi::CallbackInfo &info)
 		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
 		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
 		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
+		is_transparent = actual_flags & SDL_WINDOW_TRANSPARENT;
 
 		SDL_GetWindowPosition(window, &x, &y);
 		SDL_GetWindowSize(window, &width, &height);
@@ -337,6 +340,7 @@ window::create (const Napi::CallbackInfo &info)
 		result.Set("resizable", is_resizable);
 		result.Set("borderless", is_borderless);
 		result.Set("alwaysOnTop", is_always_on_top);
+		result.Set("transparent", is_transparent);
 		if (has_renderer) {
 			result.Set("accelerated", is_accelerated);
 			result.Set("vsync", vsync);
