@@ -28,13 +28,8 @@ if (process.env.CROSS_COMPILE_ARCH) {
 	archFlag = `--arch ${process.env.CROSS_COMPILE_ARCH}`
 }
 
-let parallelFlag = '-j max'
-if (C.noParallel) {
-	parallelFlag = ''
-}
-
 process.chdir(C.dir.root)
-execSync(`npx -y node-gyp rebuild ${archFlag} ${parallelFlag} --verbose`, {
+execSync(`npx -y node-gyp rebuild ${archFlag} -j max --verbose`, {
 	stdio: 'inherit',
 	env: {
 		...process.env,

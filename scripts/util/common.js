@@ -17,7 +17,6 @@ const [ , owner, repo ] = pkg.repository.url.match(/([^/:]+)\/([^/]+)\.git$/u)
 const isSet = (value) => ![ undefined, '', '0', 'false' ].includes(value)
 const fromSource = isSet(process.env.NODE_SDL_FROM_SOURCE)
 const systemSdl = isSet(process.env.NODE_SDL_SYSTEM)
-const noParallel = isSet(process.env.NO_PARALLEL)
 
 const { platform, arch } = process
 const targetArch = process.env.CROSS_COMPILE_ARCH || arch
@@ -30,7 +29,6 @@ module.exports = {
 	dir,
 	fromSource,
 	systemSdl,
-	noParallel,
 	version,
 	isPrerelease,
 	owner,
