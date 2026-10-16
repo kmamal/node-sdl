@@ -1124,27 +1124,11 @@ In WebGPU mode, you must use WebGPU calls to render to the window, and calls to 
 
 ### window.native
 
-- `<object>`
-  - `handle : <Buffer>|<null>` The platform-specific handle of the window, or `null` if it can't be determined.
-  - `subsystem : <string>|<null>` On Linux and the BSDs, either `'x11'` or `'wayland'`, depending on the video driver SDL is running under, or `null` if it's some other driver. Always `null` on other platforms.
+- `<unknown>`
 
-The native type of `handle` is HWND on Windows and NSView* on macOS.
-
-On Linux and the BSDs, `handle` holds a struct with the following layout, which SDL fills according to the video driver it runs under (check `subsystem` to see which variant you hold):
-
-```c
-struct LinuxNativeData {
-	uint64_t subsystem;   // 1 = x11, 2 = wayland
-	void *display;        // Display*   | wl_display*
-	uintptr_t window;     // Window XID | wl_surface*
-};
-```
-
-Under any other Linux video driver (e.g. kmsdrm), `handle` and `subsystem` are `null`, and windows created with `{ opengl: true }` or `{ webgpu: true }` fail with an error.
-
-The `window.native` object may also include extra fields beyond the documented ones.
-Ignore them and don't use them.
-The library uses them internally to pass data to [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) or [@kmamal/gpu](https://github.com/kmamal/gpu#readme), and they can change at any time.
+An opaque value holding the window's platform-specific handles.
+Its only purpose is to let [@kmamal/gl](https://github.com/kmamal/headless-gl#readme) and [@kmamal/gpu](https://github.com/kmamal/gpu#readme) render to the window.
+Don't inspect or depend on its contents: they are internal and can change at any time.
 
 ### window.maximized
 

@@ -6,8 +6,8 @@ const window = sdl.video.createWindow({
 	opengl: true,
 })
 
-const { pixelWidth: width, pixelHeight: height, native } = window
-const gl = createContext(width, height, { window: native })
+const { pixelWidth: width, pixelHeight: height } = window
+const gl = createContext(width, height, { window })
 const ext = gl.getExtension('STACKGL_resize_drawingbuffer')
 
 const vertexShader = gl.createShader(gl.VERTEX_SHADER)
