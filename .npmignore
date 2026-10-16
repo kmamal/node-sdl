@@ -8,8 +8,6 @@
 /publish/
 /scripts/clean.mjs
 /scripts/install-deps-mac.sh
-/scripts/install-deps-raspbian.sh
 /scripts/install-deps-ubuntu.sh
-/scripts/release-rpi-qemu.sh
 /scripts/release.mjs
 /scripts/upload-release.mjs
