@@ -57,6 +57,7 @@ class Window extends EventsViaPoll {
 			vsync,
 			opengl = false,
 			webgpu = false,
+			transparent = false
 		} = options
 
 		const hasAccelerated = accelerated !== undefined
@@ -117,6 +118,7 @@ class Window extends EventsViaPoll {
 			vsync ?? 1,
 			opengl,
 			webgpu,
+			transparent
 		)
 
 		this._id = result.id
