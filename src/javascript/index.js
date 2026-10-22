@@ -1,5 +1,5 @@
 const { isMainThread } = require('node:worker_threads')
-if (!isMainThread) { throw new Error('@kmamal/sdl can only be used in the main thread') }
+if (!isMainThread) { throw new Error("@kmamal/sdl can only be used in the main thread, import @kmamal/sdl/worker in workers") }
 
 const Bindings = require('./bindings')
 const Globals = require('./globals')

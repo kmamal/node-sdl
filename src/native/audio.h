@@ -11,6 +11,9 @@ namespace audio {
 	extern std::map<bool, std::string> device_types;
 	extern std::map<SDL_AudioFormat, std::string> formats;
 
+	void closeEnvStreams(Napi::Env env);
+	void closeAllStreams();
+
 	Napi::Value _getDevice(Napi::Env &env, SDL_AudioDeviceID id);
 	Napi::Array _getDevices(Napi::Env &env, bool is_recording);
 

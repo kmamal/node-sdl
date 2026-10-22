@@ -258,7 +258,7 @@
   - [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
 - [sdl.power](#sdlpower)
   - [sdl.power.info](#sdlpowerinfo)
-- [helpers](#helpers)
+- [Worker threads](#worker-threads)
 
 ## sdl
 
@@ -525,7 +525,7 @@ Fired when a display's `usable` region changes, for example when a dock or taskb
 Helper function that maps each pixel format to the number of bytes each of its pixels takes up.
 For planar YUV formats this refers to the Y plane, so it is `1`, except for `'p010'` where it is `2`.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.isYuv(format)
 
@@ -535,7 +535,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 Helper function that tells RGB formats apart from YUV ones.
 Only RGB formats can be used with [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer) and [`sdl.mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y).
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.isPlanarYuv(format)
 
@@ -544,7 +544,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 Helper function that tells planar YUV formats (where the Y, U, and V components are stored in separate planes) apart from all others.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.minStride(format, width)
 
@@ -557,7 +557,7 @@ For most formats this is just `width * bytesPerPixel`.
 For the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'` it is `4 * Math.ceil(width / 2)`.
 The functions that accept [image data](#image-data) throw if the stride you give them is smaller than this.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.minBufferSize(format, stride, height)
 
@@ -571,7 +571,7 @@ For most formats this is just `stride * height`.
 For planar YUV formats it also counts the chroma planes.
 The functions that accept [image data](#image-data) throw if the buffer you give them is smaller than this.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.displays
 
@@ -1318,7 +1318,7 @@ Represents physical keys on the keyboard.
 The same key always produces the same scancode.
 Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
 
-This enum is also available from `@kmamal/sdl/helpers`.
+This enum is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 <details>
 
@@ -1616,7 +1616,7 @@ Each value is `true` if the corresponding key is pressed and `false` otherwise.
 Represents the buttons on a mouse.
 A mouse can have many buttons, but this enum covers the five most common ones.
 
-This enum is also available from `@kmamal/sdl/helpers`.
+This enum is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 | Value                     | Corresponding `SDL_BUTTON_*` |
 | ---                       | ---                          |
@@ -2431,7 +2431,7 @@ Gravity affects accelerometers:
 even when the device is completely at rest, they still indicate an acceleration of magnitude [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity) away from the center of the earth.
 If your application needs to correct for gravitational acceleration, use the `sdl.sensor.STANDARD_GRAVITY` constant.
 
-This constant is also available from `@kmamal/sdl/helpers`.
+This constant is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.sensor.devices
 
@@ -2605,7 +2605,7 @@ Every sample format the library reports, such as a stream's or a device's `forma
 
 Helper function that maps each sample format to the number of bytes its samples take up.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.minSampleValue(format)
 
@@ -2614,7 +2614,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 Helper function that maps each sample format to the minimum value its samples can take.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.maxSampleValue(format)
 
@@ -2623,7 +2623,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 Helper function that maps each sample format to the maximum value its samples can take.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.zeroSampleValue(format)
 
@@ -2632,7 +2632,7 @@ This function is also available from `@kmamal/sdl/helpers`.
 
 Helper function that maps each sample format to the sample value for silence.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.readSample(format, buffer[, offset])
 
@@ -2646,7 +2646,7 @@ For example, `sdl.audio.readSample('f32le', buffer, offset)` is equivalent to `b
 
 The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
@@ -2660,7 +2660,7 @@ Helper function that calls the `write*` method of `Buffer` that matches the form
 For example, `sdl.audio.writeSample('f32le', buffer, value, offset)` is equivalent to `buffer.writeFloatLE(value, offset)`.
 The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
 
-This function is also available from `@kmamal/sdl/helpers`.
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.playback
 
@@ -3007,28 +3007,21 @@ Replaces the text contents of the clipboard.
 
 The current power information of the device.
 
-## helpers
+## Worker threads
 
-Import the `@kmamal/sdl` library only from the main thread.
+Import `@kmamal/sdl` only from the main thread.
 If you import it from a `worker_thread`, you get an error.
-This happens because of limitations in SDL itself, where it's often unsafe to call functions from threads other than the one that called `SDL_Init`, and in Node.js native modules, where each thread gets its own instance of the module and the instances can't easily talk to each other.
+The main thread owns SDL: it initializes it, polls its events, and shuts it down when the process exits.
+SDL allows most of its functions to be called only from that thread.
 
-You can still offload CPU-heavy work to a thread, so that the main thread responds to input events faster.
-Threads have no access to the SDL-related functions, but they can write data to buffers and pass those buffers to the main thread, which can pass them to SDL.
-Threads do not need the core of the library, but they benefit from the helper functions.
-An audio renderer, for example, can use the [`readSample`](#sdlaudioreadsampleformat-buffer-offset) and [`writeSample`](#sdlaudiowritesampleformat-buffer-value-offset) functions.
-
-Since the helpers don't call any SDL code underneath, they are safe to use.
-The `@kmamal/sdl/helpers` sub-module provides them.
-It loads the native addon only to read its constant tables (such as `keyboard.SCANCODE`), never initializes SDL, and works from any thread.
-For an example of their use, see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/16-audio-thread/audio-worker.js).
-
-The members of `@kmamal/sdl/helpers` live under the same paths as in the main module, so `sdl.audio.readSample` becomes `require('@kmamal/sdl/helpers').audio.readSample`.
+Workers can import the `@kmamal/sdl/worker` sub-module instead, which throws if you import it from the main thread.
+Its members live under the same paths as in the main module, so `sdl.audio.writeSample` becomes `require('@kmamal/sdl/worker').audio.writeSample`.
 They are:
 
 - [`sdl.video.bytesPerPixel`](#sdlvideobytesperpixelformat)
 - [`sdl.video.isYuv`](#sdlvideoisyuvformat)
 - [`sdl.video.isPlanarYuv`](#sdlvideoisplanaryuvformat)
+- [`sdl.video.minStride`](#sdlvideominstrideformat-width)
 - [`sdl.video.minBufferSize`](#sdlvideominbuffersizeformat-stride-height)
 - [`sdl.keyboard.SCANCODE`](#enum-scancode)
 - [`sdl.mouse.BUTTON`](#enum-button)
@@ -3039,3 +3032,23 @@ They are:
 - [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
 - [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
 - [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
+- `sdl.audio.playback.openDevice([device[, options]])`
+- `sdl.audio.recording.openDevice([device[, options]])`
+
+All of them except `openDevice()` only do computations or read constant tables, so they work even before the main thread imports `@kmamal/sdl`.
+
+The two `openDevice()` functions work like [`sdl.audio.playback.openDevice()`](#sdlaudioplaybackopendevicedevice-options) and [`sdl.audio.recording.openDevice()`](#sdlaudiorecordingopendevicedevice-options), and return the same [`AudioPlaybackStream`](#class-audioplaybackstream-extends-audiostream) and [`AudioRecordingStream`](#class-audiorecordingstream-extends-audiostream) objects, so a worker can produce or consume audio without passing buffers through the main thread.
+
+- `device: <object>|<null>` A device from the main thread's `sdl.audio.playback.devices` or `sdl.audio.recording.devices`, posted to the worker. `device.id` must be `null` or an unsigned 32-bit integer. If `device` is `null` or omitted, the stream opens the default device.
+
+The worker module has no device lists and receives no events.
+It can't check that `device` is a real device, so opening a device that no longer exists throws.
+If the device goes away while a stream is open, calls on the stream start throwing.
+A stream's `'close'` event still fires when the worker closes it.
+
+The main thread must import `@kmamal/sdl` before a worker opens a stream, otherwise `openDevice()` throws.
+A worker's streams are closed when the worker exits or is terminated.
+A worker stays alive while its playback streams have audio queued, the same way the main thread does.
+When the main thread exits, it shuts SDL down, so calls a worker makes after that point throw.
+
+For an example, see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/16-audio-thread), which renders audio in a worker and plays it from there.

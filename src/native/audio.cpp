@@ -1,12 +1,19 @@
 #include "audio.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
+#include <mutex>
 
 std::map<bool, std::string> audio::device_types;
 std::map<SDL_AudioFormat, std::string> audio::formats;
 
-static std::map<SDL_AudioDeviceID, SDL_AudioStream *> open_streams;
+struct OpenStream {
+	SDL_AudioStream *stream;
+	napi_env env;
+};
+
+static std::map<SDL_AudioDeviceID, OpenStream> open_streams;
 
 static SDL_AudioStream *
 _getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
@@ -17,7 +24,32 @@ _getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
 		message << "getAudioStream(" << audio_id << ") error: invalid audio stream id";
 		throw Napi::Error::New(env, message.str());
 	}
-	return entry->second;
+	return entry->second.stream;
+}
+
+void
+audio::closeEnvStreams (Napi::Env env)
+{
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	for (auto it = open_streams.begin(); it != open_streams.end();) {
+		if (it->second.env == (napi_env) env) {
+			SDL_DestroyAudioStream(it->second.stream);
+			it = open_streams.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+}
+
+void
+audio::closeAllStreams ()
+{
+	for (auto &entry : open_streams) {
+		SDL_DestroyAudioStream(entry.second.stream);
+	}
+	open_streams.clear();
 }
 
 
@@ -82,6 +114,9 @@ audio::getDevices(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	bool is_recording = info[0].As<Napi::Boolean>().Value();
 
 	return audio::_getDevices(env, is_recording);
@@ -91,6 +126,9 @@ Napi::Value
 audio::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	bool has_id = !info[0].IsNull();
 	bool is_recording = info[1].As<Napi::Boolean>().Value();
@@ -132,7 +170,7 @@ audio::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	open_streams[audio_id] = stream;
+	open_streams[audio_id] = { stream, env };
 
 	return Napi::Number::New(env, audio_id);
 }
@@ -141,6 +179,9 @@ Napi::Value
 audio::getDeviceFormat (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 
@@ -172,6 +213,9 @@ audio::play (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 	bool should_play = info[1].As<Napi::Boolean>().Value();
 
@@ -195,6 +239,9 @@ audio::getQueued (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
@@ -214,6 +261,9 @@ Napi::Value
 audio::getAvailable (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 
@@ -235,6 +285,9 @@ audio::clear (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
@@ -253,6 +306,9 @@ Napi::Value
 audio::putData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 	void *src = info[1].As<Napi::Buffer<char>>().Data();
@@ -275,6 +331,9 @@ audio::getData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 	void *dst = info[1].As<Napi::Buffer<char>>().Data();
 	int size = info[2].As<Napi::Number>().Int32Value();
@@ -296,6 +355,9 @@ Napi::Value
 audio::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 

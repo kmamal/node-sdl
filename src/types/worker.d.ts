@@ -1,7 +1,6 @@
-
 import type { Sdl } from './index'
 
-export namespace SdlHelpers {
+export namespace SdlWorker {
 
 	export namespace Video {
 
@@ -52,14 +51,21 @@ export namespace SdlHelpers {
 			zeroSampleValue (format: Format): number
 			readSample (format: Format, buffer: Buffer, offset?: number): number
 			writeSample (format: Format, buffer: Buffer, value: number, offset?: number): number
+
+			readonly playback: DeviceModule<Sdl.Audio.AudioPlaybackStream>
+			readonly recording: DeviceModule<Sdl.Audio.AudioRecordingStream>
+		}
+
+		interface DeviceModule<Stream extends Sdl.Audio.AudioStream> {
+			openDevice (device?: Sdl.Audio.Device | null, options?: Sdl.Audio.StreamOptions): Stream
 		}
 
 	}
 
 }
 
-export const video: SdlHelpers.Video.Module
-export const keyboard: SdlHelpers.Keyboard.Module
-export const mouse: SdlHelpers.Mouse.Module
-export const sensor: SdlHelpers.Sensor.Module
-export const audio: SdlHelpers.Audio.Module
+export const video: SdlWorker.Video.Module
+export const keyboard: SdlWorker.Keyboard.Module
+export const mouse: SdlWorker.Mouse.Module
+export const sensor: SdlWorker.Sensor.Module
+export const audio: SdlWorker.Audio.Module

@@ -27,6 +27,7 @@
                 # Node-API version of the oldest supported Node.js (v22.0.0)
                 'NAPI_VERSION=9',
                 'NODE_ADDON_API_DISABLE_DEPRECATED',
+                'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS',
             ],
             'cflags': ['-Werror', '-Wall', '-Wextra'],
             'conditions': [

@@ -50,9 +50,9 @@
       "types": "./src/types/index.d.ts",
       "default": "./src/javascript/index.js"
     },
-    "./helpers": {
-      "types": "./src/types/helpers.d.ts",
-      "default": "./src/javascript/helpers.js"
+    "./worker": {
+      "types": "./src/types/worker.d.ts",
+      "default": "./src/javascript/worker.js"
     }
   },
   "gypfile": true,

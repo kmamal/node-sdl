@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `@kmamal/sdl/worker` sub-module for worker threads: the helpers plus `audio.playback.openDevice()` and `audio.recording.openDevice()`, so a worker can play or record audio directly. See [Worker threads](https://github.com/kmamal/node-sdl/blob/master/docs/api-reference.md#worker-threads).
+
+### Removed
+
+- `@kmamal/sdl/helpers`. Import `@kmamal/sdl/worker` instead, which has the same members plus audio streams. Unlike the helpers, it can't be imported from the main thread, where the same functions are available from `@kmamal/sdl`.
+
 ## [v1.0.0] - 2026-10-01
 
 The library now builds against SDL3 (3.4.x) instead of SDL2. This release contains breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
@@ -18,6 +26,7 @@ The library now builds against SDL3 (3.4.x) instead of SDL2. This release contai
 - Audio and video formats are reported using the platform-independent enums. The platform-dependent ones are only used as input.
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
 - steamHandle is now reported as a BigInt.
+- `@kmamal/sdl/helpers` is now `@kmamal/sdl/helpers`, and includes a lot of extra stuff.
 
 ### Added
 
@@ -31,7 +40,6 @@ The library now builds against SDL3 (3.4.x) instead of SDL2. This release contai
 - Audio device objects report the `format`, `channels`, `frequency`, and `buffered` the device is running with while streams are open on them.
 - Gamepad buttons `misc1` and `touchpad` are now reported instead of arriving with `button: null`.
 - Pixel-format helpers similar to audio format helpers.
-- More stuff in `@kmamal/sdl/helpers`
 - More scancodes and keys
 
 ### Fixed

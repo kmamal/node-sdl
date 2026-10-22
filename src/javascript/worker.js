@@ -1,6 +1,39 @@
+const { isMainThread } = require('node:worker_threads')
+if (isMainThread) { throw new Error("@kmamal/sdl/worker can only be used in worker threads, import @kmamal/sdl in the main thread") }
+
+const Globals = require('./globals')
+
+Globals.events = {
+	poll () {},
+	withoutPolling (fn) { fn() },
+	switchToPollingFast () {},
+	switchToPollingSlow () {},
+}
+
 const Enums = require('./enums')
 const { getFormatHelpers: getAudioFormatHelpers } = require('./audio/format-helpers')
 const { getFormatHelpers: getVideoFormatHelpers } = require('./video/format-helpers')
+const { AudioPlaybackStream } = require('./audio/audio-playback-stream')
+const { AudioRecordingStream } = require('./audio/audio-recording-stream')
+const { makeDefault: makeDefaultDevice } = require('./audio/device')
+
+const makeModule = (type, Stream) => {
+	const defaultDevice = makeDefaultDevice()
+
+	return {
+		openDevice (device = null, options = {}) {
+			if (device === null) { device = defaultDevice }
+			else {
+				if (typeof device !== 'object') { throw Object.assign(new Error("device must be an object"), { device }) }
+				const { id } = device
+				if (id !== null && !Number.isInteger(id)) { throw Object.assign(new Error("device.id must be an integer or null"), { id }) }
+				if (id !== null && (id < 0 || id > 2 ** 32 - 1)) { throw Object.assign(new Error("device.id must be an unsigned 32-bit integer"), { id }) }
+			}
+
+			return new Stream(device, options)
+		},
+	}
+}
 
 module.exports = {
 	video: {
@@ -48,5 +81,8 @@ module.exports = {
 			if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
 			return getAudioFormatHelpers(format).writer.call(buffer, value, offset)
 		},
+
+		playback: makeModule('playback', AudioPlaybackStream),
+		recording: makeModule('recording', AudioRecordingStream),
 	},
 }

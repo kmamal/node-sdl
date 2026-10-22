@@ -19,6 +19,8 @@
 Napi::Object
 init (Napi::Env env, Napi::Object exports)
 {
+	global::registerEnv(env);
+
 	exports.Set("enums_get", Napi::Function::New<enums::get>(env));
 
 	exports.Set("global_initialize", Napi::Function::New<global::initialize>(env));

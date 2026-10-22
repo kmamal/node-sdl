@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <atomic>
 
 #if defined(SDL_PLATFORM_MACOS)
 	#include "cocoa-global.h"
@@ -19,6 +20,28 @@
 
 
 static SDL_ThreadID mainThreadId;
+static std::atomic<bool> ready { false };
+
+std::mutex &
+global::lock()
+{
+	static std::mutex mutex;
+	return mutex;
+}
+
+void
+global::assertReady(Napi::Env &env)
+{
+	if (!ready.load(std::memory_order_acquire)) {
+		throw Napi::Error::New(env, "SDL is not initialized, import @kmamal/sdl in the main thread first");
+	}
+}
+
+void
+global::registerEnv(Napi::Env env)
+{
+	env.AddCleanupHook([env]() { audio::closeEnvStreams(env); });
+}
 
 bool watchEvents(void*, SDL_Event *event) {
 	if (true
@@ -395,6 +418,8 @@ global::initialize(const Napi::CallbackInfo &info)
 
 	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
 
+	ready.store(true, std::memory_order_release);
+
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("version", versions);
 	result.Set("platform", platform);
@@ -410,6 +435,10 @@ global::cleanup(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	audio::closeAllStreams();
+	ready.store(false, std::memory_order_release);
 	SDL_Quit();
 
 	return env.Undefined();
