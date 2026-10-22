@@ -9,7 +9,7 @@
 > Most of the API is unchanged, but several changes break compatibility.
 > The [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) lists them all.
 
-SDL bindings for Node.js. Gives applications access to systems that Node.js does not normally provide:
+SDL bindings for Node.js. Gives desktop applications access to systems that Node.js does not normally provide:
 
 - 💻 Window management
 - ⌨ Keyboard
@@ -22,13 +22,15 @@ SDL bindings for Node.js. Gives applications access to systems that Node.js does
 - 🔋 Battery status
 - 🧭 Sensors
 
-The bindings also let you use Canvas2D, WebGL, and WebGPU without a browser, through these libraries:
+In addition, all these things can be used without a browser:
 
 - __Canvas2D:__ [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, it is the fastest of the many canvas libraries on npm.
-- __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). I forked [headless-gl](https://github.com/stackgl/headless-gl#readme) and modified it to render directly to SDL windows.
-- __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). I forked [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) and modified it to render directly to SDL windows.
+- __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). A fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) modified to render directly to SDL windows.
+- __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). A fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) modified to render directly to SDL windows.
+- __Web Audio:__ [@kmamal/audio](https://github.com/kmamal/audio#readme). An implementation of the Web Audio API that uses `@kmamal/sdl` for audio playback and recording.
+- __Three.js:__ [@kmamal/three](https://github.com/kmamal/three#readme). A fork of [Three.js](https://threejs.org/) ported to the desktop via tha above libraries.
 
-The package officially supports Linux (X11 and Wayland), Mac, and Windows.
+This package officially supports Linux (X11 and Wayland), Mac, and Windows.
 It should work on any system that both SDL and Node.js support, but I haven't tried others.
 Prebuilt binaries exist for x64 and arm architectures on all supported platforms.
 
@@ -132,6 +134,18 @@ device.queue.submit([ commandEncoder.finish() ])
 // Render to window
 renderer.swap()
 
+```
+
+### Web Audio
+
+```js
+// TODO
+```
+
+### Three.js
+
+```js
+// TODO
 ```
 
 # Documentation
