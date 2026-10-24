@@ -9,7 +9,7 @@
 > Most of the API is unchanged, but several changes break compatibility.
 > The [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) lists them all.
 
-SDL bindings for Node.js. Gives desktop applications access to systems that Node.js does not normally provide:
+SDL bindings for Node.js. Gives desktop applications access to features that Node.js does not normally provide:
 
 - 💻 Window management
 - ⌨ Keyboard
@@ -22,7 +22,7 @@ SDL bindings for Node.js. Gives desktop applications access to systems that Node
 - 🔋 Battery status
 - 🧭 Sensors
 
-In addition, all these things can be used without a browser:
+In addition, all these things can now be used without a browser:
 
 - __Canvas2D:__ [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas). In my experience, it is the fastest of the many canvas libraries on npm.
 - __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). A fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) modified to render directly to SDL windows.

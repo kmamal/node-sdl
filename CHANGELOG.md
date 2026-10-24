@@ -7,14 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- `@kmamal/sdl/worker` sub-module for worker threads: the helpers plus `audio.playback.openDevice()` and `audio.recording.openDevice()`, so a worker can play or record audio directly. See [Worker threads](https://github.com/kmamal/node-sdl/blob/master/docs/api-reference.md#worker-threads).
-
-### Removed
-
-- `@kmamal/sdl/helpers`. Import `@kmamal/sdl/worker` instead, which has the same members plus audio streams. Unlike the helpers, it can't be imported from the main thread, where the same functions are available from `@kmamal/sdl`.
-
 ## [v1.0.0] - 2026-10-01
 
 The library now builds against SDL3 (3.4.x) instead of SDL2. This release contains breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
