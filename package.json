@@ -69,7 +69,7 @@
   "devDependencies": {
     "@kmamal/evdev": "0.0.8",
     "@kmamal/testing": "0.0.34",
-    "@types/node": "26.6.4",
+    "@types/node": "26.6.5",
     "node-addon-api": "8.9.2",
     "node-gyp": "13.1.0"
   },
@@ -84,6 +84,6 @@
     "@kmamal/evdev": true
   },
   "dependencies": {
-    "modern-tar": "0.8.5"
+    "modern-tar": "0.8.6"
   }
 }
