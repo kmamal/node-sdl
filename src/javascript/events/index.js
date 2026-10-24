@@ -491,6 +491,7 @@ const poll = () => {
 
 const withoutPolling = (fn) => {
 	const prevValue = polling
+	polling = true
 	try { fn() }
 	finally { polling = prevValue }
 }
