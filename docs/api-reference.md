@@ -243,6 +243,10 @@
     - [audioStream.playing](#audiostreamplaying)
     - [audioStream.play([play])](#audiostreamplayplay)
     - [audioStream.pause()](#audiostreampause)
+    - [audioStream.gain](#audiostreamgain)
+    - [audioStream.setGain(gain)](#audiostreamsetgaingain)
+    - [audioStream.frequencyRatio](#audiostreamfrequencyratio)
+    - [audioStream.setFrequencyRatio(frequencyRatio)](#audiostreamsetfrequencyratiofrequencyratio)
     - [audioStream.clear()](#audiostreamclear)
     - [audioStream.closed](#audiostreamclosed)
     - [audioStream.close()](#audiostreamclose)
@@ -2728,6 +2732,8 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
+  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a finite, non-negative number. Default: `1`
+  - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioPlaybackStream>`](#class-audioplaybackstream-extends-audiostream) the opened stream.
 
 Opens a playback device and returns a stream bound to it.
@@ -2807,6 +2813,8 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
+  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a finite, non-negative number. Default: `1`
+  - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioRecordingStream>`](#class-audiorecordingstream-extends-audiostream) the opened stream.
 
 Opens a recording device and returns a stream bound to it.
@@ -2922,6 +2930,32 @@ Starts or stops the stream.
 ### audioStream.pause()
 
 Equivalent to [`audioStream.play(false)`](#audiostreamplayplay)
+
+### audioStream.gain
+
+- `<number>`
+
+A volume multiplier that SDL applies to the stream's data, after you write it for playback or before you read it from a recording.
+`1` leaves the data unchanged, `0` silences it.
+
+### audioStream.setGain(gain)
+
+- `gain: <number>`: The new gain. Must be a finite, non-negative number.
+
+Changes the stream's [`gain`](#audiostreamgain).
+
+### audioStream.frequencyRatio
+
+- `<number>`
+
+Changes the speed of the stream relative to its `frequency`, which also changes the pitch.
+SDL resamples the data so that a ratio of `2` plays it twice as fast, and `0.5` at half speed.
+
+### audioStream.setFrequencyRatio(frequencyRatio)
+
+- `frequencyRatio: <number>`: The new ratio. Must be between `0.01` and `100`.
+
+Changes the stream's [`frequencyRatio`](#audiostreamfrequencyratio).
 
 ### audioStream.clear()
 

@@ -96,6 +96,8 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("audio_getData", Napi::Function::New<audio::getData>(env));
 	exports.Set("audio_clear", Napi::Function::New<audio::clear>(env));
 	exports.Set("audio_close", Napi::Function::New<audio::close>(env));
+	exports.Set("audio_setGain", Napi::Function::New<audio::setGain>(env));
+	exports.Set("audio_setFrequencyRatio", Napi::Function::New<audio::setFrequencyRatio>(env));
 
 	exports.Set("clipboard_getText", Napi::Function::New<clipboard::getText>(env));
 	exports.Set("clipboard_setText", Napi::Function::New<clipboard::setText>(env));

@@ -1366,6 +1366,8 @@ export namespace Sdl {
 			readonly frequency?: number
 			readonly format?: Format | FormatAlias
 			readonly buffered?: number
+			readonly gain?: number
+			readonly frequencyRatio?: number
 		}
 
 		export interface AudioStream extends EventEmitter {
@@ -1383,6 +1385,11 @@ export namespace Sdl {
 			readonly playing: boolean
 			play (play?: boolean): void
 			pause (): void
+
+			readonly gain: number
+			setGain (gain: number): void
+			readonly frequencyRatio: number
+			setFrequencyRatio (frequencyRatio: number): void
 
 			clear (): void
 

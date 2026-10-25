@@ -368,3 +368,49 @@ audio::close (const Napi::CallbackInfo &info)
 
 	return env.Undefined();
 }
+
+Napi::Value
+audio::setGain (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	float gain = info[1].As<Napi::Number>().FloatValue();
+
+	SDL_AudioStream *stream = _getStream(env, audio_id);
+
+	if (!SDL_SetAudioStreamGain(stream, gain)) {
+		std::ostringstream message;
+		message << "SDL_SetAudioStreamGain(" << audio_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	return env.Undefined();
+}
+
+Napi::Value
+audio::setFrequencyRatio (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	float ratio = info[1].As<Napi::Number>().FloatValue();
+
+	SDL_AudioStream *stream = _getStream(env, audio_id);
+
+	if (!SDL_SetAudioStreamFrequencyRatio(stream, ratio)) {
+		std::ostringstream message;
+		message << "SDL_SetAudioStreamFrequencyRatio(" << audio_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	return env.Undefined();
+}
