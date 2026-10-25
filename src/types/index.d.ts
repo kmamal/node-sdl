@@ -524,6 +524,21 @@ export namespace Sdl {
 			| 'bgrx32'
 			| 'xbgr32'
 
+		export interface ConversionSrcSpec {
+			readonly width: number
+			readonly height: number
+			readonly stride?: number
+			readonly format: Format | FormatAlias
+		}
+
+		export interface ConversionDstSpec {
+			readonly width?: number
+			readonly height?: number
+			readonly stride?: number
+			readonly format: Format | FormatAlias
+			readonly scaling?: Scaling
+		}
+
 		export type Scaling
 			= 'nearest'
 			| 'linear'
@@ -699,6 +714,9 @@ export namespace Sdl {
 				opengl?: boolean
 				webgpu?: boolean
 			}): Window
+
+			convert (srcSpec: ConversionSrcSpec, srcData: Buffer, dstSpec: ConversionDstSpec, dstData?: undefined): Buffer
+			convert (srcSpec: ConversionSrcSpec, srcData: Buffer, dstSpec: ConversionDstSpec, dstData: Buffer): number
 
 			bytesPerPixel (format: Format | FormatAlias): number
 			isYuv (format: Format | FormatAlias): boolean

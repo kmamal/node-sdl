@@ -17,7 +17,8 @@ const { getFormatHelpers: getVideoFormatHelpers } = require('./video/format-help
 const { AudioPlaybackStream } = require('./audio/audio-playback-stream')
 const { AudioRecordingStream } = require('./audio/audio-recording-stream')
 const { makeDefault: makeDefaultDevice } = require('./audio/device')
-const { convert } = require('./audio/conversion')
+const { convert: convertAudio } = require('./audio/conversion')
+const { convert: convertImage } = require('./video/conversion')
 
 const makeModule = (type, Stream) => {
 	const defaultDevice = makeDefaultDevice()
@@ -38,6 +39,8 @@ const makeModule = (type, Stream) => {
 
 module.exports = {
 	video: {
+		convert: convertImage,
+
 		bytesPerPixel (format) { return getVideoFormatHelpers(format).bytesPerPixel },
 		isYuv (format) { return getVideoFormatHelpers(format).isYuv },
 		isPlanarYuv (format) { return getVideoFormatHelpers(format).isPlanarYuv },
@@ -80,7 +83,7 @@ module.exports = {
 			return getAudioFormatHelpers(format).writer.call(buffer, value, offset)
 		},
 
-		convert,
+		convert: convertAudio,
 
 		playback: makeModule('playback', AudioPlaybackStream),
 		recording: makeModule('recording', AudioRecordingStream),

@@ -16,6 +16,7 @@
   - [Event: 'displayScaleChange'](#event-displayscalechange)
   - [Event: 'displayModeChange'](#event-displaymodechange)
   - [Event: 'displayUsableChange'](#event-displayusablechange)
+  - [sdl.video.convert(srcSpec, srcData, dstSpec[, dstData])](#sdlvideoconvertsrcspec-srcdata-dstspec-dstdata)
   - [sdl.video.bytesPerPixel(format)](#sdlvideobytesperpixelformat)
   - [sdl.video.isYuv(format)](#sdlvideoisyuvformat)
   - [sdl.video.isPlanarYuv(format)](#sdlvideoisplanaryuvformat)
@@ -521,6 +522,28 @@ Fired when a display changes its current mode.
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display's `usable` region changes, for example when a dock or taskbar appears, disappears, or moves.
+
+### sdl.video.convert(srcSpec, srcData, dstSpec[, dstData])
+
+- `srcSpec: <object>` The layout of `srcData`.
+  - `width: <number>`: The width of the image in pixels.
+  - `height: <number>`: The height of the image in pixels.
+  - `stride: <number>`: How many bytes each row of the source takes up. Default: [`sdl.video.minStride(srcSpec.format, srcSpec.width)`](#sdlvideominstrideformat-width)
+  - `format: `[`<PixelFormat>`](#pixel-formats): The format of the source.
+- `srcData: <Buffer>` The image data to convert, as described in [image data](#image-data).
+- `dstSpec: <object>` The layout of the result.
+  - `width: <number>`: The width of the result in pixels. Default: `srcSpec.width`
+  - `height: <number>`: The height of the result in pixels. Default: `srcSpec.height`
+  - `stride: <number>`: How many bytes each row of the result takes up. Default: [`sdl.video.minStride(dstSpec.format, dstSpec.width)`](#sdlvideominstrideformat-width)
+  - `format: `[`<PixelFormat>`](#pixel-formats): The format of the result.
+  - `scaling: <string>` How to scale the image if the result has a different size. Either `'nearest'` or `'linear'`. Default: `'nearest'`
+- `dstData: <Buffer>` The buffer to write the result into. It must be at least [`sdl.video.minBufferSize(dstSpec.format, dstSpec.stride, dstSpec.height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, and must not overlap `srcData`. If omitted, the function allocates a buffer of exactly that size.
+- Returns: `<Buffer>` | `<number>` If `dstData` was omitted, a new buffer that holds the converted image. Otherwise, the number of bytes of `dstData` that make up the image.
+
+Converts an image between pixel formats, and optionally scales it to a different size.
+Both RGB and YUV formats are accepted, but SDL doesn't support every combination, in which case the function throws with SDL's error message.
+
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.bytesPerPixel(format)
 
@@ -3072,6 +3095,7 @@ Workers can import the `@kmamal/sdl/worker` sub-module instead, which throws if 
 Its members live under the same paths as in the main module, so `sdl.audio.writeSample` becomes `require('@kmamal/sdl/worker').audio.writeSample`.
 They are:
 
+- [`sdl.video.convert`](#sdlvideoconvertsrcspec-srcdata-dstspec-dstdata)
 - [`sdl.video.bytesPerPixel`](#sdlvideobytesperpixelformat)
 - [`sdl.video.isYuv`](#sdlvideoisyuvformat)
 - [`sdl.video.isPlanarYuv`](#sdlvideoisplanaryuvformat)

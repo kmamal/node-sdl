@@ -30,6 +30,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("events_isDispatchingFromWatch", Napi::Function::New<events::isDispatchingFromWatch>(env));
 
 	exports.Set("video_getDisplays", Napi::Function::New<video::getDisplays>(env));
+	exports.Set("video_convert", Napi::Function::New<video::convert>(env));
 
 	exports.Set("window_create", Napi::Function::New<window::create>(env));
 	exports.Set("window_setTitle", Napi::Function::New<window::setTitle>(env));

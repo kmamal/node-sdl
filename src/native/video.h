@@ -14,6 +14,7 @@ namespace video {
 	Napi::Array _getDisplays (Napi::Env &env);
 
 	Napi::Value getDisplays(const Napi::CallbackInfo &info);
+	Napi::Value convert(const Napi::CallbackInfo &info);
 
 }; // namespace video
 

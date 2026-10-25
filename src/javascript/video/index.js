@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
 const { getFormatHelpers } = require('./format-helpers')
+const { convert } = require('./conversion')
 const { validateNonNegativeInteger } = require('../validate')
 
 
@@ -42,6 +43,8 @@ const video = new class extends EventsViaPoll {
 	}
 
 	createWindow (options) { return new Window(options) }
+
+	convert (...args) { return convert(...args) }
 
 	bytesPerPixel (format) { return getFormatHelpers(format).bytesPerPixel }
 	isYuv (format) { return getFormatHelpers(format).isYuv }

@@ -7,6 +7,9 @@ export namespace SdlWorker {
 		export type Format = Sdl.Video.Format | Sdl.Video.FormatAlias
 
 		interface Module {
+			convert (srcSpec: Sdl.Video.ConversionSrcSpec, srcData: Buffer, dstSpec: Sdl.Video.ConversionDstSpec, dstData?: undefined): Buffer
+			convert (srcSpec: Sdl.Video.ConversionSrcSpec, srcData: Buffer, dstSpec: Sdl.Video.ConversionDstSpec, dstData: Buffer): number
+
 			bytesPerPixel (format: Format): number
 			isYuv (format: Format): boolean
 			isPlanarYuv (format: Format): boolean
