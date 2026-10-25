@@ -24,6 +24,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("enums_get", Napi::Function::New<enums::get>(env));
 
 	exports.Set("global_initialize", Napi::Function::New<global::initialize>(env));
+	exports.Set("global_initSubsystem", Napi::Function::New<global::initSubsystem>(env));
 	exports.Set("global_cleanup", Napi::Function::New<global::cleanup>(env));
 
 	exports.Set("events_poll", Napi::Function::New<events::poll>(env));

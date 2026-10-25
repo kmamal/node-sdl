@@ -11,6 +11,7 @@ namespace global {
 	void registerEnv(Napi::Env env);
 
 	Napi::Value initialize(const Napi::CallbackInfo &info);
+	Napi::Value initSubsystem(const Napi::CallbackInfo &info);
 	Napi::Value cleanup(const Napi::CallbackInfo &info);
 
 }; // namespace global

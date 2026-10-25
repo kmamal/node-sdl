@@ -302,6 +302,8 @@ To make SDL initialize video/audio drivers other than the default ones, set the 
 The `current` video or audio driver may be `null`.
 This usually happens on systems without compatible devices, such as a CI pipeline.
 
+The `joystick`, `gamepad`, `haptic`, and `sensor` submodules are lazily initialized the first time you access them.
+
 Sample data for Linux:
 
 ```js

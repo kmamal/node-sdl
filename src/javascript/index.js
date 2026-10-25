@@ -4,16 +4,16 @@ if (!isMainThread) { throw new Error("@kmamal/sdl can only be used in the main t
 const Bindings = require('./bindings')
 const Globals = require('./globals')
 
+const { installLazyFlags, loadJoystickModules, loadSensorModule } = require('./subsystems')
+
 const info = Bindings.global_initialize()
+installLazyFlags(info.initialized)
 Globals.info = info
 
 const { video } = require('./video')
 const { keyboard } = require('./keyboard')
 const { mouse } = require('./mouse')
 const { touch } = require('./touch')
-const { joystick } = require('./joystick')
-const { gamepad } = require('./gamepad')
-const { sensor } = require('./sensor')
 const { audio } = require('./audio')
 const { clipboard } = require('./clipboard')
 const { power } = require('./power')
@@ -27,9 +27,9 @@ module.exports = {
 	keyboard,
 	mouse,
 	touch,
-	joystick,
-	gamepad,
-	sensor,
+	get joystick () { return loadJoystickModules().joystick },
+	get gamepad () { return loadJoystickModules().gamepad },
+	get sensor () { return loadSensorModule() },
 	audio,
 	clipboard,
 	power,

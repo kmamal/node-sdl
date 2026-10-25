@@ -19,6 +19,7 @@ The library now builds against SDL3 (3.4.x) instead of SDL2. This release contai
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
 - steamHandle is now reported as a BigInt.
 - `@kmamal/sdl/helpers` is now `@kmamal/sdl/helpers`, and includes a lot of extra stuff.
+- The joystick, gamepad, haptic, and sensor subsystems are initialized on first access to `sdl.joystick`, `sdl.gamepad`, `sdl.sensor`, or their `sdl.info.initialized` flag, instead of on import.
 
 ### Added
 

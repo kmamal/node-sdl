@@ -393,11 +393,6 @@ global::initialize(const Napi::CallbackInfo &info)
 	drivers.Set("video", video_drivers);
 	drivers.Set("audio", audio_drivers);
 
-	initialized.Set("joystick", SDL_InitSubSystem(SDL_INIT_JOYSTICK));
-	initialized.Set("gamepad", SDL_InitSubSystem(SDL_INIT_GAMEPAD));
-	initialized.Set("haptic", SDL_InitSubSystem(SDL_INIT_HAPTIC));
-	initialized.Set("sensor", SDL_InitSubSystem(SDL_INIT_SENSOR));
-
 	// Drop errors from optional subsystems that failed to initialize
 	SDL_ClearError();
 
@@ -427,6 +422,34 @@ global::initialize(const Napi::CallbackInfo &info)
 	result.Set("initialized", initialized);
 
 	return result;
+}
+
+
+Napi::Value
+global::initSubsystem(const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	std::string name = info[0].As<Napi::String>().Utf8Value();
+
+	SDL_InitFlags flags;
+	if (name == "joystick") { flags = SDL_INIT_JOYSTICK; }
+	else if (name == "gamepad") { flags = SDL_INIT_GAMEPAD; }
+	else if (name == "haptic") { flags = SDL_INIT_HAPTIC; }
+	else if (name == "sensor") { flags = SDL_INIT_SENSOR; }
+	else {
+		std::ostringstream message;
+		message << "initSubsystem(" << name << ") error: invalid subsystem";
+		throw Napi::Error::New(env, message.str());
+	}
+
+	bool success = SDL_InitSubSystem(flags);
+	SDL_ClearError();
+
+	return Napi::Boolean::New(env, success);
 }
 
 
