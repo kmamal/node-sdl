@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { startEffect, stopEffect, releaseDevice, setPlayer } = require('../joystick/shared')
+const { startEffect, stopEffect, releaseDevice, setPlayer, validateRumble, validateLed, validatePlayer } = require('../joystick/shared')
 
 const validEvents = [
 	'axisMotion',
@@ -85,8 +85,7 @@ class GamepadInstance extends EventsViaPoll {
 	setPlayer (player) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		if (!Number.isInteger(player)) { throw Object.assign(new Error("player must be an integer"), { player }) }
-		if (player < 0 || player > 2 ** 31 - 1) { throw Object.assign(new Error("player must be a non-negative 32-bit integer"), { player }) }
+		validatePlayer(player)
 
 		setPlayer(this._device.id, player)
 	}
@@ -106,12 +105,7 @@ class GamepadInstance extends EventsViaPoll {
 	setLed (red, green, blue) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		if (!Number.isFinite(red)) { throw Object.assign(new Error("red must be a number"), { red }) }
-		if (red < 0 || red > 1) { throw Object.assign(new Error("red must be between 0 and 1"), { red }) }
-		if (!Number.isFinite(green)) { throw Object.assign(new Error("green must be a number"), { green }) }
-		if (green < 0 || green > 1) { throw Object.assign(new Error("green must be between 0 and 1"), { green }) }
-		if (!Number.isFinite(blue)) { throw Object.assign(new Error("blue must be a number"), { blue }) }
-		if (blue < 0 || blue > 1) { throw Object.assign(new Error("blue must be between 0 and 1"), { blue }) }
+		validateLed(red, green, blue)
 
 		if (!this.hasLed) { throw Object.assign(new Error("device has no led"), { id: this._device.id }) }
 
@@ -127,14 +121,7 @@ class GamepadInstance extends EventsViaPoll {
 	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		if (!Number.isFinite(lowFreqRumble)) { throw Object.assign(new Error("lowFreqRumble must be a number"), { lowFreqRumble }) }
-		if (lowFreqRumble < 0 || lowFreqRumble > 1) { throw Object.assign(new Error("lowFreqRumble must be between 0 and 1"), { lowFreqRumble }) }
-		if (!Number.isFinite(highFreqRumble)) { throw Object.assign(new Error("highFreqRumble must be a number"), { highFreqRumble }) }
-		if (highFreqRumble < 0 || highFreqRumble > 1) { throw Object.assign(new Error("highFreqRumble must be between 0 and 1"), { highFreqRumble }) }
-		if (duration !== null) {
-			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-			if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("duration must be a non-negative 32-bit integer"), { duration }) }
-		}
+		validateRumble('lowFreqRumble', lowFreqRumble, 'highFreqRumble', highFreqRumble, duration)
 
 		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
 
@@ -158,14 +145,7 @@ class GamepadInstance extends EventsViaPoll {
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
 		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
 
-		if (!Number.isFinite(leftRumble)) { throw Object.assign(new Error("leftRumble must be a number"), { leftRumble }) }
-		if (leftRumble < 0 || leftRumble > 1) { throw Object.assign(new Error("leftRumble must be between 0 and 1"), { leftRumble }) }
-		if (!Number.isFinite(rightRumble)) { throw Object.assign(new Error("rightRumble must be a number"), { rightRumble }) }
-		if (rightRumble < 0 || rightRumble > 1) { throw Object.assign(new Error("rightRumble must be between 0 and 1"), { rightRumble }) }
-		if (duration !== null) {
-			if (!Number.isInteger(duration)) { throw Object.assign(new Error("duration must be an integer"), { duration }) }
-			if (duration < 0 || duration > 2 ** 31 - 1) { throw Object.assign(new Error("duration must be a non-negative 32-bit integer"), { duration }) }
-		}
+		validateRumble('leftRumble', leftRumble, 'rightRumble', rightRumble, duration)
 
 		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }
 

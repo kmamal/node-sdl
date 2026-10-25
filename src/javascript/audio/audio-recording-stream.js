@@ -1,6 +1,8 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { AudioStream } = require('./audio-stream')
+const { validateBytes } = require('./validate')
+const { validateBuffer } = require('../validate')
 
 class AudioRecordingStream extends AudioStream {
 	constructor (device, options) {
@@ -17,11 +19,9 @@ class AudioRecordingStream extends AudioStream {
 	getData (buffer, bytes = null) {
 		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		validateBuffer('buffer', buffer)
 		bytes ??= buffer.length
-		if (!Number.isInteger(bytes)) { throw Object.assign(new Error("bytes must be an integer"), { bytes }) }
-		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("bytes must be a non-negative 32-bit integer"), { bytes }) }
-		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
+		validateBytes(buffer, bytes)
 
 		if (bytes === 0) { return 0 }
 

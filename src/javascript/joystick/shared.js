@@ -1,5 +1,6 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
+const { validateNumberRange, validateNonNegativeInt32 } = require('../validate')
 
 const effects = {
 	rumble: {
@@ -19,12 +20,31 @@ const clearEffectTimeout = (effect, id) => {
 
 const MAX_DURATION = 0xFFFF
 
-const startEffect = (kind, id, a, b, duration) => {
-	if (duration === 0) { return stopEffect(kind, id) }
+const validateUnit = (name, value) => { validateNumberRange(name, value, 0, 1) }
+
+const validateRumble = (nameA, a, nameB, b, duration) => {
+	validateUnit(nameA, a)
+	validateUnit(nameB, b)
+	if (duration !== null) { validateNonNegativeInt32('duration', duration) }
+}
+
+const validateLed = (red, green, blue) => {
+	validateUnit('red', red)
+	validateUnit('green', green)
+	validateUnit('blue', blue)
+}
+
+const validatePlayer = (player) => { validateNonNegativeInt32('player', player) }
+
+const startEffect = (kind, id, _a, _b, duration) => {
+	if (duration === 0) {
+		stopEffect(kind, id)
+		return
+	}
 
 	const effect = effects[kind]
-	a = Math.round(a * 0xFFFF)
-	b = Math.round(b * 0xFFFF)
+	const a = Math.round(_a * 0xFFFF)
+	const b = Math.round(_b * 0xFFFF)
 	effect.call(id, a, b, MAX_DURATION)
 
 	clearEffectTimeout(effect, id)
@@ -87,4 +107,7 @@ module.exports = {
 	stopEffect,
 	releaseDevice,
 	setPlayer,
+	validateRumble,
+	validateLed,
+	validatePlayer,
 }

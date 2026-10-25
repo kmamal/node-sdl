@@ -1,4 +1,5 @@
 const Os = require('node:os')
+const { validateString } = require('../validate')
 
 const minStride = (bytesPerPixel) => (width) => width * bytesPerPixel
 const minStridePacked = (width) => 4 * Math.ceil(width / 2)
@@ -108,7 +109,7 @@ else {
 }
 
 const getFormatHelpers = (format) => {
-	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+	validateString('format', format)
 	const helpers = VideoFormatHelpers[format]
 	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 	return helpers

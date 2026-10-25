@@ -62,7 +62,7 @@ T.test("sdl::worker validates devices", async (t) => {
 	`)
 
 	t.equal(result.notObject, "device must be an object")
-	t.equal(result.badId, "device.id must be an integer or null")
+	t.equal(result.badId, "device.id must be an integer")
 	t.equal(result.negativeId, "device.id must be an unsigned 32-bit integer")
 })
 

@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { validateString } = require('../validate')
 
 const validEvents = [ 'update' ]
 
@@ -13,7 +14,7 @@ const clipboard = new class extends EventsViaPoll {
 	}
 
 	setText (text) {
-		if (typeof text !== 'string') { throw Object.assign(new Error("text must be a string"), { text }) }
+		validateString('text', text)
 
 		Bindings.clipboard_setText(text)
 	}

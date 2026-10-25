@@ -4,24 +4,24 @@ const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioFormatHelpers } = require('./format-helpers')
 const { update: updateDevice } = require('./device')
+const {
+	validateString,
+	validateObject,
+	validateBuffer,
+	validateNonNegativeNumber,
+	validateNumberRange,
+	validatePositiveInteger,
+	validateIntegerRange,
+	validatePositiveInt32,
+} = require('../validate')
 
 const validEvents = [ 'close' ]
-
-const validateGain = (gain) => {
-	if (typeof gain !== 'number' || !Number.isFinite(gain)) { throw Object.assign(new Error("gain must be a finite number"), { gain }) }
-	if (gain < 0) { throw Object.assign(new Error("gain must be non-negative"), { gain }) }
-}
-
-const validateFrequencyRatio = (frequencyRatio) => {
-	if (typeof frequencyRatio !== 'number' || !Number.isFinite(frequencyRatio)) { throw Object.assign(new Error("frequencyRatio must be a finite number"), { frequencyRatio }) }
-	if (frequencyRatio < 0.01 || frequencyRatio > 100) { throw Object.assign(new Error("frequencyRatio must be between 0.01 and 100"), { frequencyRatio }) }
-}
 
 class AudioStream extends EventsViaPoll {
 	constructor (recording, device, options) {
 		super(validEvents)
 
-		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+		validateObject('options', options)
 
 		const {
 			channels = 1,
@@ -32,18 +32,14 @@ class AudioStream extends EventsViaPoll {
 			frequencyRatio = 1,
 		} = options
 
-		if (!Number.isInteger(channels)) { throw Object.assign(new Error("channels must be an integer"), { channels }) }
-		if (channels < 1 || channels > 8) { throw Object.assign(new Error("channels must be between 1 and 8"), { channels }) }
-		if (!Number.isInteger(frequency)) { throw Object.assign(new Error("frequency must be an integer"), { frequency }) }
-		if (frequency <= 0 || frequency > 2 ** 31 - 1) { throw Object.assign(new Error("frequency must be a positive 32-bit integer"), { frequency }) }
-		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		if (!Number.isInteger(buffered)) { throw Object.assign(new Error("buffered must be an integer"), { buffered }) }
-		if (buffered <= 0) { throw Object.assign(new Error("buffered must be positive"), { buffered }) }
+		validateIntegerRange('channels', channels, 1, 8)
+		validatePositiveInt32('frequency', frequency)
+		validateString('format', format)
+		validatePositiveInteger('buffered', buffered)
 		if (buffered > 2 ** 15) { throw Object.assign(new Error("buffered must be at most 32768"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("buffered must be a power of 2"), { buffered }) }
-
-		validateGain(gain)
-		validateFrequencyRatio(frequencyRatio)
+		validateNonNegativeNumber('gain', gain)
+		validateNumberRange('frequencyRatio', frequencyRatio, 0.01, 100)
 
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
@@ -52,7 +48,8 @@ class AudioStream extends EventsViaPoll {
 		try {
 			if (gain !== 1) { Bindings.audio_setGain(id, gain) }
 			if (frequencyRatio !== 1) { Bindings.audio_setFrequencyRatio(id, frequencyRatio) }
-		} catch (error) {
+		}
+		catch (error) {
 			Bindings.audio_close(id)
 			throw error
 		}
@@ -95,12 +92,12 @@ class AudioStream extends EventsViaPoll {
 	get zeroSampleValue () { return this._zeroSampleValue }
 
 	readSample (buffer, offset) {
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		validateBuffer('buffer', buffer)
 		return this._reader.call(buffer, offset)
 	}
 
 	writeSample (buffer, value, offset) {
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		validateBuffer('buffer', buffer)
 		return this._writer.call(buffer, value, offset)
 	}
 
@@ -108,7 +105,7 @@ class AudioStream extends EventsViaPoll {
 	setGain (gain) {
 		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
-		validateGain(gain)
+		validateNonNegativeNumber('gain', gain)
 
 		Bindings.audio_setGain(this._id, gain)
 
@@ -119,7 +116,7 @@ class AudioStream extends EventsViaPoll {
 	setFrequencyRatio (frequencyRatio) {
 		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
-		validateFrequencyRatio(frequencyRatio)
+		validateNumberRange('frequencyRatio', frequencyRatio, 0.01, 100)
 
 		Bindings.audio_setFrequencyRatio(this._id, frequencyRatio)
 

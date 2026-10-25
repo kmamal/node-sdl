@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { mapping, reverseMapping, isCharacter } = require('./key-mapping')
+const { validateIntegerRange, validateString } = require('../validate')
 
 const validEvents = [ 'keymapChange' ]
 
@@ -12,8 +13,7 @@ const keyboard = new class extends EventsViaPoll {
 	get SCANCODE () { return Enums.scancodes }
 
 	getKey (scancode) {
-		if (!Number.isInteger(scancode)) { throw Object.assign(new Error("scancode must be an integer"), { scancode }) }
-		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("scancode must be between 0 and 511"), { scancode }) }
+		validateIntegerRange('scancode', scancode, 0, 511)
 
 		Globals.events.poll()
 		const _key = Bindings.keyboard_getKey(scancode)
@@ -21,7 +21,7 @@ const keyboard = new class extends EventsViaPoll {
 	}
 
 	getScancode (key) {
-		if (typeof key !== 'string') { throw Object.assign(new Error("key must be a string"), { key }) }
+		validateString('key', key)
 
 		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }

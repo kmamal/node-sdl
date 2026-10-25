@@ -4,6 +4,7 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { GamepadInstance } = require('./gamepad-instance')
 const { make: makeGamepadDevice } = require('./device')
 const { make: makeJoystickDevice } = require('../joystick/device')
+const { validateString } = require('../validate')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
@@ -35,7 +36,7 @@ const gamepad = new class extends EventsViaPoll {
 	addMappings (mappings) {
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }
 		for (const mapping of mappings) {
-			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mapping }) }
+			validateString('mapping', mapping)
 		}
 
 		try { Bindings.gamepad_addMappings(mappings) }
