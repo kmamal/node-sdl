@@ -29,6 +29,7 @@ namespace audio {
 	Napi::Value close(const Napi::CallbackInfo &info);
 	Napi::Value setGain(const Napi::CallbackInfo &info);
 	Napi::Value setFrequencyRatio(const Napi::CallbackInfo &info);
+	Napi::Value convert(const Napi::CallbackInfo &info);
 
 }; // namespace audio
 

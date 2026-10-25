@@ -42,7 +42,7 @@ T.test("sdl::worker module", async (t) => {
 	`)
 
 	t.equal(result.keys, [ 'video', 'keyboard', 'mouse', 'sensor', 'audio' ])
-	t.equal(result.audioKeys, [ 'bytesPerSample', 'minSampleValue', 'maxSampleValue', 'zeroSampleValue', 'readSample', 'writeSample', 'playback', 'recording' ])
+	t.equal(result.audioKeys, [ 'bytesPerSample', 'minSampleValue', 'maxSampleValue', 'zeroSampleValue', 'readSample', 'writeSample', 'convert', 'playback', 'recording' ])
 	t.equal(result.bytesPerSample, 2)
 	t.equal(result.numScancodes, Object.keys(sdl.keyboard.SCANCODE).length)
 	t.equal(result.mainImport, "@kmamal/sdl can only be used in the main thread, import @kmamal/sdl/worker in workers")

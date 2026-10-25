@@ -51,6 +51,8 @@ export namespace SdlWorker {
 			zeroSampleValue (format: Format): number
 			readSample (format: Format, buffer: Buffer, offset?: number): number
 			writeSample (format: Format, buffer: Buffer, value: number, offset?: number): number
+			convert (srcSpec: Sdl.Audio.ConversionSpec, srcData: Buffer, dstSpec: Sdl.Audio.ConversionSpec, dstData?: undefined): Buffer
+			convert (srcSpec: Sdl.Audio.ConversionSpec, srcData: Buffer, dstSpec: Sdl.Audio.ConversionSpec, dstData: Buffer): number
 
 			readonly playback: DeviceModule<Sdl.Audio.AudioPlaybackStream>
 			readonly recording: DeviceModule<Sdl.Audio.AudioRecordingStream>

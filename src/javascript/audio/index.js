@@ -4,6 +4,8 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
 const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
+const { convert } = require('./conversion')
+const { validateBuffer } = require('../validate')
 const {
 	make: makeDevice,
 	makeDefault: makeDefaultDevice,
@@ -46,6 +48,8 @@ const audio = {
 	minSampleValue (format) { return getFormatHelpers(format).minSampleValue },
 	maxSampleValue (format) { return getFormatHelpers(format).maxSampleValue },
 	zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue },
+
+	convert,
 
 	readSample (format, buffer, offset) {
 		validateBuffer('buffer', buffer)

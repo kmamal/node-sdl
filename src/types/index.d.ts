@@ -1370,6 +1370,12 @@ export namespace Sdl {
 			readonly frequencyRatio?: number
 		}
 
+		export interface ConversionSpec {
+			readonly format?: Format | FormatAlias
+			readonly channels?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+			readonly frequency?: number
+		}
+
 		export interface AudioStream extends EventEmitter {
 			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
 			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
@@ -1428,6 +1434,9 @@ export namespace Sdl {
 		interface Module {
 			readonly playback: DeviceModule<AudioPlaybackStream>
 			readonly recording: DeviceModule<AudioRecordingStream>
+
+			convert (srcSpec: ConversionSpec, srcData: Buffer, dstSpec: ConversionSpec, dstData?: undefined): Buffer
+			convert (srcSpec: ConversionSpec, srcData: Buffer, dstSpec: ConversionSpec, dstData: Buffer): number
 
 			bytesPerSample (format: Format | FormatAlias): number
 			minSampleValue (format: Format | FormatAlias): number

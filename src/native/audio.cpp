@@ -414,3 +414,60 @@ audio::setFrequencyRatio (const Napi::CallbackInfo &info)
 
 	return env.Undefined();
 }
+
+Napi::Value
+audio::convert (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	SDL_AudioSpec src_spec;
+	src_spec.format = (SDL_AudioFormat) info[0].As<Napi::Number>().Int32Value();
+	src_spec.channels = info[1].As<Napi::Number>().Int32Value();
+	src_spec.freq = info[2].As<Napi::Number>().Int32Value();
+
+	Napi::Buffer<uint8_t> src = info[3].As<Napi::Buffer<uint8_t>>();
+	int src_size = info[4].As<Napi::Number>().Int32Value();
+
+	SDL_AudioSpec dst_spec;
+	dst_spec.format = (SDL_AudioFormat) info[5].As<Napi::Number>().Int32Value();
+	dst_spec.channels = info[6].As<Napi::Number>().Int32Value();
+	dst_spec.freq = info[7].As<Napi::Number>().Int32Value();
+
+	SDL_AudioStream *stream = SDL_CreateAudioStream(&src_spec, &dst_spec);
+	if (stream == nullptr) {
+		std::ostringstream message;
+		message << "SDL_CreateAudioStream() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	if (!SDL_PutAudioStreamData(stream, src.Data(), src_size) || !SDL_FlushAudioStream(stream)) {
+		std::ostringstream message;
+		message << "SDL_PutAudioStreamData() error: " << SDL_GetError();
+		SDL_ClearError();
+		SDL_DestroyAudioStream(stream);
+		throw Napi::Error::New(env, message.str());
+	}
+
+	int available = SDL_GetAudioStreamAvailable(stream);
+	if (available < 0) { available = 0; }
+
+	Napi::Buffer<uint8_t> dst = info[8].As<Napi::Buffer<uint8_t>>();
+	if (dst.Length() < (size_t) available) {
+		SDL_DestroyAudioStream(stream);
+		std::ostringstream message;
+		message << "dstData must hold at least " << available << " bytes";
+		throw Napi::Error::New(env, message.str());
+	}
+
+	int got = available > 0 ? SDL_GetAudioStreamData(stream, dst.Data(), available) : 0;
+	SDL_DestroyAudioStream(stream);
+	if (got < 0) {
+		std::ostringstream message;
+		message << "SDL_GetAudioStreamData() error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	return Napi::Number::New(env, got);
+}

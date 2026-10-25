@@ -217,6 +217,7 @@
   - [sdl.audio.zeroSampleValue(format)](#sdlaudiozerosamplevalueformat)
   - [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
   - [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
+  - [sdl.audio.convert(srcSpec, srcData, dstSpec[, dstData])](#sdlaudioconvertsrcspec-srcdata-dstspec-dstdata)
   - [sdl.audio.playback](#sdlaudioplayback)
     - [Event: 'deviceAdd'](#audio-playback-event-deviceadd)
     - [Event: 'deviceRemove'](#audio-playback-event-deviceremove)
@@ -2666,6 +2667,25 @@ The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-end
 
 This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
+### sdl.audio.convert(srcSpec, srcData, dstSpec[, dstData])
+
+- `srcSpec: <object>` The layout of `srcData`.
+  - `format: `[`<SampleFormat>`](#sample-formats): Default: `'f32'`
+  - `channels: <number>`: An integer from `1` to `8`. Default: `1`
+  - `frequency: <number>`: The sampling frequency in frames per second. Default: `48e3`
+- `srcData: <Buffer>` The audio data to convert. Its length must be a whole number of sample frames in the `srcSpec` layout.
+- `dstSpec: <object>` The layout of the result, with the same fields and defaults as `srcSpec`.
+- `dstData: <Buffer>` The buffer to write the result into. If omitted, the function allocates a buffer that is large enough.
+- Returns: `<Buffer>` | `<number>` If `dstData` was omitted, a new buffer that holds exactly the converted data. Otherwise, the number of bytes written to `dstData`.
+
+Converts audio data between sample formats, channel layouts, and sampling frequencies using SDL's converter and resampler.
+Changing the number of channels follows SDL's channel layouts, see [audio data](#audio-data).
+The conversion happens in one call, so the output contains the whole resampled signal without the delay that a streaming resampler adds.
+If `dstData` is too small to hold the result, the function throws and writes nothing.
+SDL writes the result straight into `dstData`, so there is no intermediate copy.
+
+This function is also available from [`@kmamal/sdl/worker`](#worker-threads), even before the main thread imports `@kmamal/sdl`.
+
 ### sdl.audio.playback
 
 `sdl.audio.playback` and `sdl.audio.recording` manage playback and recording devices separately.
@@ -3066,6 +3086,7 @@ They are:
 - [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
 - [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
 - [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
+- [`sdl.audio.convert`](#sdlaudioconvertsrcspec-srcdata-dstspec-dstdata)
 - `sdl.audio.playback.openDevice([device[, options]])`
 - `sdl.audio.recording.openDevice([device[, options]])`
 

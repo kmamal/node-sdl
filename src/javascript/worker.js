@@ -17,6 +17,7 @@ const { getFormatHelpers: getVideoFormatHelpers } = require('./video/format-help
 const { AudioPlaybackStream } = require('./audio/audio-playback-stream')
 const { AudioRecordingStream } = require('./audio/audio-recording-stream')
 const { makeDefault: makeDefaultDevice } = require('./audio/device')
+const { convert } = require('./audio/conversion')
 
 const makeModule = (type, Stream) => {
 	const defaultDevice = makeDefaultDevice()
@@ -78,6 +79,8 @@ module.exports = {
 			validateBuffer('buffer', buffer)
 			return getAudioFormatHelpers(format).writer.call(buffer, value, offset)
 		},
+
+		convert,
 
 		playback: makeModule('playback', AudioPlaybackStream),
 		recording: makeModule('recording', AudioRecordingStream),
