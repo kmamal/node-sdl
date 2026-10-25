@@ -7,6 +7,7 @@ const {
 	validateObject,
 	validateInt32,
 	validatePositiveInt32,
+	validateNotDestroyed,
 } = require('../validate')
 const {
 	validateVsync,
@@ -192,7 +193,7 @@ class Window extends EventsViaPoll {
 
 	get title () { return this._title }
 	setTitle (title) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		validateString('title', title)
 
@@ -202,20 +203,20 @@ class Window extends EventsViaPoll {
 
 	get x () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._x
 	}
 
 	get y () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._y
 	}
 
 	setPosition (x, y) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		validateInt32('x', x)
 		validateInt32('y', y)
@@ -225,20 +226,20 @@ class Window extends EventsViaPoll {
 
 	get width () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._width
 	}
 
 	get height () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._height
 	}
 
 	setSize (width, height) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		validatePositiveInt32('width', width)
 		validatePositiveInt32('height', height)
@@ -248,7 +249,7 @@ class Window extends EventsViaPoll {
 
 	setSizeInPixels (pixelWidth, pixelHeight) {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		validatePositiveInt32('pixelWidth', pixelWidth)
 		validatePositiveInt32('pixelHeight', pixelHeight)
@@ -258,34 +259,34 @@ class Window extends EventsViaPoll {
 
 	get pixelWidth () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._pixelWidth
 	}
 
 	get pixelHeight () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._pixelHeight
 	}
 
 	get display () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.displays.find((a) => a.id === this._displayId) ?? null
 	}
 
 	get visible () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._visible
 	}
 
 	show (show = true) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
 
@@ -297,13 +298,13 @@ class Window extends EventsViaPoll {
 
 	get fullscreen () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._fullscreen
 	}
 
 	setFullscreen (fullscreen) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
 
@@ -311,13 +312,13 @@ class Window extends EventsViaPoll {
 	}
 
 	get resizable () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._resizable
 	}
 
 	setResizable (resizable) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
 		if (resizable && this._borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless: this._borderless }) }
@@ -326,13 +327,13 @@ class Window extends EventsViaPoll {
 	}
 
 	get borderless () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._borderless
 	}
 
 	setBorderless (borderless) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
 		if (borderless && this._resizable) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable: this._resizable, borderless }) }
@@ -341,19 +342,19 @@ class Window extends EventsViaPoll {
 	}
 
 	get alwaysOnTop () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._alwaysOnTop
 	}
 
 	get accelerated () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._accelerated
 	}
 
 	setAccelerated (accelerated) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call setAccelerated in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setAccelerated in webgpu mode") }
@@ -366,13 +367,13 @@ class Window extends EventsViaPoll {
 	}
 
 	get vsync () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._vsync
 	}
 
 	setVsync (vsync) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call setVsync in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setVsync in webgpu mode") }
@@ -385,45 +386,45 @@ class Window extends EventsViaPoll {
 	}
 
 	get opengl () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._opengl
 	}
 
 	get webgpu () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._webgpu
 	}
 
 	get native () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._native
 	}
 
 	get minimized () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._minimized
 	}
 
 	minimize () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_minimize(this._id)
 	}
 
 	get maximized () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._maximized
 	}
 
 	maximize () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (!this._resizable) { throw new Error("can't maximize a non-resizable window") }
 
@@ -431,46 +432,46 @@ class Window extends EventsViaPoll {
 	}
 
 	restore () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_restore(this._id)
 	}
 
 	get focused () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.windows.focused === this
 	}
 
 	focus () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_focus(this._id)
 	}
 
 	get hovered () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.windows.hovered === this
 	}
 
 	get mouseCaptured () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Bindings.window_getMouseCaptured(this._id)
 	}
 
 	get relativeMouseMode () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._relativeMouseMode
 	}
 
 	setRelativeMouseMode (relative = true) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
 
@@ -480,7 +481,7 @@ class Window extends EventsViaPoll {
 	unsetRelativeMouseMode () { this.setRelativeMouseMode(false) }
 
 	render (width, height, stride, format, buffer, options = {}) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
@@ -514,7 +515,7 @@ class Window extends EventsViaPoll {
 	}
 
 	setIcon (width, height, stride, format, buffer) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		validateImage(width, height, stride, format, buffer, validateRgbFormat)
 
@@ -524,7 +525,7 @@ class Window extends EventsViaPoll {
 	}
 
 	flash (untilFocused = false) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (typeof untilFocused !== 'boolean') { throw Object.assign(new Error("untilFocused must be a boolean"), { untilFocused }) }
 
@@ -532,14 +533,14 @@ class Window extends EventsViaPoll {
 	}
 
 	stopFlashing () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_flash(this._id, 0)
 	}
 
 	get destroyed () { return this._destroyed }
 	destroy () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
@@ -565,7 +566,7 @@ class Window extends EventsViaPoll {
 	}
 
 	destroyGently () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		let shouldPrevent = false
 		Globals.events.withoutPolling(() => {

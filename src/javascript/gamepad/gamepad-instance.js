@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { validateNotClosed } = require('../validate')
 const { startEffect, stopEffect, releaseDevice, setPlayer, validateRumble, validateLed, validatePlayer } = require('../joystick/shared')
 
 const validEvents = [
@@ -49,41 +50,41 @@ class GamepadInstance extends EventsViaPoll {
 
 	get steamHandle () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return this._steamHandle
 	}
 
 	get axes () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return this._axes
 	}
 
 	get buttons () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return this._buttons
 	}
 
 	get buttonLabels () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return this._buttonLabels
 	}
 
 	get power () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return this._power
 	}
 
 	setPlayer (player) {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		validatePlayer(player)
 
@@ -91,19 +92,19 @@ class GamepadInstance extends EventsViaPoll {
 	}
 
 	resetPlayer () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		setPlayer(this._device.id, -1)
 	}
 
 	get hasLed () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasLed
 	}
 	setLed (red, green, blue) {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		validateLed(red, green, blue)
 
@@ -114,12 +115,12 @@ class GamepadInstance extends EventsViaPoll {
 
 	get hasRumble () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumble
 	}
 	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		validateRumble('lowFreqRumble', lowFreqRumble, 'highFreqRumble', highFreqRumble, duration)
 
@@ -129,7 +130,7 @@ class GamepadInstance extends EventsViaPoll {
 	}
 
 	stopRumble () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		if (!this.hasRumble) { throw Object.assign(new Error("device has no rumble"), { id: this._device.id }) }
 
@@ -138,12 +139,12 @@ class GamepadInstance extends EventsViaPoll {
 
 	get hasRumbleTriggers () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumbleTriggers
 	}
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		validateRumble('leftRumble', leftRumble, 'rightRumble', rightRumble, duration)
 
@@ -153,7 +154,7 @@ class GamepadInstance extends EventsViaPoll {
 	}
 
 	stopRumbleTriggers () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		if (!this.hasRumbleTriggers) { throw Object.assign(new Error("device has no trigger rumble"), { id: this._device.id }) }
 
@@ -162,7 +163,7 @@ class GamepadInstance extends EventsViaPoll {
 
 	get closed () { return this._closed }
 	close () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		this._closed = true
 

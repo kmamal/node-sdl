@@ -2,6 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { refreshDevices } = require('./devices')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { validateNotClosed } = require('../validate')
 
 const validEvents = [
 	'update',
@@ -34,14 +35,14 @@ class SensorInstance extends EventsViaPoll {
 
 	get data () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return Bindings.sensor_getData(this._device.id)
 	}
 
 	get closed () { return this._closed }
 	close () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		this._closed = true
 

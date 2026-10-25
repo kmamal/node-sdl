@@ -67,6 +67,14 @@ const validatePositiveInt32 = (name, value) => {
 	validateIntegerRange(name, value, 1, INT32_MAX, "must be a positive 32-bit integer")
 }
 
+const validateNotClosed = (instance) => {
+	if (instance._closed) { throw Object.assign(new Error("instance is closed"), { id: instance._device.id }) }
+}
+
+const validateNotDestroyed = (window) => {
+	if (window._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: window._id }) }
+}
+
 module.exports = {
 	validateString,
 	validateObject,
@@ -82,4 +90,6 @@ module.exports = {
 	validateInt32,
 	validateNonNegativeInt32,
 	validatePositiveInt32,
+	validateNotClosed,
+	validateNotDestroyed,
 }
