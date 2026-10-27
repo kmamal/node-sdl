@@ -87,4 +87,7 @@ const getFormatHelpers = (format) => {
 	return helpers
 }
 
-module.exports = { AudioFormatHelpers, getFormatHelpers }
+module.exports = {
+	AudioFormatHelpers,
+	getFormatHelpers,
+}

@@ -5,6 +5,13 @@ const hasPlayback = sdl.info.initialized.audio && sdl.audio.playback.devices.len
 
 const sine = (frames, frequency, rate) => Float32Array.from({ length: frames }, (_, i) => Math.sin(2 * Math.PI * frequency * i / rate))
 
+const checkFormat = (t, device) => {
+	t.ok(device.format === null || typeof device.format === 'string')
+	t.ok(Number.isInteger(device.channels) && device.channels > 0)
+	t.ok(Number.isInteger(device.frequency) && device.frequency > 0)
+	t.ok(Number.isInteger(device.buffered) && device.buffered >= 0)
+}
+
 T.test("sdl::audio::convert", (t) => {
 	const input = Buffer.from(sine(4800, 1000, 48000).buffer)
 	const f32Mono = { format: 'f32', channels: 1, frequency: 48000 }
@@ -54,6 +61,12 @@ T.test("sdl::audio::convert", (t) => {
 	t.throws(() => sdl.audio.convert({ format: 'x' }, Buffer.alloc(8), {}, Buffer.alloc(8)), /invalid srcSpec.format/u)
 	t.throws(() => sdl.audio.convert({}, Buffer.alloc(8), { channels: 9 }, Buffer.alloc(8)), /dstSpec.channels must be between 1 and 8/u)
 	t.throws(() => sdl.audio.convert({ frequency: 0 }, Buffer.alloc(8), {}, Buffer.alloc(8)), /srcSpec.frequency must be between/u)
+})
+
+T.test("sdl::audio::device formats", (t) => {
+	if (!sdl.info.initialized.audio) { return }
+	for (const device of sdl.audio.playback.devices) { checkFormat(t, device) }
+	for (const device of sdl.audio.recording.devices) { checkFormat(t, device) }
 })
 
 T.test("sdl::audio::gain and frequencyRatio", (t) => {

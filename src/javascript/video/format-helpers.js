@@ -115,4 +115,7 @@ const getFormatHelpers = (format) => {
 	return helpers
 }
 
-module.exports = { VideoFormatHelpers, getFormatHelpers }
+module.exports = {
+	VideoFormatHelpers,
+	getFormatHelpers,
+}

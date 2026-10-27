@@ -53,6 +53,21 @@ audio::closeAllStreams ()
 }
 
 
+static void
+_setFormat (Napi::Object &target, const SDL_AudioSpec &spec, int sample_frames)
+{
+	Napi::Env env = target.Env();
+	auto format_entry = audio::formats.find(spec.format);
+	Napi::Value format = format_entry != audio::formats.end()
+		? Napi::String::New(env, format_entry->second)
+		: env.Null();
+
+	target.Set("format", format);
+	target.Set("channels", spec.channels);
+	target.Set("frequency", spec.freq);
+	target.Set("buffered", sample_frames);
+}
+
 static Napi::Value
 _packDevice (Napi::Env &env, SDL_AudioDeviceID id)
 {
@@ -65,6 +80,15 @@ _packDevice (Napi::Env &env, SDL_AudioDeviceID id)
 	Napi::Object device = Napi::Object::New(env);
 	device.Set("id", id);
 	device.Set("name", name);
+
+	SDL_AudioSpec spec;
+	int sample_frames;
+	if (SDL_GetAudioDeviceFormat(id, &spec, &sample_frames)) {
+		_setFormat(device, spec, sample_frames);
+	}
+	else {
+		SDL_ClearError();
+	}
 
 	return device;
 }
@@ -183,7 +207,7 @@ audio::getDeviceFormat (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_AudioSpec spec;
 	int sample_frames;
@@ -194,17 +218,8 @@ audio::getDeviceFormat (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	auto format_entry = audio::formats.find(spec.format);
-	Napi::Value format = format_entry != audio::formats.end()
-		? Napi::String::New(env, format_entry->second)
-		: env.Null();
-
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("format", format);
-	result.Set("channels", spec.channels);
-	result.Set("frequency", spec.freq);
-	result.Set("buffered", sample_frames);
-
+	_setFormat(result, spec, sample_frames);
 	return result;
 }
 

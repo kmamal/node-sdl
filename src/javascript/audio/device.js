@@ -1,32 +1,26 @@
-const Globals = require('../globals')
 const Bindings = require('../bindings')
+const Enums = require('../enums')
 
-const closedFormat = {
+const unknownFormat = {
 	format: null,
 	channels: null,
 	frequency: null,
 	buffered: null,
 }
 
-const make = (device) => ({ ...device, ...closedFormat })
+const make = (device) => ({ id: null, name: null, ...unknownFormat, ...device })
 
-const makeDefault = () => make({ id: null, name: null })
+const makeDefault = (recording) => {
+	const device = make({})
+	Object.defineProperty(device, '_realId', {
+		value: recording ? Enums.audioDevice.defaultRecording : Enums.audioDevice.defaultPlayback,
+	})
+	update(device)
+	return device
+}
 
 const update = (device) => {
-	let stream = null
-	for (const candidate of Globals.audioStreams.values()) {
-		if (candidate._device === device) {
-			stream = candidate
-			break
-		}
-	}
-
-	if (!stream) {
-		Object.assign(device, closedFormat)
-		return
-	}
-
-	try { Object.assign(device, Bindings.audio_getDeviceFormat(stream._id)) }
+	try { Object.assign(device, Bindings.audio_getDeviceFormat(device.id ?? device._realId)) }
 	catch (_) {}
 }
 

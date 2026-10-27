@@ -12,11 +12,9 @@ const {
 } = require('./device')
 
 
-Globals.audioDevices.playback = [ makeDefaultDevice() ]
-Globals.audioDevices.recording = [ makeDefaultDevice() ]
 if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback.push(...Bindings.audio_getDevices(false).map(makeDevice))
-	Globals.audioDevices.recording.push(...Bindings.audio_getDevices(true).map(makeDevice))
+	Globals.audioDevices.playback = [ makeDefaultDevice(false), ...Bindings.audio_getDevices(false).map(makeDevice) ]
+	Globals.audioDevices.recording = [ makeDefaultDevice(true), ...Bindings.audio_getDevices(true).map(makeDevice) ]
 }
 
 
@@ -33,8 +31,10 @@ const makeModule = (type, Stream) => new class extends EventsViaPoll {
 	openDevice (device = null, options = {}) {
 		Globals.events.poll()
 		const list = Globals.audioDevices[type]
-		if (device === null) { device = list[0] }
-		else if (!list.includes(device)) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device }) }
+
+		if (device === null) { return new Stream(list[0], options) }
+
+		if (!list.includes(device)) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device }) }
 
 		return new Stream(device, options)
 	}

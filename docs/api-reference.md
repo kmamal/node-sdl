@@ -2740,10 +2740,10 @@ When this event fires, the library automatically closes all streams opened from 
 - `<object>[]`
   - `id: <number>|<null>` The unique id of the device, or `null` for the default device.
   - `name: <string>|<null>` The name of the device, or `null` for the default device.
-  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The sample format the device is running at, or `null` if no stream is open on it.
-  - `channels: <number>|<null>` The number of channels the device is running with, or `null` if no stream is open on it.
-  - `frequency: <number>|<null>` The sampling frequency the device is running at, in frames per second, or `null` if no stream is open on it.
-  - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
+  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The device's sample format, or `null` if SDL can't report it.
+  - `channels: <number>|<null>` The device's number of channels, or `null` if SDL can't report it.
+  - `frequency: <number>|<null>` The device's sampling frequency in frames per second, or `null` if SDL can't report it.
+  - `buffered: <number>|<null>` The size of the device's buffer in frames, `0` if SDL doesn't know it yet, or `null` if SDL can't report it.
 
 Lists all the detected playback devices.
 
@@ -2751,8 +2751,22 @@ Sample output for PulseAudio:
 
 ```js
 [
-  { id: null, name: null, format: null, channels: null, frequency: null, buffered: null },
-  { id: 3, name: 'Built-in Audio Analog Stereo', format: null, channels: null, frequency: null, buffered: null },
+  {
+    id: null,
+    name: null,
+    format: 's16le',
+    channels: 2,
+    frequency: 48000,
+    buffered: 1024
+  },
+  {
+    id: 15,
+    name: 'Built-in Audio Analog Stereo',
+    format: 's16le',
+    channels: 2,
+    frequency: 48000,
+    buffered: 1024
+  },
 ]
 ```
 
@@ -2765,8 +2779,9 @@ const playbackStream = sdl.audio.playback.openDevice()
 ```
 
 The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
-The library fills them in when you open the first stream on the device object, keeps them up to date while streams are open on it, and resets them to `null` when the last stream closes.
-It fills in a device only for streams opened on that same object, so a stream on the default device fills in only the default device's entry, even if it plays on hardware that the list also shows separately.
+For a device without open streams they show the format the device prefers, which is what SDL opens it with by default, so you can pick a stream `frequency` that matches the hardware and SDL doesn't have to resample.
+For a device with open streams they show the format the device is running at.
+The library updates a device object when a stream opens or closes on that same object, and when SDL reports that the device's format changed.
 The device counts `buffered` in frames at its `frequency`, so `buffered` adds a delay of `buffered / frequency` seconds.
 
 ### sdl.audio.playback.openDevice([device[, options]])
@@ -2821,10 +2836,10 @@ When this event fires, the library automatically closes all streams opened from 
 - `<object>[]`
   - `id: <number>|<null>` The unique id of the device, or `null` for the default device.
   - `name: <string>|<null>` The name of the device, or `null` for the default device.
-  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The sample format the device is running at, or `null` if no stream is open on it.
-  - `channels: <number>|<null>` The number of channels the device is running with, or `null` if no stream is open on it.
-  - `frequency: <number>|<null>` The sampling frequency the device is running at, in frames per second, or `null` if no stream is open on it.
-  - `buffered: <number>|<null>` The size of the device's buffer in frames, or `null` if no stream is open on it.
+  - `format: `[`<SampleFormat>`](#sample-formats)`|<null>` The device's sample format, or `null` if SDL can't report it.
+  - `channels: <number>|<null>` The device's number of channels, or `null` if SDL can't report it.
+  - `frequency: <number>|<null>` The device's sampling frequency in frames per second, or `null` if SDL can't report it.
+  - `buffered: <number>|<null>` The size of the device's buffer in frames, `0` if SDL doesn't know it yet, or `null` if SDL can't report it.
 
 Lists all the detected recording devices.
 
@@ -2832,8 +2847,22 @@ Sample output for PulseAudio:
 
 ```js
 [
-  { id: null, name: null, format: null, channels: null, frequency: null, buffered: null },
-  { id: 4, name: 'Built-in Audio Analog Stereo', format: null, channels: null, frequency: null, buffered: null },
+  {
+    id: null,
+    name: null,
+    format: 's16le',
+    channels: 2,
+    frequency: 48000,
+    buffered: 1024
+  },
+  {
+    id: 18,
+    name: 'Built-in Audio Analog Stereo',
+    format: 's16le',
+    channels: 2,
+    frequency: 48000,
+    buffered: 1024
+  },
 ]
 ```
 
@@ -2846,8 +2875,9 @@ const recordingStream = sdl.audio.recording.openDevice()
 ```
 
 The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
-The library fills them in when you open the first stream on the device object, keeps them up to date while streams are open on it, and resets them to `null` when the last stream closes.
-It fills in a device only for streams opened on that same object, so a stream on the default device fills in only the default device's entry, even if it records from hardware that the list also shows separately.
+For a device without open streams they show the format the device prefers, which is what SDL opens it with by default, so you can pick a stream `frequency` that matches the hardware and SDL doesn't have to resample.
+For a device with open streams they show the format the device is running at.
+The library updates a device object when a stream opens or closes on that same object, and when SDL reports that the device's format changed.
 The device counts `buffered` in frames at its `frequency`, so `buffered` adds a delay of `buffered / frequency` seconds.
 
 ### sdl.audio.recording.openDevice([device[, options]])
@@ -3088,14 +3118,13 @@ The current power information of the device.
 
 ## Worker threads
 
-Import `@kmamal/sdl` only from the main thread.
-If you import it from a `worker_thread`, you get an error.
-The main thread owns SDL: it initializes it, polls its events, and shuts it down when the process exits.
-SDL allows most of its functions to be called only from that thread.
+Many SDL features can only be used from the main thread of a process.
+This is why `@kmamal/sdl` can only be imported from the main thread and not from a `worker_thread`.
 
-Workers can import the `@kmamal/sdl/worker` sub-module instead, which throws if you import it from the main thread.
-Its members live under the same paths as in the main module, so `sdl.audio.writeSample` becomes `require('@kmamal/sdl/worker').audio.writeSample`.
-They are:
+There are however some features that can be used from other threads.
+The most important are audio and video rendering.
+To support this, this package exports the `@kmamal/sdl/worker` sub-module.
+It contains a subset of the main module:
 
 - [`sdl.video.convert`](#sdlvideoconvertsrcspec-srcdata-dstspec-dstdata)
 - [`sdl.video.bytesPerPixel`](#sdlvideobytesperpixelformat)
@@ -3113,23 +3142,14 @@ They are:
 - [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
 - [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
 - [`sdl.audio.convert`](#sdlaudioconvertsrcspec-srcdata-dstspec-dstdata)
-- `sdl.audio.playback.openDevice([device[, options]])`
-- `sdl.audio.recording.openDevice([device[, options]])`
+- [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices)
+- [`sdl.audio.playback.openDevice([device[, options]])`](#sdlaudioplaybackopendevicedevice-options)
+- [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices)
+- [`sdl.audio.recording.openDevice([device[, options]])`](#sdlaudiorecordingopendevicedevice-options)
 
-All of them except `openDevice()` only do computations or read constant tables, so they work even before the main thread imports `@kmamal/sdl`.
+Before using `audio.*.devices` and `audio.*.openDevice` you must import `@kmamal/sdl` on the main thread so that the audio sybsystem gets initialized, otherwise they throw.
+The rest works fine even without `@kmamal/sdl` on the main thread.
 
-The two `openDevice()` functions work like [`sdl.audio.playback.openDevice()`](#sdlaudioplaybackopendevicedevice-options) and [`sdl.audio.recording.openDevice()`](#sdlaudiorecordingopendevicedevice-options), and return the same [`AudioPlaybackStream`](#class-audioplaybackstream-extends-audiostream) and [`AudioRecordingStream`](#class-audiorecordingstream-extends-audiostream) objects, so a worker can produce or consume audio without passing buffers through the main thread.
-
-- `device: <object>|<null>` A device from the main thread's `sdl.audio.playback.devices` or `sdl.audio.recording.devices`, posted to the worker. `device.id` must be `null` or an unsigned 32-bit integer. If `device` is `null` or omitted, the stream opens the default device.
-
-The worker module has no device lists and receives no events.
-It can't check that `device` is a real device, so opening a device that no longer exists throws.
-If the device goes away while a stream is open, calls on the stream start throwing.
-A stream's `'close'` event still fires when the worker closes it.
-
-The main thread must import `@kmamal/sdl` before a worker opens a stream, otherwise `openDevice()` throws.
 A worker's streams are closed when the worker exits or is terminated.
 A worker stays alive while its playback streams have audio queued, the same way the main thread does.
 When the main thread exits, it shuts SDL down, so calls a worker makes after that point throw.
-
-For an example, see [this example](https://github.com/kmamal/node-sdl/blob/master/examples/16-audio-thread), which renders audio in a worker and plays it from there.

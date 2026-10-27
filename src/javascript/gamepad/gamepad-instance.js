@@ -2,7 +2,15 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { validateNotClosed } = require('../validate')
-const { startEffect, stopEffect, releaseDevice, setPlayer, validateRumble, validateLed, validatePlayer } = require('../joystick/shared')
+const {
+	startEffect,
+	stopEffect,
+	releaseDevice,
+	setPlayer,
+	validateRumble,
+	validateLed,
+	validatePlayer,
+} = require('../joystick/shared')
 
 const validEvents = [
 	'axisMotion',
@@ -103,6 +111,7 @@ class GamepadInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasLed
 	}
+
 	setLed (red, green, blue) {
 		validateNotClosed(this)
 
@@ -119,6 +128,7 @@ class GamepadInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumble
 	}
+
 	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
 		validateNotClosed(this)
 
@@ -143,6 +153,7 @@ class GamepadInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumbleTriggers
 	}
+
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
 		validateNotClosed(this)
 

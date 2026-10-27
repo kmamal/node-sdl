@@ -91,7 +91,7 @@ T.test("sdl::worker audio playback", async (t) => {
 		t.equal(stream.queued, 4800 * 4)
 		t.equal(typeof stream.opened.format, 'string')
 		t.ok(stream.opened.frequency > 0)
-		t.equal(stream.closedFormat, null)
+		t.equal(typeof stream.closedFormat, 'string')
 		t.ok(stream.sameDevice)
 	}
 })

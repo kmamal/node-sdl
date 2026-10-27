@@ -13,10 +13,10 @@ T.test("sdl::audio", async (t) => {
 	t.equal(sdl.audio.zeroSampleValue('f32le'), 0)
 
 	const checkClosedFormat = (device) => {
-		t.equal(device.format, null)
-		t.equal(device.channels, null)
-		t.equal(device.frequency, null)
-		t.equal(device.buffered, null)
+		t.equal(typeof device.format, 'string')
+		t.ok(Number.isInteger(device.channels) && device.channels > 0)
+		t.ok(Number.isInteger(device.frequency) && device.frequency > 0)
+		t.ok(Number.isInteger(device.buffered) && device.buffered >= 0)
 	}
 
 	const checkOpenFormat = (device) => {
