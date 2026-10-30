@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const { assertInitialized } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
@@ -8,11 +9,12 @@ const { validateIntegerRange, validateString } = require('../validate')
 const validEvents = [ 'keymapChange' ]
 
 const keyboard = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('video') }) }
 
 	get SCANCODE () { return Enums.scancodes }
 
 	getKey (scancode) {
+		assertInitialized('video')
 		validateIntegerRange('scancode', scancode, 0, 511)
 
 		Globals.events.poll()
@@ -21,6 +23,7 @@ const keyboard = new class extends EventsViaPoll {
 	}
 
 	getScancode (key) {
+		assertInitialized('video')
 		validateString('key', key)
 
 		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
@@ -31,6 +34,7 @@ const keyboard = new class extends EventsViaPoll {
 	}
 
 	getState () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Bindings.keyboard_getState()
 	}

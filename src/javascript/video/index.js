@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const { assertInitialized } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
@@ -23,9 +24,10 @@ const validEvents = [
 ]
 
 const video = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('video') }) }
 
 	get displays () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return [ ...Globals.displays ]
 	}
@@ -33,16 +35,21 @@ const video = new class extends EventsViaPoll {
 	get windows () { return [ ...Globals.windows.all.values() ] }
 
 	get focused () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Globals.windows.focused
 	}
 
 	get hovered () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Globals.windows.hovered
 	}
 
-	createWindow (options) { return new Window(options) }
+	createWindow (options) {
+		assertInitialized('video')
+		return new Window(options)
+	}
 
 	convert (...args) { return convert(...args) }
 

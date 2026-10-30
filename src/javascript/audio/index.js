@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const { assertInitialized } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
@@ -21,14 +22,16 @@ if (Globals.info.initialized.audio) {
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 const makeModule = (type, Stream) => new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('audio') }) }
 
 	get devices () {
+		assertInitialized('audio')
 		Globals.events.poll()
 		return [ ...Globals.audioDevices[type] ]
 	}
 
 	openDevice (device = null, options = {}) {
+		assertInitialized('audio')
 		Globals.events.poll()
 		const list = Globals.audioDevices[type]
 

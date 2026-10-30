@@ -289,20 +289,21 @@ Unless noted otherwise, whenever the API expects a whole-number quantity (positi
   - `initialized: <object>`
     - `video: <boolean>`: Is `true` if SDL initialized the video subsystem successfully, or `false` otherwise.
     - `audio: <boolean>`: Is `true` if SDL initialized the audio subsystem successfully, or `false` otherwise.
-    - `joystick: <boolean>`: Is `true` if SDL initialized the joystick subsystem successfully, or `false` otherwise.
-    - `gamepad: <boolean>`: Is `true` if SDL initialized the gamepad subsystem successfully, or `false` otherwise.
-    - `haptic: <boolean>`: Is `true` if SDL initialized the haptic subsystem successfully, or `false` otherwise.
-    - `sensor: <boolean>`: Is `true` if SDL initialized the sensor subsystem successfully, or `false` otherwise.
+    - `joystick: <boolean>|<null>`: Is `null` until the joystick subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
+    - `gamepad: <boolean>|<null>`: Is `null` until the gamepad subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
+    - `haptic: <boolean>|<null>`: Is `null` until the haptic subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
+    - `sensor: <boolean>|<null>`: Is `null` until the sensor subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
 
 The `sdl.info` object holds information that SDL produces while it initializes.
-All the values stay constant while the program runs.
+All the values stay constant while the program runs, with the exception of the `initialized` flags for the lazy-loading sub-modules (see below).
 
 To make SDL initialize video/audio drivers other than the default ones, set the appropriate [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
 
 The `current` video or audio driver may be `null`.
 This usually happens on systems without compatible devices, such as a CI pipeline.
 
-The `joystick`, `gamepad`, `haptic`, and `sensor` submodules are lazily initialized the first time you access them.
+The `joystick`, `gamepad`, `haptic`, and `sensor` subsystems are lazily initialized: their `initialized` flags start as `null`, and are set to `true` or `false` the first time a function or event listener that needs them is used.
+Initializing `joystick` or `gamepad` initializes both.
 
 Sample data for Linux:
 
@@ -326,10 +327,10 @@ Sample data for Linux:
   initialized: {
     video: true,
     audio: true,
-    joystick: true,
-    gamepad: true,
-    haptic: true,
-    sensor: true,
+    joystick: null,
+    gamepad: null,
+    haptic: null,
+    sensor: null,
   },
 }
 ```

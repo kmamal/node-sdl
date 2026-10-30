@@ -1,4 +1,5 @@
 const Globals = require('../globals')
+const { assertInitialized } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { validateImage, validateRgbFormat } = require('../video/validate')
@@ -10,15 +11,20 @@ const mouse = {
 	get BUTTON () { return Enums.mouseButtons },
 
 	getButton (button) {
+		assertInitialized('video')
 		validateIntegerRange('button', button, 1, 32)
 
 		Globals.events.poll()
 		return Bindings.mouse_getButton(button)
 	},
 
-	get position () { return Bindings.mouse_getPosition() },
+	get position () {
+		assertInitialized('video')
+		return Bindings.mouse_getPosition()
+	},
 
 	setPosition (x, y) {
+		assertInitialized('video')
 		validateNumber('x', x)
 		validateNumber('y', y)
 
@@ -26,6 +32,7 @@ const mouse = {
 	},
 
 	setCursor (cursor) {
+		assertInitialized('video')
 		validateString('cursor', cursor)
 
 		const _cursor = Enums.cursors[cursor]
@@ -34,9 +41,13 @@ const mouse = {
 		Bindings.mouse_setCursor(_cursor)
 	},
 
-	resetCursor () { Bindings.mouse_resetCursor() },
+	resetCursor () {
+		assertInitialized('video')
+		Bindings.mouse_resetCursor()
+	},
 
 	setCursorImage (width, height, stride, format, buffer, x, y) {
+		assertInitialized('video')
 		validateImage(width, height, stride, format, buffer, validateRgbFormat)
 		validateInteger('x', x)
 		if (x < 0 || x >= width) { throw Object.assign(new Error("x must be between 0 and width - 1"), { x, width }) }
@@ -49,6 +60,7 @@ const mouse = {
 	},
 
 	showCursor (show = true) {
+		assertInitialized('video')
 		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
 
 		Bindings.mouse_showCursor(show)
@@ -56,11 +68,15 @@ const mouse = {
 
 	hideCursor () { mouse.showCursor(false) },
 
-	redrawCursor () { Bindings.mouse_redrawCursor() },
+	redrawCursor () {
+		assertInitialized('video')
+		Bindings.mouse_redrawCursor()
+	},
 
 	get captured () { return captured },
 
 	capture (capture = true) {
+		assertInitialized('video')
 		if (typeof capture !== 'boolean') { throw Object.assign(new Error("capture must be a boolean"), { capture }) }
 
 		Bindings.mouse_capture(capture)

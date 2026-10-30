@@ -1,56 +1,44 @@
 const Bindings = require('./bindings')
+const Globals = require('./globals')
+const { make: makeJoystickDevice } = require('./joystick/device')
+const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('./gamepad/device')
 
 const LAZY = [ 'joystick', 'gamepad', 'haptic', 'sensor' ]
 
-const state = Object.fromEntries(LAZY.map((name) => [ name, null ]))
-
-const ensure = (name) => (state[name] ??= Bindings.global_initSubsystem(name))
-
-const ensureJoysticks = () => {
-	ensure('joystick')
-	ensure('gamepad')
+const initLazyFlags = (initialized) => {
+	for (const name of LAZY) { initialized[name] = null }
 }
 
-const installLazyFlags = (initialized) => {
-	for (const name of LAZY) {
-		Object.defineProperty(initialized, name, {
-			configurable: true,
-			enumerable: true,
-			get: () => {
-				if (name === 'joystick' || name === 'gamepad') { ensureJoysticks() }
-				const value = ensure(name)
-				Object.defineProperty(initialized, name, { value, enumerable: true, writable: false, configurable: false })
-				return value
-			},
-		})
+const initJoysticks = () => {
+	const { initialized } = Globals.info
+	initialized.joystick = Bindings.global_initSubsystem('joystick')
+	initialized.gamepad = Bindings.global_initSubsystem('gamepad')
+
+	if (initialized.joystick) {
+		const devices = Bindings.joystick_getDevices()
+		Globals.joystickDevices = devices.map(makeJoystickDevice)
+		Globals.gamepadDevices = devices.filter(filterGamepadDevice).map(makeGamepadDevice)
 	}
 }
 
-let joystickModules = null
+const ensure = (name) => {
+	const { initialized } = Globals.info
+	if (initialized[name] !== null) { return initialized[name] }
 
-const loadJoystickModules = () => {
-	if (joystickModules !== null) { return joystickModules }
-	ensureJoysticks()
-	const { joystick } = require('./joystick')
-	const { gamepad } = require('./gamepad')
-	joystickModules = { joystick, gamepad }
-	return joystickModules
+	if (name === 'joystick' || name === 'gamepad') { initJoysticks() }
+	else { initialized[name] = Bindings.global_initSubsystem(name) }
+
+	return initialized[name]
 }
 
-const joystickModulesLoaded = () => joystickModules !== null
-
-let sensorModule = null
-
-const loadSensorModule = () => {
-	if (sensorModule !== null) { return sensorModule }
-	ensure('sensor')
-	sensorModule = require('./sensor').sensor
-	return sensorModule
+const assertInitialized = (name) => {
+	const initialized = LAZY.includes(name)
+		? ensure(name)
+		: Globals.info.initialized[name]
+	if (!initialized) { throw new Error(`SDL ${name} subsystem failed to initialize`) }
 }
 
 module.exports = {
-	installLazyFlags,
-	loadJoystickModules,
-	joystickModulesLoaded,
-	loadSensorModule,
+	assertInitialized,
+	initLazyFlags,
 }

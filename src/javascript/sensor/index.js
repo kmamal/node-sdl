@@ -1,3 +1,4 @@
+const { assertInitialized } = require('../subsystems')
 const { refreshDevices } = require('./devices')
 const { SensorInstance } = require('./sensor-instance')
 
@@ -5,9 +6,15 @@ const { SensorInstance } = require('./sensor-instance')
 const sensor = {
 	STANDARD_GRAVITY: 9.80665,
 
-	get devices () { return [ ...refreshDevices() ] },
+	get devices () {
+		assertInitialized('sensor')
+		return [ ...refreshDevices() ]
+	},
 
-	openDevice (device) { return new SensorInstance(device) },
+	openDevice (device) {
+		assertInitialized('sensor')
+		return new SensorInstance(device)
+	},
 }
 
 module.exports = { sensor }

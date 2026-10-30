@@ -4,7 +4,8 @@ const { video: videoModule } = require('../video')
 const { keyboard: keyboardModule } = require('../keyboard')
 const { mapping, isCharacter } = require('../keyboard/key-mapping')
 const { make: makeJoystickDevice } = require('../joystick/device')
-const { loadJoystickModules } = require('../subsystems')
+const { joystick: joystickModule } = require('../joystick')
+const { gamepad: gamepadModule } = require('../gamepad')
 const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('../gamepad/device')
 const { audio: audioModule } = require('../audio')
 const { make: makeAudioDevice, update: updateAudioDevice } = require('../audio/device')
@@ -309,8 +310,7 @@ const handleEvent = (event) => {
 		case 'joystickDevice':
 		case 'gamepadDevice': {
 			const isGamepad = target === 'gamepadDevice'
-			const modules = loadJoystickModules()
-			const emitter = isGamepad ? modules.gamepad : modules.joystick
+			const emitter = isGamepad ? gamepadModule : joystickModule
 			const list = isGamepad ? Globals.gamepadDevices : Globals.joystickDevices
 
 			switch (type) {

@@ -7,7 +7,7 @@ const activeEmitters = new Set()
 const commonEvents = [ 'newListener', 'removeListener', 'error', '*' ]
 
 class EventsViaPoll extends EventEmitter {
-	constructor (validEvents) {
+	constructor (validEvents, assertReady = null) {
 		super()
 
 		this._validEvents = validEvents
@@ -36,6 +36,8 @@ class EventsViaPoll extends EventEmitter {
 			}
 
 			if (type === 'newListener' || type === 'removeListener') { return }
+
+			if (assertReady && type !== 'error') { assertReady() }
 
 			count++
 			if (count !== 1) { return }

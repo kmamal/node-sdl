@@ -442,10 +442,10 @@ export namespace Sdl {
 		readonly initialized: {
 			readonly video: boolean
 			readonly audio: boolean
-			readonly joystick: boolean
-			readonly gamepad: boolean
-			readonly haptic: boolean
-			readonly sensor: boolean
+			readonly joystick: boolean | null
+			readonly gamepad: boolean | null
+			readonly haptic: boolean | null
+			readonly sensor: boolean | null
 		}
 	}
 

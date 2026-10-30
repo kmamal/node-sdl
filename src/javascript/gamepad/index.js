@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { assertInitialized } = require('../subsystems')
 const { GamepadInstance } = require('./gamepad-instance')
 const { make: makeGamepadDevice } = require('./device')
 const { make: makeJoystickDevice } = require('../joystick/device')
@@ -24,16 +25,21 @@ const refreshDevices = () => {
 }
 
 const gamepad = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('gamepad') }) }
 
 	get devices () {
+		assertInitialized('gamepad')
 		Globals.events.poll()
 		return [ ...Globals.gamepadDevices ]
 	}
 
-	openDevice (device) { return new GamepadInstance(device) }
+	openDevice (device) {
+		assertInitialized('gamepad')
+		return new GamepadInstance(device)
+	}
 
 	addMappings (mappings) {
+		assertInitialized('gamepad')
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }
 		for (const mapping of mappings) {
 			validateString('mapping', mapping)
