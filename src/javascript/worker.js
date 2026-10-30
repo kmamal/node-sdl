@@ -16,14 +16,22 @@ const { getFormatHelpers: getAudioFormatHelpers } = require('./audio/format-help
 const { getFormatHelpers: getVideoFormatHelpers } = require('./video/format-helpers')
 const { AudioPlaybackStream } = require('./audio/audio-playback-stream')
 const { AudioRecordingStream } = require('./audio/audio-recording-stream')
-const { makeDefault: makeDefaultDevice } = require('./audio/device')
+const Bindings = require('./bindings')
+const { make: makeDevice } = require('./audio/device')
 const { convert: convertAudio } = require('./audio/conversion')
 const { convert: convertImage } = require('./video/conversion')
 
 const makeModule = (type, Stream) => {
-	const defaultDevice = makeDefaultDevice()
+	const recording = type === 'recording'
+	const defaultDevice = makeDevice({})
 
 	return {
+		get devices () {
+			const [ defaultInfo, ...devices ] = Bindings.audio_getDevices(recording)
+			Object.assign(defaultDevice, defaultInfo)
+			return [ defaultDevice, ...devices.map(makeDevice) ]
+		},
+
 		openDevice (device = null, options = {}) {
 			if (device === null) { return new Stream(defaultDevice, options) }
 

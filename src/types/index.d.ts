@@ -348,9 +348,17 @@ export namespace Events {
 		interface AudioEvent extends BaseEvent {}
 
 		export interface Close extends AudioEvent { readonly type: 'close' }
+		export interface Drain extends AudioEvent {
+			readonly type: 'drain'
+			readonly underruns: number
+			readonly missing: number
+		}
+		export interface Readable extends AudioEvent { readonly type: 'readable' }
 
 		export type Any
 			= Close
+			| Drain
+			| Readable
 
 	}
 
@@ -1429,11 +1437,21 @@ export namespace Sdl {
 		}
 
 		export interface AudioPlaybackStream extends AudioStream {
+			on (event: 'drain', listener: (event: Events.Audio.Drain) => void): this
+			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
+			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
+
 			readonly queued: number
 			putData (buffer: Buffer, bytes?: number): void
 		}
 
 		export interface AudioRecordingStream extends AudioStream {
+			on (event: 'readable', listener: (event: Events.Audio.Readable) => void): this
+			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
+			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
+
 			readonly available: number
 			getData (buffer: Buffer, bytes?: number): number
 		}

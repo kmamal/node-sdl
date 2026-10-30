@@ -23,8 +23,7 @@ class AudioPlaybackStream extends AudioStream {
 		validateBuffer('buffer', buffer)
 		bytes ??= buffer.length
 		validateBytes(buffer, bytes)
-		const frameSize = this._channels * this._bytesPerSample
-		if (bytes % frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${frameSize}`), { bytes }) }
+		if (bytes % this._frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${this._frameSize}`), { bytes }) }
 
 		if (bytes === 0) { return }
 

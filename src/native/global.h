@@ -8,7 +8,6 @@ namespace global {
 
 	std::mutex &lock();
 	void assertReady(Napi::Env &env);
-	void registerEnv(Napi::Env env);
 
 	Napi::Value initialize(const Napi::CallbackInfo &info);
 	Napi::Value initSubsystem(const Napi::CallbackInfo &info);

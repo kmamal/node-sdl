@@ -62,6 +62,7 @@ export namespace SdlWorker {
 		}
 
 		interface DeviceModule<Stream extends Sdl.Audio.AudioStream> {
+			readonly devices: Sdl.Audio.Device[]
 			openDevice (device?: Sdl.Audio.Device | null, options?: Sdl.Audio.StreamOptions): Stream
 		}
 

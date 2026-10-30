@@ -7,15 +7,12 @@ const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
 const { convert } = require('./conversion')
 const { validateBuffer } = require('../validate')
-const {
-	make: makeDevice,
-	makeDefault: makeDefaultDevice,
-} = require('./device')
+const { make: makeDevice } = require('./device')
 
 
 if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback = [ makeDefaultDevice(false), ...Bindings.audio_getDevices(false).map(makeDevice) ]
-	Globals.audioDevices.recording = [ makeDefaultDevice(true), ...Bindings.audio_getDevices(true).map(makeDevice) ]
+	Globals.audioDevices.playback = Bindings.audio_getDevices(false).map(makeDevice)
+	Globals.audioDevices.recording = Bindings.audio_getDevices(true).map(makeDevice)
 }
 
 

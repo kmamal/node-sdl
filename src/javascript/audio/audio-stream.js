@@ -3,7 +3,6 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioFormatHelpers } = require('./format-helpers')
-const { update: updateDevice } = require('./device')
 const {
 	validateString,
 	validateObject,
@@ -15,11 +14,12 @@ const {
 	validatePositiveInt32,
 } = require('../validate')
 
-const validEvents = [ 'close' ]
+const notifyEvents = { playback: 'drain', recording: 'readable' }
 
 class AudioStream extends EventsViaPoll {
 	constructor (recording, device, options) {
-		super(validEvents)
+		const notifyEvent = notifyEvents[recording ? 'recording' : 'playback']
+		super([ 'close', notifyEvent ])
 
 		validateObject('options', options)
 
@@ -44,19 +44,32 @@ class AudioStream extends EventsViaPoll {
 		const _format = Enums.audioFormat[format]
 		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 
-		const id = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered)
+		const helper = AudioFormatHelpers[format]
+
+		const notify = (underruns, missing) => {
+			if (this._closed) { return }
+			const event = recording
+				? { type: notifyEvent }
+				: { type: notifyEvent, underruns, missing }
+			Globals.events.withoutPolling(() => {
+				try { this.emit(notifyEvent, event) }
+				catch (error) { this.emit('error', error) }
+			})
+		}
+
+		const id = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered, notify, device)
 		try {
 			if (gain !== 1) { Bindings.audio_setGain(id, gain) }
 			if (frequencyRatio !== 1) { Bindings.audio_setFrequencyRatio(id, frequencyRatio) }
 		}
 		catch (error) {
-			Bindings.audio_close(id)
+			Bindings.audio_close(id, device, device.id, recording)
 			throw error
 		}
 
 		this._id = id
 		this._recording = recording
-		const helper = AudioFormatHelpers[format]
+		this._frameSize = channels * helper.bytesPerSample
 
 		this._device = device
 		this._channels = channels
@@ -76,7 +89,16 @@ class AudioStream extends EventsViaPoll {
 		this._writer = helper.writer
 
 		Globals.audioStreams.set(this._id, this)
-		updateDevice(this._device)
+
+		const notifyListeners = () => this.listenerCount(notifyEvent) + this.listenerCount('*')
+		this.on('newListener', (type) => {
+			if ((type !== notifyEvent && type !== '*') || notifyListeners() !== 0) { return }
+			Bindings.audio_setNotify(this._id, true)
+		})
+		this.on('removeListener', (type) => {
+			if ((type !== notifyEvent && type !== '*') || notifyListeners() !== 0 || this._closed) { return }
+			Bindings.audio_setNotify(this._id, false)
+		})
 	}
 
 	get id () { return this._id }
@@ -154,10 +176,8 @@ class AudioStream extends EventsViaPoll {
 		Globals.audioStreams.delete(this._id)
 
 		// This call could throw if the device is gone
-		try { Bindings.audio_close(this._id) }
+		try { Bindings.audio_close(this._id, this._device, this._device.id, this._recording) }
 		catch (_) { }
-
-		updateDevice(this._device)
 
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("stream is closed"), { id: this._id }))

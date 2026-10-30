@@ -543,6 +543,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::DEVICE_ADD);
 			packed.Set("audioDeviceType", audio::device_types[is_recording]);
 			packed.Set("device", device);
+			packed.Set("defaultDevice", audio::_getDefaultDevice(env, is_recording));
 			break;
 		}
 		case SDL_EVENT_AUDIO_DEVICE_REMOVED: {
@@ -550,6 +551,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::DEVICE_REMOVE);
 			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
 			packed.Set("deviceId", event.adevice.which);
+			packed.Set("defaultDevice", audio::_getDefaultDevice(env, event.adevice.recording));
 			break;
 		}
 		case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: {
@@ -557,6 +559,7 @@ events::dispatchEvent(const SDL_Event &event)
 			packed.Set("type", events::types::DEVICE_FORMAT_CHANGE);
 			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
 			packed.Set("deviceId", event.adevice.which);
+			packed.Set("format", audio::_getFormat(env, event.adevice.which));
 			break;
 		}
 

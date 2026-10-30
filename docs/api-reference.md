@@ -253,9 +253,11 @@
     - [audioStream.closed](#audiostreamclosed)
     - [audioStream.close()](#audiostreamclose)
   - [class AudioPlaybackStream extends AudioStream](#class-audioplaybackstream-extends-audiostream)
+    - [Event: 'drain'](#audio-playback-stream-event-drain)
     - [playbackStream.queued](#playbackstreamqueued)
     - [playbackStream.putData(buffer[, bytes])](#playbackstreamputdatabuffer-bytes)
   - [class AudioRecordingStream extends AudioStream](#class-audiorecordingstream-extends-audiostream)
+    - [Event: 'readable'](#audio-recording-stream-event-readable)
     - [recordingStream.available](#recordingstreamavailable)
     - [recordingStream.getData(buffer[, bytes])](#recordingstreamgetdatabuffer-bytes)
 - [sdl.clipboard](#sdlclipboard)
@@ -3053,6 +3055,17 @@ Closes the stream.
 The API does not expose the `AudioPlaybackStream` class, so you can't (and shouldn't) use it with the `new` operator.
 Instead, [`sdl.audio.playback.openDevice()`](#sdlaudioplaybackopendevicedevice-options) returns objects of type `AudioPlaybackStream`.
 
+<a id="audio-playback-stream-event-drain"></a>
+
+### Event: 'drain'
+
+- `underruns: <number>` The number of times since the previous `'drain'` event that the device pulled audio from the stream and the stream had less queued than the device asked for.
+- `missing: <number>` The total number of bytes, in the stream's format, that the device asked for and the stream didn't have, summed over those `underruns`.
+
+Fired each time the device has pulled audio from the stream.
+Check [`playbackStream.queued`](#playbackstreamqueued) to determine how close the stream is to running out of data and refill it by calling [`playbackStream.putData()`](#playbackstreamputdatabuffer-bytes) to keep playback going without gaps.
+SDL plays silence for any shortfall, which `underruns` and `missing` report.
+
 ### playbackStream.queued
 
 - `<number>`
@@ -3070,6 +3083,13 @@ Takes the audio data that you have written to the buffer and queues it on the st
 
 The API does not expose the `AudioRecordingStream` class, so you can't (and shouldn't) use it with the `new` operator.
 Instead, [`sdl.audio.recording.openDevice()`](#sdlaudiorecordingopendevicedevice-options) returns objects of type `AudioRecordingStream`.
+
+<a id="audio-recording-stream-event-readable"></a>
+
+### Event: 'readable'
+
+Fired when the device has recorded new audio into the stream.
+Call [`recordingStream.getData()`](#recordingstreamgetdatabuffer-bytes) to retrieve and process it.
 
 ### recordingStream.available
 
@@ -3151,6 +3171,8 @@ It contains a subset of the main module:
 Before using `audio.*.devices` and `audio.*.openDevice` you must import `@kmamal/sdl` on the main thread so that the audio sybsystem gets initialized, otherwise they throw.
 The rest works fine even without `@kmamal/sdl` on the main thread.
 
+Workers receive no events, so in a worker `audio.*.devices` asks SDL for a fresh list on every read, and device objects only update when a stream opens or closes on them.
+Stream events such as [`'drain'`](#audio-playback-stream-event-drain) and [`'readable'`](#audio-recording-stream-event-readable) do fire in workers, because they don't go through the event queue.
 A worker's streams are closed when the worker exits or is terminated.
 A worker stays alive while its playback streams have audio queued, the same way the main thread does.
 When the main thread exits, it shuts SDL down, so calls a worker makes after that point throw.

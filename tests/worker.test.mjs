@@ -113,15 +113,90 @@ T.test("sdl::worker streams are released on terminate", async (t) => {
 	`, { eval: true })
 	const id = await new Promise((resolve) => { worker.once('message', resolve) })
 
-	t.throwsNot(() => Bindings.audio_getDeviceFormat(id))
+	t.throwsNot(() => Bindings.audio_getQueued(id))
 
 	await worker.terminate()
 
-	t.throws(() => Bindings.audio_getDeviceFormat(id))
+	t.throws(() => Bindings.audio_getQueued(id))
 
 	const stream = sdl.audio.playback.openDevice()
 	t.equal(stream.queued, 0)
 	stream.close()
+})
+
+T.test("sdl::worker devices", async (t) => {
+	if (!sdl.info.initialized.audio) { return }
+
+	const [ result ] = await runWorker(`
+		const playback = sdl.audio.playback.devices
+		const recording = sdl.audio.recording.devices
+		send({
+			playback: playback.map(({ id, name, frequency }) => ({ id, name, frequency })),
+			recording: recording.map(({ id, name }) => ({ id, name })),
+			sameDefault: sdl.audio.playback.devices[0] === playback[0],
+		})
+	`)
+
+	t.equal(result.playback.map((d) => d.id), sdl.audio.playback.devices.map((d) => d.id))
+	t.equal(result.recording.map((d) => d.id), sdl.audio.recording.devices.map((d) => d.id))
+	t.equal(result.playback[0].name, null)
+	t.equal(result.playback[0].frequency, sdl.audio.playback.devices[0].frequency)
+	t.ok(result.sameDefault)
+})
+
+T.test("sdl::worker drain", async (t) => {
+	t.timeout(5e3)
+
+	if (!hasPlayback) {
+		console.warn("NO AUDIO PLAYBACK FOUND")
+		return
+	}
+
+	const [ result ] = await runWorker(`
+		const stream = sdl.audio.playback.openDevice(null, { channels: 1, frequency: 48000, buffered: 1024 })
+		const chunk = Buffer.alloc(4096 * 4)
+		let drains = 0
+		let underruns = 0
+		stream.on('drain', (event) => {
+			drains++
+			underruns += event.underruns
+			if (stream.queued <= chunk.length) { stream.putData(chunk) }
+		})
+		stream.putData(chunk)
+		stream.putData(chunk)
+		stream.play()
+		await new Promise((resolve) => { setTimeout(resolve, 300) })
+		stream.close()
+		send({ drains, underruns })
+	`)
+
+	t.ok(result.drains > 0)
+	t.equal(result.underruns, 0)
+})
+
+T.test("sdl::worker terminated during drain", async (t) => {
+	t.timeout(30e3)
+
+	if (!hasPlayback) {
+		console.warn("NO AUDIO PLAYBACK FOUND")
+		return
+	}
+
+	for (let i = 0; i < 50; i++) {
+		const worker = new Worker(`
+			const sdl = require(${JSON.stringify(workerPath)})
+			const { parentPort } = require('node:worker_threads')
+			const stream = sdl.audio.playback.openDevice(null, { channels: 1, buffered: 256 })
+			stream.on('drain', () => { stream.putData(Buffer.alloc(256 * 4)) })
+			stream.play()
+			parentPort.postMessage(stream.id)
+			setInterval(() => {}, 1e3)
+		`, { eval: true })
+		const id = await new Promise((resolve) => { worker.once('message', resolve) })
+		await new Promise((resolve) => { setTimeout(resolve, i % 5) })
+		await worker.terminate()
+		t.throws(() => Bindings.audio_getQueued(id))
+	}
 })
 
 T.test("sdl::worker stays alive while audio plays", async (t) => {

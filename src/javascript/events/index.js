@@ -8,7 +8,7 @@ const { joystick: joystickModule } = require('../joystick')
 const { gamepad: gamepadModule } = require('../gamepad')
 const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('../gamepad/device')
 const { audio: audioModule } = require('../audio')
-const { make: makeAudioDevice, update: updateAudioDevice } = require('../audio/device')
+const { make: makeAudioDevice } = require('../audio/device')
 const { clipboard: clipboardModule } = require('../clipboard')
 const { refreshDevices: refreshTouchDevices } = require('../touch/devices')
 
@@ -427,6 +427,9 @@ const handleEvent = (event) => {
 			const list = Globals.audioDevices[audioDeviceType]
 			const emitter = audioModule[audioDeviceType]
 
+			const { defaultDevice } = event
+			delete event.defaultDevice
+
 			switch (type) {
 				case 'deviceAdd': {
 					const { device } = event
@@ -436,7 +439,7 @@ const handleEvent = (event) => {
 					const made = makeAudioDevice(device)
 					list.push(made)
 					event.device = made
-					updateAudioDevice(list[0])
+					Object.assign(list[0], defaultDevice)
 				} break
 
 				case 'deviceRemove': {
@@ -453,16 +456,16 @@ const handleEvent = (event) => {
 							tryCall(() => { stream.close() })
 						}
 					}
-					updateAudioDevice(list[0])
+					Object.assign(list[0], defaultDevice)
 
 					event.device = device
 				} break
 
 				case 'deviceFormatChange': {
-					const { deviceId } = event
+					const { deviceId, format } = event
 					const device = Globals.audioStreams.get(deviceId)?.device
 						?? list.find((a) => a.id === deviceId)
-					if (device) { updateAudioDevice(device) }
+					if (device) { Object.assign(device, format) }
 				} return
 
 				// No default

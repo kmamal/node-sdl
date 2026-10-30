@@ -11,15 +11,15 @@ namespace audio {
 	extern std::map<bool, std::string> device_types;
 	extern std::map<SDL_AudioFormat, std::string> formats;
 
-	void closeEnvStreams(Napi::Env env);
 	void closeAllStreams();
 
 	Napi::Value _getDevice(Napi::Env &env, SDL_AudioDeviceID id);
+	Napi::Object _getFormat(Napi::Env &env, SDL_AudioDeviceID id);
+	Napi::Object _getDefaultDevice(Napi::Env &env, bool is_recording);
 	Napi::Array _getDevices(Napi::Env &env, bool is_recording);
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);
-	Napi::Value getDeviceFormat(const Napi::CallbackInfo &info);
 	Napi::Value play(const Napi::CallbackInfo &info);
 	Napi::Value getQueued(const Napi::CallbackInfo &info);
 	Napi::Value getAvailable(const Napi::CallbackInfo &info);
@@ -27,6 +27,7 @@ namespace audio {
 	Napi::Value getData(const Napi::CallbackInfo &info);
 	Napi::Value clear(const Napi::CallbackInfo &info);
 	Napi::Value close(const Napi::CallbackInfo &info);
+	Napi::Value setNotify(const Napi::CallbackInfo &info);
 	Napi::Value setGain(const Napi::CallbackInfo &info);
 	Napi::Value setFrequencyRatio(const Napi::CallbackInfo &info);
 	Napi::Value convert(const Napi::CallbackInfo &info);

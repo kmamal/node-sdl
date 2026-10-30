@@ -37,12 +37,6 @@ global::assertReady(Napi::Env &env)
 	}
 }
 
-void
-global::registerEnv(Napi::Env env)
-{
-	env.AddCleanupHook([env]() { audio::closeEnvStreams(env); });
-}
-
 bool watchEvents(void*, SDL_Event *event) {
 	if (true
 		&& SDL_GetCurrentThreadID() == mainThreadId

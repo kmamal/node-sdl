@@ -21,13 +21,10 @@ process.on('beforeExit', (code) => {
 		if (!stream.playing) { continue }
 
 		let queued = null
-		let device = null
-		try {
-			queued = Bindings.audio_getQueued(stream.id)
-			device = Bindings.audio_getDeviceFormat(stream.id)
-		}
+		try { queued = Bindings.audio_getQueued(stream.id) }
 		catch (_) { }
-		if (!queued || !device) { continue }
+		const { device } = stream
+		if (!queued || !device.frequency) { continue }
 
 		const { channels, frequency, bytesPerSample } = stream
 		const bytesPerSecond = channels * frequency * bytesPerSample

@@ -4,19 +4,110 @@
 #include <string>
 #include <sstream>
 #include <mutex>
+#include <atomic>
+#include <cstdint>
 
 std::map<bool, std::string> audio::device_types;
 std::map<SDL_AudioFormat, std::string> audio::formats;
 
+struct StreamState;
+
+static void _notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::nullptr_t *);
+
+using NotifyFunction = Napi::TypedThreadSafeFunction<StreamState, std::nullptr_t, _notifyJs>;
+
+struct StreamState {
+	std::atomic<bool> notify { false };
+	std::atomic<bool> pending { false };
+	std::atomic<uint32_t> underruns { 0 };
+	std::atomic<uint32_t> missing { 0 };
+	NotifyFunction tsfn;
+};
+
 struct OpenStream {
 	SDL_AudioStream *stream;
 	napi_env env;
+	bool is_recording;
+	StreamState *state;
 };
 
 static std::map<SDL_AudioDeviceID, OpenStream> open_streams;
 
-static SDL_AudioStream *
-_getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
+static void
+_notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::nullptr_t *)
+{
+	state->pending.store(false, std::memory_order_release);
+	uint32_t underruns = state->underruns.exchange(0, std::memory_order_relaxed);
+	uint32_t missing = state->missing.exchange(0, std::memory_order_relaxed);
+	if (env == nullptr || callback.IsEmpty()) { return; }
+	callback.Call({ Napi::Number::New(env, underruns), Napi::Number::New(env, missing) });
+}
+
+static void
+_wake (StreamState *state)
+{
+	if (!state->notify.load(std::memory_order_acquire)) { return; }
+	if (state->pending.exchange(true, std::memory_order_acq_rel)) { return; }
+	if (state->tsfn.NonBlockingCall() != napi_ok) {
+		state->pending.store(false, std::memory_order_release);
+	}
+}
+
+static void SDLCALL
+_onGet (void *userdata, SDL_AudioStream *, int additional_amount, int)
+{
+	StreamState *state = (StreamState *) userdata;
+
+	if (!state->notify.load(std::memory_order_acquire)) { return; }
+
+	if (additional_amount > 0) {
+		state->underruns.fetch_add(1, std::memory_order_relaxed);
+		state->missing.fetch_add((uint32_t) additional_amount, std::memory_order_relaxed);
+	}
+
+	_wake(state);
+}
+
+static void SDLCALL
+_onPut (void *userdata, SDL_AudioStream *, int, int)
+{
+	StreamState *state = (StreamState *) userdata;
+	_wake(state);
+}
+
+static void
+_unbind (OpenStream &entry)
+{
+	if (entry.is_recording) { SDL_SetAudioStreamPutCallback(entry.stream, nullptr, nullptr); }
+	else { SDL_SetAudioStreamGetCallback(entry.stream, nullptr, nullptr); }
+}
+
+static void
+_envCleanup (void *arg)
+{
+	SDL_AudioDeviceID audio_id = (SDL_AudioDeviceID) (uintptr_t) arg;
+
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	auto it = open_streams.find(audio_id);
+	if (it == open_streams.end()) { return; }
+
+	_unbind(it->second);
+	SDL_DestroyAudioStream(it->second.stream);
+	open_streams.erase(it);
+}
+
+static void
+_destroy (SDL_AudioDeviceID audio_id, OpenStream &entry, bool same_env)
+{
+	_unbind(entry);
+	SDL_DestroyAudioStream(entry.stream);
+	if (same_env) { napi_remove_env_cleanup_hook(entry.env, _envCleanup, (void *) (uintptr_t) audio_id); }
+	entry.state->tsfn.Release();
+}
+
+static OpenStream &
+_getEntry (Napi::Env &env, SDL_AudioDeviceID audio_id)
 {
 	auto entry = open_streams.find(audio_id);
 	if (entry == open_streams.end()) {
@@ -24,38 +115,35 @@ _getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
 		message << "getAudioStream(" << audio_id << ") error: invalid audio stream id";
 		throw Napi::Error::New(env, message.str());
 	}
-	return entry->second.stream;
+	return entry->second;
 }
 
-void
-audio::closeEnvStreams (Napi::Env env)
+static SDL_AudioStream *
+_getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
 {
-	std::lock_guard<std::mutex> guard(global::lock());
-
-	for (auto it = open_streams.begin(); it != open_streams.end();) {
-		if (it->second.env == (napi_env) env) {
-			SDL_DestroyAudioStream(it->second.stream);
-			it = open_streams.erase(it);
-		}
-		else {
-			it++;
-		}
-	}
+	return _getEntry(env, audio_id).stream;
 }
 
 void
 audio::closeAllStreams ()
 {
 	for (auto &entry : open_streams) {
-		SDL_DestroyAudioStream(entry.second.stream);
+		_destroy(entry.first, entry.second, false);
 	}
 	open_streams.clear();
 }
 
 
 static void
-_setFormat (Napi::Object &target, const SDL_AudioSpec &spec, int sample_frames)
+_setFormat (Napi::Object &target, SDL_AudioDeviceID id)
 {
+	SDL_AudioSpec spec;
+	int sample_frames;
+	if (!SDL_GetAudioDeviceFormat(id, &spec, &sample_frames)) {
+		SDL_ClearError();
+		return;
+	}
+
 	Napi::Env env = target.Env();
 	auto format_entry = audio::formats.find(spec.format);
 	Napi::Value format = format_entry != audio::formats.end()
@@ -66,6 +154,12 @@ _setFormat (Napi::Object &target, const SDL_AudioSpec &spec, int sample_frames)
 	target.Set("channels", spec.channels);
 	target.Set("frequency", spec.freq);
 	target.Set("buffered", sample_frames);
+}
+
+static SDL_AudioDeviceID
+_defaultId (bool is_recording)
+{
+	return is_recording ? SDL_AUDIO_DEVICE_DEFAULT_RECORDING : SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
 }
 
 static Napi::Value
@@ -80,15 +174,7 @@ _packDevice (Napi::Env &env, SDL_AudioDeviceID id)
 	Napi::Object device = Napi::Object::New(env);
 	device.Set("id", id);
 	device.Set("name", name);
-
-	SDL_AudioSpec spec;
-	int sample_frames;
-	if (SDL_GetAudioDeviceFormat(id, &spec, &sample_frames)) {
-		_setFormat(device, spec, sample_frames);
-	}
-	else {
-		SDL_ClearError();
-	}
+	_setFormat(device, id);
 
 	return device;
 }
@@ -97,6 +183,24 @@ Napi::Value
 audio::_getDevice(Napi::Env &env, SDL_AudioDeviceID id)
 {
 	return _packDevice(env, id);
+}
+
+Napi::Object
+audio::_getFormat(Napi::Env &env, SDL_AudioDeviceID id)
+{
+	Napi::Object result = Napi::Object::New(env);
+	_setFormat(result, id);
+	return result;
+}
+
+Napi::Object
+audio::_getDefaultDevice(Napi::Env &env, bool is_recording)
+{
+	Napi::Object device = Napi::Object::New(env);
+	device.Set("id", env.Null());
+	device.Set("name", env.Null());
+	_setFormat(device, _defaultId(is_recording));
+	return device;
 }
 
 Napi::Array
@@ -116,7 +220,8 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 	Napi::Array devices = Napi::Array::New(env);
 
 	try {
-		int num_returned = 0;
+		devices.Set((uint32_t) 0, audio::_getDefaultDevice(env, is_recording));
+		int num_returned = 1;
 		for (int i = 0; i < num_devices; i++) {
 			Napi::Value device = _packDevice(env, device_ids[i]);
 			if (device.IsNull()) { continue; }
@@ -131,7 +236,6 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 
 	return devices;
 }
-
 
 Napi::Value
 audio::getDevices(const Napi::CallbackInfo &info)
@@ -160,12 +264,12 @@ audio::open (const Napi::CallbackInfo &info)
 	int format = info[3].As<Napi::Number>().Int32Value();
 	int channels = info[4].As<Napi::Number>().Int32Value();
 	int samples = info[5].As<Napi::Number>().Int32Value();
+	Napi::Function callback = info[6].As<Napi::Function>();
+	Napi::Object device = info[7].As<Napi::Object>();
 
 	SDL_AudioDeviceID device_id = has_id
 		? info[0].As<Napi::Number>().Uint32Value()
-		: is_recording
-			? SDL_AUDIO_DEVICE_DEFAULT_RECORDING
-			: SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+		: _defaultId(is_recording);
 
 	SDL_AudioSpec desired;
 	SDL_memset(&desired, 0, sizeof(desired));
@@ -194,33 +298,29 @@ audio::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	open_streams[audio_id] = { stream, env };
+	StreamState *state = new StreamState();
+	state->tsfn = NotifyFunction::New(env, callback, "audioStreamNotify", 0, 1, state,
+		[](Napi::Env, void *, StreamState *state) { delete state; });
+	state->tsfn.Unref(env);
 
-	return Napi::Number::New(env, audio_id);
-}
+	napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id);
+	OpenStream &entry = open_streams[audio_id] = { stream, env, is_recording, state };
 
-Napi::Value
-audio::getDeviceFormat (const Napi::CallbackInfo &info)
-{
-	Napi::Env env = info.Env();
-
-	std::lock_guard<std::mutex> guard(global::lock());
-	global::assertReady(env);
-
-	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
-
-	SDL_AudioSpec spec;
-	int sample_frames;
-	if (!SDL_GetAudioDeviceFormat(audio_id, &spec, &sample_frames)) {
+	bool bound = is_recording
+		? SDL_SetAudioStreamPutCallback(stream, _onPut, state)
+		: SDL_SetAudioStreamGetCallback(stream, _onGet, state);
+	if (!bound) {
 		std::ostringstream message;
-		message << "SDL_GetAudioDeviceFormat(" << audio_id << ") error: " << SDL_GetError();
+		message << "SDL_SetAudioStream" << (is_recording ? "Put" : "Get") << "Callback(" << audio_id << ") error: " << SDL_GetError();
 		SDL_ClearError();
+		_destroy(audio_id, entry, true);
+		open_streams.erase(audio_id);
 		throw Napi::Error::New(env, message.str());
 	}
 
-	Napi::Object result = Napi::Object::New(env);
-	_setFormat(result, spec, sample_frames);
-	return result;
+	_setFormat(device, audio_id);
+
+	return Napi::Number::New(env, audio_id);
 }
 
 Napi::Value
@@ -375,11 +475,36 @@ audio::close (const Napi::CallbackInfo &info)
 	global::assertReady(env);
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	Napi::Object device = info[1].As<Napi::Object>();
+	bool has_id = !info[2].IsNull();
+	bool is_recording = info[3].As<Napi::Boolean>().Value();
 
-	SDL_AudioStream *stream = _getStream(env, audio_id);
-
-	SDL_DestroyAudioStream(stream);
+	OpenStream &entry = _getEntry(env, audio_id);
+	_destroy(audio_id, entry, true);
 	open_streams.erase(audio_id);
+
+	_setFormat(device, has_id ? info[2].As<Napi::Number>().Uint32Value() : _defaultId(is_recording));
+
+	return env.Undefined();
+}
+
+Napi::Value
+audio::setNotify (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	bool notify = info[1].As<Napi::Boolean>().Value();
+
+	StreamState *state = _getEntry(env, audio_id).state;
+	if (notify) {
+		state->underruns.store(0, std::memory_order_relaxed);
+		state->missing.store(0, std::memory_order_relaxed);
+	}
+	state->notify.store(notify, std::memory_order_release);
 
 	return env.Undefined();
 }
