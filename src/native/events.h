@@ -19,6 +19,7 @@ namespace events {
 		extern std::string JOYSTICK_DEVICE;
 		extern std::string GAMEPAD_DEVICE;
 		extern std::string AUDIO_DEVICE;
+		extern std::string CHANGE;
 	};
 
 	namespace types {
@@ -77,11 +78,11 @@ namespace events {
 		extern std::string UPDATE;
 	};
 
-	bool dispatchEvent(const SDL_Event &event);
 	bool dispatchEventFromWatch(const SDL_Event &event);
 
 	Napi::Value isDispatchingFromWatch(const Napi::CallbackInfo &info);
 	Napi::Value poll(const Napi::CallbackInfo &info);
+	Napi::Value broadcastChange(const Napi::CallbackInfo &info);
 
 }; // namespace events
 

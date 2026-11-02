@@ -43,15 +43,6 @@ T.test("sdl::keyboard", (t) => {
 	const scancodeSet2 = new Set(scancodes2)
 	t.ok(scancodeSet1.size - scancodeSet2.size < 80)
 
-
-	// //
-	// const entries = Object.entries(sdl.keyboard.SCANCODE)
-	// for (let i = 0; i < entries.length; i++) {
-	// 	console.log(entries[i], keys[i], scancodes2[i])
-	// }
-	// //
-
-
 	const state = sdl.keyboard.getState()
 
 	let numPressed = 0

@@ -2,6 +2,7 @@
 #define _GAMEPAD_H_
 
 #include <napi.h>
+#include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
@@ -15,8 +16,8 @@ namespace gamepad {
 
 	double mapAxis (SDL_Gamepad *gamepad, SDL_GamepadAxis axis);
 	double mapAxisValue (int value);
-	void getState (Napi::Env &env, SDL_Gamepad *gamepad, Napi::Object dst);
-	Napi::Value getSteamHandle(Napi::Env &env, SDL_Gamepad *gamepad);
+	void getState (SDL_Gamepad *gamepad, packed::Value &dst);
+	packed::Value getSteamHandle(SDL_Gamepad *gamepad);
 
 	Napi::Value addMappings(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);

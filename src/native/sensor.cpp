@@ -1,4 +1,6 @@
 #include "sensor.h"
+#include "global.h"
+#include "threads.h"
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
@@ -13,6 +15,9 @@ Napi::Value
 sensor::getDevices (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int num_devices;
 	SDL_SensorID *sensor_ids = SDL_GetSensors(&num_devices);
@@ -73,6 +78,9 @@ sensor::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int id = info[0].As<Napi::Number>().Int32Value();
 
 	SDL_Sensor *sensor = SDL_OpenSensor(id);
@@ -83,6 +91,8 @@ sensor::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	threads::trackOpen(env, threads::SENSOR, id);
+
 	return env.Undefined();
 }
 
@@ -90,6 +100,9 @@ Napi::Value
 sensor::getData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	int sensor_id = info[0].As<Napi::Number>().Int32Value();
 
@@ -121,7 +134,12 @@ sensor::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int sensor_id = info[0].As<Napi::Number>().Int32Value();
+
+	threads::trackClose(env, threads::SENSOR, sensor_id);
 
 	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
 	if (sensor == nullptr) {

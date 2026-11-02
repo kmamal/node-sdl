@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { validateNotClosed } = require('../validate')
+const { validateNotClosed, validateObject } = require('../validate')
 const {
 	startEffect,
 	stopEffect,
@@ -23,11 +23,13 @@ const validEvents = [
 ]
 
 class GamepadInstance extends EventsViaPoll {
-	constructor (device) {
+	constructor (requested) {
 		super(validEvents)
 
 		Globals.events.poll()
-		if (!Globals.gamepadDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.gamepad.devices"), { device }) }
+		validateObject('device', requested)
+		const device = Globals.gamepadDevices.find(({ id }) => id === requested.id)
+		if (!device) { throw Object.assign(new Error("device must be from sdl.gamepad.devices"), { device: requested }) }
 
 		const result = Bindings.gamepad_open(device.id)
 

@@ -2,6 +2,7 @@
 #define _AUDIO_H_
 
 #include <napi.h>
+#include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
@@ -13,11 +14,12 @@ namespace audio {
 
 	void closeAllStreams();
 
-	Napi::Value _getDevice(Napi::Env &env, SDL_AudioDeviceID id);
-	Napi::Object _getFormat(Napi::Env &env, SDL_AudioDeviceID id);
-	Napi::Object _getDefaultDevice(Napi::Env &env, bool is_recording);
+	packed::Value _getDevice(SDL_AudioDeviceID id);
+	packed::Value _getFormat(SDL_AudioDeviceID id);
+	packed::Value _getDefaultDevice(bool is_recording);
 	Napi::Array _getDevices(Napi::Env &env, bool is_recording);
 
+	Napi::Value getDrivers(const Napi::CallbackInfo &info);
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);
 	Napi::Value play(const Napi::CallbackInfo &info);

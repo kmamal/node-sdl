@@ -26,11 +26,6 @@ const validateNonNegativeNumber = (name, value) => {
 	if (value < 0) { fail(`${name} must be non-negative`, name, value) }
 }
 
-const validatePositiveNumber = (name, value) => {
-	validateNumber(name, value)
-	if (value <= 0) { fail(`${name} must be positive`, name, value) }
-}
-
 const validateNumberRange = (name, value, min, max) => {
 	validateNumber(name, value)
 	if (value < min || value > max) { fail(`${name} must be between ${min} and ${max}`, name, value) }
@@ -81,7 +76,6 @@ module.exports = {
 	validateBuffer,
 	validateNumber,
 	validateNonNegativeNumber,
-	validatePositiveNumber,
 	validateNumberRange,
 	validateInteger,
 	validateNonNegativeInteger,

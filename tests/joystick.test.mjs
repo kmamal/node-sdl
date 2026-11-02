@@ -45,6 +45,10 @@ T.test("sdl::joystick", async (t) => {
 	const instance = sdl.joystick.openDevice(device)
 
 	t.equal(instance.device, device)
+
+	const copyInstance = sdl.joystick.openDevice({ ...device })
+	t.equal(copyInstance.device, device)
+	copyInstance.close()
 	t.equal(instance.firmwareVersion, null)
 	t.equal(instance.serialNumber, null)
 	t.equal(instance.hasLed, false)

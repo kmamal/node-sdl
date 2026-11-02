@@ -1,4 +1,4 @@
-import sdl from '@kmamal/sdl/worker'
+import sdl from '@kmamal/sdl'
 
 const TWO_PI = 2 * Math.PI
 

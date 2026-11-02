@@ -1,5 +1,5 @@
 const Globals = require('../globals')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { validateImage, validateRgbFormat } = require('../video/validate')
@@ -8,6 +8,8 @@ const { validateInteger, validateIntegerRange, validateNumber, validateString } 
 let captured = false
 
 const mouse = {
+	isAvailable () { return isAvailable('video') },
+
 	get BUTTON () { return Enums.mouseButtons },
 
 	getButton (button) {

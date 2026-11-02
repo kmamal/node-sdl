@@ -125,7 +125,6 @@ T.test("sdl::window", async (t) => {
 	t.equal(window1.accelerated, true)
 
 	t.equal(window1.vsync, 1)
-	// t.equal(window2.vsync, 0) // TODO: set automatically to 1
 	window1.setVsync(0)
 	t.equal(window1.vsync, 0)
 	window1.setVsync(1)
@@ -152,7 +151,8 @@ T.test("sdl::window", async (t) => {
 		window1.restore()
 		t.ok(await waitFor(() => !window1.maximized))
 		t.equal(window1.minimized, false)
-	} else {
+	}
+	else {
 		console.warn("WINDOW MANAGER IGNORED MAXIMIZE")
 	}
 	window1.setResizable(false)
@@ -162,11 +162,11 @@ T.test("sdl::window", async (t) => {
 		window1.restore()
 		t.ok(await waitFor(() => !window1.minimized))
 		t.equal(window1.maximized, false)
-	} else {
+	}
+	else {
 		console.warn("WINDOW MANAGER IGNORED MINIMIZE")
 	}
 
-	// t.equal(window1.focused, false)
 	t.equal(window2.focused, false)
 	window1.focus()
 	if (await waitFor(() => window1.focused)) {
@@ -180,7 +180,8 @@ T.test("sdl::window", async (t) => {
 		window1.focus()
 		t.ok(await waitFor(() => window1.focused))
 		window2.hide()
-	} else {
+	}
+	else {
 		console.warn("WINDOW MANAGER IGNORED FOCUS")
 	}
 
@@ -214,7 +215,7 @@ T.test("sdl::window", async (t) => {
 	t.equal(sdl.video.windows.length, 0)
 })
 
-T.test("sdl::window opengl/webgpu have no renderer", async (t) => {
+T.test("sdl::window opengl/webgpu have no renderer", (t) => {
 	t.throws(() => { sdl.video.createWindow({ opengl: true, accelerated: true }) })
 	t.throws(() => { sdl.video.createWindow({ opengl: true, vsync: 0 }) })
 	t.throws(() => { sdl.video.createWindow({ webgpu: true, accelerated: false }) })

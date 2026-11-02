@@ -1,8 +1,7 @@
 const Globals = require('../globals')
 const { EventEmitter } = require('node:events')
 
-let _ID = 0
-const activeEmitters = new Set()
+let numListeners = 0
 
 const commonEvents = [ 'newListener', 'removeListener', 'error', '*' ]
 
@@ -12,20 +11,11 @@ class EventsViaPoll extends EventEmitter {
 
 		this._validEvents = validEvents
 
-		const id = _ID++
-		let count = 0
-
 		// NOTE: this needs to be first, otherwise it will emit for 'newListener'
 		this.on('removeListener', (type) => {
 			if (type === 'newListener' || type === 'removeListener') { return }
 
-			count--
-			if (count !== 0) { return }
-
-			activeEmitters.delete(id)
-			if (activeEmitters.size !== 0) { return }
-
-			Globals.events.switchToPollingSlow()
+			if (--numListeners === 0) { Globals.events.setDemand(false) }
 		})
 
 		this.on('newListener', (type) => {
@@ -39,13 +29,7 @@ class EventsViaPoll extends EventEmitter {
 
 			if (assertReady && type !== 'error') { assertReady() }
 
-			count++
-			if (count !== 1) { return }
-
-			activeEmitters.add(id)
-			if (activeEmitters.size !== 1) { return }
-
-			Globals.events.switchToPollingFast()
+			if (++numListeners === 1) { Globals.events.setDemand(true) }
 		})
 	}
 

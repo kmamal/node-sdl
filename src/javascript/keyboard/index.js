@@ -1,5 +1,5 @@
 const Globals = require('../globals')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
@@ -10,6 +10,8 @@ const validEvents = [ 'keymapChange' ]
 
 const keyboard = new class extends EventsViaPoll {
 	constructor () { super(validEvents, () => { assertInitialized('video') }) }
+
+	isAvailable () { return isAvailable('video') }
 
 	get SCANCODE () { return Enums.scancodes }
 

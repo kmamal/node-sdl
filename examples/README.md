@@ -97,12 +97,12 @@ We again use [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static), thi
 
 ## [16. Audio rendering thread](https://github.com/kmamal/node-sdl/tree/master/examples/16-audio-thread)
 
-Worker threads can open audio streams through `@kmamal/sdl/worker`, as long as the main thread imports `@kmamal/sdl` first.
+Worker threads can import `@kmamal/sdl` and open audio streams just like the main thread, as long as the main thread imports it too.
 This example renders a sine wave in a worker and queues it on a playback stream opened by the worker itself, so the main thread stays free for input and drawing.
 
 ## [17. Changing audio driver dynamically](https://github.com/kmamal/node-sdl/tree/master/examples/17-audio-driver)
 SDL initializes automatically when you import `@kmamal/sdl`, and after that you can't change the audio or video driver.
-To change drivers, you must restart the process with different values for the `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` environment variables.
+To change drivers, you must restart the process with different values for the `SDL_VIDEO_DRIVER` and `SDL_AUDIO_DRIVER` environment variables.
 This example shows how to build an audio player that changes audio drivers without closing its main window.
 It keeps the audio playback in a child process, separate from the main window.
 

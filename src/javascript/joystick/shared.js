@@ -1,6 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { validateNumberRange, validateNonNegativeInt32 } = require('../validate')
+const { refreshAndBroadcast } = require('./devices')
 
 const effects = {
 	rumble: {
@@ -95,11 +96,7 @@ const releaseDevice = (id) => {
 
 const setPlayer = (id, player) => {
 	Bindings.joystick_setPlayer(id, player)
-	const devices = Bindings.joystick_getDevices()
-	for (const device of [ ...Globals.joystickDevices, ...Globals.gamepadDevices ]) {
-		const updated = devices.find(({ id: _id }) => _id === device.id)
-		if (updated) { device.player = updated.player }
-	}
+	refreshAndBroadcast()
 }
 
 module.exports = {

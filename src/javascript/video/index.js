@@ -1,16 +1,11 @@
 const Globals = require('../globals')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
 const { getFormatHelpers } = require('./format-helpers')
 const { convert } = require('./conversion')
 const { validateNonNegativeInteger } = require('../validate')
-
-
-Globals.displays = Globals.info.initialized.video
-	? Bindings.video_getDisplays()
-	: []
 
 
 const validEvents = [
@@ -25,6 +20,13 @@ const validEvents = [
 
 const video = new class extends EventsViaPoll {
 	constructor () { super(validEvents, () => { assertInitialized('video') }) }
+
+	isAvailable () { return isAvailable('video') }
+
+	get drivers () {
+		assertInitialized('video')
+		return Bindings.video_getDrivers()
+	}
 
 	get displays () {
 		assertInitialized('video')

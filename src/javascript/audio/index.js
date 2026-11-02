@@ -1,19 +1,12 @@
 const Globals = require('../globals')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
 const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
 const { convert } = require('./conversion')
-const { validateBuffer } = require('../validate')
-const { make: makeDevice } = require('./device')
-
-
-if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback = Bindings.audio_getDevices(false).map(makeDevice)
-	Globals.audioDevices.recording = Bindings.audio_getDevices(true).map(makeDevice)
-}
+const { validateBuffer, validateObject } = require('../validate')
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
@@ -27,20 +20,30 @@ const makeModule = (type, Stream) => new class extends EventsViaPoll {
 		return [ ...Globals.audioDevices[type] ]
 	}
 
-	openDevice (device = null, options = {}) {
+	openDevice (requested = null, options = {}) {
 		assertInitialized('audio')
 		Globals.events.poll()
 		const list = Globals.audioDevices[type]
 
-		if (device === null) { return new Stream(list[0], options) }
+		if (requested === null) { return new Stream(list[0], options) }
 
-		if (!list.includes(device)) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device }) }
+		validateObject('device', requested)
 
-		return new Stream(device, options)
+		const found = list.find(({ id }) => id === requested.id)
+		if (!found) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device: requested }) }
+
+		return new Stream(found, options)
 	}
 }()
 
 const audio = {
+	isAvailable () { return isAvailable('audio') },
+
+	get drivers () {
+		assertInitialized('audio')
+		return Bindings.audio_getDrivers()
+	},
+
 	playback: makeModule('playback', AudioPlaybackStream),
 	recording: makeModule('recording', AudioRecordingStream),
 

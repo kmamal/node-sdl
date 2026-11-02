@@ -135,7 +135,7 @@ audio::closeAllStreams ()
 
 
 static void
-_setFormat (Napi::Object &target, SDL_AudioDeviceID id)
+_setFormat (packed::Value &target, SDL_AudioDeviceID id)
 {
 	SDL_AudioSpec spec;
 	int sample_frames;
@@ -144,16 +144,26 @@ _setFormat (Napi::Object &target, SDL_AudioDeviceID id)
 		return;
 	}
 
-	Napi::Env env = target.Env();
 	auto format_entry = audio::formats.find(spec.format);
-	Napi::Value format = format_entry != audio::formats.end()
-		? Napi::String::New(env, format_entry->second)
-		: env.Null();
+	packed::Value format;
+	if (format_entry != audio::formats.end()) { format = packed::Value::ref(format_entry->second); }
 
-	target.Set("format", format);
-	target.Set("channels", spec.channels);
-	target.Set("frequency", spec.freq);
-	target.Set("buffered", sample_frames);
+	target.set("format", std::move(format));
+	target.set("channels", spec.channels);
+	target.set("frequency", spec.freq);
+	target.set("buffered", sample_frames);
+}
+
+static void
+_setFormat (Napi::Object &target, SDL_AudioDeviceID id)
+{
+	packed::Value format = packed::Value::object();
+	_setFormat(format, id);
+
+	Napi::Env env = target.Env();
+	for (const packed::Member &member : format.members()) {
+		target.Set(member.key, member.value.toNapi(env));
+	}
 }
 
 static SDL_AudioDeviceID
@@ -162,43 +172,43 @@ _defaultId (bool is_recording)
 	return is_recording ? SDL_AUDIO_DEVICE_DEFAULT_RECORDING : SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
 }
 
-static Napi::Value
-_packDevice (Napi::Env &env, SDL_AudioDeviceID id)
+static packed::Value
+_packDevice (SDL_AudioDeviceID id)
 {
 	const char *name = SDL_GetAudioDeviceName(id);
 	if (name == nullptr) {
 		SDL_ClearError();
-		return env.Null();
+		return packed::Value();
 	}
 
-	Napi::Object device = Napi::Object::New(env);
-	device.Set("id", id);
-	device.Set("name", name);
+	packed::Value device = packed::Value::object();
+	device.set("id", id);
+	device.set("name", name);
 	_setFormat(device, id);
 
 	return device;
 }
 
-Napi::Value
-audio::_getDevice(Napi::Env &env, SDL_AudioDeviceID id)
+packed::Value
+audio::_getDevice(SDL_AudioDeviceID id)
 {
-	return _packDevice(env, id);
+	return _packDevice(id);
 }
 
-Napi::Object
-audio::_getFormat(Napi::Env &env, SDL_AudioDeviceID id)
+packed::Value
+audio::_getFormat(SDL_AudioDeviceID id)
 {
-	Napi::Object result = Napi::Object::New(env);
+	packed::Value result = packed::Value::object();
 	_setFormat(result, id);
 	return result;
 }
 
-Napi::Object
-audio::_getDefaultDevice(Napi::Env &env, bool is_recording)
+packed::Value
+audio::_getDefaultDevice(bool is_recording)
 {
-	Napi::Object device = Napi::Object::New(env);
-	device.Set("id", env.Null());
-	device.Set("name", env.Null());
+	packed::Value device = packed::Value::object();
+	device.set("id", packed::Value());
+	device.set("name", packed::Value());
 	_setFormat(device, _defaultId(is_recording));
 	return device;
 }
@@ -220,12 +230,12 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 	Napi::Array devices = Napi::Array::New(env);
 
 	try {
-		devices.Set((uint32_t) 0, audio::_getDefaultDevice(env, is_recording));
+		devices.Set((uint32_t) 0, audio::_getDefaultDevice(is_recording).toNapi(env));
 		int num_returned = 1;
 		for (int i = 0; i < num_devices; i++) {
-			Napi::Value device = _packDevice(env, device_ids[i]);
-			if (device.IsNull()) { continue; }
-			devices.Set(num_returned++, device);
+			packed::Value device = _packDevice(device_ids[i]);
+			if (device.isNull()) { continue; }
+			devices.Set(num_returned++, device.toNapi(env));
 		}
 	}
 	catch (...) {
@@ -235,6 +245,27 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 	SDL_free(device_ids);
 
 	return devices;
+}
+
+Napi::Value
+audio::getDrivers(const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	Napi::Array all = Napi::Array::New(env);
+	int num_drivers = SDL_GetNumAudioDrivers();
+	for (int i = 0; i < num_drivers; i ++) {
+		all.Set(i, SDL_GetAudioDriver(i));
+	}
+
+	Napi::Object result = Napi::Object::New(env);
+	result.Set("all", all);
+	result.Set("current", Napi::String::New(env, SDL_GetCurrentAudioDriver()));
+
+	return result;
 }
 
 Napi::Value

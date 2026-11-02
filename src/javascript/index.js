@@ -1,14 +1,8 @@
 const { isMainThread } = require('node:worker_threads')
-if (!isMainThread) { throw new Error("@kmamal/sdl can only be used in the main thread, import @kmamal/sdl/worker in workers") }
-
 const Bindings = require('./bindings')
 const Globals = require('./globals')
 
-const { initLazyFlags } = require('./subsystems')
-
-const info = Bindings.global_initialize()
-initLazyFlags(info.initialized)
-Globals.info = info
+Globals.info = Bindings.global_initialize(isMainThread)
 
 const { video } = require('./video')
 const { keyboard } = require('./keyboard')
@@ -25,7 +19,7 @@ require('./events')
 require('./cleanup')
 
 module.exports = {
-	info,
+	info: Globals.info,
 	video,
 	keyboard,
 	mouse,

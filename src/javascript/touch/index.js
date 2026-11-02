@@ -1,12 +1,10 @@
-const Globals = require('../globals')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const { refreshDevices } = require('./devices')
 
 
-if (Globals.info.initialized.video) { refreshDevices() }
-
-
 const touch = {
+	isAvailable () { return isAvailable('video') },
+
 	get devices () {
 		assertInitialized('video')
 		return [ ...refreshDevices() ]

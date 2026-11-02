@@ -19,6 +19,9 @@
                 'src/native/audio.cpp',
                 'src/native/clipboard.cpp',
                 'src/native/power.cpp',
+                'src/native/threads.cpp',
+                'src/native/packed.cpp',
+                'src/native/testing.cpp',
             ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",

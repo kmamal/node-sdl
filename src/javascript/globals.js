@@ -1,6 +1,14 @@
 
 module.exports = {
-	info: null,
+	info: {},
+
+	initialized: {
+		video: null,
+		audio: null,
+		joystick: null,
+		gamepad: null,
+		sensor: null,
+	},
 
 	displays: [],
 	windows: {

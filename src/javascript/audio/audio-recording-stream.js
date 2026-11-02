@@ -16,11 +16,11 @@ class AudioRecordingStream extends AudioStream {
 		return Bindings.audio_getAvailable(this._id)
 	}
 
-	getData (buffer, bytes = null) {
+	getData (buffer, _bytes = null) {
 		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
 
 		validateBuffer('buffer', buffer)
-		bytes ??= buffer.length
+		const bytes = _bytes ?? buffer.length
 		validateBytes(buffer, bytes)
 
 		if (bytes === 0) { return 0 }

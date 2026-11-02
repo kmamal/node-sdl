@@ -5,6 +5,9 @@
 #include "joystick.h"
 #include "gamepad.h"
 #include "audio.h"
+#include "threads.h"
+#include "global.h"
+#include <memory>
 #include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
@@ -23,6 +26,7 @@ std::string events::targets::CLIPBOARD;
 std::string events::targets::JOYSTICK_DEVICE;
 std::string events::targets::GAMEPAD_DEVICE;
 std::string events::targets::AUDIO_DEVICE;
+std::string events::targets::CHANGE;
 
 std::string events::types::QUIT;
 std::string events::types::DISPLAY_ADD;
@@ -82,6 +86,23 @@ std::string events::types::UPDATE;
 static Napi::Env *poll_env = nullptr;
 static Napi::Function *poll_callback = nullptr;
 
+struct Packing {
+	packed::Value value = packed::Value::object();
+	const std::string *target = nullptr;
+	Uint32 target_id = 0;
+
+	void setTarget (const std::string &name) {
+		target = &name;
+		value.set("target", packed::Value::ref(name));
+	}
+	void setTargetId (Uint32 id) {
+		target_id = id;
+		value.set("targetId", id);
+	}
+	void setType (const std::string &name) { value.set("type", packed::Value::ref(name)); }
+	void set (const char *key, packed::Value item) { value.set(key, std::move(item)); }
+};
+
 static const std::string *
 _windowEventType (Uint32 type)
 {
@@ -107,20 +128,33 @@ _windowEventType (Uint32 type)
 	}
 }
 
+struct JoysticksLock {
+	JoysticksLock () { SDL_LockJoysticks(); }
+	~JoysticksLock () { SDL_UnlockJoysticks(); }
+};
+
+template <typename Map, typename Key>
+static packed::Value
+_lookup (const Map &map, Key key)
+{
+	auto entry = map.find(key);
+	return entry != map.end() ? packed::Value::ref(entry->second) : packed::Value();
+}
+
 static bool
-_packWindowEvent (const SDL_Event &event, Napi::Object &packed)
+_packWindowEvent (const SDL_Event &event, Packing &packed)
 {
 	const std::string *type = _windowEventType(event.type);
 	if (type == nullptr) { return false; }
 
-	packed.Set("target", events::targets::WINDOW);
-	packed.Set("targetId", event.window.windowID);
-	packed.Set("type", *type);
+	packed.setTarget(events::targets::WINDOW);
+	packed.setTargetId(event.window.windowID);
+	packed.setType(*type);
 
 	switch (event.type) {
 		case SDL_EVENT_WINDOW_MOVED: {
-			packed.Set("x", event.window.data1);
-			packed.Set("y", event.window.data2);
+			packed.set("x", event.window.data1);
+			packed.set("y", event.window.data2);
 			break;
 		}
 		case SDL_EVENT_WINDOW_RESIZED:
@@ -137,14 +171,14 @@ _packWindowEvent (const SDL_Event &event, Napi::Object &packed)
 			int pixel_width, pixel_height;
 			SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
 
-			packed.Set("width", width);
-			packed.Set("height", height);
-			packed.Set("pixelWidth", pixel_width);
-			packed.Set("pixelHeight", pixel_height);
+			packed.set("width", width);
+			packed.set("height", height);
+			packed.set("pixelWidth", pixel_width);
+			packed.set("pixelHeight", pixel_height);
 			break;
 		}
 		case SDL_EVENT_WINDOW_DISPLAY_CHANGED: {
-			packed.Set("displayId", event.window.data1);
+			packed.set("displayId", event.window.data1);
 			break;
 		}
 		default: break;
@@ -153,57 +187,48 @@ _packWindowEvent (const SDL_Event &event, Napi::Object &packed)
 	return true;
 }
 
-bool
-events::dispatchEvent(const SDL_Event &event)
+static bool
+_packEvent (const SDL_Event &event, Packing &packed)
 {
-	if (poll_env == nullptr) { return false; }
-	Napi::Env &env = *poll_env;
-
-	Napi::Object packed = Napi::Object::New(env);
-
 	if (event.type >= SDL_EVENT_WINDOW_FIRST && event.type <= SDL_EVENT_WINDOW_LAST) {
-		if (!_packWindowEvent(event, packed)) { return false; }
+		return _packWindowEvent(event, packed);
 	}
-	else switch (event.type) {
+
+	switch (event.type) {
 		case SDL_EVENT_QUIT: {
-			packed.Set("target", events::targets::APP);
-			packed.Set("type", events::types::QUIT);
+			packed.setTarget(events::targets::APP);
+			packed.setType(events::types::QUIT);
 			break;
 		}
 
 		case SDL_EVENT_DISPLAY_ADDED: {
-			Napi::Value display = video::_getDisplay(env, event.display.displayID);
-			if (display.IsNull()) { return false; }
+			packed::Value display = video::_getDisplay(event.display.displayID);
+			if (display.isNull()) { return false; }
 
-			packed.Set("target", events::targets::VIDEO);
-			packed.Set("type", events::types::DISPLAY_ADD);
-			packed.Set("display", display);
+			packed.setTarget(events::targets::VIDEO);
+			packed.setType(events::types::DISPLAY_ADD);
+			packed.set("display", std::move(display));
 			break;
 		}
 		case SDL_EVENT_DISPLAY_REMOVED: {
-			packed.Set("target", events::targets::VIDEO);
-			packed.Set("type", events::types::DISPLAY_REMOVE);
-			packed.Set("displayId", event.display.displayID);
+			packed.setTarget(events::targets::VIDEO);
+			packed.setType(events::types::DISPLAY_REMOVE);
+			packed.set("displayId", event.display.displayID);
 			break;
 		}
 		case SDL_EVENT_DISPLAY_ORIENTATION: {
-			auto orientation_entry = video::orientations.find((SDL_DisplayOrientation) event.display.data1);
-			Napi::Value orientation = orientation_entry != video::orientations.end()
-				? Napi::String::New(env, orientation_entry->second)
-				: env.Null();
-
-			packed.Set("target", events::targets::VIDEO);
-			packed.Set("displayId", event.display.displayID);
-			packed.Set("type", events::types::DISPLAY_ORIENT);
-			packed.Set("orientation", orientation);
+			packed.setTarget(events::targets::VIDEO);
+			packed.set("displayId", event.display.displayID);
+			packed.setType(events::types::DISPLAY_ORIENT);
+			packed.set("orientation", _lookup(video::orientations, (SDL_DisplayOrientation) event.display.data1));
 			break;
 		}
 		case SDL_EVENT_DISPLAY_MOVED: {
-			packed.Set("target", events::targets::VIDEO);
-			packed.Set("type", events::types::DISPLAY_MOVE);
+			packed.setTarget(events::targets::VIDEO);
+			packed.setType(events::types::DISPLAY_MOVE);
 
 			SDL_DisplayID display_id = event.display.displayID;
-			packed.Set("displayId", display_id);
+			packed.set("displayId", display_id);
 
 			SDL_Rect rect;
 
@@ -211,255 +236,243 @@ events::dispatchEvent(const SDL_Event &event)
 				SDL_ClearError();
 				return false;
 			}
-			packed.Set("geometryX", rect.x);
-			packed.Set("geometryY", rect.y);
+			packed.set("geometryX", rect.x);
+			packed.set("geometryY", rect.y);
 
 			if(!SDL_GetDisplayUsableBounds(display_id, &rect)) {
 				SDL_ClearError();
 				return false;
 			}
-			packed.Set("usableX", rect.x);
-			packed.Set("usableY", rect.y);
+			packed.set("usableX", rect.x);
+			packed.set("usableY", rect.y);
 
 			break;
 		}
 		case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
 		case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED:
 		case SDL_EVENT_DISPLAY_USABLE_BOUNDS_CHANGED: {
-			Napi::Value display = video::_getDisplay(env, event.display.displayID);
-			if (display.IsNull()) { return false; }
+			packed::Value display = video::_getDisplay(event.display.displayID);
+			if (display.isNull()) { return false; }
 
-			packed.Set("target", events::targets::VIDEO);
-			packed.Set("type", event.type == SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
+			packed.setTarget(events::targets::VIDEO);
+			packed.setType(event.type == SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
 				? events::types::DISPLAY_SCALE
 				: event.type == SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED
 					? events::types::DISPLAY_MODE
 					: events::types::DISPLAY_USABLE);
-			packed.Set("displayId", event.display.displayID);
-			packed.Set("display", display);
+			packed.set("displayId", event.display.displayID);
+			packed.set("display", std::move(display));
 			break;
 		}
 
 		case SDL_EVENT_RENDER_DEVICE_LOST: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.render.windowID);
-			packed.Set("type", events::types::RENDER_DEVICE_LOST);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.render.windowID);
+			packed.setType(events::types::RENDER_DEVICE_LOST);
 			break;
 		}
 
 		case SDL_EVENT_DROP_BEGIN:
 		case SDL_EVENT_DROP_COMPLETE: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.drop.windowID);
-			packed.Set("type", event.type == SDL_EVENT_DROP_BEGIN ? events::types::DROP_BEGIN : events::types::DROP_COMPLETE);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.drop.windowID);
+			packed.setType(event.type == SDL_EVENT_DROP_BEGIN ? events::types::DROP_BEGIN : events::types::DROP_COMPLETE);
 			break;
 		}
 		case SDL_EVENT_DROP_FILE:
 		case SDL_EVENT_DROP_TEXT: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.drop.windowID);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.drop.windowID);
 
 			bool is_file = event.type == SDL_EVENT_DROP_FILE;
-			packed.Set("type", is_file ? events::types::DROP_FILE : events::types::DROP_TEXT);
-			packed.Set(is_file ? "file" : "text", event.drop.data);
+			packed.setType(is_file ? events::types::DROP_FILE : events::types::DROP_TEXT);
+			packed.set(is_file ? "file" : "text", event.drop.data);
 			break;
 		}
 
 		case SDL_EVENT_KEY_DOWN:
 		case SDL_EVENT_KEY_UP: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.key.windowID);
-			packed.Set(
-				"type",
-				event.type == SDL_EVENT_KEY_DOWN
-					? events::types::KEY_DOWN
-					: events::types::KEY_UP
-			);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.key.windowID);
+			packed.setType(event.type == SDL_EVENT_KEY_DOWN
+				? events::types::KEY_DOWN
+				: events::types::KEY_UP);
 
-			packed.Set("scancode", (int) event.key.scancode);
+			packed.set("scancode", (int) event.key.scancode);
 
-			packed.Set("key", keyboard::packKey(env, event.key.key));
+			packed.set("key", keyboard::packKey(event.key.key));
 
 			if (event.type == SDL_EVENT_KEY_DOWN) {
-				packed.Set("repeat", event.key.repeat);
+				packed.set("repeat", event.key.repeat);
 			}
 
-			packed.Set("alt", !!(event.key.mod & SDL_KMOD_ALT));
-			packed.Set("ctrl", !!(event.key.mod & SDL_KMOD_CTRL));
-			packed.Set("shift", !!(event.key.mod & SDL_KMOD_SHIFT));
-			packed.Set("super", !!(event.key.mod & SDL_KMOD_GUI));
-			packed.Set("altgr", !!(event.key.mod & SDL_KMOD_MODE));
-			packed.Set("numlock", !!(event.key.mod & SDL_KMOD_NUM));
-			packed.Set("capslock", !!(event.key.mod & SDL_KMOD_CAPS));
+			packed.set("alt", !!(event.key.mod & SDL_KMOD_ALT));
+			packed.set("ctrl", !!(event.key.mod & SDL_KMOD_CTRL));
+			packed.set("shift", !!(event.key.mod & SDL_KMOD_SHIFT));
+			packed.set("super", !!(event.key.mod & SDL_KMOD_GUI));
+			packed.set("altgr", !!(event.key.mod & SDL_KMOD_MODE));
+			packed.set("numlock", !!(event.key.mod & SDL_KMOD_NUM));
+			packed.set("capslock", !!(event.key.mod & SDL_KMOD_CAPS));
 			break;
 		}
 
 		case SDL_EVENT_TEXT_INPUT: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.text.windowID);
-			packed.Set("type", events::types::TEXT_INPUT);
-			packed.Set("text", event.text.text);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.text.windowID);
+			packed.setType(events::types::TEXT_INPUT);
+			packed.set("text", event.text.text);
 			break;
 		}
 
 		case SDL_EVENT_KEYMAP_CHANGED: {
-			packed.Set("target", events::targets::KEYBOARD);
-			packed.Set("type", events::types::KEYMAP_CHANGE);
+			packed.setTarget(events::targets::KEYBOARD);
+			packed.setType(events::types::KEYMAP_CHANGE);
 			break;
 		}
 
 		case SDL_EVENT_MOUSE_MOTION: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.motion.windowID);
-			packed.Set("type", events::types::MOUSE_MOVE);
-			packed.Set("touch", event.motion.which == SDL_TOUCH_MOUSEID);
-			packed.Set("pen", event.motion.which == SDL_PEN_MOUSEID);
-			packed.Set("x", event.motion.x);
-			packed.Set("y", event.motion.y);
-			packed.Set("dx", event.motion.xrel);
-			packed.Set("dy", event.motion.yrel);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.motion.windowID);
+			packed.setType(events::types::MOUSE_MOVE);
+			packed.set("touch", event.motion.which == SDL_TOUCH_MOUSEID);
+			packed.set("pen", event.motion.which == SDL_PEN_MOUSEID);
+			packed.set("x", event.motion.x);
+			packed.set("y", event.motion.y);
+			packed.set("dx", event.motion.xrel);
+			packed.set("dy", event.motion.yrel);
 			break;
 		}
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		case SDL_EVENT_MOUSE_BUTTON_UP: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.button.windowID);
-			packed.Set(
-				"type",
-				event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
-					? events::types::MOUSE_BUTTON_DOWN
-					: events::types::MOUSE_BUTTON_UP
-			);
-			packed.Set("touch", event.button.which == SDL_TOUCH_MOUSEID);
-			packed.Set("pen", event.button.which == SDL_PEN_MOUSEID);
-			packed.Set("button", event.button.button);
-			packed.Set("x", event.button.x);
-			packed.Set("y", event.button.y);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.button.windowID);
+			packed.setType(event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
+				? events::types::MOUSE_BUTTON_DOWN
+				: events::types::MOUSE_BUTTON_UP);
+			packed.set("touch", event.button.which == SDL_TOUCH_MOUSEID);
+			packed.set("pen", event.button.which == SDL_PEN_MOUSEID);
+			packed.set("button", event.button.button);
+			packed.set("x", event.button.x);
+			packed.set("y", event.button.y);
 			break;
 		}
 		case SDL_EVENT_MOUSE_WHEEL: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.wheel.windowID);
-			packed.Set("type", events::types::MOUSE_WHEEL);
-			packed.Set("touch", event.wheel.which == SDL_TOUCH_MOUSEID);
-			packed.Set("pen", event.wheel.which == SDL_PEN_MOUSEID);
-			packed.Set("x", event.wheel.mouse_x);
-			packed.Set("y", event.wheel.mouse_y);
-			packed.Set("dx", event.wheel.x);
-			packed.Set("dy", event.wheel.y);
-			packed.Set("flipped", event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.wheel.windowID);
+			packed.setType(events::types::MOUSE_WHEEL);
+			packed.set("touch", event.wheel.which == SDL_TOUCH_MOUSEID);
+			packed.set("pen", event.wheel.which == SDL_PEN_MOUSEID);
+			packed.set("x", event.wheel.mouse_x);
+			packed.set("y", event.wheel.mouse_y);
+			packed.set("dx", event.wheel.x);
+			packed.set("dy", event.wheel.y);
+			packed.set("flipped", event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED);
 			break;
 		}
 
 		case SDL_EVENT_FINGER_UP:
 		case SDL_EVENT_FINGER_DOWN:
 		case SDL_EVENT_FINGER_CANCELED: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("targetId", event.tfinger.windowID);
-			packed.Set("type", event.type == SDL_EVENT_FINGER_UP
+			packed.setTarget(events::targets::WINDOW);
+			packed.setTargetId(event.tfinger.windowID);
+			packed.setType(event.type == SDL_EVENT_FINGER_UP
 				? events::types::FINGER_UP
 				: event.type == SDL_EVENT_FINGER_DOWN
 					? events::types::FINGER_DOWN
 					: events::types::FINGER_CANCEL);
-			packed.Set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
-			packed.Set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
-			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchID));
-			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerID));
-			packed.Set("x", event.tfinger.x);
-			packed.Set("y", event.tfinger.y);
-			packed.Set("pressure", event.tfinger.pressure);
+			packed.set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
+			packed.set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
+			packed.set("touchId", (uint64_t) event.tfinger.touchID);
+			packed.set("fingerId", (uint64_t) event.tfinger.fingerID);
+			packed.set("x", event.tfinger.x);
+			packed.set("y", event.tfinger.y);
+			packed.set("pressure", event.tfinger.pressure);
 			break;
 		}
 		case SDL_EVENT_FINGER_MOTION: {
-			packed.Set("target", events::targets::WINDOW);
-			packed.Set("type", events::types::FINGER_MOVE);
-			packed.Set("targetId", event.tfinger.windowID);
-			packed.Set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
-			packed.Set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
-			packed.Set("touchId", Napi::BigInt::New(env, event.tfinger.touchID));
-			packed.Set("fingerId", Napi::BigInt::New(env, event.tfinger.fingerID));
-			packed.Set("x", event.tfinger.x);
-			packed.Set("y", event.tfinger.y);
-			packed.Set("dx", event.tfinger.dx);
-			packed.Set("dy", event.tfinger.dy);
-			packed.Set("pressure", event.tfinger.pressure);
+			packed.setTarget(events::targets::WINDOW);
+			packed.setType(events::types::FINGER_MOVE);
+			packed.setTargetId(event.tfinger.windowID);
+			packed.set("mouse", event.tfinger.touchID == SDL_MOUSE_TOUCHID);
+			packed.set("pen", event.tfinger.touchID == SDL_PEN_TOUCHID);
+			packed.set("touchId", (uint64_t) event.tfinger.touchID);
+			packed.set("fingerId", (uint64_t) event.tfinger.fingerID);
+			packed.set("x", event.tfinger.x);
+			packed.set("y", event.tfinger.y);
+			packed.set("dx", event.tfinger.dx);
+			packed.set("dy", event.tfinger.dy);
+			packed.set("pressure", event.tfinger.pressure);
 			break;
 		}
 
 		case SDL_EVENT_JOYSTICK_ADDED:
 		case SDL_EVENT_GAMEPAD_ADDED: {
-			packed.Set("target", event.type == SDL_EVENT_JOYSTICK_ADDED
+			packed.setTarget(event.type == SDL_EVENT_JOYSTICK_ADDED
 				? events::targets::JOYSTICK_DEVICE
 				: events::targets::GAMEPAD_DEVICE);
-			packed.Set("type", events::types::DEVICE_ADD);
-			packed.Set("device", joystick::_getDevice(env, event.jdevice.which));
+			packed.setType(events::types::DEVICE_ADD);
+			packed.set("device", joystick::_getDevice(event.jdevice.which));
 			break;
 		}
 		case SDL_EVENT_JOYSTICK_REMOVED:
 		case SDL_EVENT_GAMEPAD_REMOVED: {
-			packed.Set("target", event.type == SDL_EVENT_JOYSTICK_REMOVED
+			packed.setTarget(event.type == SDL_EVENT_JOYSTICK_REMOVED
 				? events::targets::JOYSTICK_DEVICE
 				: events::targets::GAMEPAD_DEVICE);
-			packed.Set("type", events::types::DEVICE_REMOVE);
-			packed.Set("deviceId", event.jdevice.which);
+			packed.setType(events::types::DEVICE_REMOVE);
+			packed.set("deviceId", event.jdevice.which);
 			break;
 		}
 
 		case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
-			packed.Set("target", events::targets::JOYSTICK);
-			packed.Set("targetId", event.jaxis.which);
-			packed.Set("type", events::types::AXIS_MOTION);
-			packed.Set("axis", event.jaxis.axis);
-			packed.Set("value", joystick::mapAxisValue(event.jaxis.value));
+			packed.setTarget(events::targets::JOYSTICK);
+			packed.setTargetId(event.jaxis.which);
+			packed.setType(events::types::AXIS_MOTION);
+			packed.set("axis", event.jaxis.axis);
+			packed.set("value", joystick::mapAxisValue(event.jaxis.value));
 			break;
 		}
 		case SDL_EVENT_JOYSTICK_BALL_MOTION: {
-			packed.Set("target", events::targets::JOYSTICK);
-			packed.Set("targetId", event.jball.which);
-			packed.Set("type", events::types::BALL_MOTION);
-			packed.Set("ball", event.jball.ball);
-			packed.Set("dx", event.jball.xrel);
-			packed.Set("dy", event.jball.yrel);
+			packed.setTarget(events::targets::JOYSTICK);
+			packed.setTargetId(event.jball.which);
+			packed.setType(events::types::BALL_MOTION);
+			packed.set("ball", event.jball.ball);
+			packed.set("dx", event.jball.xrel);
+			packed.set("dy", event.jball.yrel);
 			break;
 		}
 		case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
 		case SDL_EVENT_JOYSTICK_BUTTON_UP: {
-			packed.Set("target", events::targets::JOYSTICK);
-			packed.Set("targetId", event.jbutton.which);
-			packed.Set(
-				"type",
-				event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
-					? events::types::BUTTON_DOWN
-					: events::types::BUTTON_UP
-			);
-			packed.Set("button", event.jbutton.button);
+			packed.setTarget(events::targets::JOYSTICK);
+			packed.setTargetId(event.jbutton.which);
+			packed.setType(event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
+				? events::types::BUTTON_DOWN
+				: events::types::BUTTON_UP);
+			packed.set("button", event.jbutton.button);
 			break;
 		}
 		case SDL_EVENT_JOYSTICK_HAT_MOTION: {
-			packed.Set("target", events::targets::JOYSTICK);
-			packed.Set("targetId", event.jhat.which);
-			packed.Set("type", events::types::HAT_MOTION);
-			packed.Set("hat", event.jhat.hat);
-			auto hat_position_entry = joystick::hat_positions.find(event.jhat.value);
-			Napi::Value hat_position = hat_position_entry != joystick::hat_positions.end()
-				? Napi::String::New(env, hat_position_entry->second)
-				: env.Null();
-			packed.Set("value", hat_position);
+			packed.setTarget(events::targets::JOYSTICK);
+			packed.setTargetId(event.jhat.which);
+			packed.setType(events::types::HAT_MOTION);
+			packed.set("hat", event.jhat.hat);
+			packed.set("value", _lookup(joystick::hat_positions, event.jhat.value));
 			break;
 		}
 
 		case SDL_EVENT_JOYSTICK_BATTERY_UPDATED: {
-			packed.Set("target", events::targets::JOYSTICK);
-			packed.Set("targetId", event.jbattery.which);
-			packed.Set("type", events::types::POWER_UPDATE);
-			packed.Set("power", joystick::mapPowerInfo(env, event.jbattery.state, event.jbattery.percent));
+			packed.setTarget(events::targets::JOYSTICK);
+			packed.setTargetId(event.jbattery.which);
+			packed.setType(events::types::POWER_UPDATE);
+			packed.set("power", joystick::mapPowerInfo(event.jbattery.state, event.jbattery.percent));
 			break;
 		}
 
 		case SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED: {
-			packed.Set("target", events::targets::GAMEPAD);
-			packed.Set("type", events::types::STEAM_HANDLE_UPDATE);
+			packed.setTarget(events::targets::GAMEPAD);
+			packed.setType(events::types::STEAM_HANDLE_UPDATE);
 
+			JoysticksLock joysticks_lock;
 			SDL_JoystickID gamepad_id = event.gdevice.which;
 			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 			if (gamepad == nullptr) {
@@ -467,15 +480,16 @@ events::dispatchEvent(const SDL_Event &event)
 				return false;
 			}
 
-			packed.Set("targetId", gamepad_id);
-			packed.Set("steamHandle", gamepad::getSteamHandle(env, gamepad));
+			packed.setTargetId(gamepad_id);
+			packed.set("steamHandle", gamepad::getSteamHandle(gamepad));
 			break;
 		}
 
 		case SDL_EVENT_GAMEPAD_REMAPPED: {
-			packed.Set("target", events::targets::GAMEPAD);
-			packed.Set("type", events::types::REMAP);
+			packed.setTarget(events::targets::GAMEPAD);
+			packed.setType(events::types::REMAP);
 
+			JoysticksLock joysticks_lock;
 			SDL_JoystickID gamepad_id = event.gdevice.which;
 			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 			if (gamepad == nullptr) {
@@ -483,96 +497,111 @@ events::dispatchEvent(const SDL_Event &event)
 				return false;
 			}
 
-			packed.Set("targetId", gamepad_id);
-			packed.Set("device", joystick::_getDevice(env, gamepad_id));
-			gamepad::getState(env, gamepad, packed);
+			packed.setTargetId(gamepad_id);
+			packed.set("device", joystick::_getDevice(gamepad_id));
+			gamepad::getState(gamepad, packed.value);
 			break;
 		}
 
 		case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
-			packed.Set("target", events::targets::GAMEPAD);
-			packed.Set("type", events::types::AXIS_MOTION);
+			packed.setTarget(events::targets::GAMEPAD);
+			packed.setType(events::types::AXIS_MOTION);
 
-			int gamepad_id = event.gaxis.which;
+			JoysticksLock joysticks_lock;
+			SDL_JoystickID gamepad_id = event.gaxis.which;
 			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 			if (gamepad == nullptr) {
 				SDL_ClearError();
 				return false;
 			}
 
-			packed.Set("targetId", gamepad_id);
+			packed.setTargetId(gamepad_id);
 
 			SDL_GamepadAxis axis = (SDL_GamepadAxis) event.gaxis.axis;
 			auto axis_entry = gamepad::axes.find(axis);
 			if (axis_entry == gamepad::axes.end()) { return false; }
-			packed.Set("axis", axis_entry->second);
-			packed.Set("value", gamepad::mapAxisValue(event.gaxis.value));
+			packed.set("axis", packed::Value::ref(axis_entry->second));
+			packed.set("value", gamepad::mapAxisValue(event.gaxis.value));
 			break;
 		}
 		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 		case SDL_EVENT_GAMEPAD_BUTTON_UP: {
-			packed.Set("target", events::targets::GAMEPAD);
-			packed.Set("targetId", event.gbutton.which);
-			packed.Set(
-				"type",
-				event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN
-					? events::types::BUTTON_DOWN
-					: events::types::BUTTON_UP
-			);
+			packed.setTarget(events::targets::GAMEPAD);
+			packed.setTargetId(event.gbutton.which);
+			packed.setType(event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN
+				? events::types::BUTTON_DOWN
+				: events::types::BUTTON_UP);
 
 			auto button_entry = gamepad::buttons.find((SDL_GamepadButton) event.gbutton.button);
 			if (button_entry == gamepad::buttons.end()) { return false; }
-			packed.Set("button", button_entry->second);
+			packed.set("button", packed::Value::ref(button_entry->second));
 			break;
 		}
 
 		case SDL_EVENT_SENSOR_UPDATE: {
-			packed.Set("target", events::targets::SENSOR);
-			packed.Set("targetId", event.sensor.which);
-			packed.Set("type", events::types::UPDATE);
+			packed.setTarget(events::targets::SENSOR);
+			packed.setTargetId(event.sensor.which);
+			packed.setType(events::types::UPDATE);
 			break;
 		}
 
 		case SDL_EVENT_AUDIO_DEVICE_ADDED: {
 			bool is_recording = event.adevice.recording;
 
-			Napi::Value device = audio::_getDevice(env, event.adevice.which);
-			if (device.IsNull()) { return false; }
+			packed::Value device = audio::_getDevice(event.adevice.which);
+			if (device.isNull()) { return false; }
 
-			packed.Set("target", events::targets::AUDIO_DEVICE);
-			packed.Set("type", events::types::DEVICE_ADD);
-			packed.Set("audioDeviceType", audio::device_types[is_recording]);
-			packed.Set("device", device);
-			packed.Set("defaultDevice", audio::_getDefaultDevice(env, is_recording));
+			packed.setTarget(events::targets::AUDIO_DEVICE);
+			packed.setType(events::types::DEVICE_ADD);
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[is_recording]));
+			packed.set("device", std::move(device));
+			packed.set("defaultDevice", audio::_getDefaultDevice(is_recording));
 			break;
 		}
 		case SDL_EVENT_AUDIO_DEVICE_REMOVED: {
-			packed.Set("target", events::targets::AUDIO_DEVICE);
-			packed.Set("type", events::types::DEVICE_REMOVE);
-			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
-			packed.Set("deviceId", event.adevice.which);
-			packed.Set("defaultDevice", audio::_getDefaultDevice(env, event.adevice.recording));
+			packed.setTarget(events::targets::AUDIO_DEVICE);
+			packed.setType(events::types::DEVICE_REMOVE);
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[event.adevice.recording]));
+			packed.set("deviceId", event.adevice.which);
+			packed.set("defaultDevice", audio::_getDefaultDevice(event.adevice.recording));
 			break;
 		}
 		case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: {
-			packed.Set("target", events::targets::AUDIO_DEVICE);
-			packed.Set("type", events::types::DEVICE_FORMAT_CHANGE);
-			packed.Set("audioDeviceType", audio::device_types[event.adevice.recording]);
-			packed.Set("deviceId", event.adevice.which);
-			packed.Set("format", audio::_getFormat(env, event.adevice.which));
+			packed.setTarget(events::targets::AUDIO_DEVICE);
+			packed.setType(events::types::DEVICE_FORMAT_CHANGE);
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[event.adevice.recording]));
+			packed.set("deviceId", event.adevice.which);
+			packed.set("format", audio::_getFormat(event.adevice.which));
 			break;
 		}
 
 		case SDL_EVENT_CLIPBOARD_UPDATE: {
-			packed.Set("target", events::targets::CLIPBOARD);
-			packed.Set("type", events::types::UPDATE);
+			packed.setTarget(events::targets::CLIPBOARD);
+			packed.setType(events::types::UPDATE);
 			break;
 		}
 	}
 
-	if (!packed.Has("type")) { return false; }
+	return packed.value.has("type");
+}
 
-	poll_callback->Call(poll_env->Global(), { packed });
+static bool
+_dispatchEvent (const SDL_Event &event)
+{
+	if (poll_env == nullptr) { return false; }
+	Napi::Env &env = *poll_env;
+
+	Packing packing;
+	if (!_packEvent(event, packing)) { return false; }
+
+	threads::Event shared = {
+		packing.target,
+		packing.target_id,
+		std::make_shared<const packed::Value>(std::move(packing.value)),
+	};
+
+	threads::distribute(shared, env);
+	poll_callback->Call(env.Global(), { shared.value->toNapi(env) });
 
 	return true;
 }
@@ -623,7 +652,7 @@ bool
 events::dispatchEventFromWatch(const SDL_Event &event)
 {
 	dispatching_from_watch++;
-	bool dispatched = events::dispatchEvent(event);
+	bool dispatched = _dispatchEvent(event);
 	dispatching_from_watch--;
 
 	if (dispatched) {
@@ -639,13 +668,9 @@ events::dispatchEventFromWatch(const SDL_Event &event)
 	return dispatched;
 }
 
-Napi::Value
-events::poll (const Napi::CallbackInfo &info)
+static void
+_pump (Napi::Env &env, Napi::Function &callback)
 {
-	Napi::Env env = info.Env();
-
-	Napi::Function callback = info[0].As<Napi::Function>();
-
 	Uint64 poll_start = SDL_GetTicksNS();
 
 	poll_env = &env;
@@ -655,7 +680,7 @@ events::poll (const Napi::CallbackInfo &info)
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			if (wasDispatchedFromWatch(event)) { continue; }
-			events::dispatchEvent(event);
+			_dispatchEvent(event);
 		}
 
 		watch_dispatched_events.erase(
@@ -674,6 +699,40 @@ events::poll (const Napi::CallbackInfo &info)
 	}
 	poll_env = nullptr;
 	poll_callback = nullptr;
+}
+
+Napi::Value
+events::poll (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	Napi::Function callback = info[0].As<Napi::Function>();
+
+	if (global::isMainThread()) {
+		global::processInitRequests();
+		threads::drain(env, callback);
+		_pump(env, callback);
+		return Napi::Boolean::New(env, threads::isPollingFast());
+	}
+
+	threads::drain(env, callback);
+
+	return env.Undefined();
+}
+
+Napi::Value
+events::broadcastChange (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::string name = info[0].As<Napi::String>().Utf8Value();
+
+	packed::Value value = packed::Value::object();
+	value.set("target", packed::Value::ref(events::targets::CHANGE));
+	value.set("type", name);
+
+	threads::Event shared = { nullptr, 0, std::make_shared<const packed::Value>(std::move(value)) };
+	threads::distribute(shared, env);
 
 	return env.Undefined();
 }

@@ -14,6 +14,8 @@
 #include "audio.h"
 #include "clipboard.h"
 #include "power.h"
+#include "threads.h"
+#include "testing.h"
 
 
 Napi::Object
@@ -25,9 +27,13 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("global_initSubsystem", Napi::Function::New<global::initSubsystem>(env));
 	exports.Set("global_cleanup", Napi::Function::New<global::cleanup>(env));
 
+	exports.Set("events_register", Napi::Function::New<threads::registerThread>(env));
+	exports.Set("events_setDemand", Napi::Function::New<threads::setDemand>(env));
 	exports.Set("events_poll", Napi::Function::New<events::poll>(env));
+	exports.Set("events_broadcastChange", Napi::Function::New<events::broadcastChange>(env));
 	exports.Set("events_isDispatchingFromWatch", Napi::Function::New<events::isDispatchingFromWatch>(env));
 
+	exports.Set("video_getDrivers", Napi::Function::New<video::getDrivers>(env));
 	exports.Set("video_getDisplays", Napi::Function::New<video::getDisplays>(env));
 	exports.Set("video_convert", Napi::Function::New<video::convert>(env));
 
@@ -86,6 +92,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("sensor_getData", Napi::Function::New<sensor::getData>(env));
 	exports.Set("sensor_close", Napi::Function::New<sensor::close>(env));
 
+	exports.Set("audio_getDrivers", Napi::Function::New<audio::getDrivers>(env));
 	exports.Set("audio_getDevices", Napi::Function::New<audio::getDevices>(env));
 	exports.Set("audio_open", Napi::Function::New<audio::open>(env));
 	exports.Set("audio_play", Napi::Function::New<audio::play>(env));
@@ -102,6 +109,12 @@ init (Napi::Env env, Napi::Object exports)
 
 	exports.Set("clipboard_getText", Napi::Function::New<clipboard::getText>(env));
 	exports.Set("clipboard_setText", Napi::Function::New<clipboard::setText>(env));
+
+	exports.Set("testing_attachVirtualJoystick", Napi::Function::New<testing::attachVirtualJoystick>(env));
+	exports.Set("testing_setVirtualJoystickAxis", Napi::Function::New<testing::setVirtualJoystickAxis>(env));
+	exports.Set("testing_setVirtualJoystickButton", Napi::Function::New<testing::setVirtualJoystickButton>(env));
+	exports.Set("testing_detachVirtualJoystick", Napi::Function::New<testing::detachVirtualJoystick>(env));
+	exports.Set("testing_pushAudioDeviceEvent", Napi::Function::New<testing::pushAudioDeviceEvent>(env));
 
 	exports.Set("power_getInfo", Napi::Function::New<power::getInfo>(env));
 

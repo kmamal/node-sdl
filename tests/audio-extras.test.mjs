@@ -1,7 +1,8 @@
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
 
-const hasPlayback = sdl.info.initialized.audio && sdl.audio.playback.devices.length > 1
+const hasAudio = sdl.audio.isAvailable()
+const hasPlayback = hasAudio && sdl.audio.playback.devices.length > 1
 
 const sine = (frames, frequency, rate) => Float32Array.from({ length: frames }, (_, i) => Math.sin(2 * Math.PI * frequency * i / rate))
 
@@ -64,7 +65,7 @@ T.test("sdl::audio::convert", (t) => {
 })
 
 T.test("sdl::audio::device formats", (t) => {
-	if (!sdl.info.initialized.audio) { return }
+	if (!hasAudio) { return }
 	for (const device of sdl.audio.playback.devices) { checkFormat(t, device) }
 	for (const device of sdl.audio.recording.devices) { checkFormat(t, device) }
 })
@@ -93,7 +94,7 @@ T.test("sdl::audio::gain and frequencyRatio", (t) => {
 	t.throws(() => sdl.audio.playback.openDevice(null, { frequencyRatio: 0 }), /frequencyRatio must be between/u)
 })
 
-const hasRecording = sdl.info.initialized.audio && sdl.audio.recording.devices.length > 1
+const hasRecording = hasAudio && sdl.audio.recording.devices.length > 1
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) })
 

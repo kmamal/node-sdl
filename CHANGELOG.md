@@ -9,18 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v1.0.0] - 2026-10-01
 
-The library now builds against SDL3 (3.4.x) instead of SDL2. This release contains breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
-
 ### Changed
 
-- Exceptions thrown in event listeners are re-emitted as an `'error'` event on the window or instance, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception. They no longer stop event delivery or crash the process.
+- The library now builds against SDL3 (3.4.x) instead of SDL2. This introduces many breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
+- All SDL subsystems are now initialized lazily, on first use. The `sdl.info.initialized` flags are gone and instead every submodule now has an `isAvailable()` function that tries to initialize the subsystem and returns `true` or `false`. Functions, properties, and event listeners that need an SDL subsystem throw if that subsystem has failed to initialize.
+- `sdl.info.drivers.video` and `sdl.info.drivers.audio` moved to `sdl.video.drivers` and `sdl.audio.drivers`.
+- `@kmamal/sdl` can now be imported from worker threads and works exactly as in the main thread with the exception of the video subsystem (`sdl.video`, `sdl.keyboard`, `sdl.mouse`, `sdl.touch`, and `sdl.clipboard`) which can only be used on the main thread. `@kmamal/sdl/helpers` is no longer needed and has been removed.
+- Exceptions thrown in event listeners are re-emitted as an `'error'` event, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception. They no longer stop event delivery or crash the process.
 - Attaching a listener to a destroyed window or a closed instance or stream now throws, instead of silently never firing.
 - Audio and video formats are reported using the platform-independent enums. The platform-dependent ones are only used as input.
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
 - steamHandle is now reported as a BigInt.
-- `@kmamal/sdl/helpers` is now `@kmamal/sdl/worker`, and includes a lot of extra stuff.
-- Functions, properties, and event listeners that need an SDL subsystem throw if that subsystem failed to initialize.
-- The joystick, gamepad, haptic, and sensor subsystems are lazily initialized when they are first needed. Until then their `sdl.info.initialized` flags are `null`.
 
 ### Added
 

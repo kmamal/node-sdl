@@ -48,14 +48,6 @@ T.test("sdl::touch", async (t) => {
 	])
 	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
 
-	// t.equal(sdl.touch.devices.length, 1)
-
-	// const device = sdl.touch.devices[0]
-
-	// t.equal(typeof device.id, 'number')
-	// t.equal(device.name, 'Emulated Wacom Tablet')
-	// t.equal(device.type, 'direct')
-
 	t.equal(sdl.touch.devices.length, 0)
 	console.warn("TOUCH TESTS NOT IMPLEMENTED YET")
 

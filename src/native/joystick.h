@@ -2,6 +2,7 @@
 #define _JOYSTICK_H_
 
 #include <napi.h>
+#include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
@@ -14,10 +15,10 @@ namespace joystick {
 
 	double mapAxis (SDL_Joystick *joystick, int axis);
 	double mapAxisValue (int value);
-	Napi::Value _getDevice (Napi::Env &env, SDL_JoystickID id);
+	packed::Value _getDevice (SDL_JoystickID id);
 	Napi::Array _getDevices (Napi::Env &env);
-	Napi::Value getPowerInfo(Napi::Env &env, SDL_Joystick *joystick);
-	Napi::Value mapPowerInfo(Napi::Env &env, SDL_PowerState state, int percent);
+	packed::Value getPowerInfo(SDL_Joystick *joystick);
+	packed::Value mapPowerInfo(SDL_PowerState state, int percent);
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);

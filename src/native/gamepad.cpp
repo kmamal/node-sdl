@@ -1,4 +1,6 @@
 #include "gamepad.h"
+#include "global.h"
+#include "threads.h"
 #include "joystick.h"
 #include <SDL3/SDL.h>
 #include <map>
@@ -23,73 +25,55 @@ gamepad::mapAxisValue (int value) {
 	return value / range;
 }
 
-Napi::Value
-gamepad::getSteamHandle (Napi::Env &env, SDL_Gamepad *gamepad)
+packed::Value
+gamepad::getSteamHandle (SDL_Gamepad *gamepad)
 {
 	Uint64 _steam_handle = SDL_GetGamepadSteamHandle(gamepad);
 	return _steam_handle != 0
-		? Napi::BigInt::New(env, _steam_handle)
-		: env.Null();
+		? packed::Value((uint64_t) _steam_handle)
+		: packed::Value();
 }
 
 void
-gamepad::getState (Napi::Env &env, SDL_Gamepad *gamepad, Napi::Object dst)
+gamepad::getState (SDL_Gamepad *gamepad, packed::Value &dst)
 {
-	Napi::Object axes_obj = Napi::Object::New(env);
-	axes_obj.Set("leftStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX));
-	axes_obj.Set("leftStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY));
-	axes_obj.Set("rightStickX", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX));
-	axes_obj.Set("rightStickY", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY));
-	axes_obj.Set("leftTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER));
-	axes_obj.Set("rightTrigger", gamepad::mapAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER));
-
-	Napi::Object buttons_obj = Napi::Object::New(env);
-	buttons_obj.Set("dpadLeft", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_LEFT));
-	buttons_obj.Set("dpadRight", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT));
-	buttons_obj.Set("dpadUp", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_UP));
-	buttons_obj.Set("dpadDown", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_DPAD_DOWN));
-	buttons_obj.Set("south", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_SOUTH));
-	buttons_obj.Set("east", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_EAST));
-	buttons_obj.Set("west", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_WEST));
-	buttons_obj.Set("north", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_NORTH));
-	buttons_obj.Set("guide", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_GUIDE));
-	buttons_obj.Set("back", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_BACK));
-	buttons_obj.Set("start", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_START));
-	buttons_obj.Set("leftStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_STICK));
-	buttons_obj.Set("rightStick", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_STICK));
-	buttons_obj.Set("leftShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER));
-	buttons_obj.Set("rightShoulder", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER));
-	buttons_obj.Set("rightPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1));
-	buttons_obj.Set("leftPaddle1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE1));
-	buttons_obj.Set("rightPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2));
-	buttons_obj.Set("leftPaddle2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_PADDLE2));
-	buttons_obj.Set("misc1", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC1));
-	buttons_obj.Set("misc2", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC2));
-	buttons_obj.Set("misc3", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC3));
-	buttons_obj.Set("misc4", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC4));
-	buttons_obj.Set("misc5", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC5));
-	buttons_obj.Set("misc6", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_MISC6));
-	buttons_obj.Set("touchpad", SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD));
-
-	Napi::Object button_labels_obj = Napi::Object::New(env);
-	for (auto button : { SDL_GAMEPAD_BUTTON_SOUTH, SDL_GAMEPAD_BUTTON_EAST, SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH }) {
-		auto label_entry = gamepad::button_labels.find(SDL_GetGamepadButtonLabel(gamepad, button));
-		Napi::Value label = label_entry != gamepad::button_labels.end()
-			? Napi::String::New(env, label_entry->second)
-			: env.Null();
-		button_labels_obj.Set(gamepad::buttons[button], label);
+	packed::Value axes_obj = packed::Value::object();
+	for (auto axis : {
+		SDL_GAMEPAD_AXIS_LEFTX,
+		SDL_GAMEPAD_AXIS_LEFTY,
+		SDL_GAMEPAD_AXIS_RIGHTX,
+		SDL_GAMEPAD_AXIS_RIGHTY,
+		SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
+		SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
+	}) {
+		axes_obj.set(gamepad::axes[axis], gamepad::mapAxis(gamepad, axis));
 	}
 
-	dst.Set("axes", axes_obj);
-	dst.Set("buttons", buttons_obj);
-	dst.Set("buttonLabels", button_labels_obj);
-}
+	packed::Value buttons_obj = packed::Value::object();
+	for (auto &entry : gamepad::buttons) {
+		buttons_obj.set(entry.second, SDL_GetGamepadButton(gamepad, entry.first));
+	}
 
+	packed::Value button_labels_obj = packed::Value::object();
+	for (auto button : { SDL_GAMEPAD_BUTTON_SOUTH, SDL_GAMEPAD_BUTTON_EAST, SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH }) {
+		auto label_entry = gamepad::button_labels.find(SDL_GetGamepadButtonLabel(gamepad, button));
+		packed::Value label;
+		if (label_entry != gamepad::button_labels.end()) { label = packed::Value::ref(label_entry->second); }
+		button_labels_obj.set(gamepad::buttons[button], std::move(label));
+	}
+
+	dst.set("axes", std::move(axes_obj));
+	dst.set("buttons", std::move(buttons_obj));
+	dst.set("buttonLabels", std::move(button_labels_obj));
+}
 
 Napi::Value
 gamepad::addMappings (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
 
 	Napi::Array mappings = info[0].As<Napi::Array>();
 
@@ -117,6 +101,9 @@ gamepad::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int id = info[0].As<Napi::Number>().Int32Value();
 
 	SDL_ClearError();
@@ -133,33 +120,31 @@ gamepad::open (const Napi::CallbackInfo &info)
 	if (error[0] != '\0') { fprintf(stderr, "SDL silent error: %s\n", error); }
 	SDL_ClearError();
 
+	threads::trackOpen(env, threads::GAMEPAD, id);
+
 	try {
 		int _firmware_version = SDL_GetGamepadFirmwareVersion(gamepad);
-		Napi::Value firmware_version = _firmware_version != 0
-			? Napi::Number::New(env, _firmware_version)
-			: env.Null();
+		packed::Value firmware_version;
+		if (_firmware_version != 0) { firmware_version = _firmware_version; }
 
 		const char *_serial_number = SDL_GetGamepadSerial(gamepad);
-		Napi::Value serial_number = _serial_number != nullptr
-			? Napi::String::New(env, _serial_number)
-			: env.Null();
-
-		Napi::Value steam_handle = getSteamHandle(env, gamepad);
+		packed::Value serial_number;
+		if (_serial_number != nullptr) { serial_number = _serial_number; }
 
 		SDL_Joystick *joystick = SDL_GetGamepadJoystick(gamepad);
-		Napi::Value power = joystick::getPowerInfo(env, joystick);
 
-		Napi::Object result = Napi::Object::New(env);
-		result.Set("firmwareVersion", firmware_version);
-		result.Set("serialNumber", serial_number);
-		result.Set("steamHandle", steam_handle);
-		result.Set("power", power);
+		packed::Value result = packed::Value::object();
+		result.set("firmwareVersion", std::move(firmware_version));
+		result.set("serialNumber", std::move(serial_number));
+		result.set("steamHandle", getSteamHandle(gamepad));
+		result.set("power", joystick::getPowerInfo(joystick));
 
-		gamepad::getState(env, gamepad, result);
+		gamepad::getState(gamepad, result);
 
-		return result;
+		return result.toNapi(env);
 	}
 	catch (...) {
+		threads::trackClose(env, threads::GAMEPAD, id);
 		SDL_CloseGamepad(gamepad);
 		throw;
 	}
@@ -170,7 +155,12 @@ gamepad::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int gamepad_id = info[0].As<Napi::Number>().Int32Value();
+
+	threads::trackClose(env, threads::GAMEPAD, gamepad_id);
 
 	SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 	if (gamepad == nullptr) {

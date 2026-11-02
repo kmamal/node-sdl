@@ -390,6 +390,11 @@ export namespace Events {
 
 export namespace Sdl {
 
+	export interface Drivers {
+		readonly all: string[]
+		readonly current: string
+	}
+
 	export interface Info {
 		readonly version: {
 			readonly compile: {
@@ -437,24 +442,6 @@ export namespace Sdl {
 			| 'tvOS'
 			| 'visionOS'
 			| null
-		readonly drivers: {
-			readonly video: {
-				readonly all: string[]
-				readonly current: string | null
-			}
-			readonly audio: {
-				readonly all: string[]
-				readonly current: string | null
-			}
-		}
-		readonly initialized: {
-			readonly video: boolean
-			readonly audio: boolean
-			readonly joystick: boolean | null
-			readonly gamepad: boolean | null
-			readonly haptic: boolean | null
-			readonly sensor: boolean | null
-		}
 	}
 
 	export namespace Video {
@@ -689,6 +676,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
@@ -699,6 +688,7 @@ export namespace Sdl {
 			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
+			readonly drivers: Drivers
 			readonly displays: Display[]
 
 			readonly windows: Window[]
@@ -989,6 +979,8 @@ export namespace Sdl {
 		export type Key = string
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
 
 			on (event: 'keymapChange', listener: (event: Events.Keyboard.KeymapChange) => void): this
@@ -1037,6 +1029,8 @@ export namespace Sdl {
 			| 'wResize'
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly BUTTON: { [name in ButtonNames]: number }
 
 			getButton (button: number): boolean
@@ -1076,6 +1070,8 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly devices: Device[]
 		}
 
@@ -1168,6 +1164,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'deviceAdd', listener: (event: Events.JoystickDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.JoystickDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.JoystickDevice.Any) => void): this
@@ -1300,6 +1298,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'deviceAdd', listener: (event: Events.GamepadDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.GamepadDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.GamepadDevice.Any) => void): this
@@ -1352,6 +1352,8 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly STANDARD_GRAVITY: 9.80665
 
 			readonly devices: Device[]
@@ -1468,6 +1470,9 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
+			readonly drivers: Drivers
 			readonly playback: DeviceModule<AudioPlaybackStream>
 			readonly recording: DeviceModule<AudioRecordingStream>
 
@@ -1486,6 +1491,8 @@ export namespace Sdl {
 	export namespace Clipboard {
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
 			on (event: '*', listener: (type: string, event: Events.Clipboard.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this

@@ -12,19 +12,48 @@ T.test("sdl::info", (t) => {
 
 	t.ok([ 'Linux', 'macOS', 'Windows' ].includes(sdl.info.platform))
 
-	t.ok(Array.isArray(sdl.info.drivers.video.all))
-	for (const driver of sdl.info.drivers.video.all) {
-		t.equal(typeof driver, 'string')
-		t.ok(driver.length > 0)
-	}
-	t.equal(typeof sdl.info.drivers.video.current, 'string')
-	t.ok(sdl.info.drivers.video.all.includes(sdl.info.drivers.video.current))
+	t.equal(sdl.info.initialized, undefined)
+})
 
-	t.ok(Array.isArray(sdl.info.drivers.audio.all))
-	for (const driver of sdl.info.drivers.audio.all) {
+T.test("sdl::video::drivers", (t) => {
+	let drivers
+	try { ({ drivers } = sdl.video) }
+	catch {
+		t.equal(sdl.video.isAvailable(), false)
+		return
+	}
+	t.equal(sdl.video.isAvailable(), true)
+
+	t.ok(Array.isArray(drivers.all))
+	for (const driver of drivers.all) {
 		t.equal(typeof driver, 'string')
 		t.ok(driver.length > 0)
 	}
-	t.equal(typeof sdl.info.drivers.audio.current, 'string')
-	t.ok(sdl.info.drivers.audio.all.includes(sdl.info.drivers.audio.current))
+	t.equal(typeof drivers.current, 'string')
+	t.ok(drivers.all.includes(drivers.current))
+})
+
+T.test("sdl::audio::drivers", (t) => {
+	let drivers
+	try { ({ drivers } = sdl.audio) }
+	catch {
+		t.equal(sdl.audio.isAvailable(), false)
+		return
+	}
+	t.equal(sdl.audio.isAvailable(), true)
+
+	t.ok(Array.isArray(drivers.all))
+	for (const driver of drivers.all) {
+		t.equal(typeof driver, 'string')
+		t.ok(driver.length > 0)
+	}
+	t.equal(typeof drivers.current, 'string')
+	t.ok(drivers.all.includes(drivers.current))
+})
+
+T.test("sdl::isAvailable", (t) => {
+	for (const module of [ sdl.video, sdl.keyboard, sdl.mouse, sdl.touch, sdl.clipboard, sdl.audio, sdl.joystick, sdl.gamepad, sdl.sensor ]) {
+		t.equal(typeof module.isAvailable(), 'boolean')
+	}
+	t.equal(sdl.keyboard.isAvailable(), sdl.video.isAvailable())
 })

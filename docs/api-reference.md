@@ -22,6 +22,8 @@
   - [sdl.video.isPlanarYuv(format)](#sdlvideoisplanaryuvformat)
   - [sdl.video.minStride(format, width)](#sdlvideominstrideformat-width)
   - [sdl.video.minBufferSize(format, stride, height)](#sdlvideominbuffersizeformat-stride-height)
+  - [sdl.video.isAvailable()](#sdlvideoisavailable)
+  - [sdl.video.drivers](#sdlvideodrivers)
   - [sdl.video.displays](#sdlvideodisplays)
   - [sdl.video.windows](#sdlvideowindows)
   - [sdl.video.focused](#sdlvideofocused)
@@ -111,11 +113,13 @@
   - [Virtual keys](#virtual-keys)
   - [Enum: SCANCODE](#enum-scancode)
   - [Event: 'keymapChange'](#event-keymapchange)
+  - [sdl.keyboard.isAvailable()](#sdlkeyboardisavailable)
   - [sdl.keyboard.getKey(scancode)](#sdlkeyboardgetkeyscancode)
   - [sdl.keyboard.getScancode(key)](#sdlkeyboardgetscancodekey)
   - [sdl.keyboard.getState()](#sdlkeyboardgetstate)
 - [sdl.mouse](#sdlmouse)
   - [Enum: BUTTON](#enum-button)
+  - [sdl.mouse.isAvailable()](#sdlmouseisavailable)
   - [sdl.mouse.getButton(button)](#sdlmousegetbuttonbutton)
   - [sdl.mouse.position](#sdlmouseposition)
   - [sdl.mouse.setPosition(x, y)](#sdlmousesetpositionx-y)
@@ -129,11 +133,13 @@
   - [sdl.mouse.capture([capture])](#sdlmousecapturecapture)
   - [sdl.mouse.uncapture()](#sdlmouseuncapture)
 - [sdl.touch](#sdltouch)
+  - [sdl.touch.isAvailable()](#sdltouchisavailable)
   - [sdl.touch.devices](#sdltouchdevices)
 - [sdl.joystick](#sdljoystick)
   - [Hat positions](#hat-positions)
   - [Event: 'deviceAdd'](#joystick-event-deviceadd)
   - [Event: 'deviceRemove'](#joystick-event-deviceremove)
+  - [sdl.joystick.isAvailable()](#sdljoystickisavailable)
   - [sdl.joystick.devices](#sdljoystickdevices)
   - [sdl.joystick.openDevice(device)](#sdljoystickopendevicedevice)
   - [class JoystickInstance](#class-joystickinstance)
@@ -168,6 +174,7 @@
   - [Event: 'deviceAdd'](#gamepad-event-deviceadd)
   - [Event: 'deviceRemove'](#gamepad-event-deviceremove)
   - [sdl.gamepad.addMappings(mappings)](#sdlgamepadaddmappingsmappings)
+  - [sdl.gamepad.isAvailable()](#sdlgamepadisavailable)
   - [sdl.gamepad.devices](#sdlgamepaddevices)
   - [sdl.gamepad.openDevice(device)](#sdlgamepadopendevicedevice)
   - [class GamepadInstance](#class-gamepadinstance)
@@ -200,6 +207,7 @@
     - [gamepadInstance.close()](#gamepadinstanceclose)
 - [sdl.sensor](#sdlsensor)
   - [sdl.sensor.STANDARD_GRAVITY](#sdlsensorstandard_gravity)
+  - [sdl.sensor.isAvailable()](#sdlsensorisavailable)
   - [sdl.sensor.devices](#sdlsensordevices)
   - [sdl.sensor.openDevice(device)](#sdlsensoropendevicedevice)
   - [class SensorInstance](#class-sensorinstance)
@@ -219,6 +227,8 @@
   - [sdl.audio.readSample(format, buffer[, offset])](#sdlaudioreadsampleformat-buffer-offset)
   - [sdl.audio.writeSample(format, buffer, value[, offset])](#sdlaudiowritesampleformat-buffer-value-offset)
   - [sdl.audio.convert(srcSpec, srcData, dstSpec[, dstData])](#sdlaudioconvertsrcspec-srcdata-dstspec-dstdata)
+  - [sdl.audio.isAvailable()](#sdlaudioisavailable)
+  - [sdl.audio.drivers](#sdlaudiodrivers)
   - [sdl.audio.playback](#sdlaudioplayback)
     - [Event: 'deviceAdd'](#audio-playback-event-deviceadd)
     - [Event: 'deviceRemove'](#audio-playback-event-deviceremove)
@@ -262,6 +272,7 @@
     - [recordingStream.getData(buffer[, bytes])](#recordingstreamgetdatabuffer-bytes)
 - [sdl.clipboard](#sdlclipboard)
   - [Event: 'update'](#clipboard-event-update)
+  - [sdl.clipboard.isAvailable()](#sdlclipboardisavailable)
   - [sdl.clipboard.text](#sdlclipboardtext)
   - [sdl.clipboard.setText(text)](#sdlclipboardsettexttext)
 - [sdl.power](#sdlpower)
@@ -281,31 +292,9 @@ Unless noted otherwise, whenever the API expects a whole-number quantity (positi
     - `runtime: <object>` The version of the SDL library that was found and loaded at runtime.
       - `major, minor, patch: <Semver>` The components of the version.
   - `platform: <string>|<null>` The name of the platform the program runs on, as reported by SDL, or `null` if SDL doesn't know it. The supported platforms report `'Linux'`, `'Windows'`, and `'macOS'`, but SDL can also report `'AIX'`, `'Android'`, `'Atari MiNT'`, `'BSDI'`, `'Emscripten'`, `'FreeBSD'`, `'GNU/Hurd'`, `'HP-UX'`, `'Haiku'`, `'Irix'`, `'Managarm'`, `'NetBSD'`, `'Nintendo 3DS'`, `'Nokia N-Gage'`, `'OS/2'`, `'OSF/1'`, `'OpenBSD'`, `'PlayStation 2'`, `'PlayStation Portable'`, `'PlayStation Vita'`, `'QNX Neutrino'`, `'RISC OS'`, `'Solaris'`, `'WinGDK'`, `'Xbox One'`, `'Xbox Series X|S'`, `'iOS'`, `'tvOS'`, and `'visionOS'`.
-  - `drivers: <object>`
-    - `video: <object>`
-      - `all: <string>[]` A list of all video drivers.
-      - `current: <string>|<null>` The video driver that is currently selected.
-    - `audio: <object>`
-      - `all: <string>[]` A list of all audio drivers.
-      - `current: <string>|<null>` The audio driver that is currently selected.
-  - `initialized: <object>`
-    - `video: <boolean>`: Is `true` if SDL initialized the video subsystem successfully, or `false` otherwise.
-    - `audio: <boolean>`: Is `true` if SDL initialized the audio subsystem successfully, or `false` otherwise.
-    - `joystick: <boolean>|<null>`: Is `null` until the joystick subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
-    - `gamepad: <boolean>|<null>`: Is `null` until the gamepad subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
-    - `haptic: <boolean>|<null>`: Is `null` until the haptic subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
-    - `sensor: <boolean>|<null>`: Is `null` until the sensor subsystem gets initialized, then `true` if SDL initialized it successfully, or `false` otherwise.
 
 The `sdl.info` object holds information that SDL produces while it initializes.
-All the values stay constant while the program runs, with the exception of the `initialized` flags for the lazy-loading sub-modules (see below).
-
-To make SDL initialize video/audio drivers other than the default ones, set the appropriate [environment variables](https://wiki.libsdl.org/FAQUsingSDL).
-
-The `current` video or audio driver may be `null`.
-This usually happens on systems without compatible devices, such as a CI pipeline.
-
-The `joystick`, `gamepad`, `haptic`, and `sensor` subsystems are lazily initialized: their `initialized` flags start as `null`, and are set to `true` or `false` the first time a function or event listener that needs them is used.
-Initializing `joystick` or `gamepad` initializes both.
+All the values stay constant while the program runs.
 
 Sample data for Linux:
 
@@ -316,24 +305,6 @@ Sample data for Linux:
     runtime: { major: 3, minor: 4, patch: 14 },
   },
   platform: 'Linux',
-  drivers: {
-    video: {
-      all: [ 'wayland', 'x11', 'kmsdrm', 'offscreen', 'dummy', 'evdev' ],
-      current: 'x11',
-    },
-    audio: {
-      all: [ 'pipewire', 'pulseaudio', 'alsa', 'sndio', 'jack', 'disk', 'dummy' ],
-      current: 'pipewire',
-    },
-  },
-  initialized: {
-    video: true,
-    audio: true,
-    joystick: null,
-    gamepad: null,
-    haptic: null,
-    sensor: null,
-  },
 }
 ```
 
@@ -548,8 +519,6 @@ Fired when a display's `usable` region changes, for example when a dock or taskb
 Converts an image between pixel formats, and optionally scales it to a different size.
 Both RGB and YUV formats are accepted, but SDL doesn't support every combination, in which case the function throws with SDL's error message.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 ### sdl.video.bytesPerPixel(format)
 
 - `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
@@ -557,8 +526,6 @@ This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 Helper function that maps each pixel format to the number of bytes each of its pixels takes up.
 For planar YUV formats this refers to the Y plane, so it is `1`, except for `'p010'` where it is `2`.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.isYuv(format)
 
@@ -568,16 +535,12 @@ This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 Helper function that tells RGB formats apart from YUV ones.
 Only RGB formats can be used with [`window.setIcon()`](#windowseticonwidth-height-stride-format-buffer) and [`sdl.mouse.setCursorImage()`](#sdlmousesetcursorimagewidth-height-stride-format-buffer-x-y).
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 ### sdl.video.isPlanarYuv(format)
 
 - `format: `[`<PixelFormat>`](#pixel-formats): The pixel format.
 - Returns: `<boolean>` Is `true` if the format is a planar YUV format.
 
 Helper function that tells planar YUV formats (where the Y, U, and V components are stored in separate planes) apart from all others.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.minStride(format, width)
 
@@ -589,8 +552,6 @@ Helper function that computes the smallest `stride` that can hold a row of an im
 For most formats this is just `width * bytesPerPixel`.
 For the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'` it is `4 * Math.ceil(width / 2)`.
 The functions that accept [image data](#image-data) throw if the stride you give them is smaller than this.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.video.minBufferSize(format, stride, height)
 
@@ -604,7 +565,29 @@ For most formats this is just `stride * height`.
 For planar YUV formats it also counts the chroma planes.
 The functions that accept [image data](#image-data) throw if the buffer you give them is smaller than this.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
+### sdl.video.isAvailable()
+
+- Returns: `<boolean>` `true` if the video subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
+### sdl.video.drivers
+
+- `<object>`
+  - `all: <string>[]` A list of all the video drivers SDL supports on this platform.
+  - `current: <string>` The video driver SDL is using.
+
+To make SDL use a driver other than the default one, set the `SDL_VIDEO_DRIVER` [environment variable](https://wiki.libsdl.org/SDL3/FAQUsingSDL) before importing the library.
+
+Sample data for Linux:
+
+```js
+{
+  all: [ 'wayland', 'x11', 'kmsdrm', 'offscreen', 'dummy', 'evdev' ],
+  current: 'x11',
+}
+```
 
 ### sdl.video.displays
 
@@ -1351,8 +1334,6 @@ Represents physical keys on the keyboard.
 The same key always produces the same scancode.
 Values are based on the [USB usage page standard](https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf).
 
-This enum is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 <details>
 
   <summary>Click to expand table</summary>
@@ -1614,6 +1595,13 @@ Fired when a system event, such as a change of input language or keyboard layout
 After this event, the correspondence between physical and logical keys might differ.
 Assume that any earlier results from [`getKey()`](#sdlkeyboardgetkeyscancode) or [`getScancode()`](#sdlkeyboardgetscancodekey) are no longer valid.
 
+### sdl.keyboard.isAvailable()
+
+- Returns: `<boolean>` `true` if the video subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
 ### sdl.keyboard.getKey(scancode)
 
 - `scancode: `[`<Scancode>`](#enum-scancode)
@@ -1649,8 +1637,6 @@ Each value is `true` if the corresponding key is pressed and `false` otherwise.
 Represents the buttons on a mouse.
 A mouse can have many buttons, but this enum covers the five most common ones.
 
-This enum is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 | Value                     | Corresponding `SDL_BUTTON_*` |
 | ---                       | ---                          |
 | `sdl.mouse.BUTTON.LEFT`   | `SDL_BUTTON_LEFT`            |
@@ -1658,6 +1644,13 @@ This enum is also available from [`@kmamal/sdl/worker`](#worker-threads).
 | `sdl.mouse.BUTTON.RIGHT`  | `SDL_BUTTON_RIGHT`           |
 | `sdl.mouse.BUTTON.X1`     | `SDL_BUTTON_X1`              |
 | `sdl.mouse.BUTTON.X2`     | `SDL_BUTTON_X2`              |
+
+### sdl.mouse.isAvailable()
+
+- Returns: `<boolean>` `true` if the video subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
 
 ### sdl.mouse.getButton(button)
 
@@ -1769,6 +1762,13 @@ Equivalent to [`sdl.mouse.capture(false)`](#sdlmousecapturecapture).
 
 ## sdl.touch
 
+### sdl.touch.isAvailable()
+
+- Returns: `<boolean>` `true` if the video subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
 ### sdl.touch.devices
 
 - `<object>[]`
@@ -1828,6 +1828,13 @@ Fired when the system removes a joystick device.
 Read [`sdl.joystick.devices`](#sdljoystickdevices) to get the new list of joystick devices.
 When this event fires, the library automatically closes all instances opened from the removed device.
 
+### sdl.joystick.isAvailable()
+
+- Returns: `<boolean>` `true` if the joystick subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
 ### sdl.joystick.devices
 
 - `<object>[]`
@@ -1877,7 +1884,7 @@ Sample output:
 
 ### sdl.joystick.openDevice(device)
 
-- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices) to open. Must be the actual object from that list, not a copy.
+- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`joystickInstance.device`](#joystickinstancedevice) returns.
 - Returns: [`<joystickInstance>`](#class-joystickinstance) the opened joystick device instance.
 
 Opens a joystick device and returns its instance.
@@ -2144,6 +2151,13 @@ Registers new mappings for gamepads.
 This may [remap](#event-remap) gamepad instances that are already open.
 If one of the mappings is invalid, the mappings before it in the array stay registered.
 
+### sdl.gamepad.isAvailable()
+
+- Returns: `<boolean>` `true` if the gamepad subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
 ### sdl.gamepad.devices
 
 - `<object>[]`
@@ -2197,7 +2211,7 @@ Sample output:
 
 ### sdl.gamepad.openDevice(device)
 
-- `device: <object>` An object from [`sdl.gamepad.devices`](#sdlgamepaddevices) to open. Must be the actual object from that list, not a copy.
+- `device: <object>` An object from [`sdl.gamepad.devices`](#sdlgamepaddevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`gamepadInstance.device`](#gamepadinstancedevice) returns.
 - Returns: [`<GamepadInstance>`](#class-gamepadinstance) the opened gamepad device instance.
 
 Opens a gamepad device and returns its instance.
@@ -2464,7 +2478,12 @@ Gravity affects accelerometers:
 even when the device is completely at rest, they still indicate an acceleration of magnitude [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity) away from the center of the earth.
 If your application needs to correct for gravitational acceleration, use the `sdl.sensor.STANDARD_GRAVITY` constant.
 
-This constant is also available from [`@kmamal/sdl/worker`](#worker-threads).
+### sdl.sensor.isAvailable()
+
+- Returns: `<boolean>` `true` if the sensor subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
 
 ### sdl.sensor.devices
 
@@ -2485,7 +2504,7 @@ Sample output:
 
 ### sdl.sensor.openDevice(device)
 
-- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices) to open. Must be the actual object from that list, not a copy.
+- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`sensorInstance.device`](#sensorinstancedevice) returns.
 - Returns: [`<SensorInstance>`](#class-sensorinstance) the opened sensor device instance.
 
 Opens a sensor device and returns an instance for it.
@@ -2638,16 +2657,12 @@ Every sample format the library reports, such as a stream's or a device's `forma
 
 Helper function that maps each sample format to the number of bytes its samples take up.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 ### sdl.audio.minSampleValue(format)
 
 - `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
 - Returns: `<number>` The minimum sample value.
 
 Helper function that maps each sample format to the minimum value its samples can take.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.maxSampleValue(format)
 
@@ -2656,16 +2671,12 @@ This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 Helper function that maps each sample format to the maximum value its samples can take.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 ### sdl.audio.zeroSampleValue(format)
 
 - `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
 - Returns: `<number>` The zero sample value.
 
 Helper function that maps each sample format to the sample value for silence.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.readSample(format, buffer[, offset])
 
@@ -2679,8 +2690,6 @@ For example, `sdl.audio.readSample('f32le', buffer, offset)` is equivalent to `b
 
 The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
-
 ### sdl.audio.writeSample(format, buffer, value[, offset])
 
 - `format: `[`<SampleFormat>`](#sample-formats): The desired sample format.
@@ -2692,8 +2701,6 @@ This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 Helper function that calls the `write*` method of `Buffer` that matches the format argument.
 For example, `sdl.audio.writeSample('f32le', buffer, value, offset)` is equivalent to `buffer.writeFloatLE(value, offset)`.
 The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-endian or big-endian method matching the byte order of the machine.
-
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads).
 
 ### sdl.audio.convert(srcSpec, srcData, dstSpec[, dstData])
 
@@ -2712,7 +2719,29 @@ The conversion happens in one call, so the output contains the whole resampled s
 If `dstData` is too small to hold the result, the function throws and writes nothing.
 SDL writes the result straight into `dstData`, so there is no intermediate copy.
 
-This function is also available from [`@kmamal/sdl/worker`](#worker-threads), even before the main thread imports `@kmamal/sdl`.
+### sdl.audio.isAvailable()
+
+- Returns: `<boolean>` `true` if the audio subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
+### sdl.audio.drivers
+
+- `<object>`
+  - `all: <string>[]` A list of all the audio drivers SDL supports on this platform.
+  - `current: <string>` The audio driver SDL is using.
+
+To make SDL use a driver other than the default one, set the `SDL_AUDIO_DRIVER` [environment variable](https://wiki.libsdl.org/SDL3/FAQUsingSDL) before importing the library.
+
+Sample data for Linux:
+
+```js
+{
+  all: [ 'pipewire', 'pulseaudio', 'alsa', 'sndio', 'jack', 'disk', 'dummy' ],
+  current: 'pipewire',
+}
+```
 
 ### sdl.audio.playback
 
@@ -2789,7 +2818,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
 
 ### sdl.audio.playback.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices). Must be the actual object from that list, not a copy. Passing `null` selects the default device, the list's first entry. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices), or a copy of one. The device is looked up by its `id`, and the stream is bound to the object in the list, which is what [`stream.device`](#audiostreamdevice) returns. Passing `null` selects the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
@@ -2885,7 +2914,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
 
 ### sdl.audio.recording.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices). Must be the actual object from that list, not a copy. Passing `null` selects the default device, the list's first entry. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices), or a copy of one. The device is looked up by its `id`, and the stream is bound to the object in the list, which is what [`stream.device`](#audiostreamdevice) returns. Passing `null` selects the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
@@ -3114,6 +3143,13 @@ Takes the recorded audio data that waits on the stream and writes it to the prov
 Fired when the contents of the clipboard change.
 Read the new contents from [`sdl.clipboard.text`](#sdlclipboardtext).
 
+### sdl.clipboard.isAvailable()
+
+- Returns: `<boolean>` `true` if the video subsystem is available, `false` otherwise.
+
+Tries to initialize the subsystem if that hasn't happened yet.
+Returns `false` if the initialization fails, or if the subsystem can't be used from the current thread.
+
 ### sdl.clipboard.text
 
 - `<string>`
@@ -3139,40 +3175,16 @@ The current power information of the device.
 
 ## Worker threads
 
-Many SDL features can only be used from the main thread of a process.
-This is why `@kmamal/sdl` can only be imported from the main thread and not from a `worker_thread`.
+`@kmamal/sdl` can be imported from [worker threads](https://nodejs.org/api/worker_threads.html), and the same module works the same way everywhere.
+The exception is everything that depends on SDL's video subsystem, which SDL restricts to the main thread of the process: `sdl.video`, `sdl.keyboard`, `sdl.mouse`, `sdl.touch`, and `sdl.clipboard`.
+In a worker, their functions, properties, and event listeners throw.
+Only the helpers that don't touch SDL state work anywhere: `sdl.video.convert()`, `sdl.video.bytesPerPixel()`, `sdl.video.isYuv()`, `sdl.video.isPlanarYuv()`, `sdl.video.minStride()`, `sdl.video.minBufferSize()`, `sdl.keyboard.SCANCODE`, and `sdl.mouse.BUTTON`.
+Everything else, including `sdl.joystick`, `sdl.gamepad`, `sdl.sensor`, `sdl.audio`, and `sdl.power`, behaves the same in a worker as on the main thread.
 
-There are however some features that can be used from other threads.
-The most important are audio and video rendering.
-To support this, this package exports the `@kmamal/sdl/worker` sub-module.
-It contains a subset of the main module:
+SDL itself must be initialized on the main thread, which has to import `@kmamal/sdl` for the library to work anywhere.
+SDL is restricted to the main thread on some platforms (on macOS it refuses to initialize video, and only notices joystick hotplug, on the thread that initialized it), and there is no way for a worker to run code on the main thread unless the main thread has loaded the library.
+Importing `@kmamal/sdl` in the main thread initializes SDL and starts polling for events, which the main thread forwards to every other thread.
+A worker can import `@kmamal/sdl` before the main thread does, but until the main thread imports it, anything in the worker that needs an SDL subsystem throws `@kmamal/sdl must be imported on the main thread before it can be used in a worker`.
+For a program that uses SDL only from workers, a single `import '@kmamal/sdl'` in the main script is enough, or start Node with `node -r @kmamal/sdl main.js`.
 
-- [`sdl.video.convert`](#sdlvideoconvertsrcspec-srcdata-dstspec-dstdata)
-- [`sdl.video.bytesPerPixel`](#sdlvideobytesperpixelformat)
-- [`sdl.video.isYuv`](#sdlvideoisyuvformat)
-- [`sdl.video.isPlanarYuv`](#sdlvideoisplanaryuvformat)
-- [`sdl.video.minStride`](#sdlvideominstrideformat-width)
-- [`sdl.video.minBufferSize`](#sdlvideominbuffersizeformat-stride-height)
-- [`sdl.keyboard.SCANCODE`](#enum-scancode)
-- [`sdl.mouse.BUTTON`](#enum-button)
-- [`sdl.sensor.STANDARD_GRAVITY`](#sdlsensorstandard_gravity)
-- [`sdl.audio.bytesPerSample`](#sdlaudiobytespersampleformat)
-- [`sdl.audio.minSampleValue`](#sdlaudiominsamplevalueformat)
-- [`sdl.audio.maxSampleValue`](#sdlaudiomaxsamplevalueformat)
-- [`sdl.audio.zeroSampleValue`](#sdlaudiozerosamplevalueformat)
-- [`sdl.audio.readSample`](#sdlaudioreadsampleformat-buffer-offset)
-- [`sdl.audio.writeSample`](#sdlaudiowritesampleformat-buffer-value-offset)
-- [`sdl.audio.convert`](#sdlaudioconvertsrcspec-srcdata-dstspec-dstdata)
-- [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices)
-- [`sdl.audio.playback.openDevice([device[, options]])`](#sdlaudioplaybackopendevicedevice-options)
-- [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices)
-- [`sdl.audio.recording.openDevice([device[, options]])`](#sdlaudiorecordingopendevicedevice-options)
-
-Before using `audio.*.devices` and `audio.*.openDevice` you must import `@kmamal/sdl` on the main thread so that the audio sybsystem gets initialized, otherwise they throw.
-The rest works fine even without `@kmamal/sdl` on the main thread.
-
-Workers receive no events, so in a worker `audio.*.devices` asks SDL for a fresh list on every read, and device objects only update when a stream opens or closes on them.
-Stream events such as [`'drain'`](#audio-playback-stream-event-drain) and [`'readable'`](#audio-recording-stream-event-readable) do fire in workers, because they don't go through the event queue.
-A worker's streams are closed when the worker exits or is terminated.
-A worker stays alive while its playback streams have audio queued, the same way the main thread does.
-When the main thread exits, it shuts SDL down, so calls a worker makes after that point throw.
+Listeners in a worker never keep the main thread alive.

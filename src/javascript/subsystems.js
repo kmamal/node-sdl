@@ -1,44 +1,50 @@
+const { isMainThread } = require('node:worker_threads')
 const Bindings = require('./bindings')
 const Globals = require('./globals')
-const { make: makeJoystickDevice } = require('./joystick/device')
-const { make: makeGamepadDevice, filter: filterGamepadDevice } = require('./gamepad/device')
+const { makeDevice: makeJoystickDevice } = require('./joystick/devices')
+const { makeDevice: makeGamepadDevice, isGamepadDevice } = require('./gamepad/devices')
+const { refreshDevices: refreshAudioDevices } = require('./audio/devices')
 
-const LAZY = [ 'joystick', 'gamepad', 'haptic', 'sensor' ]
-
-const initLazyFlags = (initialized) => {
-	for (const name of LAZY) { initialized[name] = null }
+const initSubsystem = (name) => {
+	Globals.initialized[name] = Bindings.global_initSubsystem(name)
+	return Globals.initialized[name]
 }
 
 const initJoysticks = () => {
-	const { initialized } = Globals.info
-	initialized.joystick = Bindings.global_initSubsystem('joystick')
-	initialized.gamepad = Bindings.global_initSubsystem('gamepad')
+	initSubsystem('joystick')
+	initSubsystem('gamepad')
+	if (!Globals.initialized.joystick) { return }
+	const devices = Bindings.joystick_getDevices()
+	Globals.joystickDevices = devices.map(makeJoystickDevice)
+	Globals.gamepadDevices = devices.filter(isGamepadDevice).map(makeGamepadDevice)
+}
 
-	if (initialized.joystick) {
-		const devices = Bindings.joystick_getDevices()
-		Globals.joystickDevices = devices.map(makeJoystickDevice)
-		Globals.gamepadDevices = devices.filter(filterGamepadDevice).map(makeGamepadDevice)
-	}
+const initializers = {
+	video: () => {
+		if (!isMainThread) { throw new Error("the video subsystem is only available on the main thread") }
+		if (initSubsystem('video')) { Globals.displays = Bindings.video_getDisplays() }
+	},
+	audio: () => { if (initSubsystem('audio')) { refreshAudioDevices() } },
+	joystick: initJoysticks,
+	gamepad: initJoysticks,
+	sensor: () => { initSubsystem('sensor') },
 }
 
 const ensure = (name) => {
-	const { initialized } = Globals.info
-	if (initialized[name] !== null) { return initialized[name] }
+	if (Globals.initialized[name] === null) { initializers[name]() }
+	return Globals.initialized[name]
+}
 
-	if (name === 'joystick' || name === 'gamepad') { initJoysticks() }
-	else { initialized[name] = Bindings.global_initSubsystem(name) }
-
-	return initialized[name]
+const isAvailable = (name) => {
+	try { return ensure(name) }
+	catch (_) { return false }
 }
 
 const assertInitialized = (name) => {
-	const initialized = LAZY.includes(name)
-		? ensure(name)
-		: Globals.info.initialized[name]
-	if (!initialized) { throw new Error(`SDL ${name} subsystem failed to initialize`) }
+	if (!ensure(name)) { throw new Error(`SDL ${name} subsystem failed to initialize`) }
 }
 
 module.exports = {
 	assertInitialized,
-	initLazyFlags,
+	isAvailable,
 }

@@ -1,5 +1,4 @@
-
-const make = (device) => {
+const makeDevice = (device) => {
 	const {
 		isGamepad,
 		gamepadMapping,
@@ -15,9 +14,9 @@ const make = (device) => {
 	}
 }
 
-const filter = (device) => device.isGamepad
+const isGamepadDevice = (device) => device.isGamepad
 
 module.exports = {
-	make,
-	filter,
+	makeDevice,
+	isGamepadDevice,
 }

@@ -18,22 +18,22 @@ process.on('exit', (code) => {
 		catch (error) { errors.push(error) }
 	}
 
-	for (const joystick of Globals.joystickInstances.all.values()) {
+	for (const joystick of Globals.joystickInstances.all) {
 		try { joystick.close() }
 		catch (error) { errors.push(error) }
 	}
 
-	for (const gamepad of Globals.gamepadInstances.all.values()) {
+	for (const gamepad of Globals.gamepadInstances.all) {
 		try { gamepad.close() }
 		catch (error) { errors.push(error) }
 	}
 
-	for (const sensor of Globals.sensorInstances.all.values()) {
+	for (const sensor of Globals.sensorInstances.all) {
 		try { sensor.close() }
 		catch (error) { errors.push(error) }
 	}
 
 	Bindings.global_cleanup()
 
-	if (errors.length) { throw new AggregateError(errors, "errors occurred during process exit cleanup") }
+	if (errors.length) { throw new AggregateError(errors, "errors occurred during exit cleanup") }
 })

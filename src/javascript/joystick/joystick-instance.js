@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { validateNotClosed } = require('../validate')
+const { validateNotClosed, validateObject } = require('../validate')
 const { startEffect, stopEffect, releaseDevice, setPlayer, validateRumble, validateLed, validatePlayer } = require('./shared')
 
 const validEvents = [
@@ -15,11 +15,13 @@ const validEvents = [
 ]
 
 class JoystickInstance extends EventsViaPoll {
-	constructor (device) {
+	constructor (requested) {
 		super(validEvents)
 
 		Globals.events.poll()
-		if (!Globals.joystickDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.joystick.devices"), { device }) }
+		validateObject('device', requested)
+		const device = Globals.joystickDevices.find(({ id }) => id === requested.id)
+		if (!device) { throw Object.assign(new Error("device must be from sdl.joystick.devices"), { device: requested }) }
 
 		const result = Bindings.joystick_open(device.id)
 
@@ -103,6 +105,7 @@ class JoystickInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasLed
 	}
+
 	setLed (red, green, blue) {
 		validateNotClosed(this)
 
@@ -119,6 +122,7 @@ class JoystickInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumble
 	}
+
 	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
 		validateNotClosed(this)
 
@@ -143,6 +147,7 @@ class JoystickInstance extends EventsViaPoll {
 
 		return Bindings.joystick_getCapabilities(this._device.id).hasRumbleTriggers
 	}
+
 	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
 		validateNotClosed(this)
 

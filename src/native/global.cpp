@@ -8,19 +8,35 @@
 #include "sensor.h"
 #include "audio.h"
 #include "power.h"
+#include "threads.h"
 #include <SDL3/SDL.h>
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include <atomic>
+#include <condition_variable>
+#include <chrono>
 
 #if defined(SDL_PLATFORM_MACOS)
 	#include "cocoa-global.h"
 #endif
 
 
-static SDL_ThreadID mainThreadId;
+static std::atomic<SDL_ThreadID> main_thread_id { 0 };
 static std::atomic<bool> ready { false };
+static std::atomic<bool> started { false };
+static bool tables_set = false;
+
+struct InitRequest {
+	SDL_InitFlags flags;
+	bool done = false;
+	bool result = false;
+};
+
+static std::mutex request_mutex;
+static std::condition_variable request_cv;
+static std::vector<InitRequest *> pending_requests;
 
 std::mutex &
 global::lock()
@@ -29,17 +45,31 @@ global::lock()
 	return mutex;
 }
 
+bool
+global::isReady()
+{
+	return ready.load(std::memory_order_acquire);
+}
+
+bool
+global::isMainThread()
+{
+	return ready.load(std::memory_order_acquire) && SDL_GetCurrentThreadID() == main_thread_id.load(std::memory_order_acquire);
+}
+
 void
 global::assertReady(Napi::Env &env)
 {
-	if (!ready.load(std::memory_order_acquire)) {
-		throw Napi::Error::New(env, "SDL is not initialized, import @kmamal/sdl in the main thread first");
-	}
+	if (ready.load(std::memory_order_acquire)) { return; }
+
+	throw Napi::Error::New(env, started.load(std::memory_order_acquire)
+		? "SDL has been shut down"
+		: "@kmamal/sdl must be imported on the main thread before it can be used in a worker");
 }
 
 bool watchEvents(void*, SDL_Event *event) {
 	if (true
-		&& SDL_GetCurrentThreadID() == mainThreadId
+		&& SDL_GetCurrentThreadID() == main_thread_id.load(std::memory_order_acquire)
 		&& (false
 			|| event->type == SDL_EVENT_WINDOW_MOVED
 			|| event->type == SDL_EVENT_WINDOW_RESIZED
@@ -51,10 +81,11 @@ bool watchEvents(void*, SDL_Event *event) {
 }
 
 
-Napi::Value
-global::initialize(const Napi::CallbackInfo &info)
+static void
+_setTables ()
 {
-	Napi::Env env = info.Env();
+	if (tables_set) { return; }
+	tables_set = true;
 
 	events::targets::APP = "app";
 	events::targets::VIDEO = "video";
@@ -67,6 +98,7 @@ global::initialize(const Napi::CallbackInfo &info)
 	events::targets::JOYSTICK_DEVICE = "joystickDevice";
 	events::targets::GAMEPAD_DEVICE = "gamepadDevice";
 	events::targets::AUDIO_DEVICE = "audioDevice";
+	events::targets::CHANGE = "change";
 
 	events::types::QUIT = "quit";
 	events::types::DISPLAY_ADD = "displayAdd";
@@ -300,9 +332,12 @@ global::initialize(const Napi::CallbackInfo &info)
 	power::states[SDL_POWERSTATE_ON_BATTERY] = "battery";
 	power::states[SDL_POWERSTATE_CHARGING] = "charging";
 	power::states[SDL_POWERSTATE_CHARGED] = "charged";
+}
 
-
-	Napi::Object initialized = Napi::Object::New(env);
+static void
+_start (Napi::Env &env)
+{
+	_setTables();
 
 	SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
 	SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "0");
@@ -313,6 +348,41 @@ global::initialize(const Napi::CallbackInfo &info)
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+
+	main_thread_id.store(SDL_GetCurrentThreadID(), std::memory_order_release);
+
+	if (!SDL_AddEventWatch(watchEvents, nullptr)) {
+		std::ostringstream message;
+		message << "SDL_AddEventWatch() error: " << SDL_GetError();
+		SDL_ClearError();
+		SDL_Quit();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
+
+#if defined(SDL_PLATFORM_MACOS)
+	reenableInertialScrolling();
+#endif
+
+	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
+
+	started.store(true, std::memory_order_release);
+	ready.store(true, std::memory_order_release);
+}
+
+
+Napi::Value
+global::initialize(const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	bool is_main = info[0].As<Napi::Boolean>().Value();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	if (is_main && !ready.load(std::memory_order_acquire)) { _start(env); }
+	else { _setTables(); }
 
 	int sdl_compile_version = SDL_VERSION;
 
@@ -341,81 +411,58 @@ global::initialize(const Napi::CallbackInfo &info)
 		platform = Napi::String::New(env, platform_name);
 	}
 
-	Napi::Array all_video_drivers = Napi::Array::New(env);
-
-	int num_video_drivers = SDL_GetNumVideoDrivers();
-	for (int i = 0; i < num_video_drivers; i ++) {
-		all_video_drivers.Set(i, SDL_GetVideoDriver(i));
-	}
-
-	Napi::Value current_video_driver;
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
-		current_video_driver = Napi::String::New(env, SDL_GetCurrentVideoDriver());
-		initialized.Set("video", true);
-	}
-	else {
-		current_video_driver = env.Null();
-		initialized.Set("video", false);
-	}
-
-	Napi::Object video_drivers = Napi::Object::New(env);
-	video_drivers.Set("all", all_video_drivers);
-	video_drivers.Set("current", current_video_driver);
-
-	Napi::Array all_audio_drivers = Napi::Array::New(env);
-
-	int num_audio_drivers = SDL_GetNumAudioDrivers();
-	for (int i = 0; i < num_audio_drivers; i ++) {
-		all_audio_drivers.Set(i, SDL_GetAudioDriver(i));
-	}
-
-	Napi::Value current_audio_driver;
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
-		current_audio_driver = Napi::String::New(env, SDL_GetCurrentAudioDriver());
-		initialized.Set("audio", true);
-	}
-	else {
-		current_audio_driver = env.Null();
-		initialized.Set("audio", false);
-	}
-
-	Napi::Object audio_drivers = Napi::Object::New(env);
-	audio_drivers.Set("all", all_audio_drivers);
-	audio_drivers.Set("current", current_audio_driver);
-
-	Napi::Object drivers = Napi::Object::New(env);
-	drivers.Set("video", video_drivers);
-	drivers.Set("audio", audio_drivers);
-
-	// Drop errors from optional subsystems that failed to initialize
-	SDL_ClearError();
-
-	mainThreadId = SDL_GetCurrentThreadID();
-	if (!SDL_AddEventWatch(watchEvents, nullptr)) {
-		std::ostringstream message;
-		message << "SDL_AddEventWatch() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-
-	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);
-
-#if defined(SDL_PLATFORM_MACOS)
-	reenableInertialScrolling();
-#endif
-
-
-	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
-
-	ready.store(true, std::memory_order_release);
-
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("version", versions);
 	result.Set("platform", platform);
-	result.Set("drivers", drivers);
-	result.Set("initialized", initialized);
 
 	return result;
+}
+
+
+static bool
+_initSubsystem (SDL_InitFlags flags)
+{
+	if ((SDL_WasInit(flags) & flags) == flags) { return true; }
+
+	bool success = SDL_InitSubSystem(flags);
+	SDL_ClearError();
+	return success;
+}
+
+static void
+_failInitRequests ()
+{
+	std::lock_guard<std::mutex> guard(request_mutex);
+	for (InitRequest *request : pending_requests) {
+		request->done = true;
+		request->result = false;
+	}
+	pending_requests.clear();
+	request_cv.notify_all();
+}
+
+void
+global::processInitRequests()
+{
+	std::vector<InitRequest *> batch;
+	{
+		std::lock_guard<std::mutex> guard(request_mutex);
+		if (pending_requests.empty()) { return; }
+		batch.swap(pending_requests);
+	}
+
+	{
+		std::lock_guard<std::mutex> guard(global::lock());
+		for (InitRequest *request : batch) {
+			request->result = ready.load(std::memory_order_acquire) && _initSubsystem(request->flags);
+		}
+	}
+
+	{
+		std::lock_guard<std::mutex> guard(request_mutex);
+		for (InitRequest *request : batch) { request->done = true; }
+	}
+	request_cv.notify_all();
 }
 
 
@@ -424,13 +471,12 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
-	global::assertReady(env);
-
 	std::string name = info[0].As<Napi::String>().Utf8Value();
 
 	SDL_InitFlags flags;
-	if (name == "joystick") { flags = SDL_INIT_JOYSTICK; }
+	if (name == "video") { flags = SDL_INIT_VIDEO; }
+	else if (name == "audio") { flags = SDL_INIT_AUDIO; }
+	else if (name == "joystick") { flags = SDL_INIT_JOYSTICK; }
 	else if (name == "gamepad") { flags = SDL_INIT_GAMEPAD; }
 	else if (name == "haptic") { flags = SDL_INIT_HAPTIC; }
 	else if (name == "sensor") { flags = SDL_INIT_SENSOR; }
@@ -440,23 +486,56 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	bool success = SDL_InitSubSystem(flags);
-	SDL_ClearError();
+	if (global::isMainThread()) {
+		std::lock_guard<std::mutex> guard(global::lock());
+		global::assertReady(env);
+		return Napi::Boolean::New(env, _initSubsystem(flags));
+	}
 
-	return Napi::Boolean::New(env, success);
+	InitRequest request = { flags };
+	{
+		std::lock_guard<std::mutex> guard(request_mutex);
+		global::assertReady(env);
+		pending_requests.push_back(&request);
+	}
+	threads::wakeMain();
+
+	{
+		std::unique_lock<std::mutex> guard(request_mutex);
+		while (!request.done) {
+			if (!ready.load(std::memory_order_acquire)) {
+				auto it = std::find(pending_requests.begin(), pending_requests.end(), &request);
+				if (it != pending_requests.end()) { pending_requests.erase(it); }
+				throw Napi::Error::New(env, "SDL has been shut down");
+			}
+			request_cv.wait_for(guard, std::chrono::milliseconds(100));
+		}
+	}
+
+	return Napi::Boolean::New(env, request.result);
 }
 
+
+void
+global::teardown()
+{
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	if (!ready.load(std::memory_order_acquire)) { return; }
+	ready.store(false, std::memory_order_release);
+
+	audio::closeAllStreams();
+	threads::shutdown();
+	_failInitRequests();
+	SDL_Quit();
+}
 
 Napi::Value
 global::cleanup(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
-
-	audio::closeAllStreams();
-	ready.store(false, std::memory_order_release);
-	SDL_Quit();
+	threads::leave(env);
 
 	return env.Undefined();
 }

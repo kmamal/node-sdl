@@ -1,31 +1,23 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { assertInitialized } = require('../subsystems')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const { GamepadInstance } = require('./gamepad-instance')
-const { make: makeGamepadDevice } = require('./device')
-const { make: makeJoystickDevice } = require('../joystick/device')
+const { refreshAndBroadcast } = require('../joystick/devices')
 const { validateString } = require('../validate')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 // Updated mappings change existing joystick and gamepad devices without an event
 const refreshDevices = () => {
-	const devices = Bindings.joystick_getDevices()
-	for (const joystickDevice of Globals.joystickDevices) {
-		const device = devices.find(({ id }) => id === joystickDevice.id)
-		if (device) { Object.assign(joystickDevice, makeJoystickDevice(device)) }
-	}
-	for (const gamepadDevice of Globals.gamepadDevices) {
-		const device = devices.find(({ id }) => id === gamepadDevice.id)
-		if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
-	}
-
+	refreshAndBroadcast()
 	Globals.events.poll()
 }
 
 const gamepad = new class extends EventsViaPoll {
 	constructor () { super(validEvents, () => { assertInitialized('gamepad') }) }
+
+	isAvailable () { return isAvailable('gamepad') }
 
 	get devices () {
 		assertInitialized('gamepad')

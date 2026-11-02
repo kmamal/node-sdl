@@ -2,7 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { refreshDevices } = require('./devices')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { validateNotClosed } = require('../validate')
+const { validateNotClosed, validateObject } = require('../validate')
 
 const validEvents = [
 	'update',
@@ -10,15 +10,17 @@ const validEvents = [
 ]
 
 class SensorInstance extends EventsViaPoll {
-	constructor (device) {
+	constructor (requested) {
 		super(validEvents)
 
 		refreshDevices()
-		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device }) }
+		validateObject('device', requested)
+		const found = Globals.sensorDevices.find(({ id }) => id === requested.id)
+		if (!found) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device: requested }) }
 
-		Bindings.sensor_open(device.id)
+		Bindings.sensor_open(found.id)
 
-		this._device = device
+		this._device = found
 
 		this._closed = false
 
