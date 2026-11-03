@@ -63,7 +63,8 @@ class AudioStream extends EventsViaPoll {
 			if (frequencyRatio !== 1) { Bindings.audio_setFrequencyRatio(id, frequencyRatio) }
 		}
 		catch (error) {
-			Bindings.audio_close(id, device)
+			try { Bindings.audio_close(id, device) }
+			catch (_) { }
 			throw error
 		}
 
