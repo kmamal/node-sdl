@@ -995,7 +995,7 @@ export namespace Sdl {
 			getKey (scancode: Scancode): Key | null
 			getScancode (key: Key): Scancode | null
 
-			getState (): boolean[]
+			getState (): Uint8Array
 		}
 
 	}

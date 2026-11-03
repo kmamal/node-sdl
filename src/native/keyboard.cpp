@@ -67,11 +67,10 @@ keyboard::getState(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	Napi::Array result = Napi::Array::New(env, keyboard::num_keys);
+	static_assert(sizeof(bool) == 1, "bool must be one byte");
 
-	for (int i = 0; i < keyboard::num_keys; i++) {
-		result.Set(i, keyboard::keys[i]);
-	}
+	Napi::Uint8Array result = Napi::Uint8Array::New(env, keyboard::num_keys);
+	SDL_memcpy(result.Data(), keyboard::keys, keyboard::num_keys);
 
 	return result;
 }

@@ -47,12 +47,12 @@ T.test("sdl::keyboard", (t) => {
 
 	let numPressed = 0
 	for (const isPressed of state) {
-		t.equal(typeof isPressed, 'boolean')
+		t.ok(isPressed === 0 || isPressed === 1)
 		if (isPressed) { numPressed++ }
 	}
 	t.ok(numPressed <= 3)
 
 	for (const scancode of Object.values(sdl.keyboard.SCANCODE)) {
-		t.equal(typeof state[scancode], 'boolean')
+		t.ok(state[scancode] === 0 || state[scancode] === 1)
 	}
 })

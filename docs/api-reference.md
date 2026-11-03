@@ -1626,10 +1626,10 @@ Throws if `key` is not a valid [`Key`](#virtual-keys).
 
 ### sdl.keyboard.getState()
 
-- Returns: `<boolean[]>` an array representing the state of each key.
+- Returns: `<Uint8Array>` an array representing the state of each key.
 
 Index the returned array with [`Scancode`](#enum-scancode) values.
-Each value is `true` if the corresponding key is pressed and `false` otherwise.
+Each value is `1` if the corresponding key is pressed and `0` otherwise.
 
 ## sdl.mouse
 
