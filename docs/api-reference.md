@@ -2114,11 +2114,11 @@ Because gamepads are an abstraction over joysticks, they operate on the same set
 A joystick device needs a "mapping" to also work as a gamepad device.
 A mapping is a string that holds the device's GUID, its name, and a series of pairings between each joystick axis or button and the matching gamepad axis or button name.
 See the [sample output](#sdlgamepaddevices) for an example.
-SDL has good default gamepad mappings, but if you need more, the community maintains a database at [gabomdq/SDL_GameGamepadDB](https://github.com/gabomdq/SDL_GameGamepadDB).
+SDL has good default gamepad mappings, but if you need more, the community maintains a database at [mdqinc/SDL_GameControllerDB](https://github.com/mdqinc/SDL_GameControllerDB).
 Add its mappings like this:
 
 ```js
-const url = 'https://raw.githubusercontent.com/gabomdq/SDL_GameGamepadDB/master/gamepaddb.txt'
+const url = 'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt'
 const result = await fetch(url)
 const text = await result.text()
 const mappings = text.split('\n').filter((line) => line && !line.startsWith('#'))
