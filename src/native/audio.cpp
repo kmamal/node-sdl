@@ -340,9 +340,13 @@ audio::open (const Napi::CallbackInfo &info)
 		SDL_DestroyAudioStream(stream);
 		throw;
 	}
-	state->tsfn.Unref(env);
-
-	napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id);
+	napi_status status = napi_unref_threadsafe_function(env, state->tsfn);
+	if (status == napi_ok) { status = napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id); }
+	if (status != napi_ok) {
+		state->tsfn.Release();
+		SDL_DestroyAudioStream(stream);
+		NAPI_THROW_IF_FAILED(env, status, Napi::Value());
+	}
 	OpenStream &entry = open_streams[audio_id] = { stream, env, device_id, is_recording, state };
 
 	bool bound = is_recording

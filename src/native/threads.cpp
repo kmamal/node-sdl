@@ -28,7 +28,9 @@ _wake (Thread &thread)
 {
 	if (thread.wake_pending || thread.wake == nullptr) { return; }
 	thread.wake_pending = true;
-	napi_call_threadsafe_function(thread.wake, nullptr, napi_tsfn_nonblocking);
+	if (napi_call_threadsafe_function(thread.wake, nullptr, napi_tsfn_nonblocking) != napi_ok) {
+		thread.wake_pending = false;
+	}
 }
 
 static bool
@@ -224,10 +226,13 @@ threads::registerThread (const Napi::CallbackInfo &info)
 
 	napi_threadsafe_function wake;
 	napi_value resource_name;
-	napi_create_string_utf8(env, "sdlPoll", NAPI_AUTO_LENGTH, &resource_name);
-	napi_status status = napi_create_threadsafe_function(env, poll, nullptr, resource_name, 0, 1, nullptr, nullptr, nullptr, nullptr, &wake);
-	if (status != napi_ok) { throw Napi::Error::New(env, "napi_create_threadsafe_function() error"); }
-	napi_unref_threadsafe_function(env, wake);
+	NAPI_THROW_IF_FAILED(env, napi_create_string_utf8(env, "sdlPoll", NAPI_AUTO_LENGTH, &resource_name), Napi::Value());
+	NAPI_THROW_IF_FAILED(env, napi_create_threadsafe_function(env, poll, nullptr, resource_name, 0, 1, nullptr, nullptr, nullptr, nullptr, &wake), Napi::Value());
+	napi_status status = napi_unref_threadsafe_function(env, wake);
+	if (status != napi_ok) {
+		napi_release_threadsafe_function(wake, napi_tsfn_abort);
+		NAPI_THROW_IF_FAILED(env, status, Napi::Value());
+	}
 
 	{
 		std::lock_guard<std::mutex> registry_guard(mutex);
@@ -238,6 +243,12 @@ threads::registerThread (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, "@kmamal/sdl is already loaded in this thread");
 		}
 
+		status = napi_add_env_cleanup_hook(env, _envCleanup, (void *) (napi_env) env);
+		if (status != napi_ok) {
+			napi_release_threadsafe_function(wake, napi_tsfn_abort);
+			NAPI_THROW_IF_FAILED(env, status, Napi::Value());
+		}
+
 		Thread &thread = all_threads[env];
 		thread.wake = wake;
 		thread.is_main = is_main;
@@ -245,8 +256,6 @@ threads::registerThread (const Napi::CallbackInfo &info)
 	}
 
 	if (!is_main) { threads::wakeMain(); }
-
-	napi_add_env_cleanup_hook(env, _envCleanup, (void *) (napi_env) env);
 
 	return env.Undefined();
 }
@@ -266,10 +275,12 @@ threads::setDemand (const Napi::CallbackInfo &info)
 
 		Thread &thread = it->second;
 		if (thread.demand != demand) {
+			napi_status status = demand
+				? napi_ref_threadsafe_function(env, thread.wake)
+				: napi_unref_threadsafe_function(env, thread.wake);
+			NAPI_THROW_IF_FAILED(env, status, Napi::Value());
 			thread.demand = demand;
 			num_demanding.fetch_add(demand ? 1 : -1, std::memory_order_acq_rel);
-			if (demand) { napi_ref_threadsafe_function(env, thread.wake); }
-			else { napi_unref_threadsafe_function(env, thread.wake); }
 		}
 	}
 
