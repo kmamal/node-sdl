@@ -2,9 +2,12 @@ const Bindings = require('./bindings')
 const Globals = require('./globals')
 
 process.on('exit', (code) => {
-	if (code !== 0) { return }
-
 	Globals.events.stopPolling()
+
+	if (code !== 0) {
+		Bindings.global_cleanup()
+		return
+	}
 
 	const errors = []
 
