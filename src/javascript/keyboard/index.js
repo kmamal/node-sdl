@@ -8,6 +8,8 @@ const { validateIntegerRange, validateString } = require('../validate')
 
 const validEvents = [ 'keymapChange' ]
 
+const mapKey = (key) => mapping[key] ?? (isCharacter(key) ? key : null)
+
 const keyboard = new class extends EventsViaPoll {
 	constructor () { super(validEvents, () => { assertInitialized('video') }) }
 
@@ -20,8 +22,7 @@ const keyboard = new class extends EventsViaPoll {
 		validateIntegerRange('scancode', scancode, 0, 511)
 
 		Globals.events.poll()
-		const _key = Bindings.keyboard_getKey(scancode)
-		return mapping[_key] ?? (isCharacter(_key) ? _key : null)
+		return mapKey(Bindings.keyboard_getKey(scancode))
 	}
 
 	getScancode (key) {

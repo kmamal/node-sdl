@@ -1620,6 +1620,7 @@ Throws if `scancode` is not an integer from `0` to `511`.
 
 Maps a key to the corresponding scancode based on the current keyboard mapping.
 Returns `null` if the key corresponds to no scancode in the current mapping.
+If the key is typed together with a modifier, this returns the scancode of the key it is typed on, so on a US layout `getScancode('?')` is the scancode of `/` and `getKey(getScancode('?'))` is `'/'`.
 If multiple physical keys produce the same virtual key, this returns only the first one.
 
 Throws if `key` is not a valid [`Key`](#virtual-keys).
