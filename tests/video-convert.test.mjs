@@ -33,8 +33,8 @@ T.test("sdl::video::convert", (t) => {
 	t.throws(() => sdl.video.convert(src, rgba, { format: 'bgra32' }, new Uint8Array(bgra.length)), /dstData must be a Buffer/u)
 	t.throws(() => sdl.video.convert(src, rgba, { format: 'bgra32', stride: 4 }), /dstSpec.stride is smaller/u)
 	t.throws(() => sdl.video.convert(src, rgba, { format: 'nope' }), /invalid dstSpec.format/u)
-	t.throws(() => sdl.video.convert({ ...src, format: 'nope' }, rgba, { format: 'bgra32' }), /invalid format/u)
-	t.throws(() => sdl.video.convert(src, rgba.subarray(1), { format: 'bgra32' }), /buffer is smaller/u)
+	t.throws(() => sdl.video.convert({ ...src, format: 'nope' }, rgba, { format: 'bgra32' }), /invalid srcSpec.format/u)
+	t.throws(() => sdl.video.convert(src, rgba.subarray(1), { format: 'bgra32' }), /srcData is smaller/u)
 	t.throws(() => sdl.video.convert(src, rgba, { format: 'bgra32' }, rgba), /must not overlap/u)
 })
 

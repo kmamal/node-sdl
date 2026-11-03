@@ -1,7 +1,6 @@
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { VideoFormatHelpers } = require('./format-helpers')
-const { validateImage } = require('./validate')
 const { validateObject, validateString, validateBuffer, validateInteger, validatePositiveInt32 } = require('../validate')
 
 const overlaps = (a, b) => {
@@ -12,16 +11,25 @@ const overlaps = (a, b) => {
 const convert = (srcSpec, srcData, dstSpec, dstData) => {
 	validateObject('srcSpec', srcSpec)
 	validateObject('dstSpec', dstSpec)
-	const { width, height, format: srcFormat } = srcSpec
-	const { width: dstWidth = width, height: dstHeight = height, format: dstFormat, scaling = 'nearest' } = dstSpec
+	const { width: srcWidth, height: srcHeight, format: srcFormat } = srcSpec
+	const { width: dstWidth = srcWidth, height: dstHeight = srcHeight, format: dstFormat, scaling = 'nearest' } = dstSpec
 	let { stride: srcStride } = srcSpec
 	let { stride: dstStride } = dstSpec
 
-	if (srcStride === undefined && VideoFormatHelpers[srcFormat] !== undefined) {
-		validatePositiveInt32('srcSpec.width', width)
-		srcStride = VideoFormatHelpers[srcFormat].minStride(width)
-	}
-	validateImage(width, height, srcStride, srcFormat, srcData, () => {})
+	validatePositiveInt32('srcSpec.width', srcWidth)
+	validatePositiveInt32('srcSpec.height', srcHeight)
+	validateString('srcSpec.format', srcFormat)
+	const srcHelpers = VideoFormatHelpers[srcFormat]
+	if (srcHelpers === undefined) { throw Object.assign(new Error("invalid srcSpec.format"), { srcFormat }) }
+
+	const minSrcStride = srcHelpers.minStride(srcWidth)
+	if (srcStride === undefined) { srcStride = minSrcStride }
+	validateInteger('srcSpec.stride', srcStride)
+	if (srcStride < minSrcStride) { throw Object.assign(new Error("srcSpec.stride is smaller than expected"), { srcStride, width: srcWidth, srcFormat }) }
+	if (srcStride > 2 ** 31 - 1) { throw Object.assign(new Error("srcSpec.stride must be a 32-bit integer"), { srcStride }) }
+
+	validateBuffer('srcData', srcData)
+	if (srcData.length < srcHelpers.minBufferSize(srcStride, srcHeight)) { throw Object.assign(new Error("srcData is smaller than expected"), { srcData, srcStride, height: srcHeight, srcFormat }) }
 
 	validatePositiveInt32('dstSpec.width', dstWidth)
 	validatePositiveInt32('dstSpec.height', dstHeight)
@@ -45,14 +53,14 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 
 	if (dstData === undefined) {
 		const buffer = Buffer.alloc(size)
-		Bindings.video_convert(width, height, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, buffer, dstStride, _scaling)
+		Bindings.video_convert(srcWidth, srcHeight, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, buffer, dstStride, _scaling)
 		return buffer
 	}
 
 	validateBuffer('dstData', dstData)
 	if (dstData.length < size) { throw Object.assign(new Error("dstData is smaller than expected"), { dstData, dstStride, dstHeight, dstFormat }) }
 	if (overlaps(srcData, dstData)) { throw Object.assign(new Error("srcData and dstData must not overlap")) }
-	Bindings.video_convert(width, height, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, dstData, dstStride, _scaling)
+	Bindings.video_convert(srcWidth, srcHeight, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, dstData, dstStride, _scaling)
 	return size
 }
 
