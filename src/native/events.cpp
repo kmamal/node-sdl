@@ -595,6 +595,11 @@ _dispatchEvent (const SDL_Event &event)
 	Packing packing;
 	if (!_packEvent(event, packing)) { return false; }
 
+	if (!threads::hasWorkers()) {
+		poll_callback->Call(env.Global(), { packing.value.toNapi(env) });
+		return true;
+	}
+
 	threads::Event shared = {
 		packing.target,
 		packing.target_id,

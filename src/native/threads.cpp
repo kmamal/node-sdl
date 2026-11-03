@@ -177,6 +177,12 @@ threads::isPollingFast ()
 		|| num_workers.load(std::memory_order_acquire) > 0;
 }
 
+bool
+threads::hasWorkers ()
+{
+	return num_workers.load(std::memory_order_acquire) > 0;
+}
+
 void
 threads::wakeMain ()
 {

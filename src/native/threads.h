@@ -24,6 +24,7 @@ namespace threads {
 	void distribute(const Event &event, napi_env except);
 	void drain(Napi::Env &env, Napi::Function &callback);
 	bool isPollingFast();
+	bool hasWorkers();
 	void wakeMain();
 	void shutdown();
 
