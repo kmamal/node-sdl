@@ -1,6 +1,7 @@
 import E from '@kmamal/evdev'
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
+import GamepadEvents from '../src/javascript/gamepad/events.js'
 
 T.test("sdl::gamepad", async (t) => {
 	t.timeout(3e3)
@@ -154,6 +155,23 @@ T.test("sdl::gamepad.addMappings updates joystick devices", async (t) => {
 	t.equal(sdl.gamepad.devices.length, 1)
 	t.equal(sdl.joystick.devices[0], device)
 	t.equal(device.type, 'gamepad')
+
+	const gamepadDevice = sdl.gamepad.devices[0]
+	GamepadEvents.handleEvent({
+		type: 'remap',
+		device: {
+			...gamepadDevice,
+			isGamepad: true,
+			gamepadMapping: 'remapped',
+			gamepadName: 'Remapped Joystick',
+			gamepadType: gamepadDevice.type,
+		},
+		axes: {},
+		buttons: {},
+		buttonLabels: {},
+	}, gamepadDevice.id)
+	t.equal(gamepadDevice.mapping, 'remapped')
+	t.equal(gamepadDevice.name, 'Remapped Joystick')
 
 	virtualJoystick.destroy()
 	await new Promise((resolve) => { setTimeout(resolve, 1e3) })
