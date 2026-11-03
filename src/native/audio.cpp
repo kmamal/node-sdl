@@ -330,8 +330,15 @@ audio::open (const Napi::CallbackInfo &info)
 	}
 
 	StreamState *state = new StreamState();
-	state->tsfn = NotifyFunction::New(env, callback, "audioStreamNotify", 0, 1, state,
-		[](Napi::Env, void *, StreamState *state) { delete state; });
+	try {
+		state->tsfn = NotifyFunction::New(env, callback, "audioStreamNotify", 0, 1, state,
+			[](Napi::Env, void *, StreamState *state) { delete state; });
+	}
+	catch (...) {
+		delete state;
+		SDL_DestroyAudioStream(stream);
+		throw;
+	}
 	state->tsfn.Unref(env);
 
 	napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id);
@@ -349,7 +356,14 @@ audio::open (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
-	_setFormat(device, audio_id);
+	try {
+		_setFormat(device, audio_id);
+	}
+	catch (...) {
+		_destroy(audio_id, entry, true);
+		open_streams.erase(audio_id);
+		throw;
+	}
 
 	return Napi::Number::New(env, audio_id);
 }
