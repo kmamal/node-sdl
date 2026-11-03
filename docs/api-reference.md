@@ -2715,7 +2715,7 @@ The native byte order formats (`'s16'`, `'s32'`, and `'f32'`) use the little-end
 - `srcSpec: <object>` The layout of `srcData`.
   - `format: `[`<SampleFormat>`](#sample-formats): Default: `'f32'`
   - `channels: <number>`: An integer from `1` to `8`. Default: `1`
-  - `frequency: <number>`: The sampling frequency in frames per second. An integer from `1` to `384000`. Default: `48e3`
+  - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
 - `srcData: <Buffer>` The audio data to convert. Its length must be a whole number of sample frames in the `srcSpec` layout.
 - `dstSpec: <object>` The layout of the result, with the same fields and defaults as `srcSpec`.
 - `dstData: <Buffer>` The buffer to write the result into. If omitted, the function allocates a buffer that is large enough.
