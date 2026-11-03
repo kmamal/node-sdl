@@ -160,6 +160,10 @@ _setFormat (packed::Value &target, SDL_AudioDeviceID id)
 	int sample_frames;
 	if (!SDL_GetAudioDeviceFormat(id, &spec, &sample_frames)) {
 		SDL_ClearError();
+		target.set("format", packed::Value());
+		target.set("channels", packed::Value());
+		target.set("frequency", packed::Value());
+		target.set("buffered", packed::Value());
 		return;
 	}
 

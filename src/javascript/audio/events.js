@@ -14,6 +14,8 @@ const handleEvent = (event) => {
 	const list = Globals.audioDevices[audioDeviceType]
 	const emitter = audioModule[audioDeviceType]
 
+	Object.assign(list[0], defaultDevice)
+
 	switch (type) {
 		case 'deviceAdd': {
 			const { device } = event
@@ -23,7 +25,6 @@ const handleEvent = (event) => {
 			const made = makeAudioDevice(device)
 			list.push(made)
 			event.device = made
-			Object.assign(list[0], defaultDevice)
 		} break
 
 		case 'deviceRemove': {
@@ -46,7 +47,6 @@ const handleEvent = (event) => {
 					tryCall(() => { stream.close() })
 				}
 			}
-			Object.assign(list[0], defaultDevice)
 
 			event.device = device
 		} break
@@ -56,7 +56,6 @@ const handleEvent = (event) => {
 			const device = Globals.audioStreams.get(deviceId)?.device
 				?? list.find((a) => a.id === deviceId)
 			if (device) { Object.assign(device, format) }
-			Object.assign(list[0], defaultDevice)
 		} return
 
 		// No default
