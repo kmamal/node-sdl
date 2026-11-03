@@ -528,7 +528,7 @@ audio::close (const Napi::CallbackInfo &info)
 
 	OpenStream &entry = _getEntry(env, audio_id);
 	SDL_AudioDeviceID device_id = entry.device_id;
-	_destroy(audio_id, entry, true);
+	_destroy(audio_id, entry, entry.env == (napi_env) env);
 	open_streams.erase(audio_id);
 
 	_setFormat(device, device_id);
