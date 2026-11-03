@@ -9,6 +9,7 @@ module.exports = {
 		gamepad: null,
 		sensor: null,
 	},
+	initErrors: {},
 
 	displays: [],
 	windows: {

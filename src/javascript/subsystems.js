@@ -6,7 +6,9 @@ const { makeDevice: makeGamepadDevice, isGamepadDevice } = require('./gamepad/de
 const { refreshDevices: refreshAudioDevices } = require('./audio/devices')
 
 const initSubsystem = (name) => {
-	Globals.initialized[name] = Bindings.global_initSubsystem(name)
+	const result = Bindings.global_initSubsystem(name)
+	Globals.initialized[name] = result === true
+	if (result !== true) { Globals.initErrors[name] = result }
 	return Globals.initialized[name]
 }
 
@@ -41,7 +43,10 @@ const isAvailable = (name) => {
 }
 
 const assertInitialized = (name) => {
-	if (!ensure(name)) { throw new Error(`SDL ${name} subsystem failed to initialize`) }
+	if (!ensure(name)) {
+		const error = Globals.initErrors[name]
+		throw new Error(`SDL ${name} subsystem failed to initialize${error ? `: ${error}` : ''}`)
+	}
 }
 
 module.exports = {

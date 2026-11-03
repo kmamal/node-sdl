@@ -32,6 +32,7 @@ struct InitRequest {
 	SDL_InitFlags flags;
 	bool done = false;
 	bool result = false;
+	std::string error;
 };
 
 static std::mutex request_mutex;
@@ -422,13 +423,21 @@ global::initialize(const Napi::CallbackInfo &info)
 
 
 static bool
-_initSubsystem (SDL_InitFlags flags)
+_initSubsystem (SDL_InitFlags flags, std::string &error)
 {
 	if ((SDL_WasInit(flags) & flags) == flags) { return true; }
 
 	bool success = SDL_InitSubSystem(flags);
+	if (!success) { error = SDL_GetError(); }
 	SDL_ClearError();
 	return success;
+}
+
+static Napi::Value
+_initResult (Napi::Env env, bool success, const std::string &error)
+{
+	if (success) { return Napi::Boolean::New(env, true); }
+	return Napi::String::New(env, error);
 }
 
 static void
@@ -438,6 +447,7 @@ _failInitRequests ()
 	for (InitRequest *request : pending_requests) {
 		request->done = true;
 		request->result = false;
+		request->error = "SDL has been shut down";
 	}
 	pending_requests.clear();
 	request_cv.notify_all();
@@ -456,7 +466,12 @@ global::processInitRequests()
 	{
 		std::lock_guard<std::mutex> guard(global::lock());
 		for (InitRequest *request : batch) {
-			request->result = ready.load(std::memory_order_acquire) && _initSubsystem(request->flags);
+			if (!ready.load(std::memory_order_acquire)) {
+				request->result = false;
+				request->error = "SDL has been shut down";
+				continue;
+			}
+			request->result = _initSubsystem(request->flags, request->error);
 		}
 	}
 
@@ -491,10 +506,12 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 	if (global::isMainThread()) {
 		std::lock_guard<std::mutex> guard(global::lock());
 		global::assertReady(env);
-		return Napi::Boolean::New(env, _initSubsystem(flags));
+		std::string error;
+		bool success = _initSubsystem(flags, error);
+		return _initResult(env, success, error);
 	}
 
-	InitRequest request = { flags };
+	InitRequest request = { flags, false, false, std::string() };
 	{
 		std::lock_guard<std::mutex> guard(request_mutex);
 		global::assertReady(env);
@@ -514,7 +531,7 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 		}
 	}
 
-	return Napi::Boolean::New(env, request.result);
+	return _initResult(env, request.result, request.error);
 }
 
 
