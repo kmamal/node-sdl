@@ -30,6 +30,12 @@ const handleEvent = (event) => {
 			const { deviceId } = event
 			delete event.deviceId
 
+			const logical = Globals.audioStreams.get(deviceId)
+			if (logical) {
+				tryCall(() => { logical.close() })
+				return
+			}
+
 			const index = list.findIndex((a) => a.id === deviceId)
 			if (index === -1) { return }
 			const device = list[index]
