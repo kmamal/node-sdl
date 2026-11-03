@@ -92,23 +92,23 @@ class AudioStream extends EventsViaPoll {
 		Globals.audioStreams.set(this._id, this)
 
 		const notifyListeners = () => this.listenerCount(notifyEvent) + this.listenerCount('*')
-		this.on('newListener', (type) => {
+		this._addInternalListener('newListener', (type) => {
 			if ((type !== notifyEvent && type !== '*') || notifyListeners() !== 0) { return }
 			Bindings.audio_setNotify(this._id, true)
 		})
-		this.on('removeListener', (type) => {
+		this._addInternalListener('removeListener', (type) => {
 			if ((type !== notifyEvent && type !== '*') || notifyListeners() !== 0 || this._closed) { return }
 			Bindings.audio_setNotify(this._id, false)
 		})
 	}
 
-	get id () { return this._id }
 	_makeClosedError () { return Object.assign(new Error("stream is closed"), { id: this._id }) }
 
 	_assertOpen () {
 		if (this._closed) { throw this._makeClosedError() }
 	}
 
+	get id () { return this._id }
 	get device () { return this._device }
 
 	get channels () { return this._channels }

@@ -151,7 +151,7 @@ class Window extends EventsViaPoll {
 		// Keeps Node.js alive while windows are open
 		const keepAlive = () => {}
 		this.on('close', keepAlive)
-		this.on('removeListener', (type, listener) => {
+		this._addInternalListener('removeListener', (type, listener) => {
 			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
 		})
 
