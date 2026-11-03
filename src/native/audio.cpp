@@ -78,8 +78,6 @@ _onPut (void *userdata, SDL_AudioStream *, int, int)
 	_wake(state);
 }
 
-static void
-_unbind (OpenStream &entry)
 static Napi::Error
 _sdlError (Napi::Env &env, const std::string &call)
 {
@@ -95,6 +93,8 @@ _sdlError (Napi::Env &env, const char *function, SDL_AudioDeviceID audio_id)
 	return _sdlError(env, std::string(function) + "(" + std::to_string(audio_id) + ")");
 }
 
+static void
+_unbind (OpenStream &entry)
 {
 	if (entry.is_recording) { SDL_SetAudioStreamPutCallback(entry.stream, nullptr, nullptr); }
 	else { SDL_SetAudioStreamGetCallback(entry.stream, nullptr, nullptr); }
@@ -593,12 +593,35 @@ audio::setFrequencyRatio (const Napi::CallbackInfo &info)
 	return env.Undefined();
 }
 
+static void
+_destroyStandaloneStream (SDL_AudioStream *stream)
+{
+	std::lock_guard<std::mutex> guard(global::lock());
+	SDL_DestroyAudioStream(stream);
+}
+
+static SDL_AudioStream *
+_createStandaloneStream (Napi::Env &env, const SDL_AudioSpec *src_spec, const SDL_AudioSpec *dst_spec)
+{
+	std::lock_guard<std::mutex> guard(global::lock());
+
+	SDL_AudioStream *stream = SDL_CreateAudioStream(src_spec, dst_spec);
+	if (stream == nullptr) { throw _sdlError(env, "SDL_CreateAudioStream()"); }
+
+	SDL_PropertiesID props = SDL_GetAudioStreamProperties(stream);
+	if (props == 0 || !SDL_SetBooleanProperty(props, SDL_PROP_AUDIOSTREAM_AUTO_CLEANUP_BOOLEAN, false)) {
+		Napi::Error error = _sdlError(env, "SDL_SetBooleanProperty()");
+		SDL_DestroyAudioStream(stream);
+		throw error;
+	}
+
+	return stream;
+}
+
 Napi::Value
 audio::convert (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
-
-	std::lock_guard<std::mutex> guard(global::lock());
 
 	SDL_AudioSpec src_spec;
 	src_spec.format = (SDL_AudioFormat) info[0].As<Napi::Number>().Int32Value();
@@ -613,41 +636,33 @@ audio::convert (const Napi::CallbackInfo &info)
 	dst_spec.channels = info[6].As<Napi::Number>().Int32Value();
 	dst_spec.freq = info[7].As<Napi::Number>().Int32Value();
 
-	SDL_AudioStream *stream = SDL_CreateAudioStream(&src_spec, &dst_spec);
-	if (stream == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateAudioStream() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	Napi::Buffer<uint8_t> dst = info[8].As<Napi::Buffer<uint8_t>>();
+
+	SDL_AudioStream *stream = _createStandaloneStream(env, &src_spec, &dst_spec);
 
 	if (!SDL_PutAudioStreamData(stream, src.Data(), src_size) || !SDL_FlushAudioStream(stream)) {
-		std::ostringstream message;
-		message << "SDL_PutAudioStreamData() error: " << SDL_GetError();
-		SDL_ClearError();
-		SDL_DestroyAudioStream(stream);
-		throw Napi::Error::New(env, message.str());
+		Napi::Error error = _sdlError(env, "SDL_PutAudioStreamData()");
+		_destroyStandaloneStream(stream);
+		throw error;
 	}
 
 	int available = SDL_GetAudioStreamAvailable(stream);
 	if (available < 0) { available = 0; }
 
-	Napi::Buffer<uint8_t> dst = info[8].As<Napi::Buffer<uint8_t>>();
 	if (dst.Length() < (size_t) available) {
-		SDL_DestroyAudioStream(stream);
+		_destroyStandaloneStream(stream);
 		std::ostringstream message;
 		message << "dstData must hold at least " << available << " bytes";
 		throw Napi::Error::New(env, message.str());
 	}
 
 	int got = available > 0 ? SDL_GetAudioStreamData(stream, dst.Data(), available) : 0;
-	SDL_DestroyAudioStream(stream);
 	if (got < 0) {
-		std::ostringstream message;
-		message << "SDL_GetAudioStreamData() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		Napi::Error error = _sdlError(env, "SDL_GetAudioStreamData()");
+		_destroyStandaloneStream(stream);
+		throw error;
 	}
+	_destroyStandaloneStream(stream);
 
 	return Napi::Number::New(env, got);
 }
