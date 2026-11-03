@@ -2150,6 +2150,7 @@ When this event fires, the library automatically closes all instances opened fro
 
 Registers new mappings for gamepads.
 This may [remap](#event-remap) gamepad instances that are already open.
+Mappings with a `platform:` field for a different platform are skipped.
 If one of the mappings is invalid, the mappings before it in the array stay registered.
 
 ### sdl.gamepad.isAvailable()

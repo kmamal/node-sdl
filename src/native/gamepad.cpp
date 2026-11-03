@@ -67,6 +67,26 @@ gamepad::getState (SDL_Gamepad *gamepad, packed::Value &dst)
 	dst.set("buttonLabels", std::move(button_labels_obj));
 }
 
+static bool
+_isPlatformMatch (const std::string &mapping)
+{
+	static const char field[] = "platform:";
+	size_t start = mapping.find(field);
+	if (start == std::string::npos) { return true; }
+	start += sizeof(field) - 1;
+	size_t end = mapping.find(',', start);
+	if (end == std::string::npos) { end = mapping.size(); }
+	const char *platform = mapping.c_str() + start;
+	size_t length = end - start;
+
+#ifdef SDL_PLATFORM_MACOS
+	if (length == 8 && SDL_strncasecmp(platform, "Mac OS X", length) == 0) { return true; }
+#endif
+
+	const char *current = SDL_GetPlatform();
+	return length == SDL_strlen(current) && SDL_strncasecmp(platform, current, length) == 0;
+}
+
 Napi::Value
 gamepad::addMappings (const Napi::CallbackInfo &info)
 {
@@ -79,6 +99,7 @@ gamepad::addMappings (const Napi::CallbackInfo &info)
 
 	for (int i = 0; i < (int) mappings.Length(); i++) {
 		std::string mapping = mappings.Get(i).As<Napi::String>().Utf8Value();
+		if (!_isPlatformMatch(mapping)) { continue; }
 		SDL_ClearError();
 		if (SDL_AddGamepadMapping(mapping.c_str()) == -1) {
 			std::ostringstream message;

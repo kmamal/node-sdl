@@ -143,6 +143,13 @@ T.test("sdl::gamepad.addMappings updates joystick devices", async (t) => {
 	const device = sdl.joystick.devices[0]
 	t.equal(device.type, null)
 
+	sdl.gamepad.addMappings([
+		`${device.guid},Unmapped Joystick,a:b0,b:b1,leftx:a0,lefty:a1,platform:Windows,`,
+		`${device.guid},Unmapped Joystick,a:b0,b:b1,leftx:a0,lefty:a1,platform:Mac OS X,`,
+	])
+	t.equal(sdl.gamepad.devices.length, 0)
+	t.equal(device.type, null)
+
 	sdl.gamepad.addMappings([ `${device.guid},Unmapped Joystick,a:b0,b:b1,leftx:a0,lefty:a1,platform:Linux,` ])
 	t.equal(sdl.gamepad.devices.length, 1)
 	t.equal(sdl.joystick.devices[0], device)
