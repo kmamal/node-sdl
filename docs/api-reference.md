@@ -2024,7 +2024,7 @@ Clears the player assignment and the player LED.
 
 - `<boolean>`
 
-Is `true` if the joystick has a LED light whose color can be controlled.
+Is `true` if the joystick has a LED light whose color or brightness can be controlled.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### joystickInstance.setLed(red, green, blue)
@@ -2034,6 +2034,7 @@ This can change while the instance is open, for example when SDL switches a cont
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the joystick's LED light.
+If the LED only supports brightness, the brightest of the three components is used.
 
 Throws if the joystick has no LED (see [`joystickInstance.hasLed`](#joystickinstancehasled)).
 
@@ -2392,7 +2393,7 @@ Clears the player assignment and the player LED.
 
 - `<boolean>`
 
-Is `true` if the gamepad has a LED light whose color can be controlled.
+Is `true` if the gamepad has a LED light whose color or brightness can be controlled.
 This can change while the instance is open, for example when SDL switches a controller into an enhanced mode.
 
 ### gamepadInstance.setLed(red, green, blue)
@@ -2402,6 +2403,7 @@ This can change while the instance is open, for example when SDL switches a cont
 - `blue: <number>` The blue component of the led color, from `0` to `1`.
 
 Sets the color of the gamepad's LED light.
+If the LED only supports brightness, the brightest of the three components is used.
 
 Throws if the gamepad has no LED (see [`gamepadInstance.hasLed`](#gamepadinstancehasled)).
 

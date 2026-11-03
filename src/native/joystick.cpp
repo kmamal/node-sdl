@@ -367,7 +367,7 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 	}
 
 	Napi::Object result = Napi::Object::New(env);
-	result.Set("hasLed", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RGB_LED_BOOLEAN, false));
+	result.Set("hasLed", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RGB_LED_BOOLEAN, false) || SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_MONO_LED_BOOLEAN, false));
 	result.Set("hasRumble", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_RUMBLE_BOOLEAN, false));
 	result.Set("hasRumbleTriggers", SDL_GetBooleanProperty(props, SDL_PROP_JOYSTICK_CAP_TRIGGER_RUMBLE_BOOLEAN, false));
 
