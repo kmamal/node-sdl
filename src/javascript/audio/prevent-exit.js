@@ -12,6 +12,7 @@ const resetTimeout = () => {
 
 process.on('beforeExit', (code) => {
 	if (code !== 0) { return }
+	if (Globals.audioStreams.size === 0) { return }
 
 	let duration = 0
 
