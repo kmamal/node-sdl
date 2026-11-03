@@ -67,7 +67,9 @@ global::assertReady(Napi::Env &env)
 		: "@kmamal/sdl must be imported on the main thread before it can be used in a worker");
 }
 
-bool watchEvents(void*, SDL_Event *event) {
+static bool SDLCALL
+watchEvents (void *, SDL_Event *event)
+{
 	if (true
 		&& SDL_GetCurrentThreadID() == main_thread_id.load(std::memory_order_acquire)
 		&& (false
