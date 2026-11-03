@@ -345,7 +345,7 @@ All three functions take the image as a series of arguments:
 - `format: `[`<PixelFormat>`](#pixel-formats) The binary representation of the data in the buffer.
 - `buffer: <Buffer>` Holds the pixel data of the image, in the format and layout that the arguments above specify.
 
-The `stride` must be at least `width * `[`sdl.video.bytesPerPixel(format)`](#sdlvideobytesperpixelformat) (for the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'`, at least `4 * Math.ceil(width / 2)`, since each 4-byte group encodes two pixels), and the `buffer` must be at least [`sdl.video.minBufferSize(format, stride, height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, or the call throws.
+The `stride` must be at least `width * `[`sdl.video.bytesPerPixel(format)`](#sdlvideobytesperpixelformat) (for the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'`, at least `4 * Math.ceil(width / 2)`, since each 4-byte group encodes two pixels, and the same for `'p010'`, whose interleaved U/V plane needs 4 bytes for every two pixels), and the `buffer` must be at least [`sdl.video.minBufferSize(format, stride, height)`](#sdlvideominbuffersizeformat-stride-height) bytes long, or the call throws.
 
 For example, to fill the window with a red+green gradient, do:
 
@@ -550,7 +550,7 @@ Helper function that tells planar YUV formats (where the Y, U, and V components 
 
 Helper function that computes the smallest `stride` that can hold a row of an image with the given format and width.
 For most formats this is just `width * bytesPerPixel`.
-For the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'` it is `4 * Math.ceil(width / 2)`.
+For the packed YUV formats `'yuy2'`, `'uyvy'`, and `'yvyu'`, and for `'p010'`, it is `4 * Math.ceil(width / 2)`.
 The functions that accept [image data](#image-data) throw if the stride you give them is smaller than this.
 
 ### sdl.video.minBufferSize(format, stride, height)
