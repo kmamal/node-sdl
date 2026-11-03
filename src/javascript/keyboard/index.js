@@ -3,7 +3,7 @@ const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { mapping, reverseMapping, isCharacter } = require('./key-mapping')
+const { mapping, getReverseMapping, isCharacter } = require('./key-mapping')
 const { validateIntegerRange, validateString } = require('../validate')
 
 const validEvents = [ 'keymapChange' ]
@@ -28,10 +28,10 @@ const keyboard = new class extends EventsViaPoll {
 		assertInitialized('video')
 		validateString('key', key)
 
-		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
+		Globals.events.poll()
+		const _key = getReverseMapping()[key] ?? (isCharacter(key) ? key : null)
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
 
-		Globals.events.poll()
 		return Bindings.keyboard_getScancode(_key)
 	}
 

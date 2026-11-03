@@ -228,43 +228,62 @@ const mapping = Object.assign(Object.create(null), {
 	'Z': 'z',
 })
 
-const reverseMapping = Object.create(null)
-
 const isCharacter = (key) => key !== null && [ ...key ].length === 1
 
-for (const [ key, value ] of Object.entries(mapping)) {
-	maybeSkip: {
-		const existing = reverseMapping[value]
-		if (existing === undefined) { break maybeSkip }
+const buildReverseMapping = () => {
+	const reverseMapping = Object.create(null)
+
+	for (const [ key, value ] of Object.entries(mapping)) {
+		maybeSkip: {
+			const existing = reverseMapping[value]
+			if (existing === undefined) { break maybeSkip }
+
+			const keyScancode = Bindings.keyboard_getScancode(key)
+			if (keyScancode === null) { continue }
+
+			const existingScancode = Bindings.keyboard_getScancode(existing)
+			if (existingScancode === null) { break maybeSkip }
+
+			if (existingScancode < keyScancode) { continue }
+		}
+
+		reverseMapping[value] = key
+	}
+
+	for (const [ value, key ] of Object.entries(reverseMapping)) {
+		if (!isCharacter(value)) { continue }
+
+		const valueScancode = Bindings.keyboard_getScancode(value)
+		if (valueScancode === null) { continue }
 
 		const keyScancode = Bindings.keyboard_getScancode(key)
-		if (keyScancode === null) { continue }
+		if (keyScancode === null) {
+			delete reverseMapping[value]
+			continue
+		}
 
-		const existingScancode = Bindings.keyboard_getScancode(existing)
-		if (existingScancode === null) { break maybeSkip }
-
-		if (existingScancode < keyScancode) { continue }
+		const _key = Bindings.keyboard_getKey(valueScancode)
+		const roundTrips = (mapping[_key] ?? _key) === value
+		if (roundTrips && valueScancode < keyScancode) {
+			delete reverseMapping[value]
+		}
 	}
 
-	reverseMapping[value] = key
+	return reverseMapping
 }
 
-// Single-character keys are valid SDL key names.
-// Prefer bare key when it has a lower scancode.
-for (const [ value, key ] of Object.entries(reverseMapping)) {
-	if (!isCharacter(value)) { continue }
+let reverseMapping = null
 
-	const valueScancode = Bindings.keyboard_getScancode(value)
-	if (valueScancode === null) { continue }
-
-	const keyScancode = Bindings.keyboard_getScancode(key)
-	if (keyScancode === null || valueScancode < keyScancode) {
-		delete reverseMapping[value]
-	}
+const getReverseMapping = () => {
+	reverseMapping ??= buildReverseMapping()
+	return reverseMapping
 }
+
+const invalidateReverseMapping = () => { reverseMapping = null }
 
 module.exports = {
 	mapping,
-	reverseMapping,
+	getReverseMapping,
+	invalidateReverseMapping,
 	isCharacter,
 }

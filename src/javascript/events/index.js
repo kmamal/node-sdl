@@ -4,6 +4,7 @@ const Bindings = require('../bindings')
 const { keyboard: keyboardModule } = require('../keyboard')
 const { clipboard: clipboardModule } = require('../clipboard')
 const { tryEmit, tryCall } = require('./try')
+const { invalidateReverseMapping } = require('../keyboard/key-mapping')
 const {
 	handleDisplayEvent,
 	handleWindowEvent,
@@ -34,12 +35,17 @@ const handleChangeEvent = ({ type }) => {
 
 const emitTo = (emitter) => (event) => { tryEmit(emitter, event.type, event) }
 
+const handleKeyboardEvent = (event) => {
+	if (event.type === 'keymapChange') { invalidateReverseMapping() }
+	tryEmit(keyboardModule, event.type, event)
+}
+
 const handlers = {
 	app: handleAppEvent,
 	change: handleChangeEvent,
 	video: handleDisplayEvent,
 	window: handleWindowEvent,
-	keyboard: emitTo(keyboardModule),
+	keyboard: handleKeyboardEvent,
 	joystickDevice: handleJoystickDeviceEvent,
 	joystick: handleJoystickEvent,
 	gamepadDevice: handleGamepadDeviceEvent,
