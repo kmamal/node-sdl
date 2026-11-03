@@ -505,17 +505,8 @@ _packEvent (const SDL_Event &event, Packing &packed)
 
 		case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
 			packed.setTarget(events::targets::GAMEPAD);
+			packed.setTargetId(event.gaxis.which);
 			packed.setType(events::types::AXIS_MOTION);
-
-			JoysticksLock joysticks_lock;
-			SDL_JoystickID gamepad_id = event.gaxis.which;
-			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
-			if (gamepad == nullptr) {
-				SDL_ClearError();
-				return false;
-			}
-
-			packed.setTargetId(gamepad_id);
 
 			SDL_GamepadAxis axis = (SDL_GamepadAxis) event.gaxis.axis;
 			auto axis_entry = gamepad::axes.find(axis);
