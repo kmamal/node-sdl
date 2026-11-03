@@ -3143,6 +3143,7 @@ The number of bytes of recorded audio that wait on the stream for you to read.
 - Returns: `<number>` The actual number of bytes read.
 
 Takes the recorded audio data that waits on the stream and writes it to the provided buffer.
+Only whole sample frames are read, so if `bytes` is not a multiple of `channels * bytesPerSample` it is rounded down to one, and the return value is always a multiple of it.
 
 ## sdl.clipboard
 

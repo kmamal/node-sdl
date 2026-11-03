@@ -101,7 +101,7 @@ Sensors:
 
 Audio:
 
-- `putData()` and `getData()` accept empty buffers as no-ops, and reject a `bytes` count that isn't a whole number of sample frames with a validation error.
+- `putData()` and `getData()` accept empty buffers as no-ops. `putData()` rejects a `bytes` count that isn't a whole number of sample frames with a validation error.
 - `buffered` values larger than `32768` are rejected instead of silently truncated, and the buffer size the driver actually uses is reported on the stream's device.
 - `playbackStream.queued` no longer reports negative values for queues over 2 GiB.
 - `stream.playing` is `false` once the stream is closed.
