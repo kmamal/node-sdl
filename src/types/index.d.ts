@@ -1197,6 +1197,7 @@ export namespace Sdl {
 			| 'nintendoSwitchJoyconRight'
 			| 'nintendoSwitchJoyconPair'
 			| 'gamecube'
+			| 'steam'
 
 		export type Axis
 			= 'leftStickX'

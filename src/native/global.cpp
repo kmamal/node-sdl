@@ -258,6 +258,7 @@ _setTables ()
 	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR] = "nintendoSwitchJoyconPair";
 	gamepad::types[SDL_GAMEPAD_TYPE_GAMECUBE] = "gamecube";
 
+	gamepad::types[SDL_GAMEPAD_TYPE_STEAM] = "steam";
 	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTX] = "leftStickX";
 	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTY] = "leftStickY";
 	gamepad::axes[SDL_GAMEPAD_AXIS_RIGHTX] = "rightStickX";

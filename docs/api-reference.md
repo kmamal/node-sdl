@@ -2193,6 +2193,7 @@ Possible values for `type` are `null` if it is unknown, or one of:
 | `'nintendoSwitchJoyconRight'` | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT |
 | `'nintendoSwitchJoyconPair'`  | SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR  |
 | `'gamecube'`                  | SDL_GAMEPAD_TYPE_GAMECUBE                     |
+| `'steam'`                     | SDL_GAMEPAD_TYPE_STEAM                        |
 
 Sample output:
 
