@@ -17,6 +17,7 @@ static void _notifyJs (Napi::Env env, Napi::Function callback, StreamState *stat
 using NotifyFunction = Napi::TypedThreadSafeFunction<StreamState, std::nullptr_t, _notifyJs>;
 
 struct StreamState {
+	std::atomic<bool> closed { false };
 	std::atomic<bool> notify { false };
 	std::atomic<bool> pending { false };
 	std::atomic<uint32_t> underruns { 0 };
@@ -37,10 +38,11 @@ static std::map<SDL_AudioDeviceID, OpenStream> open_streams;
 static void
 _notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::nullptr_t *)
 {
-	state->pending.store(false, std::memory_order_release);
+	state->pending.exchange(false, std::memory_order_acq_rel);
 	uint32_t underruns = state->underruns.exchange(0, std::memory_order_relaxed);
 	uint32_t missing = state->missing.exchange(0, std::memory_order_relaxed);
 	if (env == nullptr || callback.IsEmpty()) { return; }
+	if (state->closed.load(std::memory_order_acquire)) { return; }
 	callback.Call({ Napi::Number::New(env, underruns), Napi::Number::New(env, missing) });
 }
 
@@ -117,6 +119,7 @@ static void
 _destroy (SDL_AudioDeviceID audio_id, OpenStream &entry, bool same_env)
 {
 	_unbind(entry);
+	entry.state->closed.store(true, std::memory_order_release);
 	SDL_DestroyAudioStream(entry.stream);
 	if (same_env) { napi_remove_env_cleanup_hook(entry.env, _envCleanup, (void *) (uintptr_t) audio_id); }
 	entry.state->tsfn.Release();
