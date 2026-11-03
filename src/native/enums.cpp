@@ -252,6 +252,7 @@ enums::get(const Napi::CallbackInfo &info)
 	scancodes.Set("CLEARAGAIN", (int) SDL_SCANCODE_CLEARAGAIN);
 	scancodes.Set("CRSEL", (int) SDL_SCANCODE_CRSEL);
 	scancodes.Set("EXSEL", (int) SDL_SCANCODE_EXSEL);
+	scancodes.Set("FRONT", (int) SDL_SCANCODE_FRONT);
 	scancodes.Set("KP_00", (int) SDL_SCANCODE_KP_00);
 	scancodes.Set("KP_000", (int) SDL_SCANCODE_KP_000);
 	scancodes.Set("THOUSANDSSEPARATOR", (int) SDL_SCANCODE_THOUSANDSSEPARATOR);

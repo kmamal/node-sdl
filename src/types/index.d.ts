@@ -891,6 +891,7 @@ export namespace Sdl {
 			| 'CLEARAGAIN'
 			| 'CRSEL'
 			| 'EXSEL'
+			| 'FRONT'
 			| 'KP_00'
 			| 'KP_000'
 			| 'THOUSANDSSEPARATOR'
