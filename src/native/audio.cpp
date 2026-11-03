@@ -78,6 +78,21 @@ _onPut (void *userdata, SDL_AudioStream *, int, int)
 
 static void
 _unbind (OpenStream &entry)
+static Napi::Error
+_sdlError (Napi::Env &env, const std::string &call)
+{
+	std::ostringstream message;
+	message << call << " error: " << SDL_GetError();
+	SDL_ClearError();
+	return Napi::Error::New(env, message.str());
+}
+
+static Napi::Error
+_sdlError (Napi::Env &env, const char *function, SDL_AudioDeviceID audio_id)
+{
+	return _sdlError(env, std::string(function) + "(" + std::to_string(audio_id) + ")");
+}
+
 {
 	if (entry.is_recording) { SDL_SetAudioStreamPutCallback(entry.stream, nullptr, nullptr); }
 	else { SDL_SetAudioStreamGetCallback(entry.stream, nullptr, nullptr); }
@@ -222,10 +237,7 @@ audio::_getDevices(Napi::Env &env, bool is_recording)
 		? SDL_GetAudioRecordingDevices(&num_devices)
 		: SDL_GetAudioPlaybackDevices(&num_devices);
 	if (device_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetAudio" << (is_recording ? "Recording" : "Playback") << "Devices() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw _sdlError(env, std::string("SDL_GetAudio") + (is_recording ? "Recording" : "Playback") + "Devices()");
 	}
 
 	Napi::Array devices = Napi::Array::New(env);
@@ -314,20 +326,13 @@ audio::open (const Napi::CallbackInfo &info)
 
 	SDL_AudioStream *stream = SDL_OpenAudioDeviceStream(device_id, &desired, nullptr, nullptr);
 	SDL_ResetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES);
-	if (stream == nullptr) {
-		std::ostringstream message;
-		message << "SDL_OpenAudioDeviceStream() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (stream == nullptr) { throw _sdlError(env, "SDL_OpenAudioDeviceStream()"); }
 
 	SDL_AudioDeviceID audio_id = SDL_GetAudioStreamDevice(stream);
 	if (audio_id == 0) {
-		std::ostringstream message;
-		message << "SDL_GetAudioStreamDevice() error: " << SDL_GetError();
-		SDL_ClearError();
+		Napi::Error error = _sdlError(env, "SDL_GetAudioStreamDevice()");
 		SDL_DestroyAudioStream(stream);
-		throw Napi::Error::New(env, message.str());
+		throw error;
 	}
 
 	StreamState *state = new StreamState();
@@ -353,12 +358,10 @@ audio::open (const Napi::CallbackInfo &info)
 		? SDL_SetAudioStreamPutCallback(stream, _onPut, state)
 		: SDL_SetAudioStreamGetCallback(stream, _onGet, state);
 	if (!bound) {
-		std::ostringstream message;
-		message << "SDL_SetAudioStream" << (is_recording ? "Put" : "Get") << "Callback(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
+		Napi::Error error = _sdlError(env, is_recording ? "SDL_SetAudioStreamPutCallback" : "SDL_SetAudioStreamGetCallback", audio_id);
 		_destroy(audio_id, entry, true);
 		open_streams.erase(audio_id);
-		throw Napi::Error::New(env, message.str());
+		throw error;
 	}
 
 	try {
@@ -381,7 +384,7 @@ audio::play (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	bool should_play = info[1].As<Napi::Boolean>().Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
@@ -390,10 +393,7 @@ audio::play (const Napi::CallbackInfo &info)
 		? SDL_ResumeAudioStreamDevice(stream)
 		: SDL_PauseAudioStreamDevice(stream);
 	if (!success) {
-		std::ostringstream message;
-		message << (should_play ? "SDL_ResumeAudioStreamDevice(" : "SDL_PauseAudioStreamDevice(") << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw _sdlError(env, should_play ? "SDL_ResumeAudioStreamDevice" : "SDL_PauseAudioStreamDevice", audio_id);
 	}
 
 	return env.Undefined();
@@ -407,17 +407,12 @@ audio::getQueued (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
 	int size = SDL_GetAudioStreamQueued(stream);
-	if (size == -1) {
-		std::ostringstream message;
-		message << "SDL_GetAudioStreamQueued(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (size == -1) { throw _sdlError(env, "SDL_GetAudioStreamQueued", audio_id); }
 
 	return Napi::Number::New(env, size);
 }
@@ -430,16 +425,11 @@ audio::flush (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
-	if (!SDL_FlushAudioStream(stream)) {
-		std::ostringstream message;
-		message << "SDL_FlushAudioStream(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (!SDL_FlushAudioStream(stream)) { throw _sdlError(env, "SDL_FlushAudioStream", audio_id); }
 
 	return env.Undefined();
 }
@@ -452,17 +442,12 @@ audio::getAvailable (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
 	int size = SDL_GetAudioStreamAvailable(stream);
-	if (size == -1) {
-		std::ostringstream message;
-		message << "SDL_GetAudioStreamAvailable(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (size == -1) { throw _sdlError(env, "SDL_GetAudioStreamAvailable", audio_id); }
 
 	return Napi::Number::New(env, size);
 }
@@ -475,16 +460,11 @@ audio::clear (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
-	if (!SDL_ClearAudioStream(stream)) {
-		std::ostringstream message;
-		message << "SDL_ClearAudioStream(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (!SDL_ClearAudioStream(stream)) { throw _sdlError(env, "SDL_ClearAudioStream", audio_id); }
 
 	return env.Undefined();
 }
@@ -497,18 +477,13 @@ audio::putData (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	void *src = info[1].As<Napi::Buffer<char>>().Data();
 	int size = info[2].As<Napi::Number>().Int32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
-	if (!SDL_PutAudioStreamData(stream, src, size)) {
-		std::ostringstream message;
-		message << "SDL_PutAudioStreamData(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (!SDL_PutAudioStreamData(stream, src, size)) { throw _sdlError(env, "SDL_PutAudioStreamData", audio_id); }
 
 	return env.Undefined();
 }
@@ -521,19 +496,14 @@ audio::getData (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	void *dst = info[1].As<Napi::Buffer<char>>().Data();
 	int size = info[2].As<Napi::Number>().Int32Value();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
 	int num = SDL_GetAudioStreamData(stream, dst, size);
-	if (num == -1) {
-		std::ostringstream message;
-		message << "SDL_GetAudioStreamData(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (num == -1) { throw _sdlError(env, "SDL_GetAudioStreamData", audio_id); }
 
 	return Napi::Number::New(env, num);
 }
@@ -546,7 +516,7 @@ audio::close (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	Napi::Object device = info[1].As<Napi::Object>();
 
 	OpenStream &entry = _getEntry(env, audio_id);
@@ -567,7 +537,7 @@ audio::setNotify (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	bool notify = info[1].As<Napi::Boolean>().Value();
 
 	StreamState *state = _getEntry(env, audio_id).state;
@@ -588,17 +558,12 @@ audio::setGain (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	float gain = info[1].As<Napi::Number>().FloatValue();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
-	if (!SDL_SetAudioStreamGain(stream, gain)) {
-		std::ostringstream message;
-		message << "SDL_SetAudioStreamGain(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (!SDL_SetAudioStreamGain(stream, gain)) { throw _sdlError(env, "SDL_SetAudioStreamGain", audio_id); }
 
 	return env.Undefined();
 }
@@ -611,17 +576,12 @@ audio::setFrequencyRatio (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int audio_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
 	float ratio = info[1].As<Napi::Number>().FloatValue();
 
 	SDL_AudioStream *stream = _getStream(env, audio_id);
 
-	if (!SDL_SetAudioStreamFrequencyRatio(stream, ratio)) {
-		std::ostringstream message;
-		message << "SDL_SetAudioStreamFrequencyRatio(" << audio_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
+	if (!SDL_SetAudioStreamFrequencyRatio(stream, ratio)) { throw _sdlError(env, "SDL_SetAudioStreamFrequencyRatio", audio_id); }
 
 	return env.Undefined();
 }

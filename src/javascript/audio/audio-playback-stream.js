@@ -12,13 +12,13 @@ class AudioPlaybackStream extends AudioStream {
 
 	get queued () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		return Bindings.audio_getQueued(this._id)
 	}
 
 	putData (buffer, _bytes = null) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		validateBuffer('buffer', buffer)
 		const bytes = _bytes ?? buffer.length

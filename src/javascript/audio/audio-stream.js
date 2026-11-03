@@ -102,6 +102,12 @@ class AudioStream extends EventsViaPoll {
 	}
 
 	get id () { return this._id }
+	_makeClosedError () { return Object.assign(new Error("stream is closed"), { id: this._id }) }
+
+	_assertOpen () {
+		if (this._closed) { throw this._makeClosedError() }
+	}
+
 	get device () { return this._device }
 
 	get channels () { return this._channels }
@@ -125,7 +131,7 @@ class AudioStream extends EventsViaPoll {
 
 	get gain () { return this._gain }
 	setGain (gain) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		validateNonNegativeNumber('gain', gain)
 
@@ -136,7 +142,7 @@ class AudioStream extends EventsViaPoll {
 
 	get frequencyRatio () { return this._frequencyRatio }
 	setFrequencyRatio (frequencyRatio) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		validateNumberRange('frequencyRatio', frequencyRatio, 0.01, 100)
 
@@ -147,7 +153,7 @@ class AudioStream extends EventsViaPoll {
 
 	get playing () { return this._playing }
 	play (play = true) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		if (typeof play !== 'boolean') { throw Object.assign(new Error("play must be a boolean"), { play }) }
 
@@ -161,14 +167,14 @@ class AudioStream extends EventsViaPoll {
 	}
 
 	clear () {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		Bindings.audio_clear(this._id)
 	}
 
 	get closed () { return this._closed }
 	close () {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		this._closed = true
 		this._playing = false
@@ -180,7 +186,7 @@ class AudioStream extends EventsViaPoll {
 		catch (_) { }
 
 		// We might be inside an event listener
-		this._retire(() => Object.assign(new Error("stream is closed"), { id: this._id }))
+		this._retire(() => this._makeClosedError())
 
 		Globals.events.withoutPolling(() => {
 			try { this.emit('close', { type: 'close' }) }
