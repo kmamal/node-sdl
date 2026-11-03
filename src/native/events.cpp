@@ -542,6 +542,10 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.setTarget(events::targets::SENSOR);
 			packed.setTargetId(event.sensor.which);
 			packed.setType(events::types::UPDATE);
+			packed.set("x", event.sensor.data[0]);
+			packed.set("y", event.sensor.data[1]);
+			packed.set("z", event.sensor.data[2]);
+			packed.set("timestamp", (uint64_t) event.sensor.sensor_timestamp);
 			break;
 		}
 

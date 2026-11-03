@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gamepad buttons `misc1` and `touchpad` are now reported instead of arriving with `button: null`.
 - Pixel-format helpers similar to audio format helpers.
 - More scancodes and keys
+- Sensor `'update'` events carry the reading (`x`, `y`, `z`) and the sensor's `timestamp`, so readings queued between polls are no longer lost.
 
 ### Fixed
 

@@ -318,6 +318,10 @@ export namespace Events {
 
 		export interface Update extends SensorEvent {
 			readonly type: 'update'
+			readonly x: number
+			readonly y: number
+			readonly z: number
+			readonly timestamp: bigint
 		}
 
 		export interface Close extends SensorEvent { readonly type: 'close' }

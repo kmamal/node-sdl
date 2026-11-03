@@ -2521,8 +2521,12 @@ Instead, [`sdl.sensor.openDevice()`](#sdlsensoropendevicedevice) returns objects
 
 ### Event: 'update'
 
+- `x: <number>` The reading along the x axis at the time of the event.
+- `y: <number>` The reading along the y axis at the time of the event.
+- `z: <number>` The reading along the z axis at the time of the event.
+- `timestamp: <bigint>` The time of the reading in nanoseconds, as reported by the sensor, or `0n` if the sensor doesn't report one.
+
 Fired when the sensor's data changes.
-Read the new data from [`sensorInstance.data`](#sensorinstancedata).
 
 <a id="sensor-instance-event-close"></a>
 
