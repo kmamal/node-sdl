@@ -50,6 +50,7 @@ const handleEvent = (event) => {
 			const device = Globals.audioStreams.get(deviceId)?.device
 				?? list.find((a) => a.id === deviceId)
 			if (device) { Object.assign(device, format) }
+			Object.assign(list[0], defaultDevice)
 		} return
 
 		// No default

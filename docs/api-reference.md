@@ -2816,7 +2816,7 @@ const playbackStream = sdl.audio.playback.openDevice()
 The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
 For a device without open streams they show the format the device prefers, which is what SDL opens it with by default, so you can pick a stream `frequency` that matches the hardware and SDL doesn't have to resample.
 For a device with open streams they show the format the device is running at.
-The library updates a device object when a stream opens or closes on that same object, and when SDL reports that the device's format changed.
+
 The device counts `buffered` in frames at its `frequency`, so `buffered` adds a delay of `buffered / frequency` seconds.
 
 ### sdl.audio.playback.openDevice([device[, options]])
@@ -2912,7 +2912,7 @@ const recordingStream = sdl.audio.recording.openDevice()
 The `format`, `channels`, `frequency`, and `buffered` fields describe the device itself, which may differ from the streams opened on it: SDL converts between each stream's format and the device's.
 For a device without open streams they show the format the device prefers, which is what SDL opens it with by default, so you can pick a stream `frequency` that matches the hardware and SDL doesn't have to resample.
 For a device with open streams they show the format the device is running at.
-The library updates a device object when a stream opens or closes on that same object, and when SDL reports that the device's format changed.
+
 The device counts `buffered` in frames at its `frequency`, so `buffered` adds a delay of `buffered / frequency` seconds.
 
 ### sdl.audio.recording.openDevice([device[, options]])

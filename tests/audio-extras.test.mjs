@@ -1,5 +1,6 @@
 import T from '@kmamal/testing'
 import sdl from '../src/javascript/index.js'
+import Bindings from '../src/javascript/bindings.js'
 
 const hasAudio = sdl.audio.isAvailable()
 const hasPlayback = hasAudio && sdl.audio.playback.devices.length > 1
@@ -68,6 +69,16 @@ T.test("sdl::audio::device formats", (t) => {
 	if (!hasAudio) { return }
 	for (const device of sdl.audio.playback.devices) { checkFormat(t, device) }
 	for (const device of sdl.audio.recording.devices) { checkFormat(t, device) }
+})
+
+T.test("sdl::audio::format change refreshes the default device", (t) => {
+	if (!hasPlayback) { return }
+	const [ defaultDevice, real ] = sdl.audio.playback.devices
+	const { frequency } = defaultDevice
+	defaultDevice.frequency = -1
+	Bindings.testing_pushAudioDeviceEvent('format', real.id, false)
+	t.equal(sdl.audio.playback.devices[0], defaultDevice)
+	t.equal(defaultDevice.frequency, frequency)
 })
 
 T.test("sdl::audio::gain and frequencyRatio", (t) => {

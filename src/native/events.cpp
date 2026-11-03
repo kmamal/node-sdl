@@ -572,6 +572,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.set("audioDeviceType", packed::Value::ref(audio::device_types.at(event.adevice.recording)));
 			packed.set("deviceId", event.adevice.which);
 			packed.set("format", audio::_getFormat(event.adevice.which));
+			packed.set("defaultDevice", audio::_getDefaultDevice(event.adevice.recording));
 			break;
 		}
 
