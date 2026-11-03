@@ -21,13 +21,16 @@ process.on('beforeExit', (code) => {
 		if (!stream.playing) { continue }
 
 		let queued = null
-		try { queued = Bindings.audio_getQueued(stream.id) }
+		try {
+			Bindings.audio_flush(stream.id)
+			queued = Bindings.audio_getQueued(stream.id)
+		}
 		catch (_) { }
 		const { device } = stream
 		if (!queued || !device.frequency) { continue }
 
-		const { channels, frequency, bytesPerSample } = stream
-		const bytesPerSecond = channels * frequency * bytesPerSample
+		const { channels, frequency, bytesPerSample, frequencyRatio } = stream
+		const bytesPerSecond = channels * frequency * bytesPerSample * frequencyRatio
 		duration = Math.max(duration, queued / bytesPerSecond + device.buffered / device.frequency)
 	}
 

@@ -423,6 +423,28 @@ audio::getQueued (const Napi::CallbackInfo &info)
 }
 
 Napi::Value
+audio::flush (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
+	global::assertReady(env);
+
+	int audio_id = info[0].As<Napi::Number>().Int32Value();
+
+	SDL_AudioStream *stream = _getStream(env, audio_id);
+
+	if (!SDL_FlushAudioStream(stream)) {
+		std::ostringstream message;
+		message << "SDL_FlushAudioStream(" << audio_id << ") error: " << SDL_GetError();
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
+	return env.Undefined();
+}
+
+Napi::Value
 audio::getAvailable (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();

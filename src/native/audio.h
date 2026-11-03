@@ -24,6 +24,7 @@ namespace audio {
 	Napi::Value open(const Napi::CallbackInfo &info);
 	Napi::Value play(const Napi::CallbackInfo &info);
 	Napi::Value getQueued(const Napi::CallbackInfo &info);
+	Napi::Value flush(const Napi::CallbackInfo &info);
 	Napi::Value getAvailable(const Napi::CallbackInfo &info);
 	Napi::Value putData(const Napi::CallbackInfo &info);
 	Napi::Value getData(const Napi::CallbackInfo &info);

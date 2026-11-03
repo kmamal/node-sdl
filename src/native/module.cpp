@@ -97,6 +97,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("audio_open", Napi::Function::New<audio::open>(env));
 	exports.Set("audio_play", Napi::Function::New<audio::play>(env));
 	exports.Set("audio_getQueued", Napi::Function::New<audio::getQueued>(env));
+	exports.Set("audio_flush", Napi::Function::New<audio::flush>(env));
 	exports.Set("audio_getAvailable", Napi::Function::New<audio::getAvailable>(env));
 	exports.Set("audio_putData", Napi::Function::New<audio::putData>(env));
 	exports.Set("audio_getData", Napi::Function::New<audio::getData>(env));
