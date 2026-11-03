@@ -46,7 +46,7 @@ gamepad::getState (SDL_Gamepad *gamepad, packed::Value &dst)
 		SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
 		SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
 	}) {
-		axes_obj.set(gamepad::axes[axis], gamepad::mapAxis(gamepad, axis));
+		axes_obj.set(gamepad::axes.at(axis), gamepad::mapAxis(gamepad, axis));
 	}
 
 	packed::Value buttons_obj = packed::Value::object();
@@ -59,7 +59,7 @@ gamepad::getState (SDL_Gamepad *gamepad, packed::Value &dst)
 		auto label_entry = gamepad::button_labels.find(SDL_GetGamepadButtonLabel(gamepad, button));
 		packed::Value label;
 		if (label_entry != gamepad::button_labels.end()) { label = packed::Value::ref(label_entry->second); }
-		button_labels_obj.set(gamepad::buttons[button], std::move(label));
+		button_labels_obj.set(gamepad::buttons.at(button), std::move(label));
 	}
 
 	dst.set("axes", std::move(axes_obj));

@@ -553,7 +553,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 
 			packed.setTarget(events::targets::AUDIO_DEVICE);
 			packed.setType(events::types::DEVICE_ADD);
-			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[is_recording]));
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types.at(is_recording)));
 			packed.set("device", std::move(device));
 			packed.set("defaultDevice", audio::_getDefaultDevice(is_recording));
 			break;
@@ -561,7 +561,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 		case SDL_EVENT_AUDIO_DEVICE_REMOVED: {
 			packed.setTarget(events::targets::AUDIO_DEVICE);
 			packed.setType(events::types::DEVICE_REMOVE);
-			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[event.adevice.recording]));
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types.at(event.adevice.recording)));
 			packed.set("deviceId", event.adevice.which);
 			packed.set("defaultDevice", audio::_getDefaultDevice(event.adevice.recording));
 			break;
@@ -569,7 +569,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 		case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: {
 			packed.setTarget(events::targets::AUDIO_DEVICE);
 			packed.setType(events::types::DEVICE_FORMAT_CHANGE);
-			packed.set("audioDeviceType", packed::Value::ref(audio::device_types[event.adevice.recording]));
+			packed.set("audioDeviceType", packed::Value::ref(audio::device_types.at(event.adevice.recording)));
 			packed.set("deviceId", event.adevice.which);
 			packed.set("format", audio::_getFormat(event.adevice.which));
 			break;
