@@ -419,8 +419,8 @@ window::setSize (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, message.str());
 		}
 
-		width = std::clamp<long>(std::lround(width / (double) density), 1, INT32_MAX);
-		height = std::clamp<long>(std::lround(height / (double) density), 1, INT32_MAX);
+		width = (int) std::clamp<long long>(std::llround(width / (double) density), 1, INT32_MAX);
+		height = (int) std::clamp<long long>(std::llround(height / (double) density), 1, INT32_MAX);
 	}
 
 	if (!SDL_SetWindowSize(window, width, height)) {
