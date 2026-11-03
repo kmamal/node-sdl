@@ -149,6 +149,8 @@ video::convert(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+
 	int src_w = info[0].As<Napi::Number>().Int32Value();
 	int src_h = info[1].As<Napi::Number>().Int32Value();
 	SDL_PixelFormat src_format = (SDL_PixelFormat) info[2].As<Napi::Number>().Int32Value();

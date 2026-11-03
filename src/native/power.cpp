@@ -1,4 +1,5 @@
 #include "power.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <map>
 
@@ -10,6 +11,8 @@ Napi::Value
 power::getInfo (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
+
+	std::lock_guard<std::mutex> guard(global::lock());
 
 	int _seconds, _percent;
 	SDL_PowerState _state = SDL_GetPowerInfo(&_seconds, &_percent);

@@ -605,6 +605,8 @@ audio::convert (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::mutex> guard(global::lock());
+
 	SDL_AudioSpec src_spec;
 	src_spec.format = (SDL_AudioFormat) info[0].As<Napi::Number>().Int32Value();
 	src_spec.channels = info[1].As<Napi::Number>().Int32Value();
