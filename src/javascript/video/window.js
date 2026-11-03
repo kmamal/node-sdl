@@ -141,8 +141,8 @@ class Window extends EventsViaPoll {
 		this._opengl = opengl
 		this._webgpu = webgpu
 
-		this._minimized = false
-		this._maximized = false
+		this._minimized = result.minimized
+		this._maximized = result.maximized
 		this._relativeMouseMode = false
 		this._destroyed = false
 
