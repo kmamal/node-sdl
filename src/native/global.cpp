@@ -76,6 +76,7 @@ watchEvents (void *, SDL_Event *event)
 		&& (false
 			|| event->type == SDL_EVENT_WINDOW_MOVED
 			|| event->type == SDL_EVENT_WINDOW_RESIZED
+			|| (event->type == SDL_EVENT_WINDOW_EXPOSED && event->window.data1 == 1)
 		)
 	) {
 		events::dispatchEventFromWatch(*event);
@@ -257,8 +258,8 @@ _setTables ()
 	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT] = "nintendoSwitchJoyconRight";
 	gamepad::types[SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR] = "nintendoSwitchJoyconPair";
 	gamepad::types[SDL_GAMEPAD_TYPE_GAMECUBE] = "gamecube";
-
 	gamepad::types[SDL_GAMEPAD_TYPE_STEAM] = "steam";
+
 	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTX] = "leftStickX";
 	gamepad::axes[SDL_GAMEPAD_AXIS_LEFTY] = "leftStickY";
 	gamepad::axes[SDL_GAMEPAD_AXIS_RIGHTX] = "rightStickX";
