@@ -291,7 +291,6 @@ class Window extends EventsViaPoll {
 		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
 
 		show ? Bindings.window_show(this._id) : Bindings.window_hide(this._id)
-		this._visible = show
 	}
 
 	hide () { this.show(false) }
