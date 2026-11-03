@@ -27,6 +27,7 @@ struct StreamState {
 struct OpenStream {
 	SDL_AudioStream *stream;
 	napi_env env;
+	SDL_AudioDeviceID device_id;
 	bool is_recording;
 	StreamState *state;
 };
@@ -342,7 +343,7 @@ audio::open (const Napi::CallbackInfo &info)
 	state->tsfn.Unref(env);
 
 	napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id);
-	OpenStream &entry = open_streams[audio_id] = { stream, env, is_recording, state };
+	OpenStream &entry = open_streams[audio_id] = { stream, env, device_id, is_recording, state };
 
 	bool bound = is_recording
 		? SDL_SetAudioStreamPutCallback(stream, _onPut, state)
@@ -521,14 +522,13 @@ audio::close (const Napi::CallbackInfo &info)
 
 	int audio_id = info[0].As<Napi::Number>().Int32Value();
 	Napi::Object device = info[1].As<Napi::Object>();
-	bool has_id = !info[2].IsNull();
-	bool is_recording = info[3].As<Napi::Boolean>().Value();
 
 	OpenStream &entry = _getEntry(env, audio_id);
+	SDL_AudioDeviceID device_id = entry.device_id;
 	_destroy(audio_id, entry, true);
 	open_streams.erase(audio_id);
 
-	_setFormat(device, has_id ? info[2].As<Napi::Number>().Uint32Value() : _defaultId(is_recording));
+	_setFormat(device, device_id);
 
 	return env.Undefined();
 }

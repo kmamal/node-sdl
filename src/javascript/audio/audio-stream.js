@@ -63,7 +63,7 @@ class AudioStream extends EventsViaPoll {
 			if (frequencyRatio !== 1) { Bindings.audio_setFrequencyRatio(id, frequencyRatio) }
 		}
 		catch (error) {
-			Bindings.audio_close(id, device, device.id, recording)
+			Bindings.audio_close(id, device)
 			throw error
 		}
 
@@ -176,7 +176,7 @@ class AudioStream extends EventsViaPoll {
 		Globals.audioStreams.delete(this._id)
 
 		// This call could throw if the device is gone
-		try { Bindings.audio_close(this._id, this._device, this._device.id, this._recording) }
+		try { Bindings.audio_close(this._id, this._device) }
 		catch (_) { }
 
 		// We might be inside an event listener
