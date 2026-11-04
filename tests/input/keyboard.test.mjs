@@ -1,5 +1,5 @@
 import T from '@kmamal/testing'
-import sdl from '../src/javascript/index.js'
+import sdl from '../../src/javascript/index.js'
 
 T.test("sdl::keyboard", (t) => {
 	const scancodes1 = Object.entries(sdl.keyboard.SCANCODE).map(([ , v ]) => v)

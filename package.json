@@ -54,6 +54,7 @@
   "gypfile": true,
   "scripts": {
     "test": "npx @kmamal/testing",
+    "test:stress": "npx @kmamal/testing 'tests/stress/*.stress.mjs'",
     "install": "cd scripts && node install.mjs",
     "download-release": "cd scripts && node download-release.mjs",
     "download-sdl": "cd scripts && node download-sdl.mjs",
@@ -63,7 +64,6 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "devDependencies": {
-    "@kmamal/evdev": "0.0.8",
     "@kmamal/testing": "0.0.34",
     "@types/node": "26.6.5",
     "node-addon-api": "8.9.2",
@@ -75,9 +75,6 @@
       "repo": "build-sdl",
       "version": "3.4.18"
     }
-  },
-  "allowScripts": {
-    "@kmamal/evdev": true
   },
   "dependencies": {
     "modern-tar": "0.8.6"

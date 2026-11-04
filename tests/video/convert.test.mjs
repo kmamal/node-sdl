@@ -1,5 +1,5 @@
 import T from '@kmamal/testing'
-import sdl from '../src/javascript/index.js'
+import sdl from '../../src/javascript/index.js'
 
 T.test("sdl::video::convert", (t) => {
 	const width = 3

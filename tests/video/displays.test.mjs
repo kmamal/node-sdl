@@ -1,11 +1,30 @@
 import T from '@kmamal/testing'
-import sdl from '../src/javascript/index.js'
+import sdl from '../../src/javascript/index.js'
+import { skip } from '../helpers/env.mjs'
 
-T.test("sdl::video", (t) => {
+T.test("sdl::video::drivers", (t) => {
+	let drivers
+	try { ({ drivers } = sdl.video) }
+	catch {
+		t.equal(sdl.video.isAvailable(), false)
+		return
+	}
+	t.equal(sdl.video.isAvailable(), true)
+
+	t.ok(Array.isArray(drivers.all))
+	for (const driver of drivers.all) {
+		t.equal(typeof driver, 'string')
+		t.ok(driver.length > 0)
+	}
+	t.equal(typeof drivers.current, 'string')
+	t.ok(drivers.all.includes(drivers.current))
+})
+
+T.test("sdl::video::displays", (t) => {
 	t.ok(Array.isArray(sdl.video.displays))
 
 	if (sdl.video.displays.length === 0) {
-		console.warn("NO DISPLAYS FOUND")
+		skip("no displays found")
 		return
 	}
 

@@ -1,5 +1,6 @@
 import T from '@kmamal/testing'
-import sdl from '../src/javascript/index.js'
+import sdl from '../../src/javascript/index.js'
+import { sleep } from '../helpers/wait.mjs'
 
 T.test("sdl::mouse", async (t) => {
 	const buttons = Object.entries(sdl.mouse.BUTTON).map(([ , v ]) => v)
@@ -39,19 +40,20 @@ T.test("sdl::mouse", async (t) => {
 
 
 	const window = sdl.video.createWindow()
-	window.focus()
+	try {
+		window.focus()
 
-	await new Promise((resolve) => { setTimeout(resolve, 0) })
+		await sleep(0)
 
-	t.equal(sdl.mouse.captured, false)
-	t.equal(typeof window.mouseCaptured, 'boolean')
-	sdl.mouse.capture()
-	t.equal(sdl.mouse.captured, true)
-	sdl.mouse.uncapture()
-	t.equal(sdl.mouse.captured, false)
-	sdl.mouse.capture(true)
-	sdl.mouse.capture(false)
-	if (!sdl.mouse.getButton(sdl.mouse.BUTTON.LEFT)) { t.equal(window.mouseCaptured, false) }
-
-	window.destroy()
+		t.equal(sdl.mouse.captured, false)
+		t.equal(typeof window.mouseCaptured, 'boolean')
+		sdl.mouse.capture()
+		t.equal(sdl.mouse.captured, true)
+		sdl.mouse.uncapture()
+		t.equal(sdl.mouse.captured, false)
+		sdl.mouse.capture(true)
+		sdl.mouse.capture(false)
+		if (!sdl.mouse.getButton(sdl.mouse.BUTTON.LEFT)) { t.equal(window.mouseCaptured, false) }
+	}
+	finally { window.destroy() }
 })
