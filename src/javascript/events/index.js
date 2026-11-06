@@ -11,6 +11,7 @@ const { audio: audioModule } = require('../audio')
 const { make: makeAudioDevice, update: updateAudioDevice } = require('../audio/device')
 const { clipboard: clipboardModule } = require('../clipboard')
 const { refreshDevices: refreshTouchDevices } = require('../touch/devices')
+const nodeTimers = require('timers');
 
 
 const tryEmit = (emitter, type, event) => {
@@ -499,18 +500,18 @@ const withoutPolling = (fn) => {
 let pollInterval = null
 
 const switchToPollingFast = () => {
-	clearInterval(pollInterval)
-	pollInterval = setInterval(poll, 0)
+	nodeTimers.clearInterval(pollInterval)
+	pollInterval = nodeTimers.setInterval(poll, 0)
 }
 
 const switchToPollingSlow = () => {
-	clearInterval(pollInterval)
-	pollInterval = setInterval(poll, 1e3)
+	nodeTimers.clearInterval(pollInterval)
+	pollInterval = nodeTimers.setInterval(poll, 1e3)
 	pollInterval.unref()
 }
 
 const stopPolling = () => {
-	clearInterval(pollInterval)
+	nodeTimers.clearInterval(pollInterval)
 	pollInterval = null
 }
 
