@@ -25,8 +25,8 @@ joystick::mapAxisValue (int value) {
 	return value / range;
 }
 
-static packed::Value
-_packDevice (SDL_JoystickID id)
+packed::Value
+joystick::_getDevice (SDL_JoystickID id)
 {
 	const char *_name = SDL_GetJoystickNameForID(id);
 	packed::Value name;
@@ -106,12 +106,6 @@ _packDevice (SDL_JoystickID id)
 	return device;
 }
 
-packed::Value
-joystick::_getDevice (SDL_JoystickID id)
-{
-	return _packDevice(id);
-}
-
 Napi::Array
 joystick::_getDevices (Napi::Env &env)
 {
@@ -128,7 +122,7 @@ joystick::_getDevices (Napi::Env &env)
 
 	try {
 		for (int i = 0; i < num_devices; i++) {
-			devices.Set(i, _packDevice(joystick_ids[i]).toNapi(env));
+			devices.Set(i, joystick::_getDevice(joystick_ids[i]).toNapi(env));
 		}
 	}
 	catch (...) {

@@ -16,13 +16,7 @@ std::map<SDL_GamepadButtonLabel, std::string> gamepad::button_labels;
 
 double
 gamepad::mapAxis (SDL_Gamepad *gamepad, SDL_GamepadAxis axis) {
-	return mapAxisValue(SDL_GetGamepadAxis(gamepad, axis));
-}
-
-double
-gamepad::mapAxisValue (int value) {
-	double range = value < 0 ? -SDL_JOYSTICK_AXIS_MIN : SDL_JOYSTICK_AXIS_MAX;
-	return value / range;
+	return joystick::mapAxisValue(SDL_GetGamepadAxis(gamepad, axis));
 }
 
 packed::Value

@@ -15,7 +15,6 @@ namespace gamepad {
 	extern std::map<SDL_GamepadButtonLabel, std::string> button_labels;
 
 	double mapAxis (SDL_Gamepad *gamepad, SDL_GamepadAxis axis);
-	double mapAxisValue (int value);
 	void getState (SDL_Gamepad *gamepad, packed::Value &dst);
 	packed::Value getSteamHandle(SDL_Gamepad *gamepad);
 

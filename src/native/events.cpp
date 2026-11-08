@@ -523,7 +523,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			auto axis_entry = gamepad::axes.find(axis);
 			if (axis_entry == gamepad::axes.end()) { return false; }
 			packed.set("axis", packed::Value::ref(axis_entry->second));
-			packed.set("value", gamepad::mapAxisValue(event.gaxis.value));
+			packed.set("value", joystick::mapAxisValue(event.gaxis.value));
 			break;
 		}
 		case SDL_EVENT_GAMEPAD_BUTTON_DOWN:

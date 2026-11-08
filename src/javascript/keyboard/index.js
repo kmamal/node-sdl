@@ -30,7 +30,7 @@ const keyboard = new class extends EventsViaPoll {
 		validateString('key', key)
 
 		Globals.events.poll()
-		const _key = isCharacter(key) ? key : (getReverseMapping()[key] ?? null)
+		const _key = isCharacter(key) ? key : getReverseMapping()[key] ?? null
 		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
 
 		const scancode = Bindings.keyboard_getScancode(_key)

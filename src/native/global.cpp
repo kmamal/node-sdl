@@ -497,7 +497,6 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 	else if (name == "audio") { flags = SDL_INIT_AUDIO; }
 	else if (name == "joystick") { flags = SDL_INIT_JOYSTICK; }
 	else if (name == "gamepad") { flags = SDL_INIT_GAMEPAD; }
-	else if (name == "haptic") { flags = SDL_INIT_HAPTIC; }
 	else if (name == "sensor") { flags = SDL_INIT_SENSOR; }
 	else {
 		std::ostringstream message;
