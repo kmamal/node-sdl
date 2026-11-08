@@ -27,8 +27,8 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 	if (dstSize > 2 ** 31 - 1) { throw Object.assign(new Error("converted data must be smaller than 2 GiB"), { size: dstSize }) }
 
 	if (dstData === undefined) {
+		if (srcData.length === 0) { return Buffer.alloc(0) }
 		const buffer = Buffer.alloc(dstSize)
-		if (srcData.length === 0) { return buffer }
 		const written = Bindings.audio_convert(src.format, src.channels, src.frequency, srcData, srcData.length, dst.format, dst.channels, dst.frequency, buffer)
 		return buffer.subarray(0, written)
 	}
