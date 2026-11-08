@@ -6,18 +6,26 @@ const validateVsync = (vsync) => {
 	if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
 }
 
+const validateStride = (name, stride, minStride, details) => {
+	validateInteger(name, stride)
+	if (stride > 2 ** 31 - 1) { throw Object.assign(new Error(`${name} must be a 32-bit integer`), details) }
+	if (stride < minStride) { throw Object.assign(new Error(`${name} is smaller than expected`), details) }
+}
+
+const validateImageBuffer = (name, buffer, minSize, details) => {
+	validateBuffer(name, buffer)
+	if (buffer.length < minSize) { throw Object.assign(new Error(`${name} is smaller than expected`), details) }
+}
+
 const validateImage = (width, height, stride, format, buffer, validateHelpers) => {
 	validatePositiveInt32('width', width)
 	validatePositiveInt32('height', height)
-	validateInteger('stride', stride)
 	validateString('format', format)
 	const helpers = VideoFormatHelpers[format]
 	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 	validateHelpers(helpers, format)
-	if (stride < helpers.minStride(width)) { throw Object.assign(new Error("stride is smaller than expected"), { stride, width, format }) }
-	if (stride > 2 ** 31 - 1) { throw Object.assign(new Error("stride must be a 32-bit integer"), { stride }) }
-	validateBuffer('buffer', buffer)
-	if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
+	validateStride('stride', stride, helpers.minStride(width), { stride, width, format })
+	validateImageBuffer('buffer', buffer, helpers.minBufferSize(stride, height), { buffer, stride, height, format })
 }
 
 const validateRenderableFormat = (helpers, format) => {
@@ -30,6 +38,8 @@ const validateRgbFormat = (helpers, format) => {
 
 module.exports = {
 	validateVsync,
+	validateStride,
+	validateImageBuffer,
 	validateImage,
 	validateRenderableFormat,
 	validateRgbFormat,

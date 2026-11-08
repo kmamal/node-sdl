@@ -1,7 +1,8 @@
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { VideoFormatHelpers } = require('./format-helpers')
-const { validateObject, validateString, validateBuffer, validateInteger, validatePositiveInt32 } = require('../validate')
+const { validateObject, validateString, validatePositiveInt32 } = require('../validate')
+const { validateStride, validateImageBuffer } = require('./validate')
 
 const overlaps = (a, b) => {
 	if (a.buffer !== b.buffer) { return false }
@@ -25,12 +26,8 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 
 	const minSrcStride = srcHelpers.minStride(srcWidth)
 	if (srcStride === undefined) { srcStride = minSrcStride }
-	validateInteger('srcSpec.stride', srcStride)
-	if (srcStride < minSrcStride) { throw Object.assign(new Error("srcSpec.stride is smaller than expected"), { srcStride, width: srcWidth, srcFormat }) }
-	if (srcStride > 2 ** 31 - 1) { throw Object.assign(new Error("srcSpec.stride must be a 32-bit integer"), { srcStride }) }
-
-	validateBuffer('srcData', srcData)
-	if (srcData.length < srcHelpers.minBufferSize(srcStride, srcHeight)) { throw Object.assign(new Error("srcData is smaller than expected"), { srcData, srcStride, height: srcHeight, srcFormat }) }
+	validateStride('srcSpec.stride', srcStride, minSrcStride, { srcStride, srcWidth, srcFormat })
+	validateImageBuffer('srcData', srcData, srcHelpers.minBufferSize(srcStride, srcHeight), { srcData, srcStride, srcHeight, srcFormat })
 
 	validatePositiveInt32('dstSpec.width', dstWidth)
 	validatePositiveInt32('dstSpec.height', dstHeight)
@@ -45,9 +42,7 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 
 	const minStride = dstHelpers.minStride(dstWidth)
 	if (dstStride === undefined) { dstStride = minStride }
-	validateInteger('dstSpec.stride', dstStride)
-	if (dstStride < minStride) { throw Object.assign(new Error("dstSpec.stride is smaller than expected"), { dstStride, dstWidth, dstFormat }) }
-	if (dstStride > 2 ** 31 - 1) { throw Object.assign(new Error("dstSpec.stride must be a 32-bit integer"), { dstStride }) }
+	validateStride('dstSpec.stride', dstStride, minStride, { dstStride, dstWidth, dstFormat })
 
 	const size = dstHelpers.minBufferSize(dstStride, dstHeight)
 	const _srcFormat = Enums.pixelFormat[srcFormat]
@@ -59,8 +54,7 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 		return buffer
 	}
 
-	validateBuffer('dstData', dstData)
-	if (dstData.length < size) { throw Object.assign(new Error("dstData is smaller than expected"), { dstData, dstStride, dstHeight, dstFormat }) }
+	validateImageBuffer('dstData', dstData, size, { dstData, dstStride, dstHeight, dstFormat })
 	if (overlaps(srcData, dstData)) { throw Object.assign(new Error("srcData and dstData must not overlap")) }
 	Bindings.video_convert(srcWidth, srcHeight, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, dstData, dstStride, _scaling)
 	return size
