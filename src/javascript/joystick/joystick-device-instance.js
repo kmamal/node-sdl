@@ -34,6 +34,8 @@ const stopEffect = (effect, id) => {
 }
 
 const startEffect = (effect, id, _a, _b, duration) => {
+	clearTimers(effect, id)
+
 	if (duration === 0) {
 		stopEffect(effect, id)
 		Globals.events.poll()
@@ -42,9 +44,7 @@ const startEffect = (effect, id, _a, _b, duration) => {
 
 	const a = Math.round(_a * 0xFFFF)
 	const b = Math.round(_b * 0xFFFF)
-	effect.call(id, a, b, MAX_DURATION)
-
-	clearTimers(effect, id)
+	effect.call(id, a, b, duration === null ? MAX_DURATION : Math.min(duration, MAX_DURATION))
 
 	// Zero intensity stops the effect, so there is nothing to wait for
 	if (a === 0 && b === 0) { return }
