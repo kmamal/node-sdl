@@ -592,6 +592,13 @@ _packEvent (const SDL_Event &event, Packing &packed)
 	return packed.value.has("type");
 }
 
+static bool in_callback = false;
+
+struct CallbackGuard {
+	CallbackGuard () { in_callback = true; }
+	~CallbackGuard () { in_callback = false; }
+};
+
 static bool
 _dispatchEvent (const SDL_Event &event)
 {
@@ -602,6 +609,7 @@ _dispatchEvent (const SDL_Event &event)
 	if (!_packEvent(event, packing)) { return false; }
 
 	if (!threads::hasWorkers()) {
+		CallbackGuard guard;
 		poll_callback->Call(env.Global(), { packing.value.toNapi(env) });
 		return true;
 	}
@@ -613,6 +621,8 @@ _dispatchEvent (const SDL_Event &event)
 	};
 
 	threads::distribute(shared, env);
+
+	CallbackGuard guard;
 	poll_callback->Call(env.Global(), { shared.value->toNapi(env) });
 
 	return true;
@@ -663,6 +673,8 @@ events::isDispatchingFromWatch (const Napi::CallbackInfo &info)
 bool
 events::dispatchEventFromWatch(const SDL_Event &event)
 {
+	if (in_callback) { return false; }
+
 	dispatching_from_watch++;
 	bool dispatched = _dispatchEvent(event);
 	dispatching_from_watch--;
