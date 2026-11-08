@@ -178,15 +178,10 @@ joystick::open (const Napi::CallbackInfo &info)
 
 	int id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_ClearError();
 	SDL_Joystick *joystick = SDL_OpenJoystick(id);
 	if (joystick == nullptr) {
 		throw global::sdlError(env, "SDL_OpenJoystick", id);
 	}
-
-	// SDL_OpenJoystick produces errors even though it succeeds
-	const char *error = SDL_GetError();
-	if (error[0] != '\0') { fprintf(stderr, "SDL silent error: %s\n", error); }
 	SDL_ClearError();
 
 	threads::trackOpen(env, threads::JOYSTICK, id);
@@ -210,17 +205,7 @@ joystick::open (const Napi::CallbackInfo &info)
 		Napi::Array axes = Napi::Array::New(env, num_axes);
 
 		for (int i = 0; i < num_axes; i++) {
-			// Clear any stale error, since failure is detected via the error state
-			SDL_ClearError();
-			double value = joystick::mapAxis(joystick, i);
-			error = SDL_GetError();
-			if (error[0] != '\0') {
-				std::ostringstream message;
-				message << "SDL_GetJoystickAxis(" << id << ", " << i << ") error: " << error;
-				SDL_ClearError();
-				throw Napi::Error::New(env, message.str());
-			}
-			axes.Set(i, value);
+			axes.Set(i, joystick::mapAxis(joystick, i));
 		}
 
 		int num_balls = SDL_GetNumJoystickBalls(joystick);
