@@ -85,10 +85,6 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 	p010: { ...yuv(2, true, false), minStride: minStridePacked },
 })
 
-for (const [ key, value ] of Object.entries(VideoFormatHelpers)) {
-	value.name = key
-}
-
 if (Os.endianness() === 'LE') {
 	VideoFormatHelpers.rgba32 = VideoFormatHelpers.abgr8888
 	VideoFormatHelpers.argb32 = VideoFormatHelpers.bgra8888
