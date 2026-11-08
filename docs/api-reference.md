@@ -2837,7 +2837,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
-  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
+  - `buffered: <number>`: Number of frames buffered by the driver. Must be a positive 32-bit integer. Default: `4096`
   - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a non-negative number that fits in a 32-bit float. Default: `1`
   - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioPlaybackStream>`](#class-audioplaybackstream-extends-audiostream) the opened stream.
@@ -2933,7 +2933,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
-  - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
+  - `buffered: <number>`: Number of frames buffered by the driver. Must be a positive 32-bit integer. Default: `4096`
   - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a non-negative number that fits in a 32-bit float. Default: `1`
   - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioRecordingStream>`](#class-audiorecordingstream-extends-audiostream) the opened stream.

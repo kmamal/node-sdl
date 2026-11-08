@@ -324,7 +324,9 @@ audio::open (const Napi::CallbackInfo &info)
 	desired.channels = channels;
 
 	std::string samples_string = std::to_string(samples);
-	SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, samples_string.c_str());
+	if (!SDL_SetHintWithPriority(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, samples_string.c_str(), SDL_HINT_OVERRIDE)) {
+		throw global::sdlError(env, "SDL_SetHintWithPriority");
+	}
 
 	SDL_AudioStream *stream = SDL_OpenAudioDeviceStream(device_id, &desired, nullptr, nullptr);
 	SDL_ResetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES);
