@@ -1,7 +1,8 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
-const { validateNotClosed, validateObject } = require('../validate')
-const { SharedDeviceInstance } = require('../joystick/shared-device-instance')
+const { validateNotClosed } = require('../validate')
+const { lookupDevice } = require('../device-instance')
+const { JoystickDeviceInstance } = require('../joystick/joystick-device-instance')
 
 const validEvents = [
 	'axisMotion',
@@ -13,14 +14,9 @@ const validEvents = [
 	'close',
 ]
 
-class GamepadInstance extends SharedDeviceInstance {
+class GamepadInstance extends JoystickDeviceInstance {
 	constructor (requested) {
-		validateObject('device', requested)
-
-		Globals.events.poll()
-
-		const device = Globals.gamepadDevices.find(({ id }) => id === requested.id)
-		if (!device) { throw Object.assign(new Error("device must be from sdl.gamepad.devices"), { device: requested }) }
+		const device = lookupDevice(requested, 'gamepad', () => Globals.gamepadDevices)
 
 		const result = Bindings.gamepad_open(device.id)
 
