@@ -40,6 +40,16 @@ keyboard::getKey(const Napi::CallbackInfo &info)
 	return packKey(keycode).toNapi(env);
 }
 
+static bool
+isKeypad(int scancode)
+{
+	return (scancode >= SDL_SCANCODE_KP_DIVIDE && scancode <= SDL_SCANCODE_KP_PERIOD)
+		|| scancode == SDL_SCANCODE_KP_EQUALS
+		|| scancode == SDL_SCANCODE_KP_COMMA
+		|| scancode == SDL_SCANCODE_KP_EQUALSAS400
+		|| (scancode >= SDL_SCANCODE_KP_00 && scancode <= SDL_SCANCODE_KP_HEXADECIMAL);
+}
+
 Napi::Value
 keyboard::getScancode(const Napi::CallbackInfo &info)
 {
@@ -51,6 +61,20 @@ keyboard::getScancode(const Napi::CallbackInfo &info)
 	if (keycode == SDLK_UNKNOWN) {
 		SDL_ClearError();
 		return env.Null();
+	}
+
+	const char *cursor = keyname.c_str();
+	size_t remaining = keyname.size();
+	Uint32 codepoint = SDL_StepUTF8(&cursor, &remaining);
+	SDL_Keycode exact = (codepoint != 0 && remaining == 0) ? (SDL_Keycode) codepoint : keycode;
+
+	for (SDL_Keycode candidate : { exact, keycode }) {
+		for (int i = 1; i < SDL_SCANCODE_COUNT; i++) {
+			if (isKeypad(i)) { continue; }
+			if (SDL_GetKeyFromScancode((SDL_Scancode) i, SDL_KMOD_NONE, true) == candidate) {
+				return Napi::Number::New(env, i);
+			}
+		}
 	}
 
 	int scancode = SDL_GetScancodeFromKey(keycode, nullptr);
