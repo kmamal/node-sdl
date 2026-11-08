@@ -21,6 +21,7 @@ struct StreamState {
 	std::atomic<bool> pending { false };
 	std::atomic<uint32_t> underruns { 0 };
 	std::atomic<uint32_t> missing { 0 };
+	std::atomic<uint32_t> available { 0 };
 	NotifyFunction tsfn;
 };
 
@@ -40,9 +41,14 @@ _notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::null
 	state->pending.exchange(false, std::memory_order_acq_rel);
 	uint32_t underruns = state->underruns.exchange(0, std::memory_order_relaxed);
 	uint32_t missing = state->missing.exchange(0, std::memory_order_relaxed);
+	uint32_t available = state->available.exchange(0, std::memory_order_relaxed);
 	if (env == nullptr || callback.IsEmpty()) { return; }
 	if (state->closed.load(std::memory_order_acquire)) { return; }
-	callback.Call({ Napi::Number::New(env, underruns), Napi::Number::New(env, missing) });
+	callback.Call({
+		Napi::Number::New(env, underruns),
+		Napi::Number::New(env, missing),
+		Napi::Number::New(env, available),
+	});
 }
 
 static void
@@ -71,9 +77,14 @@ _onGet (void *userdata, SDL_AudioStream *, int additional_amount, int)
 }
 
 static void SDLCALL
-_onPut (void *userdata, SDL_AudioStream *, int, int)
+_onPut (void *userdata, SDL_AudioStream *stream, int, int)
 {
 	StreamState *state = (StreamState *) userdata;
+
+	int available = SDL_GetAudioStreamAvailable(stream);
+	if (available < 0) { SDL_ClearError(); }
+	else { state->available.store((uint32_t) available, std::memory_order_relaxed); }
+
 	_wake(state);
 }
 
@@ -535,6 +546,7 @@ audio::setNotify (const Napi::CallbackInfo &info)
 	if (notify) {
 		state->underruns.store(0, std::memory_order_relaxed);
 		state->missing.store(0, std::memory_order_relaxed);
+		state->available.store(0, std::memory_order_relaxed);
 	}
 	state->notify.store(notify, std::memory_order_release);
 

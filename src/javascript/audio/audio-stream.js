@@ -47,10 +47,10 @@ class AudioStream extends EventsViaPoll {
 
 		const helper = AudioFormatHelpers[format]
 
-		const notify = (underruns, missing) => {
+		const notify = (underruns, missing, available) => {
 			if (this._closed) { return }
 			const event = recording
-				? { type: notifyEvent }
+				? { type: notifyEvent, available }
 				: { type: notifyEvent, underruns, missing }
 			Globals.events.withoutPolling(() => { tryEmit(this, notifyEvent, event) })
 		}

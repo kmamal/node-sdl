@@ -115,13 +115,38 @@ T.test("sdl::audio::recording readable", async (t) => {
 	const stream = sdl.audio.recording.openDevice(null, { channels: 1, buffered: 1024 })
 	t.throws(() => stream.on('drain', () => {}), /invalid event/u)
 	let readable = 0
+	let available = 0
 	stream.on('readable', (event) => {
 		t.equal(event.type, 'readable')
+		t.ok(Number.isInteger(event.available) && event.available >= 0)
 		readable++
+		available = event.available
 	})
 	stream.play()
 	await sleep(300)
 	t.ok(readable > 0)
-	t.ok(stream.available > 0)
+	t.ok(available > 0)
+	t.ok(stream.available >= available)
+	stream.close()
+})
+
+T.test("sdl::audio::readable reports backlog", async (t) => {
+	t.timeout(5e3)
+	if (!hasRecording()) {
+		skip("no audio recording")
+		return
+	}
+	const stream = sdl.audio.recording.openDevice(null, { channels: 1, buffered: 1024 })
+	const seen = []
+	stream.on('readable', (event) => { seen.push(event.available) })
+	stream.play()
+	await sleep(300)
+	t.ok(seen.length > 1)
+	t.ok(seen.at(-1) > seen[0])
+	stream.getData(Buffer.alloc(stream.available))
+	seen.length = 0
+	await sleep(100)
+	t.ok(seen.length > 0)
+	t.ok(seen[0] <= stream.available)
 	stream.close()
 })

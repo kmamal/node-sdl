@@ -360,7 +360,10 @@ export namespace Events {
 			readonly underruns: number
 			readonly missing: number
 		}
-		export interface Readable extends AudioEvent { readonly type: 'readable' }
+		export interface Readable extends AudioEvent {
+			readonly type: 'readable'
+			readonly available: number
+		}
 
 		export type Any
 			= Close
