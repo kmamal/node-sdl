@@ -1,3 +1,4 @@
+const Globals = require('../globals')
 const { assertInitialized, isAvailable } = require('../subsystems')
 const { refreshDevices } = require('./devices')
 const { SensorInstance } = require('./sensor-instance')
@@ -10,6 +11,7 @@ const sensor = {
 
 	get devices () {
 		assertInitialized('sensor')
+		Globals.events.poll()
 		return [ ...refreshDevices() ]
 	},
 

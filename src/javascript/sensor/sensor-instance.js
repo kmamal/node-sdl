@@ -13,7 +13,9 @@ class SensorInstance extends EventsViaPoll {
 	constructor (requested) {
 		validateObject('device', requested)
 
+		Globals.events.poll()
 		refreshDevices()
+
 		const device = Globals.sensorDevices.find(({ id }) => id === requested.id)
 		if (!device) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device: requested }) }
 
