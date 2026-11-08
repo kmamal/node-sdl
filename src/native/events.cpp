@@ -203,7 +203,6 @@ _packEvent (const SDL_Event &event, Packing &packed)
 
 		case SDL_EVENT_DISPLAY_ADDED: {
 			packed::Value display = video::_getDisplay(event.display.displayID);
-			if (display.isNull()) { return false; }
 
 			packed.setTarget(events::targets::VIDEO);
 			packed.setType(events::types::DISPLAY_ADD);
@@ -223,43 +222,20 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.set("orientation", _lookup(video::orientations, (SDL_DisplayOrientation) event.display.data1));
 			break;
 		}
-		case SDL_EVENT_DISPLAY_MOVED: {
-			packed.setTarget(events::targets::VIDEO);
-			packed.setType(events::types::DISPLAY_MOVE);
-
-			SDL_DisplayID display_id = event.display.displayID;
-			packed.set("displayId", display_id);
-
-			SDL_Rect rect;
-
-			if(!SDL_GetDisplayBounds(display_id, &rect)) {
-				SDL_ClearError();
-				return false;
-			}
-			packed.set("geometryX", rect.x);
-			packed.set("geometryY", rect.y);
-
-			if(!SDL_GetDisplayUsableBounds(display_id, &rect)) {
-				SDL_ClearError();
-				return false;
-			}
-			packed.set("usableX", rect.x);
-			packed.set("usableY", rect.y);
-
-			break;
-		}
+		case SDL_EVENT_DISPLAY_MOVED:
 		case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
 		case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED:
 		case SDL_EVENT_DISPLAY_USABLE_BOUNDS_CHANGED: {
 			packed::Value display = video::_getDisplay(event.display.displayID);
-			if (display.isNull()) { return false; }
 
 			packed.setTarget(events::targets::VIDEO);
-			packed.setType(event.type == SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
-				? events::types::DISPLAY_SCALE
-				: event.type == SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED
-					? events::types::DISPLAY_MODE
-					: events::types::DISPLAY_USABLE);
+			packed.setType(event.type == SDL_EVENT_DISPLAY_MOVED
+				? events::types::DISPLAY_MOVE
+				: event.type == SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
+					? events::types::DISPLAY_SCALE
+					: event.type == SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED
+						? events::types::DISPLAY_MODE
+						: events::types::DISPLAY_USABLE);
 			packed.set("displayId", event.display.displayID);
 			packed.set("display", std::move(display));
 			break;

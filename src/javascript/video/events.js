@@ -39,24 +39,7 @@ const handleDisplayEvent = (event) => {
 			event.device = display
 		} break
 
-		case 'displayMove': {
-			const { displayId, geometryX, geometryY, usableX, usableY } = event
-			delete event.displayId
-			delete event.geometryX
-			delete event.geometryY
-			delete event.usableX
-			delete event.usableY
-
-			const display = Globals.displays.find((a) => a.id === displayId)
-			if (!display) { return }
-
-			display.geometry.x = geometryX
-			display.geometry.y = geometryY
-			display.usable.x = usableX
-			display.usable.y = usableY
-			event.device = display
-		} break
-
+		case 'displayMove':
 		case 'displayScaleChange':
 		case 'displayModeChange':
 		case 'displayUsableChange': {

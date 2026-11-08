@@ -492,7 +492,7 @@ Fired when a display changes content scale.
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>`: The display's new pixel format, or `null` if it can't be determined.
 - `frequency: <number>|<null>`: The display's new refresh rate, or `null` if it can't be determined.
-- `geometry: <object>`: The display's new `geometry`, since the mode determines its size.
+- `geometry: <object>|<null>`: The display's new `geometry`, since the mode determines its size, or `null` if it can't be determined.
   - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
 
 Fired when a display changes its current mode.
@@ -600,9 +600,9 @@ Sample data for Linux:
   - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
   - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
   - `frequency: <number>|<null>` The refresh rate of the display. Is `null` if it can't be determined.
-  - `geometry: <object>` The desktop region that the display covers.
+  - `geometry: <object>|<null>` The desktop region that the display covers. Is `null` if it can't be determined.
     - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
-  - `usable: <object>` Similar to `geometry`, but excludes areas that the OS or window manager takes up, such as menus, docks, etc.
+  - `usable: <object>|<null>` Similar to `geometry`, but excludes areas that the OS or window manager takes up, such as menus, docks, etc. Is `null` if it can't be determined.
     - `x, y, width, height: <Rect>` The position and size of the display's usable region, in points.
   - `scale: <number>|<null>` The content scale of the display: how much larger UI elements should be drawn to appear at their intended size, where `1` is the 96dpi baseline. Might be `null` on some devices if it can't be retrieved.
   - `orientation: <string>|<null>` The orientation of the display.

@@ -17,34 +17,37 @@ _packDisplay (SDL_DisplayID display_id)
 	if (_name != nullptr) { name = _name; }
 	else { SDL_ClearError(); }
 
+	packed::Value format;
+	packed::Value frequency;
 	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(display_id);
-	if (mode == nullptr) {
-		SDL_ClearError();
-		return packed::Value();
+	if (mode == nullptr) { SDL_ClearError(); }
+	else {
+		auto format_entry = video::formats.find(mode->format);
+		if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
+		if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
 	}
 
 	SDL_Rect rect;
-	if(!SDL_GetDisplayBounds(display_id, &rect)) {
-		SDL_ClearError();
-		return packed::Value();
+
+	packed::Value geometry;
+	if (!SDL_GetDisplayBounds(display_id, &rect)) { SDL_ClearError(); }
+	else {
+		geometry = packed::Value::object();
+		geometry.set("x", rect.x);
+		geometry.set("y", rect.y);
+		geometry.set("width", rect.w);
+		geometry.set("height", rect.h);
 	}
 
-	packed::Value geometry = packed::Value::object();
-	geometry.set("x", rect.x);
-	geometry.set("y", rect.y);
-	geometry.set("width", rect.w);
-	geometry.set("height", rect.h);
-
-	if(!SDL_GetDisplayUsableBounds(display_id, &rect)) {
-		SDL_ClearError();
-		return packed::Value();
+	packed::Value usable;
+	if (!SDL_GetDisplayUsableBounds(display_id, &rect)) { SDL_ClearError(); }
+	else {
+		usable = packed::Value::object();
+		usable.set("x", rect.x);
+		usable.set("y", rect.y);
+		usable.set("width", rect.w);
+		usable.set("height", rect.h);
 	}
-
-	packed::Value usable = packed::Value::object();
-	usable.set("x", rect.x);
-	usable.set("y", rect.y);
-	usable.set("width", rect.w);
-	usable.set("height", rect.h);
 
 	packed::Value scale;
 	float _scale = SDL_GetDisplayContentScale(display_id);
@@ -56,13 +59,6 @@ _packDisplay (SDL_DisplayID display_id)
 	packed::Value orientation;
 	if (orientation_entry != video::orientations.end()) { orientation = packed::Value::ref(orientation_entry->second); }
 	else { SDL_ClearError(); }
-
-	auto format_entry = video::formats.find(mode->format);
-	packed::Value format;
-	if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
-
-	packed::Value frequency;
-	if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
 
 	packed::Value display = packed::Value::object();
 	display.set("id", display_id);
@@ -95,11 +91,8 @@ video::_getDisplays (Napi::Env &env)
 	Napi::Array displays = Napi::Array::New(env);
 
 	try {
-		int num_returned = 0;
 		for (int i = 0; i < num_displays; i++) {
-			packed::Value display = _packDisplay(display_ids[i]);
-			if (display.isNull()) { continue; }
-			displays.Set(num_returned++, display.toNapi(env));
+			displays.Set(i, _packDisplay(display_ids[i]).toNapi(env));
 		}
 	}
 	catch (...) {
