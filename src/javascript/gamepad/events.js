@@ -1,3 +1,4 @@
+const { isMainThread } = require('node:worker_threads')
 const Globals = require('../globals')
 const { makeDevice: makeGamepadDevice } = require('./devices')
 const { tryEmit } = require('../events/try')
@@ -8,6 +9,7 @@ const handleEvent = (event, targetId) => {
 	if (type === 'remap') {
 		const gamepadDevice = Globals.gamepadDevices.find(({ id }) => id === targetId)
 		if (gamepadDevice) { Object.assign(gamepadDevice, makeGamepadDevice(event.device)) }
+		if (isMainThread) { Globals.events.broadcastChange('joystickDevices') }
 	}
 
 	const collection = Globals.gamepadInstances.byId.get(targetId)
