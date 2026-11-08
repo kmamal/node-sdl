@@ -369,9 +369,13 @@ window.render(width, height, stride, 'rgba32', buffer)
 
 ### High-DPI
 
-On a high-dpi display, windows have more pixels than their `width` and `height` indicate.
-On such systems the library measures `width` and `height` (and all other measurements such as `x` and `y`) in "points" instead of pixels.
-Points are an abstract unit that doesn't necessarily correspond to pixels.
+On a high-dpi display, windows have more pixels than points.
+A point is the unit that the operating system uses to lay out windows, and a window's pixel density is the number of pixels per point.
+On a standard display the density is `1`, so points and pixels coincide, but on a high-dpi display it is larger (commonly `2`, or a fractional value such as `1.5`).
+
+Throughout this API, every measurement is in points unless its name or description says "pixels".
+This covers window positions and sizes, display geometry, mouse positions and movement, and the `dstRect` of [`window.render()`](#windowrenderwidth-height-stride-format-buffer-options).
+The only pixel measurements are `pixelWidth`, `pixelHeight` and `setSizeInPixels()` of a window, the `pixelWidth` and `pixelHeight` of the [`'resize'`](#event-resize) event, and the dimensions, strides and hotspots of images.
 To work with pixels, use the window's `pixelWidth` and `pixelHeight` properties.
 You usually need these values when you create a "surface" that the window will display, such as a Buffer, Canvas, or 3D rendering viewport.
 I recommend that you always use `pixelWidth` and `pixelHeight` in these cases, because you can't know beforehand whether your program will run on a high-dpi system.
@@ -489,7 +493,7 @@ Fired when a display changes content scale.
 - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>`: The display's new pixel format, or `null` if it can't be determined.
 - `frequency: <number>|<null>`: The display's new refresh rate, or `null` if it can't be determined.
 - `geometry: <object>`: The display's new `geometry`, since the mode determines its size.
-  - `x, y, width, height: <Rect>` The position and size of the display's geometry.
+  - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
 
 Fired when a display changes its current mode.
 
@@ -597,9 +601,9 @@ Sample data for Linux:
   - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
   - `frequency: <number>|<null>` The refresh rate of the display. Is `null` if it can't be determined.
   - `geometry: <object>` The desktop region that the display covers.
-    - `x, y, width, height: <Rect>` The position and size of the display's geometry.
+    - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
   - `usable: <object>` Similar to `geometry`, but excludes areas that the OS or window manager takes up, such as menus, docks, etc.
-    - `x, y, width, height: <Rect>` The position and size of the display's usable region.
+    - `x, y, width, height: <Rect>` The position and size of the display's usable region, in points.
   - `scale: <number>|<null>` The content scale of the display: how much larger UI elements should be drawn to appear at their intended size, where `1` is the 96dpi baseline. Might be `null` on some devices if it can't be retrieved.
   - `orientation: <string>|<null>` The orientation of the display.
 
@@ -663,10 +667,10 @@ The window under the mouse, or `null` if the mouse is not over a window.
 - `options: <object>`
   - `title: <string>` Appears in the window's title bar. Default: `''`
   - `display: <object>` An object from `sdl.video.displays` that selects the display for the window (if you have multiple displays), or `null` for the primary display. Default: `null`
-  - `x: <number>` The x position of the window relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
-  - `y: <number>` The y position of the window relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
-  - `width: <number>` The width of the window, or `null` for the default of `640`. Must be a positive 32-bit integer. Default: `null`
-  - `height: <number>` The height of the window, or `null` for the default of `480`. Must be a positive 32-bit integer. Default: `null`
+  - `x: <number>` The x position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
+  - `y: <number>` The y position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
+  - `width: <number>` The width of the window in points, or `null` for the default of `640`. Must be a positive 32-bit integer. Default: `null`
+  - `height: <number>` The height of the window in points, or `null` for the default of `480`. Must be a positive 32-bit integer. Default: `null`
   - `visible: <boolean>` Set to `false` to create a hidden window that appears only when you call [`window.show()`](#windowshowshow). Default: `true`
   - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
@@ -721,19 +725,19 @@ Fired when the window is restored.
 
 ### Event: 'move'
 
-- `x: <number>` The window's new x position, relative to the screen.
-- `y: <number>` The window's new y position, relative to the screen.
+- `x: <number>` The window's new x position in points, relative to the screen.
+- `y: <number>` The window's new y position in points, relative to the screen.
 
 Fired when the window changes position.
 
 ### Event: 'resize'
 
-- `width: <number>` The window's new width.
-- `height: <number>` The window's new height.
+- `width: <number>` The window's new width in points.
+- `height: <number>` The window's new height in points.
 - `pixelWidth: <number>` The window's new width in pixels. See [high-dpi](#high-dpi).
 - `pixelHeight: <number>` The window's new height in pixels. See [high-dpi](#high-dpi).
 
-Fired when the window changes size, either in logical coordinates or in pixels (for example when it moves to a display with a different scale).
+Fired when the window changes size, either in points or in pixels (for example when it moves to a display with a different scale).
 
 ### Event: 'displayChange'
 
@@ -807,8 +811,8 @@ Fired when the user enters text with the keyboard.
 
 ### Event: 'mouseButtonDown'
 
-- `x: <number>` The mouse's x position when the event happened, relative to the window.
-- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `x: <number>` The mouse's x position when the event happened, in points, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, in points, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
 - `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was pressed.
@@ -817,8 +821,8 @@ Fired when a mouse button is pressed.
 
 ### Event: 'mouseButtonUp'
 
-- `x: <number>` The mouse's x position when the event happened, relative to the window.
-- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `x: <number>` The mouse's x position when the event happened, in points, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, in points, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
 - `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `button: `[`<sdl.mouse.BUTTON>`](#enum-button) The button that was released.
@@ -827,10 +831,10 @@ Fired when a mouse button is released.
 
 ### Event: 'mouseMove'
 
-- `x: <number>` The mouse's x position when the event happened, relative to the window.
-- `y: <number>` The mouse's y position when the event happened, relative to the window.
-- `dx: <number>` The mouse's x movement, relative to its last position.
-- `dy: <number>` The mouse's y movement, relative to its last position.
+- `x: <number>` The mouse's x position when the event happened, in points, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, in points, relative to the window.
+- `dx: <number>` The mouse's x movement in points, relative to its last position.
+- `dy: <number>` The mouse's y movement in points, relative to its last position.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
 - `pen: <boolean>` Is `true` if the event was caused by a pen event.
 
@@ -838,8 +842,8 @@ Fired when the mouse moves.
 
 ### Event: 'mouseWheel'
 
-- `x: <number>` The mouse's x position when the event happened, relative to the window.
-- `y: <number>` The mouse's y position when the event happened, relative to the window.
+- `x: <number>` The mouse's x position when the event happened, in points, relative to the window.
+- `y: <number>` The mouse's y position when the event happened, in points, relative to the window.
 - `touch: <boolean>` Is `true` if the event was caused by a touch event.
 - `pen: <boolean>` Is `true` if the event was caused by a pen event.
 - `dx: <number>` The wheel's x movement, relative to its last position.
@@ -941,18 +945,18 @@ Changes the text that appears in the window's title bar.
 
 - `<number>`
 
-The window's x position, relative to the screen.
+The window's x position in points, relative to the screen.
 
 ### window.y
 
 - `<number>`
 
-The window's y position, relative to the screen.
+The window's y position in points, relative to the screen.
 
 ### window.setPosition(x, y)
 
-- `x: <number>`: The new x position, relative to the screen. Must be a 32-bit integer.
-- `y: <number>`: The new y position, relative to the screen. Must be a 32-bit integer.
+- `x: <number>`: The new x position in points, relative to the screen. Must be a 32-bit integer.
+- `y: <number>`: The new y position in points, relative to the screen. Must be a 32-bit integer.
 
 Moves the window to a new position on the screen.
 The call only submits a request to the windowing system.
@@ -965,13 +969,13 @@ Throws if the windowing system can't position windows at all.
 
 - `<number>`
 
-The window's width.
+The window's width in points.
 
 ### window.height
 
 - `<number>`
 
-The window's height.
+The window's height in points.
 
 ### window.pixelWidth
 
@@ -989,8 +993,8 @@ On [high-dpi](#high-dpi) displays, this is larger than [`height`](#windowheight)
 
 ### window.setSize(width, height)
 
-- `width: <number>`: The new width. Must be a positive 32-bit integer.
-- `height: <number>`: The new height. Must be a positive 32-bit integer.
+- `width: <number>`: The new width in points. Must be a positive 32-bit integer.
+- `height: <number>`: The new height in points. Must be a positive 32-bit integer.
 
 Changes the size of the window.
 The call only submits a request to the windowing system.
@@ -1232,7 +1236,7 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
   - `dstRect: <object>|<null>` Where exactly on the window to draw the image. Default: `null`, meaning the whole window.
-    - `x, y, width, height: <rect>` The components of the rectangle, in pixels. May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
+    - `x, y, width, height: <rect>` The components of the rectangle, in points, relative to the window (the same units as [`width`](#windowwidth) and mouse events, not pixels). May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
 
 Displays an image in the window.
 
@@ -1664,15 +1668,15 @@ Reports whether a single mouse button is pressed.
 ### sdl.mouse.position
 
 - `<object>`
-  - `x: <number>` The x position of the mouse, relative to the screen.
-  - `y: <number>` The y position of the mouse, relative to the screen.
+  - `x: <number>` The x position of the mouse in points, relative to the screen.
+  - `y: <number>` The y position of the mouse in points, relative to the screen.
 
 Reports where the mouse is on the screen.
 
 ### sdl.mouse.setPosition(x, y)
 
-- `x: <number>` The new x position of the mouse, relative to the screen. May be fractional.
-- `y: <number>` The new y position of the mouse, relative to the screen. May be fractional.
+- `x: <number>` The new x position of the mouse in points, relative to the screen. May be fractional.
+- `y: <number>` The new y position of the mouse in points, relative to the screen. May be fractional.
 
 Moves the mouse to the given position.
 
@@ -1714,8 +1718,8 @@ Switches back to the default cursor.
 ### sdl.mouse.setCursorImage(width, height, stride, format, buffer, x, y)
 
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to use as a cursor.
-- `x: <number>` The x position of the cursor image's hotspot. Must be an integer from `0` to `width - 1`.
-- `y: <number>` The y position of the cursor image's hotspot. Must be an integer from `0` to `height - 1`.
+- `x: <number>` The x position of the cursor image's hotspot in pixels. Must be an integer from `0` to `width - 1`.
+- `y: <number>` The y position of the cursor image's hotspot in pixels. Must be an integer from `0` to `height - 1`.
 
 Makes an image the mouse cursor.
 The hotspot is the pixel that counts as being under the mouse, so `x` must be from `0` to `width - 1` and `y` from `0` to `height - 1`.

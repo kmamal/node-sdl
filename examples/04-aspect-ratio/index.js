@@ -22,11 +22,16 @@ const resize = () => {
 	const factor = Math.min(factorX, factorY)
 	if (factor === 0) { return }
 
-	viewport.width = factor * image.width
-	viewport.height = factor * image.height
+	const pixelViewportWidth = factor * image.width
+	const pixelViewportHeight = factor * image.height
+	const pixelViewportX = Math.floor((window.pixelWidth - pixelViewportWidth) / 2)
+	const pixelViewportY = Math.floor((window.pixelHeight - pixelViewportHeight) / 2)
 
-	viewport.x = Math.floor((window.pixelWidth - viewport.width) / 2)
-	viewport.y = Math.floor((window.pixelHeight - viewport.height) / 2)
+	const pointsPerPixel = window.width / window.pixelWidth
+	viewport.x = pixelViewportX * pointsPerPixel
+	viewport.y = pixelViewportY * pointsPerPixel
+	viewport.width = pixelViewportWidth * pointsPerPixel
+	viewport.height = pixelViewportHeight * pointsPerPixel
 
 	render()
 }

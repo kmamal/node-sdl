@@ -1,5 +1,8 @@
 import { EventEmitter } from 'node:events'
 
+export type Points = number
+export type Pixels = number
+
 export namespace Events {
 
 	interface BaseEvent { readonly type: string }
@@ -71,16 +74,16 @@ export namespace Events {
 		}
 
 		interface MouseEvent extends WindowEvent {
-			readonly x: number
-			readonly y: number
+			readonly x: Points
+			readonly y: Points
 			readonly touch: boolean
 			readonly pen: boolean
 		}
 
 		export interface MouseMove extends MouseEvent {
 			readonly type: 'mouseMove'
-			readonly dx: number
-			readonly dy: number
+			readonly dx: Points
+			readonly dy: Points
 		}
 
 		interface MouseButtonEvent extends MouseEvent {
@@ -125,15 +128,15 @@ export namespace Events {
 		export interface Restore extends WindowEvent { readonly type: 'restore' }
 		export interface Move extends WindowEvent {
 			readonly type: 'move'
-			readonly x: number,
-			readonly y: number
+			readonly x: Points,
+			readonly y: Points
 		}
 		export interface Resize extends WindowEvent {
 			readonly type: 'resize'
-			readonly width: number
-			readonly height: number
-			readonly pixelWidth: number
-			readonly pixelHeight: number
+			readonly width: Points
+			readonly height: Points
+			readonly pixelWidth: Pixels
+			readonly pixelHeight: Pixels
 		}
 		export interface DisplayChange extends WindowEvent {
 			readonly type: 'displayChange'
@@ -548,16 +551,16 @@ export namespace Sdl {
 			readonly format: Format | null
 			readonly frequency: number | null
 			readonly geometry: {
-				readonly x: number
-				readonly y: number
-				readonly width: number
-				readonly height: number
+				readonly x: Points
+				readonly y: Points
+				readonly width: Points
+				readonly height: Points
 			}
 			readonly usable: {
-				readonly x: number
-				readonly y: number
-				readonly width: number
-				readonly height: number
+				readonly x: Points
+				readonly y: Points
+				readonly width: Points
+				readonly height: Points
 			}
 			readonly scale: number | null
 			readonly orientation: Orientation | null
@@ -602,17 +605,17 @@ export namespace Sdl {
 			readonly title: string
 			setTitle (title: string): void
 
-			readonly x: number
-			readonly y: number
-			setPosition (x: number, y: number): void
+			readonly x: Points
+			readonly y: Points
+			setPosition (x: Points, y: Points): void
 
-			readonly width: number
-			readonly height: number
-			setSize (width: number, height: number): void
+			readonly width: Points
+			readonly height: Points
+			setSize (width: Points, height: Points): void
 
-			readonly pixelWidth: number
-			readonly pixelHeight: number
-			setSizeInPixels (pixelWidth: number, pixelHeight: number): void
+			readonly pixelWidth: Pixels
+			readonly pixelHeight: Pixels
+			setSizeInPixels (pixelWidth: Pixels, pixelHeight: Pixels): void
 
 			readonly display: Display | null
 
@@ -662,10 +665,10 @@ export namespace Sdl {
 			render (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer, options?: {
 				scaling?: Scaling,
 				dstRect?: {
-					x: number,
-					y: number,
-					width: number,
-					height: number,
+					x: Points,
+					y: Points,
+					width: Points,
+					height: Points,
 				} | null
 			}): void
 
@@ -702,10 +705,10 @@ export namespace Sdl {
 			createWindow (options?: {
 				title?: string
 				display?: Display | null
-				x?: number | null
-				y?: number | null
-				width?: number | null
-				height?: number | null
+				x?: Points | null
+				y?: Points | null
+				width?: Points | null
+				height?: Points | null
 				visible?: boolean
 				fullscreen?: boolean
 				resizable?: boolean
@@ -1041,14 +1044,14 @@ export namespace Sdl {
 			getButton (button: number): boolean
 
 			readonly position: {
-				x: number
-				y: number
+				x: Points
+				y: Points
 			}
-			setPosition (x: number, y: number): void
+			setPosition (x: Points, y: Points): void
 
 			setCursor (cursor: Cursor): void
 			resetCursor (): void
-			setCursorImage (width: number, height: number, stride: number, format: Video.Format | Video.FormatAlias, buffer: Buffer, x: number, y: number): void
+			setCursorImage (width: number, height: number, stride: number, format: Video.Format | Video.FormatAlias, buffer: Buffer, x: Pixels, y: Pixels): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void

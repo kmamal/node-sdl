@@ -703,6 +703,21 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	if (hasDstRect) {
+		float x2, y2;
+		if (false
+			|| !SDL_RenderCoordinatesFromWindow(renderer, rect.x + rect.w, rect.y + rect.h, &x2, &y2)
+			|| !SDL_RenderCoordinatesFromWindow(renderer, rect.x, rect.y, &rect.x, &rect.y)
+		) {
+			std::ostringstream message;
+			message << "SDL_RenderCoordinatesFromWindow(" << window_id << ") error: " << SDL_GetError();
+			SDL_ClearError();
+			throw Napi::Error::New(env, message.str());
+		}
+		rect.w = x2 - rect.x;
+		rect.h = y2 - rect.y;
+	}
+
 	SDL_PropertiesID props = SDL_GetWindowProperties(window);
 	SDL_Texture *texture = (SDL_Texture *) SDL_GetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
 

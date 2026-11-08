@@ -53,6 +53,7 @@ Windows:
 - `setResizable()` and `setBorderless()` enforce the same mutual exclusivity as `createWindow()`.
 - `window.destroy()` no longer crashes when called from a `beforeClose` listener, or from a `move` or `resize` listener while the window is being dragged.
 - Removing all of a window's listeners no longer breaks event polling, lets the process exit while the window is open, or turns `destroy()` into a no-op.
+- `window.render()` interprets `dstRect` in window coordinates, the same units as `width`/`height` and mouse events. On high-DPI displays it was previously in physical pixels, so a rectangle built from the window size covered only part of the window.
 - `window.render()` throws instead of silently presenting stale contents when updating the texture fails, and no longer corrupts memory or leaks after a failed render or renderer switch.
 - Windows recover from a lost graphics device instead of failing every `render()` from then on.
 - `window.render()` validates image `stride` and buffer sizes, preventing out-of-bounds reads, including for planar and packed YUV formats with odd dimensions.

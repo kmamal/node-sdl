@@ -31,6 +31,7 @@ When the buffer's dimensions differ from the window's, the library scales the bu
 That distorts the image's aspect ratio, which you usually don't want.
 To prevent the distortion, we calculate the `dstRect` property and set it.
 Because this example displays pixel art, we also scale only by integer multiples of the image's dimensions.
+We work that out in pixels, and then convert the result to points, because `dstRect` is measured in points.
 
 ## [5. Canvas Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/05-canvas-drawing)
 
