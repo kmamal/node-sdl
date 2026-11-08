@@ -34,7 +34,11 @@ const video = new class extends EventsViaPoll {
 		return [ ...Globals.displays ]
 	}
 
-	get windows () { return [ ...Globals.windows.all.values() ] }
+	get windows () {
+		assertInitialized('video')
+		Globals.events.poll()
+		return [ ...Globals.windows.all.values() ]
+	}
 
 	get focused () {
 		assertInitialized('video')

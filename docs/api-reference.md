@@ -941,6 +941,7 @@ The text that appears in the window's title bar.
 - `title: <string>`: The new title.
 
 Changes the text that appears in the window's title bar.
+The [`title`](#windowtitle) property updates immediately to the value SDL reports back.
 
 ### window.x
 
@@ -960,9 +961,8 @@ The window's y position in points, relative to the screen.
 - `y: <number>`: The new y position in points, relative to the screen. Must be a 32-bit integer.
 
 Moves the window to a new position on the screen.
-The call only submits a request to the windowing system.
-Once the window has actually moved, [`x`](#windowx) and [`y`](#windowy) update and a [`'move'`](#event-move) event fires.
-The windowing system may also adjust or ignore the request (for example while the window is fullscreen or maximized), in which case [`x`](#windowx) and [`y`](#windowy) report where the window actually is.
+The call only submits a request to the windowing system, which may adjust or deny it (for example while the window is fullscreen or maximized).
+The [`x`](#windowx) and [`y`](#windowy) properties update once the corresponding [`'move'`](#event-move) event has been received, and report where the window actually is.
 
 Throws if the windowing system can't position windows at all.
 
@@ -998,9 +998,8 @@ On [high-dpi](#high-dpi) displays, this is larger than [`height`](#windowheight)
 - `height: <number>`: The new height in points. Must be a positive 32-bit integer.
 
 Changes the size of the window.
-The call only submits a request to the windowing system.
-Once the window has actually resized, [`width`](#windowwidth), [`height`](#windowheight), [`pixelWidth`](#windowpixelwidth), and [`pixelHeight`](#windowpixelheight) update and a [`'resize'`](#event-resize) event fires.
-The windowing system may also adjust or ignore the request (for example, while the window is fullscreen or maximized, the new size takes effect only once the window is restored), in which case the properties report the window's actual size.
+The call only submits a request to the windowing system, which may adjust or deny it (for example, while the window is fullscreen or maximized, the new size takes effect only once the window is restored).
+The [`width`](#windowwidth), [`height`](#windowheight), [`pixelWidth`](#windowpixelwidth), and [`pixelHeight`](#windowpixelheight) properties update once the corresponding [`'resize'`](#event-resize) event has been received, and report the window's actual size.
 
 ### window.setSizeInPixels(pixelWidth, pixelHeight)
 
@@ -1010,7 +1009,7 @@ The windowing system may also adjust or ignore the request (for example, while t
 Changes the size of the window.
 This function only behaves differently from [`window.setSize()`](#windowsetsizewidth-height) for [high-dpi](#high-dpi) displays.
 On such displays, SDL divides the requested size by the window's pixel density and rounds it to the nearest whole size in points, so `pixelWidth` and `pixelHeight` may differ slightly from the requested values unless those are multiples of the density.
-As with [`window.setSize()`](#windowsetsizewidth-height), the size properties update once the change takes effect.
+As with [`window.setSize()`](#windowsetsizewidth-height), the call only submits a request to the windowing system, and the size properties update once the corresponding [`'resize'`](#event-resize) event has been received.
 
 ### window.display
 
@@ -1030,6 +1029,8 @@ Is `true` if the window is visible.
 - `show: <boolean>` Set to `true` to make the window visible, `false` to hide it. Default: `true`
 
 Shows or hides the window.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`visible`](#windowvisible) property updates once the corresponding [`'show'`](#event-show) or [`'hide'`](#event-hide) event has been received.
 
 ### window.hide()
 
@@ -1047,8 +1048,8 @@ A fullscreen window covers the entire screen.
 - `fullscreen: <boolean>` The new value of the property.
 
 Changes the window's fullscreen property.
-The call requests the change from the windowing system asynchronously, and the system may deny it.
-The `fullscreen` property updates if and when the change takes effect.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`fullscreen`](#windowfullscreen) property updates once the windowing system reports the change.
 
 ### window.resizable
 
@@ -1062,6 +1063,7 @@ Users can resize a resizable window by dragging its borders.
 - `resizable: <boolean>` The new value of the property.
 
 Changes the window's resizable property.
+The [`resizable`](#windowresizable) property updates immediately to the value SDL reports back.
 
 Throws if `resizable` is `true` and the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
 
@@ -1077,6 +1079,7 @@ A borderless window has no borders or title bar.
 - `borderless: <boolean>` The new value of the property.
 
 Changes the window's borderless property.
+The [`borderless`](#windowborderless) property updates immediately to the value SDL reports back.
 
 Throws if `borderless` is `true` and the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
 
@@ -1099,6 +1102,7 @@ Is `null` if you set the `opengl` or `webgpu` options, since such windows have n
 - `accelerated: <boolean>` The new value of the property.
 
 Changes the window's accelerated property.
+The [`accelerated`](#windowaccelerated) and [`vsync`](#windowvsync) properties update immediately to the values SDL reports back for the new renderer.
 
 If you set the `opengl` or `webgpu` options, calls to this function fail.
 
@@ -1123,6 +1127,7 @@ If a value isn't supported, the property reports the value the renderer actually
 - `vsync: <number>` The new value of the property. Must be `-1` or a non-negative 32-bit integer.
 
 Changes the window's vsync property.
+The [`accelerated`](#windowaccelerated) and [`vsync`](#windowvsync) properties update immediately to the values SDL reports back for the new renderer.
 
 If you set the `opengl` or `webgpu` options, calls to this function fail.
 
@@ -1160,8 +1165,8 @@ Is `true` if the window is maximized.
 ### window.maximize()
 
 Maximizes the window.
-The call requests the change from the windowing system asynchronously, and the system may deny it.
-The `maximized` property updates if and when the change takes effect.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`maximized`](#windowmaximized) property updates once the corresponding [`'maximize'`](#event-maximize) event has been received.
 
 Throws if the window is not resizable.
 
@@ -1174,14 +1179,14 @@ Is `true` if the window is minimized.
 ### window.minimize()
 
 Minimizes the window.
-The call requests the change from the windowing system asynchronously, and the system may deny it.
-The `minimized` property updates if and when the change takes effect.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`minimized`](#windowminimized) property updates once the corresponding [`'minimize'`](#event-minimize) event has been received.
 
 ### window.restore()
 
 Restores the window so it is neither minimized nor maximized.
-The call requests the change from the windowing system asynchronously, and the system may deny it.
-The `minimized` and `maximized` properties update if and when the change takes effect.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`minimized`](#windowminimized) and [`maximized`](#windowmaximized) properties update once the corresponding [`'restore'`](#event-restore) event has been received.
 
 ### window.focused
 
@@ -1192,8 +1197,8 @@ Is `true` if the window has keyboard input.
 ### window.focus()
 
 Focuses the window.
-The call requests the change from the windowing system asynchronously, and the system may deny it.
-The `focused` property updates if and when the change takes effect.
+The call only submits a request to the windowing system, which may adjust or deny it.
+The [`focused`](#windowfocused) property updates once the corresponding [`'focus'`](#event-focus) event has been received.
 
 ### window.hovered
 
@@ -1224,6 +1229,7 @@ Enables or disables relative mouse mode for the window.
 While the window has focus in relative mode, SDL hides the cursor, locks it inside the window, and reports mouse movement through the `dx` and `dy` properties of [`'mouseMove'`](#event-mousemove) events, even when the cursor would have hit the edge of the screen.
 Use this for FPS-style camera controls.
 In relative mode, the `x` and `y` positions in mouse events carry no meaning.
+The [`relativeMouseMode`](#windowrelativemousemode) property updates immediately to the value SDL reports back.
 
 This function may fail on platforms that don't support raw mouse input.
 

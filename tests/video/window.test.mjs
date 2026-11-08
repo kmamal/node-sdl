@@ -62,13 +62,13 @@ T.test("sdl::window", async (t) => {
 		t.equal(window1.visible, true)
 		t.equal(window2.visible, false)
 		window1.hide()
-		t.equal(window1.visible, false)
+		t.ok(await waitFor(() => !window1.visible))
 		window1.show()
-		t.equal(window1.visible, true)
+		t.ok(await waitFor(() => window1.visible))
 		window1.show(false)
-		t.equal(window1.visible, false)
+		t.ok(await waitFor(() => !window1.visible))
 		window1.show(true)
-		t.equal(window1.visible, true)
+		t.ok(await waitFor(() => window1.visible))
 
 		t.equal(window1.fullscreen, false)
 		{

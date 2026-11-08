@@ -46,6 +46,25 @@ getWindow (Napi::Env &env, int window_id)
 	#define GL_NativeWindow LinuxNativeData
 	#define GPU_NativeData LinuxNativeData
 	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
+
+	static LinuxNativeData
+	getLinuxNativeData (SDL_PropertiesID window_props, bool is_x11, bool use_egl_window)
+	{
+		if (is_x11) {
+			return {
+				1,
+				SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
+				(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
+			};
+		}
+		return {
+			2,
+			SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
+			(uintptr_t) SDL_GetPointerProperty(window_props, use_egl_window
+				? SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER
+				: SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
+		};
+	}
 #elif defined(SDL_PLATFORM_WIN32)
 	#define NativeWindowHandle void *
 	#define GL_NativeWindow void *
@@ -64,7 +83,7 @@ getWindow (Napi::Env &env, int window_id)
 	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
 #endif
 
-void
+static void
 updateRenderer(
 	Napi::Env &env,
 	SDL_Window *window,
@@ -128,8 +147,6 @@ window::create (const Napi::CallbackInfo &info)
 	bool has_renderer = !is_opengl && !is_webgpu;
 	bool is_accelerated = has_renderer && info[11].As<Napi::Boolean>().Value();
 	int vsync = has_renderer ? info[12].As<Napi::Number>().Int32Value() : 0;
-	bool is_minimized = false;
-	bool is_maximized = false;
 
 	Uint64 desired_flags = 0
 		| SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY
@@ -202,20 +219,7 @@ window::create (const Napi::CallbackInfo &info)
 		if (has_wm_info) {
 			NativeWindowHandle _native_handle;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					_native_handle = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					_native_handle = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
-					};
-				}
+				_native_handle = getLinuxNativeData(window_props, is_x11, false);
 			#elif defined(SDL_PLATFORM_WIN32)
 				_native_handle = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
@@ -239,20 +243,7 @@ window::create (const Napi::CallbackInfo &info)
 
 			GL_NativeWindow native_gl;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					native_gl = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					native_gl = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER, nullptr),
-					};
-				}
+				native_gl = getLinuxNativeData(window_props, is_x11, true);
 			#elif defined(SDL_PLATFORM_WIN32)
 				native_gl = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
@@ -271,20 +262,7 @@ window::create (const Napi::CallbackInfo &info)
 
 			GPU_NativeData native_gpu;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					native_gpu = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					native_gpu = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
-					};
-				}
+				native_gpu = getLinuxNativeData(window_props, is_x11, false);
 			#elif defined(SDL_PLATFORM_WIN32)
 				native_gpu.hwnd = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 				native_gpu.hinstance = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
@@ -303,12 +281,13 @@ window::create (const Napi::CallbackInfo &info)
 		}
 
 		Uint64 actual_flags = SDL_GetWindowFlags(window);
+		is_visible = !(actual_flags & SDL_WINDOW_HIDDEN);
 		is_fullscreen = actual_flags & SDL_WINDOW_FULLSCREEN;
 		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
 		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
 		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
-		is_minimized = actual_flags & SDL_WINDOW_MINIMIZED;
-		is_maximized = actual_flags & SDL_WINDOW_MAXIMIZED;
+		bool is_minimized = actual_flags & SDL_WINDOW_MINIMIZED;
+		bool is_maximized = actual_flags & SDL_WINDOW_MAXIMIZED;
 
 		SDL_GetWindowPosition(window, &x, &y);
 		SDL_GetWindowSize(window, &width, &height);
@@ -323,6 +302,8 @@ window::create (const Napi::CallbackInfo &info)
 
 		Napi::Object result = Napi::Object::New(env);
 		result.Set("id", window_id);
+		result.Set("title", SDL_GetWindowTitle(window));
+		result.Set("visible", is_visible);
 		result.Set("x", x);
 		result.Set("y", y);
 		result.Set("width", width);
@@ -370,7 +351,7 @@ window::setTitle (const Napi::CallbackInfo &info)
 		throw global::sdlError(env, "SDL_SetWindowTitle", window_id, title);
 	}
 
-	return env.Undefined();
+	return Napi::String::New(env, SDL_GetWindowTitle(window));
 }
 
 Napi::Value

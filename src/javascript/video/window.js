@@ -123,6 +123,8 @@ class Window extends EventsViaPoll {
 		)
 
 		this._id = result.id
+		this._title = result.title
+		this._visible = result.visible
 		this._x = result.x
 		this._y = result.y
 		this._width = result.width
@@ -138,8 +140,6 @@ class Window extends EventsViaPoll {
 		this._vsync = result.vsync
 		this._native = result.native
 
-		this._title = title
-		this._visible = visible
 		this._opengl = opengl
 		this._webgpu = webgpu
 
@@ -199,8 +199,7 @@ class Window extends EventsViaPoll {
 
 		validateString('title', title)
 
-		Bindings.window_setTitle(this._id, title)
-		this._title = title
+		this._title = Bindings.window_setTitle(this._id, title)
 	}
 
 	get x () {
@@ -250,7 +249,6 @@ class Window extends EventsViaPoll {
 	}
 
 	setSizeInPixels (pixelWidth, pixelHeight) {
-		Globals.events.poll()
 		validateNotDestroyed(this)
 
 		validatePositiveInt32('pixelWidth', pixelWidth)
