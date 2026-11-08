@@ -1,3 +1,4 @@
+const Globals = require('../globals')
 const { assertInitialized, isAvailable } = require('../subsystems')
 const { refreshDevices } = require('./devices')
 
@@ -7,6 +8,7 @@ const touch = {
 
 	get devices () {
 		assertInitialized('video')
+		Globals.events.poll()
 		return [ ...refreshDevices() ]
 	},
 }

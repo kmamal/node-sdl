@@ -11,18 +11,17 @@ const validEvents = [
 
 class SensorInstance extends EventsViaPoll {
 	constructor (requested) {
-		super(validEvents)
-
 		validateObject('device', requested)
 
 		refreshDevices()
-		const found = Globals.sensorDevices.find(({ id }) => id === requested.id)
-		if (!found) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device: requested }) }
+		const device = Globals.sensorDevices.find(({ id }) => id === requested.id)
+		if (!device) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device: requested }) }
 
-		Bindings.sensor_open(found.id)
+		Bindings.sensor_open(device.id)
 
-		this._device = found
+		super(validEvents)
 
+		this._device = device
 		this._closed = false
 
 		Globals.sensorInstances.all.add(this)
