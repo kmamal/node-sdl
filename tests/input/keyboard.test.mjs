@@ -10,8 +10,8 @@ const includeDir = path.join(import.meta.dirname, '../../sdl/include/SDL3')
 const parseHeaderScancodes = () => {
 	const text = fs.readFileSync(path.join(includeDir, 'SDL_scancode.h'), 'utf8')
 	const result = {}
-	for (const match of text.matchAll(/^\s*SDL_SCANCODE_([A-Z0-9_]+)\s*=\s*(\d+)/gm)) {
-		const [ , name, value ] = match
+	for (const match of text.matchAll(/^\s*SDL_SCANCODE_(?<name>[A-Z0-9_]+)\s*=\s*(?<value>\d+)/gmu)) {
+		const { name, value } = match.groups
 		if (name === 'UNKNOWN' || name === 'RESERVED' || name === 'COUNT') { continue }
 		result[name] = Number(value)
 	}
@@ -20,7 +20,7 @@ const parseHeaderScancodes = () => {
 
 const parseHeaderExtendedKeys = () => {
 	const text = fs.readFileSync(path.join(includeDir, 'SDL_keycode.h'), 'utf8')
-	return [ ...text.matchAll(/^#define SDLK_([A-Z0-9_]+)\s+0x2000000[0-9a-fA-F]u/gm) ].map((m) => m[1])
+	return [ ...text.matchAll(/^#define SDLK_(?<name>[A-Z0-9_]+)\s+0x2000000[0-9a-fA-F]u/gmu) ].map((m) => m.groups.name)
 }
 
 const extendedKeyNames = {

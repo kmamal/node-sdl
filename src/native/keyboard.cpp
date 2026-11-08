@@ -9,15 +9,25 @@ const bool *keyboard::keys;
 packed::Value
 keyboard::packKey(SDL_Keycode keycode)
 {
-	bool is_character = !(keycode & (SDLK_SCANCODE_MASK | SDLK_EXTENDED_MASK))
-		&& keycode >= 0x20
-		&& keycode != 0x7F;
+	bool is_masked = (keycode & (SDLK_SCANCODE_MASK | SDLK_EXTENDED_MASK)) != 0;
 
-	if (is_character) {
-		char utf8[5];
-		char *end = SDL_UCS4ToUTF8(keycode, utf8);
-		*end = '\0';
-		return packed::Value(utf8);
+	if (!is_masked) {
+		switch (keycode) {
+			case SDLK_RETURN:
+			case SDLK_ESCAPE:
+			case SDLK_BACKSPACE:
+			case SDLK_TAB:
+			case SDLK_DELETE:
+				break;
+			default: {
+				bool is_control = keycode < 0x20 || (keycode >= 0x80 && keycode <= 0x9F);
+				if (is_control) { return packed::Value(); }
+				char utf8[5];
+				char *end = SDL_UCS4ToUTF8(keycode, utf8);
+				*end = '\0';
+				return packed::Value(utf8);
+			}
+		}
 	}
 
 	const char *name = SDL_GetKeyName(keycode);
@@ -25,6 +35,7 @@ keyboard::packKey(SDL_Keycode keycode)
 		SDL_ClearError();
 		return packed::Value();
 	}
+
 	return packed::Value(name);
 }
 
@@ -49,6 +60,16 @@ isKeypad(int scancode)
 		|| (scancode >= SDL_SCANCODE_KP_00 && scancode <= SDL_SCANCODE_KP_HEXADECIMAL);
 }
 
+static int
+findScancode(SDL_Keycode keycode)
+{
+	for (int i = 1; i < SDL_SCANCODE_COUNT; i++) {
+		if (isKeypad(i)) { continue; }
+		if (SDL_GetKeyFromScancode((SDL_Scancode) i, SDL_KMOD_NONE, true) == keycode) { return i; }
+	}
+	return 0;
+}
+
 Napi::Value
 keyboard::getScancode(const Napi::CallbackInfo &info)
 {
@@ -67,19 +88,14 @@ keyboard::getScancode(const Napi::CallbackInfo &info)
 	Uint32 codepoint = SDL_StepUTF8(&cursor, &remaining);
 	SDL_Keycode exact = (codepoint != 0 && remaining == 0) ? (SDL_Keycode) codepoint : keycode;
 
-	for (SDL_Keycode candidate : { exact, keycode }) {
-		for (int i = 1; i < SDL_SCANCODE_COUNT; i++) {
-			if (isKeypad(i)) { continue; }
-			if (SDL_GetKeyFromScancode((SDL_Scancode) i, SDL_KMOD_NONE, true) == candidate) {
-				return Napi::Number::New(env, i);
-			}
-		}
-	}
-
-	int scancode = SDL_GetScancodeFromKey(keycode, nullptr);
+	int scancode = findScancode(exact);
+	if (scancode == 0 && exact != keycode) { scancode = findScancode(keycode); }
 	if (scancode == 0) {
-		SDL_ClearError();
-		return env.Null();
+		scancode = SDL_GetScancodeFromKey(keycode, nullptr);
+		if (scancode == 0) {
+			SDL_ClearError();
+			return env.Null();
+		}
 	}
 
 	return Napi::Number::New(env, scancode);

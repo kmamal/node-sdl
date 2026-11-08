@@ -243,6 +243,8 @@ const mapping = Object.assign(Object.create(null), {
 
 const isCharacter = (key) => key !== null && [ ...key ].length === 1
 
+const mapKey = (key) => mapping[key] ?? (isCharacter(key) ? key : null)
+
 const buildReverseMapping = () => {
 	const reverseMapping = Object.create(null)
 
@@ -296,6 +298,7 @@ const invalidateReverseMapping = () => { reverseMapping = null }
 
 module.exports = {
 	mapping,
+	mapKey,
 	getReverseMapping,
 	invalidateReverseMapping,
 	isCharacter,

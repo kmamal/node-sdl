@@ -3,12 +3,10 @@ const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { mapping, getReverseMapping, isCharacter } = require('./key-mapping')
+const { mapKey, getReverseMapping, isCharacter } = require('./key-mapping')
 const { validateIntegerRange, validateString } = require('../validate')
 
 const validEvents = [ 'keymapChange' ]
-
-const mapKey = (key) => mapping[key] ?? (isCharacter(key) ? key : null)
 
 const keyboard = new class extends EventsViaPoll {
 	constructor () { super(validEvents, () => { assertInitialized('video') }) }

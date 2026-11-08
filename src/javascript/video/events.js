@@ -1,7 +1,7 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { video: videoModule } = require('.')
-const { mapping, isCharacter } = require('../keyboard/key-mapping')
+const { mapKey } = require('../keyboard/key-mapping')
 const { refreshDevices: refreshTouchDevices } = require('../touch/devices')
 const { tryEmit, tryCall } = require('../events/try')
 
@@ -157,8 +157,7 @@ const handleWindowEvent = (event, targetId) => {
 
 		case 'keyDown':
 		case 'keyUp': {
-			const { key } = event
-			event.key = mapping[key] ?? (isCharacter(key) ? key : null)
+			event.key = mapKey(event.key)
 		} break
 
 		case 'fingerDown':
