@@ -69,6 +69,8 @@ T.test("sdl::window validates arguments", (t) => {
 		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, { dstRect: { x: 0, y: 0, width: 0, height: 1 } }) })
 		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, { dstRect: { x: 0, y: 0, width: 1 } }) })
 		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, { dstRect: { x: 0, y: 0, width: 1, height: -1 } }) })
+		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, { dstRect: { x: 1e300, y: 0, width: 1, height: 1 } }) })
+		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, { dstRect: { x: 0, y: 0, width: 1e300, height: 1 } }) })
 
 		t.throws(() => { window.render(4, 4, 16, 'p010', Buffer.alloc(1024)) })
 

@@ -6,6 +6,8 @@ const {
 	validateString,
 	validateObject,
 	validateInt32,
+	validateFloat,
+	validatePositiveFloat,
 	validatePositiveInt32,
 	validateNotDestroyed,
 } = require('../validate')
@@ -497,12 +499,10 @@ class Window extends EventsViaPoll {
 
 		if (dstRect !== null) {
 			validateObject('dstRect', dstRect)
-			if (!Number.isFinite(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be a number"), { dstRect }) }
-			if (!Number.isFinite(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be a number"), { dstRect }) }
-			if (!Number.isFinite(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be a number"), { dstRect }) }
-			if (dstRect.width <= 0) { throw Object.assign(new Error("dstRect.width must be positive"), { dstRect }) }
-			if (!Number.isFinite(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be a number"), { dstRect }) }
-			if (dstRect.height <= 0) { throw Object.assign(new Error("dstRect.height must be positive"), { dstRect }) }
+			validateFloat('dstRect.x', dstRect.x)
+			validateFloat('dstRect.y', dstRect.y)
+			validatePositiveFloat('dstRect.width', dstRect.width)
+			validatePositiveFloat('dstRect.height', dstRect.height)
 		}
 
 		const _format = Enums.pixelFormat[format]

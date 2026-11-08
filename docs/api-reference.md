@@ -1236,7 +1236,7 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
   - `dstRect: <object>|<null>` Where exactly on the window to draw the image. Default: `null`, meaning the whole window.
-    - `x, y, width, height: <rect>` The components of the rectangle, in points, relative to the window (the same units as [`width`](#windowwidth) and mouse events, not pixels). May be fractional, in which case the image is positioned at sub-pixel precision. `width` and `height` must be positive.
+    - `x, y, width, height: <rect>` The components of the rectangle, in points, relative to the window (the same units as [`width`](#windowwidth) and mouse events, not pixels). May be fractional, in which case the image is positioned at sub-pixel precision. All four must be finite numbers that fit in a 32-bit float. `width` and `height` must be positive.
 
 Displays an image in the window.
 
@@ -1675,8 +1675,8 @@ Reports where the mouse is on the screen.
 
 ### sdl.mouse.setPosition(x, y)
 
-- `x: <number>` The new x position of the mouse in points, relative to the screen. May be fractional.
-- `y: <number>` The new y position of the mouse in points, relative to the screen. May be fractional.
+- `x: <number>` The new x position of the mouse in points, relative to the screen. Must fit in a 32-bit float. May be fractional.
+- `y: <number>` The new y position of the mouse in points, relative to the screen. Must fit in a 32-bit float. May be fractional.
 
 Moves the mouse to the given position.
 
@@ -2838,7 +2838,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
-  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a finite, non-negative number. Default: `1`
+  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a non-negative number that fits in a 32-bit float. Default: `1`
   - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioPlaybackStream>`](#class-audioplaybackstream-extends-audiostream) the opened stream.
 
@@ -2934,7 +2934,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
   - `format: `[`<SampleFormat>`](#sample-formats): The binary format for each sample. Default: `'f32'`
   - `buffered: <number>`: Number of frames buffered by the driver. Must be a power of `2`, at most `32768`. Default: `4096`
-  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a finite, non-negative number. Default: `1`
+  - `gain: <number>`: The initial [`gain`](#audiostreamgain). Must be a non-negative number that fits in a 32-bit float. Default: `1`
   - `frequencyRatio: <number>`: The initial [`frequencyRatio`](#audiostreamfrequencyratio). Must be between `0.01` and `100`. Default: `1`
 - Returns: [`<AudioRecordingStream>`](#class-audiorecordingstream-extends-audiostream) the opened stream.
 
@@ -3061,7 +3061,7 @@ A volume multiplier that SDL applies to the stream's data, after you write it fo
 
 ### audioStream.setGain(gain)
 
-- `gain: <number>`: The new gain. Must be a finite, non-negative number.
+- `gain: <number>`: The new gain. Must be a non-negative number that fits in a 32-bit float.
 
 Changes the stream's [`gain`](#audiostreamgain).
 

@@ -3,7 +3,7 @@ const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { validateImage, validateRgbFormat } = require('../video/validate')
-const { validateInteger, validateIntegerRange, validateNumber, validateString } = require('../validate')
+const { validateInteger, validateIntegerRange, validateFloat, validateString } = require('../validate')
 
 let captured = false
 
@@ -27,8 +27,8 @@ const mouse = {
 
 	setPosition (x, y) {
 		assertInitialized('video')
-		validateNumber('x', x)
-		validateNumber('y', y)
+		validateFloat('x', x)
+		validateFloat('y', y)
 
 		Bindings.mouse_setPosition(x, y)
 	},

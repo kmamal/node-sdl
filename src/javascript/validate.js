@@ -1,5 +1,6 @@
 const INT32_MIN = -(2 ** 31)
 const INT32_MAX = 2 ** 31 - 1
+const FLOAT32_MAX = 3.4028234663852886e38
 
 const fail = (message, name, value) => {
 	throw Object.assign(new Error(message), { [name.slice(name.lastIndexOf('.') + 1)]: value })
@@ -24,6 +25,21 @@ const validateNumber = (name, value) => {
 const validateNonNegativeNumber = (name, value) => {
 	validateNumber(name, value)
 	if (value < 0) { fail(`${name} must be non-negative`, name, value) }
+}
+
+const validateFloat = (name, value) => {
+	validateNumber(name, value)
+	if (Math.abs(value) > FLOAT32_MAX) { fail(`${name} must fit in a 32-bit float`, name, value) }
+}
+
+const validateNonNegativeFloat = (name, value) => {
+	validateNonNegativeNumber(name, value)
+	validateFloat(name, value)
+}
+
+const validatePositiveFloat = (name, value) => {
+	validateFloat(name, value)
+	if (value <= 0) { fail(`${name} must be positive`, name, value) }
 }
 
 const validateNumberRange = (name, value, min, max) => {
@@ -76,6 +92,9 @@ module.exports = {
 	validateBuffer,
 	validateNumber,
 	validateNonNegativeNumber,
+	validateFloat,
+	validateNonNegativeFloat,
+	validatePositiveFloat,
 	validateNumberRange,
 	validateInteger,
 	validateNonNegativeInteger,

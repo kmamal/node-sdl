@@ -7,7 +7,7 @@ const {
 	validateString,
 	validateObject,
 	validateBuffer,
-	validateNonNegativeNumber,
+	validateNonNegativeFloat,
 	validateNumberRange,
 	validatePositiveInteger,
 	validateIntegerRange,
@@ -38,7 +38,7 @@ class AudioStream extends EventsViaPoll {
 		validatePositiveInteger('buffered', buffered)
 		if (buffered > 2 ** 15) { throw Object.assign(new Error("buffered must be at most 32768"), { buffered }) }
 		if (buffered !== 2 ** (32 - Math.clz32(buffered) - 1)) { throw Object.assign(new Error("buffered must be a power of 2"), { buffered }) }
-		validateNonNegativeNumber('gain', gain)
+		validateNonNegativeFloat('gain', gain)
 		validateNumberRange('frequencyRatio', frequencyRatio, 0.01, 100)
 
 		const _format = Enums.audioFormat[format]
@@ -134,7 +134,7 @@ class AudioStream extends EventsViaPoll {
 	setGain (gain) {
 		this._assertOpen()
 
-		validateNonNegativeNumber('gain', gain)
+		validateNonNegativeFloat('gain', gain)
 
 		Bindings.audio_setGain(this._id, gain)
 
