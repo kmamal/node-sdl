@@ -14,15 +14,17 @@ const rgb = (bytesPerPixel) => ({
 	minStride: minStride(bytesPerPixel),
 	minBufferSize,
 	isRenderable: true,
+	isConvertible: true,
 })
 
-const yuv = (bytesPerPixel, isPlanarYuv, isRenderable = true) => ({
+const yuv = (bytesPerPixel, isPlanarYuv, isSupported = true) => ({
 	bytesPerPixel,
 	isYuv: true,
 	isPlanarYuv,
 	minStride: isPlanarYuv ? minStride(bytesPerPixel) : minStridePacked,
 	minBufferSize: isPlanarYuv ? minBufferSizePlanar : minBufferSize,
-	isRenderable,
+	isRenderable: isSupported,
+	isConvertible: isSupported,
 })
 
 const VideoFormatHelpers = Object.assign(Object.create(null), {

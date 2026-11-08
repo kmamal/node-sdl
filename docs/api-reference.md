@@ -448,7 +448,7 @@ String values that describe how a Buffer stores the pixels of an image.
 | `'yvyu'`        | `SDL_PIXELFORMAT_YVYU`              | packed mode: Y0+V0+Y1+U0 (1 plane)                                                           |
 | `'nv12'`        | `SDL_PIXELFORMAT_NV12`              | planar mode: Y + U/V interleaved (2 planes)                                                  |
 | `'nv21'`        | `SDL_PIXELFORMAT_NV21`              | planar mode: Y + V/U interleaved (2 planes)                                                  |
-| `'p010'`        | `SDL_PIXELFORMAT_P010`              | planar mode: 10-bit Y + U/V interleaved in 16-bit samples (2 planes), rejected by `window.render()` |
+| `'p010'`        | `SDL_PIXELFORMAT_P010`              | planar mode: 10-bit Y + U/V interleaved in 16-bit samples (2 planes), rejected by `window.render()` and `sdl.video.convert()` |
 
 The byte-order aliases (`'rgba32'` through `'xbgr32'`) are accepted wherever you pass a pixel format in, as a convenience.
 Every pixel format the library reports, such as a display's `format`, is one of the other, explicit names.
@@ -522,6 +522,7 @@ Fired when a display's `usable` region changes, for example when a dock or taskb
 
 Converts an image between pixel formats, and optionally scales it to a different size.
 Both RGB and YUV formats are accepted, but SDL doesn't support every combination, in which case the function throws with SDL's error message.
+The `'p010'` format can't be converted to or from at all, and is rejected up front.
 
 ### sdl.video.bytesPerPixel(format)
 

@@ -21,6 +21,7 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 	validateString('srcSpec.format', srcFormat)
 	const srcHelpers = VideoFormatHelpers[srcFormat]
 	if (srcHelpers === undefined) { throw Object.assign(new Error("invalid srcSpec.format"), { srcFormat }) }
+	if (!srcHelpers.isConvertible) { throw Object.assign(new Error("srcSpec.format can't be converted"), { srcFormat }) }
 
 	const minSrcStride = srcHelpers.minStride(srcWidth)
 	if (srcStride === undefined) { srcStride = minSrcStride }
@@ -40,6 +41,7 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 	validateString('dstSpec.format', dstFormat)
 	const dstHelpers = VideoFormatHelpers[dstFormat]
 	if (dstHelpers === undefined) { throw Object.assign(new Error("invalid dstSpec.format"), { dstFormat }) }
+	if (!dstHelpers.isConvertible) { throw Object.assign(new Error("dstSpec.format can't be converted"), { dstFormat }) }
 
 	const minStride = dstHelpers.minStride(dstWidth)
 	if (dstStride === undefined) { dstStride = minStride }
