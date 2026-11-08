@@ -73,14 +73,15 @@ _closeOpens (Thread &thread)
 	SDL_ClearError();
 }
 
-void
-threads::leave (napi_env env)
+static void _envCleanup (void *arg);
+
+static void
+_leave (napi_env env, bool from_hook)
 {
-	bool shut_down = false;
+	Thread thread;
 	{
 		std::lock_guard<std::mutex> guard(global::lock());
 
-		Thread thread;
 		{
 			std::lock_guard<std::mutex> registry_guard(mutex);
 			auto it = all_threads.find(env);
@@ -89,19 +90,28 @@ threads::leave (napi_env env)
 			all_threads.erase(it);
 			if (thread.demand) { num_demanding.fetch_sub(1, std::memory_order_acq_rel); }
 			if (!thread.is_main) { num_workers.fetch_sub(1, std::memory_order_acq_rel); }
-			shut_down = thread.is_main;
 		}
 
 		if (global::isReady()) { _closeOpens(thread); }
 	}
 
-	if (shut_down) { global::teardown(); }
+	if (thread.demand) { napi_unref_threadsafe_function(env, thread.wake); }
+	napi_release_threadsafe_function(thread.wake, napi_tsfn_abort);
+	if (!from_hook) { napi_remove_env_cleanup_hook(env, _envCleanup, (void *) env); }
+
+	if (thread.is_main) { global::teardown(); }
 }
 
 static void
 _envCleanup (void *arg)
 {
-	threads::leave((napi_env) arg);
+	_leave((napi_env) arg, true);
+}
+
+void
+threads::leave (napi_env env)
+{
+	_leave(env, false);
 }
 
 void
@@ -166,6 +176,7 @@ threads::drain (Napi::Env &env, Napi::Function &callback)
 			if (it != all_threads.end()) {
 				auto &queue = it->second.queue;
 				queue.insert(queue.begin(), pending.begin(), pending.end());
+				if (!queue.empty()) { _wake(it->second); }
 			}
 			throw;
 		}
@@ -204,10 +215,7 @@ threads::shutdown ()
 	std::lock_guard<std::mutex> guard(mutex);
 
 	for (auto &entry : all_threads) {
-		Thread &thread = entry.second;
-		if (thread.wake != nullptr && !thread.is_main) {
-			napi_release_threadsafe_function(thread.wake, napi_tsfn_abort);
-		}
+		napi_release_threadsafe_function(entry.second.wake, napi_tsfn_abort);
 	}
 	all_threads.clear();
 	num_demanding.store(0, std::memory_order_release);
