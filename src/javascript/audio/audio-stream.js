@@ -2,6 +2,7 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { tryEmit } = require('../events/try')
 const { AudioFormatHelpers } = require('./format-helpers')
 const {
 	validateString,
@@ -51,10 +52,7 @@ class AudioStream extends EventsViaPoll {
 			const event = recording
 				? { type: notifyEvent }
 				: { type: notifyEvent, underruns, missing }
-			Globals.events.withoutPolling(() => {
-				try { this.emit(notifyEvent, event) }
-				catch (error) { this.emit('error', error) }
-			})
+			Globals.events.withoutPolling(() => { tryEmit(this, notifyEvent, event) })
 		}
 
 		const id = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered, notify, device)
