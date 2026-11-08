@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const {
+	validateBoolean,
 	validateString,
 	validateObject,
 	validateInt32,
@@ -82,15 +83,15 @@ class Window extends EventsViaPoll {
 		if (y !== null) { validateInt32('y', y) }
 		if (width !== null) { validatePositiveInt32('width', width) }
 		if (height !== null) { validatePositiveInt32('height', height) }
-		if (typeof visible !== 'boolean') { throw Object.assign(new Error("visible must be a boolean"), { visible }) }
-		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
-		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
-		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
-		if (typeof alwaysOnTop !== 'boolean') { throw Object.assign(new Error("alwaysOnTop must be a boolean"), { alwaysOnTop }) }
-		if (hasAccelerated && typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		validateBoolean('visible', visible)
+		validateBoolean('fullscreen', fullscreen)
+		validateBoolean('resizable', resizable)
+		validateBoolean('borderless', borderless)
+		validateBoolean('alwaysOnTop', alwaysOnTop)
+		if (hasAccelerated) { validateBoolean('accelerated', accelerated) }
 		if (hasVsync) { validateVsync(vsync) }
-		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
-		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
+		validateBoolean('opengl', opengl)
+		validateBoolean('webgpu', webgpu)
 		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
@@ -288,7 +289,7 @@ class Window extends EventsViaPoll {
 	show (show = true) {
 		validateNotDestroyed(this)
 
-		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
+		validateBoolean('show', show)
 
 		show ? Bindings.window_show(this._id) : Bindings.window_hide(this._id)
 	}
@@ -305,7 +306,7 @@ class Window extends EventsViaPoll {
 	setFullscreen (fullscreen) {
 		validateNotDestroyed(this)
 
-		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
+		validateBoolean('fullscreen', fullscreen)
 
 		Bindings.window_setFullscreen(this._id, fullscreen)
 	}
@@ -319,7 +320,7 @@ class Window extends EventsViaPoll {
 	setResizable (resizable) {
 		validateNotDestroyed(this)
 
-		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
+		validateBoolean('resizable', resizable)
 		if (resizable && this._borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless: this._borderless }) }
 
 		this._resizable = Bindings.window_setResizable(this._id, resizable)
@@ -334,7 +335,7 @@ class Window extends EventsViaPoll {
 	setBorderless (borderless) {
 		validateNotDestroyed(this)
 
-		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
+		validateBoolean('borderless', borderless)
 		if (borderless && this._resizable) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable: this._resizable, borderless }) }
 
 		this._borderless = Bindings.window_setBorderless(this._id, borderless)
@@ -358,7 +359,7 @@ class Window extends EventsViaPoll {
 		if (this._opengl) { throw new Error("can't call setAccelerated in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setAccelerated in webgpu mode") }
 
-		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		validateBoolean('accelerated', accelerated)
 
 		const result = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
 		this._accelerated = result.accelerated
@@ -472,7 +473,7 @@ class Window extends EventsViaPoll {
 	setRelativeMouseMode (relative = true) {
 		validateNotDestroyed(this)
 
-		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
+		validateBoolean('relative', relative)
 
 		this._relativeMouseMode = Bindings.window_setRelativeMouseMode(this._id, relative)
 	}
@@ -524,7 +525,7 @@ class Window extends EventsViaPoll {
 	flash (untilFocused = false) {
 		validateNotDestroyed(this)
 
-		if (typeof untilFocused !== 'boolean') { throw Object.assign(new Error("untilFocused must be a boolean"), { untilFocused }) }
+		validateBoolean('untilFocused', untilFocused)
 
 		Bindings.window_flash(this._id, untilFocused ? 2 : 1)
 	}

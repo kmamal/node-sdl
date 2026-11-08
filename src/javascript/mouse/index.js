@@ -3,7 +3,7 @@ const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { validateImage, validateRgbFormat } = require('../video/validate')
-const { validateInteger, validateIntegerRange, validateFloat, validateString } = require('../validate')
+const { validateBoolean, validateInteger, validateIntegerRange, validateFloat, validateString } = require('../validate')
 
 let captured = false
 
@@ -63,7 +63,7 @@ const mouse = {
 
 	showCursor (show = true) {
 		assertInitialized('video')
-		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
+		validateBoolean('show', show)
 
 		Bindings.mouse_showCursor(show)
 	},
@@ -82,7 +82,7 @@ const mouse = {
 
 	capture (capture = true) {
 		assertInitialized('video')
-		if (typeof capture !== 'boolean') { throw Object.assign(new Error("capture must be a boolean"), { capture }) }
+		validateBoolean('capture', capture)
 
 		Bindings.mouse_capture(capture)
 		captured = capture

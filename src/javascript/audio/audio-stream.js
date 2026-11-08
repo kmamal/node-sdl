@@ -5,6 +5,7 @@ const { EventsViaPoll } = require('../events/events-via-poll')
 const { tryEmit } = require('../events/try')
 const { AudioFormatHelpers } = require('./format-helpers')
 const {
+	validateBoolean,
 	validateString,
 	validateObject,
 	validateBuffer,
@@ -151,7 +152,7 @@ class AudioStream extends EventsViaPoll {
 	play (play = true) {
 		this._assertOpen()
 
-		if (typeof play !== 'boolean') { throw Object.assign(new Error("play must be a boolean"), { play }) }
+		validateBoolean('play', play)
 
 		Bindings.audio_play(this._id, play)
 

@@ -6,6 +6,10 @@ const fail = (message, name, value) => {
 	throw Object.assign(new Error(message), { [name.slice(name.lastIndexOf('.') + 1)]: value })
 }
 
+const validateBoolean = (name, value) => {
+	if (typeof value !== 'boolean') { fail(`${name} must be a boolean`, name, value) }
+}
+
 const validateString = (name, value) => {
 	if (typeof value !== 'string') { fail(`${name} must be a string`, name, value) }
 }
@@ -87,6 +91,7 @@ const validateNotDestroyed = (window) => {
 }
 
 module.exports = {
+	validateBoolean,
 	validateString,
 	validateObject,
 	validateBuffer,
