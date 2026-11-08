@@ -21,8 +21,9 @@ T.test("sdl::worker module", async (t) => {
 				attempt(() => sdl.mouse.position),
 				attempt(() => sdl.touch.devices),
 				attempt(() => sdl.clipboard.text),
+				attempt(() => sdl.video.windows),
+				attempt(() => sdl.mouse.captured),
 			],
-			windows: sdl.video.windows,
 		})
 	`)
 
@@ -33,8 +34,7 @@ T.test("sdl::worker module", async (t) => {
 	t.equal(result.bytesPerPixel, 4)
 	t.equal(result.numScancodes, Object.keys(sdl.keyboard.SCANCODE).length)
 	t.equal(result.power, [ 'state', 'seconds', 'percent' ])
-	t.equal(result.video, new Array(8).fill(MAIN_THREAD_ONLY))
-	t.equal(result.windows, [])
+	t.equal(result.video, new Array(10).fill(MAIN_THREAD_ONLY))
 })
 
 T.test("sdl::worker can import first", async (t) => {

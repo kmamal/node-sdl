@@ -75,7 +75,10 @@ const mouse = {
 		Bindings.mouse_redrawCursor()
 	},
 
-	get captured () { return captured },
+	get captured () {
+		assertInitialized('video')
+		return captured
+	},
 
 	capture (capture = true) {
 		assertInitialized('video')
