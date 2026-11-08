@@ -8,20 +8,12 @@ clipboard::getText (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	bool has_text = SDL_HasClipboardText();
-
-	// Clear any stale error, since an empty result is otherwise ambiguous
 	SDL_ClearError();
 
-	if (!has_text) {
-		return Napi::String::New(env, "");
-	}
-
 	char *text = SDL_GetClipboardText();
-	if (text[0] == '\0') {
+	if (text == nullptr || text[0] == '\0') {
 		SDL_free(text);
 
-		// The clipboard may have been legitimately emptied since the check above
 		const char *error = SDL_GetError();
 		if (error[0] == '\0') {
 			return Napi::String::New(env, "");
