@@ -39,11 +39,12 @@ static void
 _notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::nullptr_t *)
 {
 	state->pending.exchange(false, std::memory_order_acq_rel);
+	if (env == nullptr || callback.IsEmpty()) { return; }
+	if (state->closed.load(std::memory_order_acquire)) { return; }
+	if (!state->notify.load(std::memory_order_acquire)) { return; }
 	uint32_t underruns = state->underruns.exchange(0, std::memory_order_relaxed);
 	uint32_t missing = state->missing.exchange(0, std::memory_order_relaxed);
 	uint32_t available = state->available.exchange(0, std::memory_order_relaxed);
-	if (env == nullptr || callback.IsEmpty()) { return; }
-	if (state->closed.load(std::memory_order_acquire)) { return; }
 	callback.Call({
 		Napi::Number::New(env, underruns),
 		Napi::Number::New(env, missing),
@@ -80,6 +81,8 @@ static void SDLCALL
 _onPut (void *userdata, SDL_AudioStream *stream, int, int)
 {
 	StreamState *state = (StreamState *) userdata;
+
+	if (!state->notify.load(std::memory_order_acquire)) { return; }
 
 	int available = SDL_GetAudioStreamAvailable(stream);
 	if (available < 0) { SDL_ClearError(); }
@@ -231,8 +234,8 @@ audio::_getDefaultDevice(bool is_recording)
 	return device;
 }
 
-Napi::Array
-audio::_getDevices(Napi::Env &env, bool is_recording)
+static Napi::Array
+_getDevices (Napi::Env &env, bool is_recording)
 {
 	int num_devices;
 	SDL_AudioDeviceID *device_ids = is_recording
@@ -293,7 +296,7 @@ audio::getDevices(const Napi::CallbackInfo &info)
 
 	bool is_recording = info[0].As<Napi::Boolean>().Value();
 
-	return audio::_getDevices(env, is_recording);
+	return _getDevices(env, is_recording);
 }
 
 Napi::Value

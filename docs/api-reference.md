@@ -3132,8 +3132,11 @@ Instead, [`sdl.audio.recording.openDevice()`](#sdlaudiorecordingopendevicedevice
 
 ### Event: 'readable'
 
+- `available: <number>` The number of bytes, in the stream's format, that waited on the stream to be read when the device last recorded into it.
+
 Fired when the device has recorded new audio into the stream.
 Call [`recordingStream.getData()`](#recordingstreamgetdatabuffer-bytes) to retrieve and process it.
+SDL never discards recorded audio, so if you read it slower than the device records it, `available` keeps growing and so does the stream's memory use.
 
 ### recordingStream.available
 
@@ -3143,11 +3146,8 @@ The number of bytes of recorded audio that wait on the stream for you to read.
 
 ### recordingStream.getData(buffer[, bytes])
 
-- `available: <number>` The number of bytes, in the stream's format, that waited on the stream to be read when the device last recorded into it.
-
 - `buffer: <Buffer>` The buffer to write data to.
 - `bytes: <number>` The number of bytes to write to the buffer. Must be a non-negative 32-bit integer that doesn't exceed `buffer.length`. Default: `buffer.length`
-SDL never discards recorded audio, so if you read it slower than the device records it, `available` keeps growing and so does the stream's memory use.
 - Returns: `<number>` The actual number of bytes read.
 
 Takes the recorded audio data that waits on the stream and writes it to the provided buffer.

@@ -17,7 +17,6 @@ namespace audio {
 	packed::Value _getDevice(SDL_AudioDeviceID id);
 	packed::Value _getFormat(SDL_AudioDeviceID id);
 	packed::Value _getDefaultDevice(bool is_recording);
-	Napi::Array _getDevices(Napi::Env &env, bool is_recording);
 
 	Napi::Value getDrivers(const Napi::CallbackInfo &info);
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
