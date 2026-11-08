@@ -1,17 +1,15 @@
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { getFormatHelpers } = require('./format-helpers')
-const { validateIntegerRange, validatePositiveInt32, validateObject, validateString, validateBuffer } = require('../validate')
+const { validateIntegerRange, validatePositiveInt32, validateObject, validateBuffer } = require('../validate')
 
 const checkSpec = (spec, name) => {
 	validateObject(name, spec)
 	const { format = 'f32', channels = 1, frequency = 48000 } = spec
-	validateString(`${name}.format`, format)
-	const _format = Enums.audioFormat[format]
-	if (_format === undefined) { throw Object.assign(new Error(`invalid ${name}.format`), { format }) }
+	const helpers = getFormatHelpers(format, `${name}.format`)
 	validateIntegerRange(`${name}.channels`, channels, 1, 8)
 	validatePositiveInt32(`${name}.frequency`, frequency)
-	return { format: _format, channels, frequency, frameSize: channels * getFormatHelpers(format).bytesPerSample }
+	return { format: Enums.audioFormat[format], channels, frequency, frameSize: channels * helpers.bytesPerSample }
 }
 
 const checkSource = (src, srcData) => {

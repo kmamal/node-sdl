@@ -80,10 +80,10 @@ else {
 	AudioFormatHelpers.f32 = AudioFormatHelpers.f32be
 }
 
-const getFormatHelpers = (format) => {
-	validateString('format', format)
+const getFormatHelpers = (format, name = 'format') => {
+	validateString(name, format)
 	const helpers = AudioFormatHelpers[format]
-	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+	if (helpers === undefined) { throw Object.assign(new Error(`invalid ${name}`), { format }) }
 	return helpers
 }
 

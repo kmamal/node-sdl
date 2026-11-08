@@ -3,10 +3,9 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { tryEmit } = require('../events/try')
-const { AudioFormatHelpers } = require('./format-helpers')
+const { getFormatHelpers } = require('./format-helpers')
 const {
 	validateBoolean,
-	validateString,
 	validateObject,
 	validateBuffer,
 	validateNonNegativeFloat,
@@ -35,15 +34,12 @@ class AudioStream extends EventsViaPoll {
 
 		validateIntegerRange('channels', channels, 1, 8)
 		validatePositiveInt32('frequency', frequency)
-		validateString('format', format)
+		const helper = getFormatHelpers(format)
 		validatePositiveInt32('buffered', buffered)
 		validateNonNegativeFloat('gain', gain)
 		validateNumberRange('frequencyRatio', frequencyRatio, 0.01, 100)
 
 		const _format = Enums.audioFormat[format]
-		if (_format === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-
-		const helper = AudioFormatHelpers[format]
 
 		const notify = (underruns, missing, available) => {
 			if (this._closed) { return }
