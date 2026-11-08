@@ -29,10 +29,10 @@ const makeModule = (type, Stream) => new class extends EventsViaPoll {
 
 		validateObject('device', requested)
 
-		const found = list.find(({ id }) => id === requested.id)
-		if (!found) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device: requested }) }
+		const device = list.find(({ id }) => id === requested.id)
+		if (!device) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device: requested }) }
 
-		return new Stream(found, options)
+		return new Stream(device, options)
 	}
 }()
 
