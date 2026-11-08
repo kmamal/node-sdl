@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@kmamal/sdl` can now be imported from worker threads and works exactly as in the main thread with the exception of the video subsystem (`sdl.video`, `sdl.keyboard`, `sdl.mouse`, `sdl.touch`, and `sdl.clipboard`) which can only be used on the main thread. `@kmamal/sdl/helpers` is no longer needed and has been removed.
 - Exceptions thrown in event listeners are re-emitted as an `'error'` event, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception. They no longer stop event delivery or crash the process.
 - Attaching a listener to a destroyed window or a closed instance or stream now throws, instead of silently never firing.
+- Video display `geometry` and `usable` can be null.
 - Audio and video formats are reported using the platform-independent enums. The platform-dependent ones are only used as input.
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
 - `sdl.keyboard.getState()` returns a `Uint8Array` of `0`/`1` values instead of an array of booleans.
