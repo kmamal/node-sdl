@@ -6,6 +6,7 @@
 
 namespace window {
 
+		void resetTexture(SDL_Window *window);
 		Napi::Value create(const Napi::CallbackInfo &info);
 		Napi::Value setTitle(const Napi::CallbackInfo &info);
 		Napi::Value setPosition(const Napi::CallbackInfo &info);

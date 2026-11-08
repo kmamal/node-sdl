@@ -5,6 +5,7 @@
 #include "joystick.h"
 #include "gamepad.h"
 #include "audio.h"
+#include "window.h"
 #include "threads.h"
 #include "global.h"
 #include <memory>
@@ -270,6 +271,16 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.setTargetId(event.render.windowID);
 			packed.setType(events::types::RENDER_DEVICE_LOST);
 			break;
+		}
+
+		case SDL_EVENT_RENDER_DEVICE_RESET: {
+			SDL_Window *window = SDL_GetWindowFromID(event.render.windowID);
+			if (window == nullptr) {
+				SDL_ClearError();
+				return false;
+			}
+			window::resetTexture(window);
+			return false;
 		}
 
 		case SDL_EVENT_DROP_BEGIN:

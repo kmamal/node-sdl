@@ -8,6 +8,17 @@
 
 static const char *TEXTURE_PROPERTY = "kmamal.sdl.texture";
 
+void
+window::resetTexture (SDL_Window *window)
+{
+	SDL_PropertiesID props = SDL_GetWindowProperties(window);
+	SDL_Texture *texture = (SDL_Texture *) SDL_GetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
+	if (texture != nullptr) {
+		SDL_DestroyTexture(texture);
+		SDL_SetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
+	}
+}
+
 static SDL_Window *
 getWindow (Napi::Env &env, int window_id)
 {
