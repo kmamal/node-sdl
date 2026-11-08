@@ -2,7 +2,6 @@
 #include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 
 std::map<SDL_TouchDeviceType, std::string> touch::device_types;
 
@@ -14,10 +13,7 @@ touch::getDevices(const Napi::CallbackInfo &info)
 	int num_devices;
 	SDL_TouchID *touch_ids = SDL_GetTouchDevices(&num_devices);
 	if (touch_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetTouchDevices() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetTouchDevices");
 	}
 
 	Napi::Array devices = Napi::Array::New(env);

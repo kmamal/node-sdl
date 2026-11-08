@@ -11,7 +11,6 @@
 #include <memory>
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 #include <vector>
 #include <algorithm>
 

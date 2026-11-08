@@ -5,7 +5,6 @@
 #include "power.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 #include <map>
 #include <cmath>
 
@@ -112,10 +111,7 @@ joystick::_getDevices (Napi::Env &env)
 	int num_devices;
 	SDL_JoystickID *joystick_ids = SDL_GetJoysticks(&num_devices);
 	if (joystick_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoysticks() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetJoysticks");
 	}
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
@@ -185,10 +181,7 @@ joystick::open (const Napi::CallbackInfo &info)
 	SDL_ClearError();
 	SDL_Joystick *joystick = SDL_OpenJoystick(id);
 	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_OpenJoystick(" << id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_OpenJoystick", id);
 	}
 
 	// SDL_OpenJoystick produces errors even though it succeeds
@@ -211,10 +204,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 		int num_axes = SDL_GetNumJoystickAxes(joystick);
 		if (num_axes < 0) {
-			std::ostringstream message;
-			message << "SDL_GetNumJoystickAxes(" << id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetNumJoystickAxes", id);
 		}
 
 		Napi::Array axes = Napi::Array::New(env, num_axes);
@@ -235,10 +225,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 		int num_balls = SDL_GetNumJoystickBalls(joystick);
 		if (num_balls < 0) {
-			std::ostringstream message;
-			message << "SDL_GetNumJoystickBalls(" << id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetNumJoystickBalls", id);
 		}
 
 		Napi::Array balls = Napi::Array::New(env, num_balls);
@@ -253,10 +240,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 		int num_buttons = SDL_GetNumJoystickButtons(joystick);
 		if (num_buttons < 0) {
-			std::ostringstream message;
-			message << "SDL_GetNumJoystickButtons(" << id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetNumJoystickButtons", id);
 		}
 
 		Napi::Array buttons = Napi::Array::New(env, num_buttons);
@@ -268,10 +252,7 @@ joystick::open (const Napi::CallbackInfo &info)
 
 		int num_hats = SDL_GetNumJoystickHats(joystick);
 		if (num_hats < 0) {
-			std::ostringstream message;
-			message << "SDL_GetNumJoystickHats(" << id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetNumJoystickHats", id);
 		}
 
 		Napi::Array hats = Napi::Array::New(env, num_hats);
@@ -326,10 +307,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	}
 
 	if (!SDL_RumbleJoystick(joystick, low_freq_rumble, high_freq_rumble, duration)) {
-		std::ostringstream message;
-		message << "SDL_RumbleJoystick(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RumbleJoystick", joystick_id);
 	}
 
 	return env.Undefined();
@@ -354,10 +332,7 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 
 	SDL_PropertiesID props = SDL_GetJoystickProperties(joystick);
 	if (props == 0) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickProperties(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetJoystickProperties", joystick_id);
 	}
 
 	Napi::Object result = Napi::Object::New(env);
@@ -389,10 +364,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 	}
 
 	if (!SDL_SetJoystickLED(joystick, std::lround(red * 0xFF), std::lround(green * 0xFF), std::lround(blue * 0xFF))) {
-		std::ostringstream message;
-		message << "SDL_SetJoystickLED(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetJoystickLED", joystick_id);
 	}
 
 	return env.Undefined();
@@ -417,10 +389,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 	}
 
 	if (!SDL_SetJoystickPlayerIndex(joystick, player)) {
-		std::ostringstream message;
-		message << "SDL_SetJoystickPlayerIndex(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetJoystickPlayerIndex", joystick_id);
 	}
 
 	return env.Undefined();
@@ -447,10 +416,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 	}
 
 	if (!SDL_RumbleJoystickTriggers(joystick, left_rumble, right_rumble, duration)) {
-		std::ostringstream message;
-		message << "SDL_RumbleJoystickTriggers(" << joystick_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RumbleJoystickTriggers", joystick_id);
 	}
 
 	return env.Undefined();

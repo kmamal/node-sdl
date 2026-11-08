@@ -11,7 +11,6 @@
 #include "threads.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <atomic>
@@ -348,20 +347,15 @@ _start (Napi::Env &env)
 	SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "0");
 
 	if (!SDL_InitSubSystem(SDL_INIT_EVENTS)) {
-		std::ostringstream message;
-		message << "SDL_Init() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_Init");
 	}
 
 	main_thread_id.store(SDL_GetCurrentThreadID(), std::memory_order_release);
 
 	if (!SDL_AddEventWatch(watchEvents, nullptr)) {
-		std::ostringstream message;
-		message << "SDL_AddEventWatch() error: " << SDL_GetError();
-		SDL_ClearError();
+		Napi::Error error = global::sdlError(env, "SDL_AddEventWatch");
 		SDL_Quit();
-		throw Napi::Error::New(env, message.str());
+		throw error;
 	}
 
 	keyboard::keys = SDL_GetKeyboardState(&keyboard::num_keys);

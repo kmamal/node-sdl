@@ -1,7 +1,6 @@
 #include "keyboard.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 
 int keyboard::num_keys;
 const bool *keyboard::keys;

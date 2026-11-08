@@ -4,7 +4,6 @@
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
-#include <sstream>
 
 
 std::map<SDL_SensorType, std::string> sensor::types;
@@ -22,10 +21,7 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 	int num_devices;
 	SDL_SensorID *sensor_ids = SDL_GetSensors(&num_devices);
 	if (sensor_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensors() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetSensors");
 	}
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
@@ -85,10 +81,7 @@ sensor::open (const Napi::CallbackInfo &info)
 
 	SDL_Sensor *sensor = SDL_OpenSensor(id);
 	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_OpenSensor(" << id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_OpenSensor", id);
 	}
 
 	threads::trackOpen(env, threads::SENSOR, id);
@@ -115,10 +108,7 @@ sensor::getData (const Napi::CallbackInfo &info)
 
 	float data[3];
 	if (!SDL_GetSensorData(sensor, data, 3)) {
-		std::ostringstream message;
-		message << "SDL_GetSensorData(" << sensor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetSensorData", sensor_id);
 	}
 
 	Napi::Object result = Napi::Object::New(env);

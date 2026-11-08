@@ -5,7 +5,6 @@
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
-#include <sstream>
 
 
 std::map<SDL_GamepadType, std::string> gamepad::types;
@@ -96,10 +95,7 @@ gamepad::addMappings (const Napi::CallbackInfo &info)
 		if (!_isPlatformMatch(mapping)) { continue; }
 		SDL_ClearError();
 		if (SDL_AddGamepadMapping(mapping.c_str()) == -1) {
-			std::ostringstream message;
-			message << "SDL_AddGamepadMapping(" << mapping << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_AddGamepadMapping", mapping);
 		}
 
 		// SDL_AddGamepadMapping produces errors even though it succeeds
@@ -124,10 +120,7 @@ gamepad::open (const Napi::CallbackInfo &info)
 	SDL_ClearError();
 	SDL_Gamepad *gamepad = SDL_OpenGamepad(id);
 	if (gamepad == nullptr) {
-		std::ostringstream message;
-		message << "SDL_OpenGamepad(" << id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_OpenGamepad", id);
 	}
 
 	// SDL_OpenGamepad produces errors even though it succeeds

@@ -1,7 +1,6 @@
 #include "testing.h"
 #include "global.h"
 #include <SDL3/SDL.h>
-#include <sstream>
 
 
 static SDL_Joystick *
@@ -13,15 +12,6 @@ _getVirtual (Napi::Env &env, SDL_JoystickID id)
 		throw Napi::Error::New(env, "invalid virtual joystick id");
 	}
 	return joystick;
-}
-
-static void
-_throwSdlError (Napi::Env &env, const char *call)
-{
-	std::ostringstream message;
-	message << call << "() error: " << SDL_GetError();
-	SDL_ClearError();
-	throw Napi::Error::New(env, message.str());
 }
 
 Napi::Value
@@ -42,12 +32,12 @@ testing::attachVirtualJoystick (const Napi::CallbackInfo &info)
 	desc.name = is_gamepad ? "Virtual Gamepad" : "Virtual Joystick";
 
 	SDL_JoystickID id = SDL_AttachVirtualJoystick(&desc);
-	if (id == 0) { _throwSdlError(env, "SDL_AttachVirtualJoystick"); }
+	if (id == 0) { throw global::sdlError(env, "SDL_AttachVirtualJoystick"); }
 
 	SDL_Joystick *joystick = SDL_OpenJoystick(id);
 	if (joystick == nullptr) {
 		SDL_DetachVirtualJoystick(id);
-		_throwSdlError(env, "SDL_OpenJoystick");
+		throw global::sdlError(env, "SDL_OpenJoystick");
 	}
 	SDL_ClearError();
 
@@ -67,7 +57,7 @@ testing::setVirtualJoystickAxis (const Napi::CallbackInfo &info)
 	int value = info[2].As<Napi::Number>().Int32Value();
 
 	if (!SDL_SetJoystickVirtualAxis(_getVirtual(env, id), axis, value)) {
-		_throwSdlError(env, "SDL_SetJoystickVirtualAxis");
+		throw global::sdlError(env, "SDL_SetJoystickVirtualAxis");
 	}
 
 	return env.Undefined();
@@ -86,7 +76,7 @@ testing::setVirtualJoystickButton (const Napi::CallbackInfo &info)
 	bool down = info[2].As<Napi::Boolean>().Value();
 
 	if (!SDL_SetJoystickVirtualButton(_getVirtual(env, id), button, down)) {
-		_throwSdlError(env, "SDL_SetJoystickVirtualButton");
+		throw global::sdlError(env, "SDL_SetJoystickVirtualButton");
 	}
 
 	return env.Undefined();
@@ -104,7 +94,7 @@ testing::detachVirtualJoystick (const Napi::CallbackInfo &info)
 
 	SDL_CloseJoystick(_getVirtual(env, id));
 
-	if (!SDL_DetachVirtualJoystick(id)) { _throwSdlError(env, "SDL_DetachVirtualJoystick"); }
+	if (!SDL_DetachVirtualJoystick(id)) { throw global::sdlError(env, "SDL_DetachVirtualJoystick"); }
 
 	return env.Undefined();
 }
@@ -130,7 +120,7 @@ testing::pushAudioDeviceEvent (const Napi::CallbackInfo &info)
 	event.adevice.which = id;
 	event.adevice.recording = is_recording;
 
-	if (!SDL_PushEvent(&event)) { _throwSdlError(env, "SDL_PushEvent"); }
+	if (!SDL_PushEvent(&event)) { throw global::sdlError(env, "SDL_PushEvent"); }
 
 	return env.Undefined();
 }

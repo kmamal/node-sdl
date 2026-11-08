@@ -1,7 +1,7 @@
 #include "clipboard.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 
 Napi::Value
 clipboard::getText (const Napi::CallbackInfo &info)
@@ -19,10 +19,7 @@ clipboard::getText (const Napi::CallbackInfo &info)
 			return Napi::String::New(env, "");
 		}
 
-		std::ostringstream message;
-		message << "SDL_GetClipboardText() error: " << error;
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetClipboardText");
 	}
 
 	Napi::String result;
@@ -44,10 +41,7 @@ clipboard::setText (const Napi::CallbackInfo &info)
 	std::string text = info[0].As<Napi::String>().Utf8Value();
 
 	if (!SDL_SetClipboardText(text.c_str())) {
-		std::ostringstream message;
-		message << "SDL_SetClipboardText() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetClipboardText");
 	}
 
 	return env.Undefined();

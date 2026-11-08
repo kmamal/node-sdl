@@ -2,7 +2,6 @@
 #include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 #include <map>
 
 
@@ -90,10 +89,7 @@ video::_getDisplays (Napi::Env &env)
 	int num_displays;
 	SDL_DisplayID *display_ids = SDL_GetDisplays(&num_displays);
 	if (display_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetDisplays() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetDisplays");
 	}
 
 	Napi::Array displays = Napi::Array::New(env);
@@ -167,20 +163,14 @@ video::convert(const Napi::CallbackInfo &info)
 
 	if (src_w == dst_w && src_h == dst_h) {
 		if (!SDL_ConvertPixels(src_w, src_h, src_format, src, src_stride, dst_format, dst, dst_stride)) {
-			std::ostringstream message;
-			message << "SDL_ConvertPixels(" << src_w << ", " << src_h << ", " << src_format << ", " << dst_format << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_ConvertPixels", src_w, src_h, src_format, dst_format);
 		}
 		return env.Undefined();
 	}
 
 	SDL_Surface *src_surface = SDL_CreateSurfaceFrom(src_w, src_h, src_format, src, src_stride);
 	if (src_surface == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateSurfaceFrom(" << src_w << ", " << src_h << ", " << src_format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateSurfaceFrom", src_w, src_h, src_format);
 	}
 	SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
 
@@ -190,20 +180,14 @@ video::convert(const Napi::CallbackInfo &info)
 		: SDL_CreateSurfaceFrom(dst_w, dst_h, dst_format, dst, dst_stride);
 	if (dst_surface == nullptr) {
 		SDL_DestroySurface(src_surface);
-		std::ostringstream message;
-		message << (is_yuv ? "SDL_CreateSurface(" : "SDL_CreateSurfaceFrom(") << dst_w << ", " << dst_h << ", " << dst_format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, is_yuv ? "SDL_CreateSurface" : "SDL_CreateSurfaceFrom", dst_w, dst_h, dst_format);
 	}
 
 	bool ok = SDL_BlitSurfaceScaled(src_surface, nullptr, dst_surface, nullptr, scaling);
 	SDL_DestroySurface(src_surface);
 	if (!ok) {
 		SDL_DestroySurface(dst_surface);
-		std::ostringstream message;
-		message << "SDL_BlitSurfaceScaled(" << src_w << ", " << src_h << ", " << src_format << ", " << dst_w << ", " << dst_h << ", " << dst_format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_BlitSurfaceScaled", src_w, src_h, src_format, dst_w, dst_h, dst_format);
 	}
 
 	if (is_yuv) {
@@ -211,10 +195,7 @@ video::convert(const Napi::CallbackInfo &info)
 	}
 	SDL_DestroySurface(dst_surface);
 	if (!ok) {
-		std::ostringstream message;
-		message << "SDL_ConvertPixels(" << dst_w << ", " << dst_h << ", " << SDL_PIXELFORMAT_ARGB8888 << ", " << dst_format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_ConvertPixels", dst_w, dst_h, SDL_PIXELFORMAT_ARGB8888, dst_format);
 	}
 
 	return env.Undefined();
