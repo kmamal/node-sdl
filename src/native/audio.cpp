@@ -640,8 +640,14 @@ audio::convert (const Napi::CallbackInfo &info)
 
 	SDL_AudioStream *stream = _createStandaloneStream(env, &src_spec, &dst_spec);
 
-	if (!SDL_PutAudioStreamData(stream, src.Data(), src_size) || !SDL_FlushAudioStream(stream)) {
+	if (!SDL_PutAudioStreamData(stream, src.Data(), src_size)) {
 		Napi::Error error = _sdlError(env, "SDL_PutAudioStreamData()");
+		_destroyStandaloneStream(stream);
+		throw error;
+	}
+
+	if (!SDL_FlushAudioStream(stream)) {
+		Napi::Error error = _sdlError(env, "SDL_FlushAudioStream()");
 		_destroyStandaloneStream(stream);
 		throw error;
 	}
