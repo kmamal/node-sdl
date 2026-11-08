@@ -109,9 +109,6 @@ video::getDrivers(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
-	global::assertReady(env);
-
 	Napi::Array all = Napi::Array::New(env);
 	int num_drivers = SDL_GetNumVideoDrivers();
 	for (int i = 0; i < num_drivers; i ++) {
