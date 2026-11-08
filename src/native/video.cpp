@@ -5,8 +5,8 @@
 #include <map>
 
 
-std::map<SDL_DisplayOrientation, std::string> video::orientations;
-std::map<SDL_PixelFormat, std::string> video::formats;
+std::map<SDL_DisplayOrientation, packed::Str> video::orientations;
+std::map<SDL_PixelFormat, packed::Str> video::formats;
 
 
 static packed::Value

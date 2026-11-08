@@ -15,6 +15,20 @@ namespace packed {
 	using Object = std::vector<Member>;
 	using Array = std::vector<Value>;
 
+	struct Str {
+		Str () = default;
+		Str (const Str &) = delete;
+		Str &operator= (const Str &) = delete;
+		Str &operator= (const char *value) { string = value; return *this; }
+
+		const std::string &str () const { return string; }
+		const char *c_str () const { return string.c_str(); }
+		operator const std::string & () const { return string; }
+
+	private:
+		std::string string;
+	};
+
 	struct Value {
 		using Data = std::variant<
 			std::monostate,
@@ -44,7 +58,9 @@ namespace packed {
 		Value (const std::string &value) : data(std::in_place_type<std::string>, value) {}
 		Value (std::string &&value) : data(std::in_place_type<std::string>, std::move(value)) {}
 
-		static Value ref (const std::string &value);
+		static Value ref (const Str &value);
+		static Value ref (Str &&value) = delete;
+		static Value ref (const std::string &value) = delete;
 		static Value ref (std::string &&value) = delete;
 		static Value object ();
 		static Value array ();
@@ -54,7 +70,9 @@ namespace packed {
 		const Value *get (const char *key) const;
 		const Object &members () const { return std::get<Object>(data); }
 		Value &set (const char *key, Value value);
-		Value &set (const std::string &key, Value value);
+		Value &set (const Str &key, Value value);
+		Value &set (Str &&key, Value value) = delete;
+		Value &set (const std::string &key, Value value) = delete;
 		Value &set (std::string &&key, Value value) = delete;
 		Value &push (Value value);
 

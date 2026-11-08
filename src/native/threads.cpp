@@ -38,7 +38,7 @@ _wants (const Thread &thread, const threads::Event &event)
 {
 	if (thread.is_main) { return true; }
 
-	const std::string *target = event.target;
+	const packed::Str *target = event.target;
 	if (target == nullptr) { return true; }
 	if (false
 		|| target == &events::targets::JOYSTICK_DEVICE

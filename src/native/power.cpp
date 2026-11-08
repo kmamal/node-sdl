@@ -4,7 +4,7 @@
 #include <map>
 
 
-std::map<SDL_PowerState, std::string> power::states;
+std::map<SDL_PowerState, packed::Str> power::states;
 
 
 Napi::Value

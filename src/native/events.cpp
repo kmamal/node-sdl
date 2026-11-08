@@ -15,72 +15,72 @@
 #include <algorithm>
 
 
-std::string events::targets::APP;
-std::string events::targets::VIDEO;
-std::string events::targets::WINDOW;
-std::string events::targets::KEYBOARD;
-std::string events::targets::JOYSTICK;
-std::string events::targets::GAMEPAD;
-std::string events::targets::SENSOR;
-std::string events::targets::CLIPBOARD;
-std::string events::targets::JOYSTICK_DEVICE;
-std::string events::targets::GAMEPAD_DEVICE;
-std::string events::targets::AUDIO_DEVICE;
-std::string events::targets::CHANGE;
+packed::Str events::targets::APP;
+packed::Str events::targets::VIDEO;
+packed::Str events::targets::WINDOW;
+packed::Str events::targets::KEYBOARD;
+packed::Str events::targets::JOYSTICK;
+packed::Str events::targets::GAMEPAD;
+packed::Str events::targets::SENSOR;
+packed::Str events::targets::CLIPBOARD;
+packed::Str events::targets::JOYSTICK_DEVICE;
+packed::Str events::targets::GAMEPAD_DEVICE;
+packed::Str events::targets::AUDIO_DEVICE;
+packed::Str events::targets::CHANGE;
 
-std::string events::types::QUIT;
-std::string events::types::DISPLAY_ADD;
-std::string events::types::DISPLAY_REMOVE;
-std::string events::types::DISPLAY_ORIENT;
-std::string events::types::DISPLAY_MOVE;
-std::string events::types::DISPLAY_SCALE;
-std::string events::types::DISPLAY_MODE;
-std::string events::types::DISPLAY_USABLE;
-std::string events::types::DISPLAY_CHANGE;
-std::string events::types::SHOW;
-std::string events::types::HIDE;
-std::string events::types::EXPOSE;
-std::string events::types::MOVE;
-std::string events::types::RESIZE;
-std::string events::types::MINIMIZE;
-std::string events::types::MAXIMIZE;
-std::string events::types::RESTORE;
-std::string events::types::ENTER_FULLSCREEN;
-std::string events::types::LEAVE_FULLSCREEN;
-std::string events::types::FOCUS;
-std::string events::types::BLUR;
-std::string events::types::HOVER;
-std::string events::types::LEAVE;
-std::string events::types::KEY_DOWN;
-std::string events::types::KEY_UP;
-std::string events::types::TEXT_INPUT;
-std::string events::types::MOUSE_MOVE;
-std::string events::types::MOUSE_BUTTON_DOWN;
-std::string events::types::MOUSE_BUTTON_UP;
-std::string events::types::MOUSE_WHEEL;
-std::string events::types::DROP_BEGIN;
-std::string events::types::DROP_COMPLETE;
-std::string events::types::DROP_FILE;
-std::string events::types::DROP_TEXT;
-std::string events::types::CLOSE;
-std::string events::types::RENDER_DEVICE_LOST;
-std::string events::types::KEYMAP_CHANGE;
-std::string events::types::FINGER_DOWN;
-std::string events::types::FINGER_UP;
-std::string events::types::FINGER_MOVE;
-std::string events::types::FINGER_CANCEL;
-std::string events::types::DEVICE_ADD;
-std::string events::types::DEVICE_REMOVE;
-std::string events::types::DEVICE_FORMAT_CHANGE;
-std::string events::types::AXIS_MOTION;
-std::string events::types::BUTTON_DOWN;
-std::string events::types::BUTTON_UP;
-std::string events::types::BALL_MOTION;
-std::string events::types::HAT_MOTION;
-std::string events::types::POWER_UPDATE;
-std::string events::types::STEAM_HANDLE_UPDATE;
-std::string events::types::REMAP;
-std::string events::types::UPDATE;
+packed::Str events::types::QUIT;
+packed::Str events::types::DISPLAY_ADD;
+packed::Str events::types::DISPLAY_REMOVE;
+packed::Str events::types::DISPLAY_ORIENT;
+packed::Str events::types::DISPLAY_MOVE;
+packed::Str events::types::DISPLAY_SCALE;
+packed::Str events::types::DISPLAY_MODE;
+packed::Str events::types::DISPLAY_USABLE;
+packed::Str events::types::DISPLAY_CHANGE;
+packed::Str events::types::SHOW;
+packed::Str events::types::HIDE;
+packed::Str events::types::EXPOSE;
+packed::Str events::types::MOVE;
+packed::Str events::types::RESIZE;
+packed::Str events::types::MINIMIZE;
+packed::Str events::types::MAXIMIZE;
+packed::Str events::types::RESTORE;
+packed::Str events::types::ENTER_FULLSCREEN;
+packed::Str events::types::LEAVE_FULLSCREEN;
+packed::Str events::types::FOCUS;
+packed::Str events::types::BLUR;
+packed::Str events::types::HOVER;
+packed::Str events::types::LEAVE;
+packed::Str events::types::KEY_DOWN;
+packed::Str events::types::KEY_UP;
+packed::Str events::types::TEXT_INPUT;
+packed::Str events::types::MOUSE_MOVE;
+packed::Str events::types::MOUSE_BUTTON_DOWN;
+packed::Str events::types::MOUSE_BUTTON_UP;
+packed::Str events::types::MOUSE_WHEEL;
+packed::Str events::types::DROP_BEGIN;
+packed::Str events::types::DROP_COMPLETE;
+packed::Str events::types::DROP_FILE;
+packed::Str events::types::DROP_TEXT;
+packed::Str events::types::CLOSE;
+packed::Str events::types::RENDER_DEVICE_LOST;
+packed::Str events::types::KEYMAP_CHANGE;
+packed::Str events::types::FINGER_DOWN;
+packed::Str events::types::FINGER_UP;
+packed::Str events::types::FINGER_MOVE;
+packed::Str events::types::FINGER_CANCEL;
+packed::Str events::types::DEVICE_ADD;
+packed::Str events::types::DEVICE_REMOVE;
+packed::Str events::types::DEVICE_FORMAT_CHANGE;
+packed::Str events::types::AXIS_MOTION;
+packed::Str events::types::BUTTON_DOWN;
+packed::Str events::types::BUTTON_UP;
+packed::Str events::types::BALL_MOTION;
+packed::Str events::types::HAT_MOTION;
+packed::Str events::types::POWER_UPDATE;
+packed::Str events::types::STEAM_HANDLE_UPDATE;
+packed::Str events::types::REMAP;
+packed::Str events::types::UPDATE;
 
 
 static Napi::Env *poll_env = nullptr;
@@ -88,10 +88,10 @@ static Napi::Function *poll_callback = nullptr;
 
 struct Packing {
 	packed::Value value = packed::Value::object();
-	const std::string *target = nullptr;
+	const packed::Str *target = nullptr;
 	Uint32 target_id = 0;
 
-	void setTarget (const std::string &name) {
+	void setTarget (const packed::Str &name) {
 		target = &name;
 		value.set("target", packed::Value::ref(name));
 	}
@@ -99,11 +99,11 @@ struct Packing {
 		target_id = id;
 		value.set("targetId", id);
 	}
-	void setType (const std::string &name) { value.set("type", packed::Value::ref(name)); }
+	void setType (const packed::Str &name) { value.set("type", packed::Value::ref(name)); }
 	void set (const char *key, packed::Value item) { value.set(key, std::move(item)); }
 };
 
-static const std::string *
+static const packed::Str *
 _windowEventType (Uint32 type)
 {
 	switch (type) {
@@ -144,7 +144,7 @@ _lookup (const Map &map, Key key)
 static bool
 _packWindowEvent (const SDL_Event &event, Packing &packed)
 {
-	const std::string *type = _windowEventType(event.type);
+	const packed::Str *type = _windowEventType(event.type);
 	if (type == nullptr) { return false; }
 
 	packed.setTarget(events::targets::WINDOW);

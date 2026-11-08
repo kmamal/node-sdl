@@ -7,10 +7,10 @@
 #include <string>
 
 
-std::map<SDL_GamepadType, std::string> gamepad::types;
-std::map<SDL_GamepadAxis, std::string> gamepad::axes;
-std::map<SDL_GamepadButton, std::string> gamepad::buttons;
-std::map<SDL_GamepadButtonLabel, std::string> gamepad::button_labels;
+std::map<SDL_GamepadType, packed::Str> gamepad::types;
+std::map<SDL_GamepadAxis, packed::Str> gamepad::axes;
+std::map<SDL_GamepadButton, packed::Str> gamepad::buttons;
+std::map<SDL_GamepadButtonLabel, packed::Str> gamepad::button_labels;
 
 
 double

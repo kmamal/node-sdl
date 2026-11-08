@@ -6,8 +6,8 @@
 #include <atomic>
 #include <cstdint>
 
-std::map<bool, std::string> audio::device_types;
-std::map<SDL_AudioFormat, std::string> audio::formats;
+std::map<bool, packed::Str> audio::device_types;
+std::map<SDL_AudioFormat, packed::Str> audio::formats;
 
 struct StreamState;
 

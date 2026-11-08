@@ -6,8 +6,8 @@
 #include <string>
 
 
-std::map<SDL_SensorType, std::string> sensor::types;
-std::map<SDL_SensorType, std::string> sensor::sides;
+std::map<SDL_SensorType, packed::Str> sensor::types;
+std::map<SDL_SensorType, packed::Str> sensor::sides;
 
 
 Napi::Value

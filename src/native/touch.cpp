@@ -3,7 +3,7 @@
 #include <SDL3/SDL.h>
 #include <string>
 
-std::map<SDL_TouchDeviceType, std::string> touch::device_types;
+std::map<SDL_TouchDeviceType, packed::Str> touch::device_types;
 
 Napi::Value
 touch::getDevices(const Napi::CallbackInfo &info)

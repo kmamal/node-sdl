@@ -10,10 +10,10 @@ Overload(Fs...) -> Overload<Fs...>;
 
 
 packed::Value
-packed::Value::ref (const std::string &value)
+packed::Value::ref (const Str &value)
 {
 	Value result;
-	result.data.emplace<const std::string *>(&value);
+	result.data.emplace<const std::string *>(&value.str());
 	return result;
 }
 
@@ -63,7 +63,7 @@ packed::Value::set (const char *key, Value value)
 }
 
 packed::Value &
-packed::Value::set (const std::string &key, Value value)
+packed::Value::set (const Str &key, Value value)
 {
 	return set(key.c_str(), std::move(value));
 }

@@ -9,8 +9,8 @@
 #include <cmath>
 
 
-std::map<Uint8, std::string> joystick::hat_positions;
-std::map<SDL_JoystickType, std::string> joystick::types;
+std::map<Uint8, packed::Str> joystick::hat_positions;
+std::map<SDL_JoystickType, packed::Str> joystick::types;
 SDL_GUID joystick::zero_guid;
 
 double

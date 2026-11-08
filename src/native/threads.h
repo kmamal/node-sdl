@@ -12,7 +12,7 @@ namespace threads {
 	enum Kind { JOYSTICK, GAMEPAD, SENSOR };
 
 	struct Event {
-		const std::string *target;
+		const packed::Str *target;
 		Uint32 target_id;
 		std::shared_ptr<const packed::Value> value;
 	};
