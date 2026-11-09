@@ -5,6 +5,7 @@ const { makeDevice: makeJoystickDevice } = require('./joystick/devices')
 const { makeDevice: makeGamepadDevice, isGamepadDevice } = require('./gamepad/devices')
 const { refreshDevices: refreshAudioDevices } = require('./audio/devices')
 
+// The flag is set before the initializers fetch devices on purpose: it tracks whether SDL initialized the subsystem, which stays true even if the fetch fails.
 const initSubsystem = (name) => {
 	const result = Bindings.global_initSubsystem(name)
 	Globals.initialized[name] = result === true

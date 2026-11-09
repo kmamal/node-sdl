@@ -22,6 +22,7 @@ class AudioRecordingStream extends AudioStream {
 		validateBuffer('buffer', buffer)
 		const bytes = _bytes ?? buffer.length
 		validateBytes(buffer, bytes)
+		// Unlike putData(), a partial frame isn't rejected: SDL rounds the read down to whole frames and the return value reports what was read.
 
 		if (bytes === 0) { return 0 }
 

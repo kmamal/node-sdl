@@ -74,6 +74,7 @@ enums::get(const Napi::CallbackInfo &info)
 	Napi::Object scale_mode = Napi::Object::New(env);
 	scale_mode.Set("nearest", (int) SDL_SCALEMODE_NEAREST);
 	scale_mode.Set("linear", (int) SDL_SCALEMODE_LINEAR);
+	// TODO: expose SDL_SCALEMODE_PIXELART as 'pixelArt' for window.render() only, since surface blits in convert() treat it as nearest. It needs SDL 3.4, so NODE_SDL_SYSTEM builds against 3.2 would need an SDL_VERSION_ATLEAST guard.
 
 	Napi::Object audio_formats = Napi::Object::New(env);
 	audio_formats.Set("s8", (int) SDL_AUDIO_S8);

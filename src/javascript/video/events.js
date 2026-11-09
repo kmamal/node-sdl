@@ -130,6 +130,7 @@ const handleWindowEvent = (event, targetId) => {
 		}
 
 		case 'renderDeviceLost': {
+			// Only SDL renderers send this event, so it never arrives for opengl/webgpu windows, whose _accelerated and _vsync are null.
 			try {
 				const result = Bindings.window_setAcceleratedAndVsync(window._id, window._accelerated, window._vsync)
 				window._accelerated = result.accelerated

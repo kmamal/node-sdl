@@ -395,6 +395,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 
 		case SDL_EVENT_JOYSTICK_ADDED:
 		case SDL_EVENT_GAMEPAD_ADDED: {
+			// Unlike displays and audio devices, a joystick that vanished before the poll isn't dropped: its REMOVED event follows in the same poll, and SDL's name cache makes SDL_GetJoystickNameForID() useless for detecting it.
 			packed.setTarget(event.type == SDL_EVENT_JOYSTICK_ADDED
 				? events::targets::JOYSTICK_DEVICE
 				: events::targets::GAMEPAD_DEVICE);

@@ -1,5 +1,6 @@
 const Bindings = require('../bindings')
 
+// Some entries look unreachable but aren't: X11 and Wayland fall back to scancode names like 'A' and 'Space' for keys without a character, and macOS and Windows rename modifiers to 'Left Command', 'Left Option' and 'Left Windows'.
 const mapping = Object.assign(Object.create(null), {
 	'±': '+/-',
 	'A': 'a',

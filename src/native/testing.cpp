@@ -98,6 +98,7 @@ testing::detachVirtualJoystick (const Napi::CallbackInfo &info)
 
 	SDL_CloseJoystick(_getVirtual(env, id));
 
+	// Can't fail once _getVirtual() has confirmed the id is an attached virtual joystick, so closing first is safe.
 	if (!SDL_DetachVirtualJoystick(id)) { throw global::sdlError(env, "SDL_DetachVirtualJoystick"); }
 
 	return env.Undefined();

@@ -345,6 +345,7 @@ window::create (const Napi::CallbackInfo &info)
 		return result;
 	}
 	catch (...) {
+		// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
 		SDL_Renderer *renderer = SDL_GetRenderer(window);
 		if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 		SDL_DestroyWindow(window);
@@ -778,6 +779,7 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
+	// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
 	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 

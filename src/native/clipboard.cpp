@@ -8,6 +8,7 @@ clipboard::getText (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	// SDL reports a failed read as an empty string and SDL_GetError() can't tell that apart from an empty clipboard, so only the out-of-memory NULL is treated as an error.
 	global::SdlPtr<char> text(SDL_GetClipboardText());
 	if (!text) {
 		throw global::sdlError(env, "SDL_GetClipboardText");
