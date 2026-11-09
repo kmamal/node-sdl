@@ -66,7 +66,6 @@ class AudioStream extends EventsViaPoll {
 
 		this._device = device
 		this._channels = channels
-		this._format = helper.name
 		this._frequency = frequency
 
 		this._playing = false
@@ -74,12 +73,7 @@ class AudioStream extends EventsViaPoll {
 		this._gain = gain
 		this._frequencyRatio = frequencyRatio
 
-		this._bytesPerSample = helper.bytesPerSample
-		this._minSampleValue = helper.minSampleValue
-		this._maxSampleValue = helper.maxSampleValue
-		this._zeroSampleValue = helper.zeroSampleValue
-		this._reader = helper.reader
-		this._writer = helper.writer
+		this._helper = helper
 
 		Globals.audioStreams.set(this._id, this)
 
@@ -106,20 +100,20 @@ class AudioStream extends EventsViaPoll {
 	get channels () { return this._channels }
 	get frequency () { return this._frequency }
 
-	get format () { return this._format }
-	get bytesPerSample () { return this._bytesPerSample }
-	get minSampleValue () { return this._minSampleValue }
-	get maxSampleValue () { return this._maxSampleValue }
-	get zeroSampleValue () { return this._zeroSampleValue }
+	get format () { return this._helper.name }
+	get bytesPerSample () { return this._helper.bytesPerSample }
+	get minSampleValue () { return this._helper.minSampleValue }
+	get maxSampleValue () { return this._helper.maxSampleValue }
+	get zeroSampleValue () { return this._helper.zeroSampleValue }
 
 	readSample (buffer, offset) {
 		validateBuffer('buffer', buffer)
-		return this._reader.call(buffer, offset)
+		return this._helper.reader.call(buffer, offset)
 	}
 
 	writeSample (buffer, value, offset) {
 		validateBuffer('buffer', buffer)
-		return this._writer.call(buffer, value, offset)
+		return this._helper.writer.call(buffer, value, offset)
 	}
 
 	get gain () { return this._gain }
