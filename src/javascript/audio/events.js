@@ -1,6 +1,5 @@
 const Globals = require('../globals')
 const { audio: audioModule } = require('.')
-const { makeDevice: makeAudioDevice } = require('./devices')
 const { tryEmit, tryCall } = require('../events/try')
 
 const handleEvent = (event) => {
@@ -22,9 +21,8 @@ const handleEvent = (event) => {
 			delete event.device
 
 			if (list.some((a) => a.id === device.id)) { return }
-			const made = makeAudioDevice(device)
-			list.push(made)
-			event.device = made
+			list.push(device)
+			event.device = device
 		} break
 
 		case 'deviceRemove': {
