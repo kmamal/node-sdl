@@ -5,6 +5,20 @@
 
 static SDL_Cursor *allocated_cursor = nullptr;
 
+template <typename... Args>
+static void
+_adoptCursor (Napi::Env &env, SDL_Cursor *cursor, const Args &...args)
+{
+	if (!SDL_SetCursor(cursor)) {
+		Napi::Error error = global::sdlError(env, "SDL_SetCursor", args...);
+		SDL_DestroyCursor(cursor);
+		throw error;
+	}
+
+	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
+	allocated_cursor = cursor;
+}
+
 
 Napi::Value
 mouse::getButton (const Napi::CallbackInfo &info)
@@ -61,14 +75,7 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 		throw global::sdlError(env, "SDL_CreateSystemCursor", cursor_id);
 	}
 
-	if (!SDL_SetCursor(cursor)) {
-		Napi::Error error = global::sdlError(env, "SDL_SetCursor", cursor_id);
-		SDL_DestroyCursor(cursor);
-		throw error;
-	}
-
-	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
-	allocated_cursor = cursor;
+	_adoptCursor(env, cursor, cursor_id);
 
 	return env.Undefined();
 }
@@ -122,14 +129,7 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 
 	SDL_DestroySurface(surface);
 
-	if (!SDL_SetCursor(cursor)) {
-		Napi::Error error = global::sdlError(env, "SDL_SetCursor");
-		SDL_DestroyCursor(cursor);
-		throw error;
-	}
-
-	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
-	allocated_cursor = cursor;
+	_adoptCursor(env, cursor);
 
 	return env.Undefined();
 }
