@@ -238,29 +238,22 @@ static Napi::Array
 _getDevices (Napi::Env &env, bool is_recording)
 {
 	int num_devices;
-	SDL_AudioDeviceID *device_ids = is_recording
+	global::SdlArray<SDL_AudioDeviceID> device_ids(is_recording
 		? SDL_GetAudioRecordingDevices(&num_devices)
-		: SDL_GetAudioPlaybackDevices(&num_devices);
-	if (device_ids == nullptr) {
+		: SDL_GetAudioPlaybackDevices(&num_devices));
+	if (!device_ids) {
 		throw global::sdlError(env, is_recording ? "SDL_GetAudioRecordingDevices" : "SDL_GetAudioPlaybackDevices");
 	}
 
 	Napi::Array devices = Napi::Array::New(env);
 
-	try {
-		devices.Set((uint32_t) 0, audio::_getDefaultDevice(is_recording).toNapi(env));
-		int num_returned = 1;
-		for (int i = 0; i < num_devices; i++) {
-			packed::Value device = _packDevice(device_ids[i]);
-			if (device.isNull()) { continue; }
-			devices.Set(num_returned++, device.toNapi(env));
-		}
+	devices.Set((uint32_t) 0, audio::_getDefaultDevice(is_recording).toNapi(env));
+	int num_returned = 1;
+	for (int i = 0; i < num_devices; i++) {
+		packed::Value device = _packDevice(device_ids[i]);
+		if (device.isNull()) { continue; }
+		devices.Set(num_returned++, device.toNapi(env));
 	}
-	catch (...) {
-		SDL_free(device_ids);
-		throw;
-	}
-	SDL_free(device_ids);
 
 	return devices;
 }

@@ -71,11 +71,8 @@ joystick::_getDevice (SDL_JoystickID id)
 	packed::Value gamepad_type;
 
 	if (is_gamepad) {
-		char *_gamepad_mapping = SDL_GetGamepadMappingForID(id);
-		if (_gamepad_mapping != nullptr) {
-			gamepad_mapping = _gamepad_mapping;
-			SDL_free(_gamepad_mapping);
-		}
+		global::SdlPtr<char> _gamepad_mapping(SDL_GetGamepadMappingForID(id));
+		if (_gamepad_mapping) { gamepad_mapping = _gamepad_mapping.get(); }
 
 		const char *_gamepad_name = SDL_GetGamepadNameForID(id);
 		if (_gamepad_name != nullptr) { gamepad_name = _gamepad_name; }
@@ -109,23 +106,16 @@ Napi::Array
 joystick::_getDevices (Napi::Env &env)
 {
 	int num_devices;
-	SDL_JoystickID *joystick_ids = SDL_GetJoysticks(&num_devices);
-	if (joystick_ids == nullptr) {
+	global::SdlArray<SDL_JoystickID> joystick_ids(SDL_GetJoysticks(&num_devices));
+	if (!joystick_ids) {
 		throw global::sdlError(env, "SDL_GetJoysticks");
 	}
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
 
-	try {
-		for (int i = 0; i < num_devices; i++) {
-			devices.Set(i, joystick::_getDevice(joystick_ids[i]).toNapi(env));
-		}
+	for (int i = 0; i < num_devices; i++) {
+		devices.Set(i, joystick::_getDevice(joystick_ids[i]).toNapi(env));
 	}
-	catch (...) {
-		SDL_free(joystick_ids);
-		throw;
-	}
-	SDL_free(joystick_ids);
 
 	return devices;
 }

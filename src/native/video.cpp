@@ -83,23 +83,16 @@ Napi::Array
 video::_getDisplays (Napi::Env &env)
 {
 	int num_displays;
-	SDL_DisplayID *display_ids = SDL_GetDisplays(&num_displays);
-	if (display_ids == nullptr) {
+	global::SdlArray<SDL_DisplayID> display_ids(SDL_GetDisplays(&num_displays));
+	if (!display_ids) {
 		throw global::sdlError(env, "SDL_GetDisplays");
 	}
 
 	Napi::Array displays = Napi::Array::New(env);
 
-	try {
-		for (int i = 0; i < num_displays; i++) {
-			displays.Set(i, _packDisplay(display_ids[i]).toNapi(env));
-		}
+	for (int i = 0; i < num_displays; i++) {
+		displays.Set(i, _packDisplay(display_ids[i]).toNapi(env));
 	}
-	catch (...) {
-		SDL_free(display_ids);
-		throw;
-	}
-	SDL_free(display_ids);
 
 	return displays;
 }

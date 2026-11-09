@@ -4,6 +4,7 @@
 #include <napi.h>
 #include <SDL3/SDL.h>
 #include <mutex>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -42,6 +43,10 @@ namespace global {
 		SDL_ClearError();
 		throw Napi::Error::New(env, message.str());
 	}
+
+	struct SdlFree { void operator() (void *ptr) const { SDL_free(ptr); } };
+	template <typename T> using SdlPtr = std::unique_ptr<T, SdlFree>;
+	template <typename T> using SdlArray = std::unique_ptr<T[], SdlFree>;
 
 	std::mutex &lock();
 	void assertReady(Napi::Env &env);

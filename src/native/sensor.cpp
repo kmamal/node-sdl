@@ -19,52 +19,45 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 	global::assertReady(env);
 
 	int num_devices;
-	SDL_SensorID *sensor_ids = SDL_GetSensors(&num_devices);
-	if (sensor_ids == nullptr) {
+	global::SdlArray<SDL_SensorID> sensor_ids(SDL_GetSensors(&num_devices));
+	if (!sensor_ids) {
 		throw global::sdlError(env, "SDL_GetSensors");
 	}
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
 
-	try {
-		for (int i = 0; i < num_devices; i++) {
-			SDL_SensorID id = sensor_ids[i];
+	for (int i = 0; i < num_devices; i++) {
+		SDL_SensorID id = sensor_ids[i];
 
-			SDL_SensorType _type = SDL_GetSensorTypeForID(id);
-			if (_type == SDL_SENSOR_INVALID) { SDL_ClearError(); }
-			auto type_entry = sensor::types.find(_type);
-			Napi::Value type = type_entry != sensor::types.end()
-				? Napi::String::New(env, type_entry->second)
-				: env.Null();
-			auto side_entry = sensor::sides.find(_type);
-			Napi::Value side = side_entry != sensor::sides.end()
-				? Napi::String::New(env, side_entry->second)
-				: env.Null();
+		SDL_SensorType _type = SDL_GetSensorTypeForID(id);
+		if (_type == SDL_SENSOR_INVALID) { SDL_ClearError(); }
+		auto type_entry = sensor::types.find(_type);
+		Napi::Value type = type_entry != sensor::types.end()
+			? Napi::String::New(env, type_entry->second)
+			: env.Null();
+		auto side_entry = sensor::sides.find(_type);
+		Napi::Value side = side_entry != sensor::sides.end()
+			? Napi::String::New(env, side_entry->second)
+			: env.Null();
 
-			const char *_name = SDL_GetSensorNameForID(id);
-			Napi::Value name;
-			if (_name != nullptr) {
-				name = Napi::String::New(env, _name);
-			}
-			else {
-				SDL_ClearError();
-				name = env.Null();
-			}
-
-			Napi::Object device = Napi::Object::New(env);
-			device.Set("id", id);
-			device.Set("name", name);
-			device.Set("type", type);
-			device.Set("side", side);
-
-			devices.Set(i, device);
+		const char *_name = SDL_GetSensorNameForID(id);
+		Napi::Value name;
+		if (_name != nullptr) {
+			name = Napi::String::New(env, _name);
 		}
+		else {
+			SDL_ClearError();
+			name = env.Null();
+		}
+
+		Napi::Object device = Napi::Object::New(env);
+		device.Set("id", id);
+		device.Set("name", name);
+		device.Set("type", type);
+		device.Set("side", side);
+
+		devices.Set(i, device);
 	}
-	catch (...) {
-		SDL_free(sensor_ids);
-		throw;
-	}
-	SDL_free(sensor_ids);
 
 	return devices;
 }

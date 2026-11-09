@@ -10,10 +10,8 @@ clipboard::getText (const Napi::CallbackInfo &info)
 
 	SDL_ClearError();
 
-	char *text = SDL_GetClipboardText();
-	if (text == nullptr || text[0] == '\0') {
-		SDL_free(text);
-
+	global::SdlPtr<char> text(SDL_GetClipboardText());
+	if (!text || *text == '\0') {
 		const char *error = SDL_GetError();
 		if (error[0] == '\0') {
 			return Napi::String::New(env, "");
@@ -22,15 +20,7 @@ clipboard::getText (const Napi::CallbackInfo &info)
 		throw global::sdlError(env, "SDL_GetClipboardText");
 	}
 
-	Napi::String result;
-	try { result = Napi::String::New(env, text); }
-	catch (...) {
-		SDL_free(text);
-		throw;
-	}
-	SDL_free(text);
-
-	return result;
+	return Napi::String::New(env, text.get());
 }
 
 Napi::Value
