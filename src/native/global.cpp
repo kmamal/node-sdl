@@ -362,8 +362,6 @@ _start (Napi::Env &env)
 	reenableInertialScrolling();
 #endif
 
-	SDL_memset(&joystick::zero_guid, 0, sizeof(joystick::zero_guid));
-
 	started.store(true, std::memory_order_release);
 	ready.store(true, std::memory_order_release);
 }

@@ -80,6 +80,8 @@ namespace packed {
 	};
 
 	struct Member {
+		// Non-owning on purpose: keys are always string literals or static strings, so
+		// skipping the copy keeps event packing cheap. Never pass a temporary here.
 		const char *key;
 		Value value;
 	};

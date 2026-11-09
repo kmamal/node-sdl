@@ -5,7 +5,6 @@
 #include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
-#include <string>
 
 namespace sensor {
 

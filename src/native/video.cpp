@@ -9,8 +9,8 @@ std::map<SDL_DisplayOrientation, packed::Str> video::orientations;
 std::map<SDL_PixelFormat, packed::Str> video::formats;
 
 
-static packed::Value
-_packDisplay (SDL_DisplayID display_id)
+packed::Value
+video::_getDisplay (SDL_DisplayID display_id)
 {
 	SDL_Rect rect;
 
@@ -72,12 +72,6 @@ _packDisplay (SDL_DisplayID display_id)
 	return display;
 }
 
-packed::Value
-video::_getDisplay (SDL_DisplayID display_id)
-{
-	return _packDisplay(display_id);
-}
-
 Napi::Array
 video::_getDisplays (Napi::Env &env)
 {
@@ -91,7 +85,7 @@ video::_getDisplays (Napi::Env &env)
 
 	int num_returned = 0;
 	for (int i = 0; i < num_displays; i++) {
-		packed::Value display = _packDisplay(display_ids[i]);
+		packed::Value display = video::_getDisplay(display_ids[i]);
 		if (display.isNull()) { continue; }
 		displays.Set(num_returned++, display.toNapi(env));
 	}

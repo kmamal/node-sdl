@@ -75,10 +75,6 @@ enums::get(const Napi::CallbackInfo &info)
 	scale_mode.Set("nearest", (int) SDL_SCALEMODE_NEAREST);
 	scale_mode.Set("linear", (int) SDL_SCALEMODE_LINEAR);
 
-	Napi::Object audio_devices = Napi::Object::New(env);
-	audio_devices.Set("defaultPlayback", (uint32_t) SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
-	audio_devices.Set("defaultRecording", (uint32_t) SDL_AUDIO_DEVICE_DEFAULT_RECORDING);
-
 	Napi::Object audio_formats = Napi::Object::New(env);
 	audio_formats.Set("s8", (int) SDL_AUDIO_S8);
 	audio_formats.Set("u8", (int) SDL_AUDIO_U8);
@@ -374,7 +370,6 @@ enums::get(const Napi::CallbackInfo &info)
 	Napi::Object all = Napi::Object::New(env);
 	all.Set("pixelFormat", pixel_formats);
 	all.Set("scaleMode", scale_mode);
-	all.Set("audioDevice", audio_devices);
 	all.Set("audioFormat", audio_formats);
 	all.Set("scancodes", scancodes);
 	all.Set("mouseButtons", mouse_buttons);

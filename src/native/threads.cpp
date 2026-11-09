@@ -168,7 +168,7 @@ threads::drain (Napi::Env &env, Napi::Function &callback)
 		Event event = std::move(pending.front());
 		pending.pop_front();
 		try {
-			callback.Call({ event.value->toNapi(env) });
+			callback.Call(env.Global(), { event.value->toNapi(env) });
 		}
 		catch (...) {
 			std::lock_guard<std::mutex> guard(mutex);

@@ -126,7 +126,7 @@ window::create (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std:: string title = info[0].As<Napi::String>().Utf8Value();
+	std::string title = info[0].As<Napi::String>().Utf8Value();
 	int display = info[1].As<Napi::Number>().Int32Value();
 	int x = info[2].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[2].As<Napi::Number>().Int32Value();
 	int y = info[3].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[3].As<Napi::Number>().Int32Value();
@@ -344,7 +344,7 @@ window::setTitle (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	int window_id = info[0].As<Napi::Number>().Int32Value();
-	std:: string title = info[1].As<Napi::String>().Utf8Value();
+	std::string title = info[1].As<Napi::String>().Utf8Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 

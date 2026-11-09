@@ -45,7 +45,7 @@ _notifyJs (Napi::Env env, Napi::Function callback, StreamState *state, std::null
 	uint32_t underruns = state->underruns.exchange(0, std::memory_order_relaxed);
 	uint32_t missing = state->missing.exchange(0, std::memory_order_relaxed);
 	uint32_t available = state->available.exchange(0, std::memory_order_relaxed);
-	callback.Call({
+	callback.Call(env.Global(), {
 		Napi::Number::New(env, underruns),
 		Napi::Number::New(env, missing),
 		Napi::Number::New(env, available),
@@ -193,8 +193,8 @@ _defaultId (bool is_recording)
 	return is_recording ? SDL_AUDIO_DEVICE_DEFAULT_RECORDING : SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
 }
 
-static packed::Value
-_packDevice (SDL_AudioDeviceID id)
+packed::Value
+audio::_getDevice (SDL_AudioDeviceID id)
 {
 	const char *name = SDL_GetAudioDeviceName(id);
 	if (name == nullptr) {
@@ -208,12 +208,6 @@ _packDevice (SDL_AudioDeviceID id)
 	_setFormat(device, id);
 
 	return device;
-}
-
-packed::Value
-audio::_getDevice(SDL_AudioDeviceID id)
-{
-	return _packDevice(id);
 }
 
 packed::Value
@@ -250,7 +244,7 @@ _getDevices (Napi::Env &env, bool is_recording)
 	devices.Set((uint32_t) 0, audio::_getDefaultDevice(is_recording).toNapi(env));
 	int num_returned = 1;
 	for (int i = 0; i < num_devices; i++) {
-		packed::Value device = _packDevice(device_ids[i]);
+		packed::Value device = audio::_getDevice(device_ids[i]);
 		if (device.isNull()) { continue; }
 		devices.Set(num_returned++, device.toNapi(env));
 	}
