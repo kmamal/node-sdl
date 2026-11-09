@@ -20,7 +20,7 @@ testing::attachVirtualJoystick (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	bool is_gamepad = info[0].As<Napi::Boolean>().Value();
@@ -50,7 +50,7 @@ testing::setVirtualJoystickAxis (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
@@ -72,7 +72,7 @@ testing::setVirtualJoystickButton (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
@@ -91,7 +91,7 @@ testing::detachVirtualJoystick (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
@@ -109,7 +109,7 @@ testing::pushAudioDeviceEvent (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	std::string type = info[0].As<Napi::String>().Utf8Value();

@@ -12,7 +12,7 @@ power::getInfo (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	// SDL_GetPowerInfo() reads the battery state straight from the OS and needs
 	// no SDL_Init(), so unlike the other worker-reachable bindings this one

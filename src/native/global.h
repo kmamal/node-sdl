@@ -48,7 +48,7 @@ namespace global {
 	template <typename T> using SdlPtr = std::unique_ptr<T, SdlFree>;
 	template <typename T> using SdlArray = std::unique_ptr<T[], SdlFree>;
 
-	std::mutex &lock();
+	std::recursive_mutex &lock();
 	void assertReady(Napi::Env &env);
 	bool isReady();
 	bool isMainThread();

@@ -36,10 +36,11 @@ static std::mutex request_mutex;
 static std::condition_variable request_cv;
 static std::vector<InitRequest *> pending_requests;
 
-std::mutex &
+// Recursive because watchEvents holds this lock while dispatching window events to JS, and the handlers re-enter it through the wrappers.
+std::recursive_mutex &
 global::lock()
 {
-	static std::mutex mutex;
+	static std::recursive_mutex mutex;
 	return mutex;
 }
 
@@ -77,6 +78,10 @@ watchEvents (void *, SDL_Event *event)
 			|| (event->type == SDL_EVENT_WINDOW_EXPOSED && event->window.data1 == 1)
 		)
 	) {
+		// SDL runs watchers with its watcher-list mutex held, and a worker holding global::lock() may be inside an SDL call that pushes an event and so waits for that same mutex.
+		// Waiting here would deadlock; try-lock instead and leave the event for the normal poll when a worker has the lock.
+		std::unique_lock<std::recursive_mutex> guard(global::lock(), std::try_to_lock);
+		if (!guard.owns_lock()) { return true; }
 		events::dispatchEventFromWatch(*event);
 	}
 	return true;
@@ -375,7 +380,7 @@ global::initialize(const Napi::CallbackInfo &info)
 
 	bool is_main = info[0].As<Napi::Boolean>().Value();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	if (is_main && !ready.load(std::memory_order_acquire)) { _start(env); }
 	else { _setTables(); }
@@ -457,7 +462,7 @@ global::processInitRequests()
 	}
 
 	{
-		std::lock_guard<std::mutex> guard(global::lock());
+		std::lock_guard<std::recursive_mutex> guard(global::lock());
 		for (InitRequest *request : batch) {
 			if (!ready.load(std::memory_order_acquire)) {
 				request->result = false;
@@ -496,7 +501,7 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 	}
 
 	if (global::isMainThread()) {
-		std::lock_guard<std::mutex> guard(global::lock());
+		std::lock_guard<std::recursive_mutex> guard(global::lock());
 		global::assertReady(env);
 		std::string error;
 		bool success = _initSubsystem(flags, error);
@@ -523,7 +528,7 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 void
 global::teardown()
 {
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	if (!ready.load(std::memory_order_acquire)) { return; }
 	ready.store(false, std::memory_order_release);

@@ -106,7 +106,7 @@ _envCleanup (void *arg)
 {
 	SDL_AudioDeviceID audio_id = (SDL_AudioDeviceID) (uintptr_t) arg;
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	auto it = open_streams.find(audio_id);
 	if (it == open_streams.end()) { return; }
@@ -261,7 +261,7 @@ audio::getDrivers(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	Napi::Array all = Napi::Array::New(env);
@@ -284,7 +284,7 @@ audio::getDevices(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	bool is_recording = info[0].As<Napi::Boolean>().Value();
@@ -297,7 +297,7 @@ audio::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	bool has_id = !info[0].IsNull();
@@ -384,7 +384,7 @@ audio::play (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -407,7 +407,7 @@ audio::getQueued (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -425,7 +425,7 @@ audio::flush (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -442,7 +442,7 @@ audio::getAvailable (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -460,7 +460,7 @@ audio::clear (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -477,7 +477,7 @@ audio::putData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -496,7 +496,7 @@ audio::getData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -516,7 +516,7 @@ audio::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -537,7 +537,7 @@ audio::setNotify (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -559,7 +559,7 @@ audio::setGain (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -577,7 +577,7 @@ audio::setFrequencyRatio (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
@@ -593,14 +593,14 @@ audio::setFrequencyRatio (const Napi::CallbackInfo &info)
 static void
 _destroyStandaloneStream (SDL_AudioStream *stream)
 {
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	SDL_DestroyAudioStream(stream);
 }
 
 static SDL_AudioStream *
 _createStandaloneStream (Napi::Env &env, const SDL_AudioSpec *src_spec, const SDL_AudioSpec *dst_spec)
 {
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	SDL_AudioStream *stream = SDL_CreateAudioStream(src_spec, dst_spec);
 	if (stream == nullptr) { throw global::sdlError(env, "SDL_CreateAudioStream"); }

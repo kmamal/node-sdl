@@ -210,7 +210,7 @@ joystick::getDevices(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	return joystick::_getDevices(env);
@@ -221,7 +221,7 @@ joystick::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
@@ -267,7 +267,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
@@ -289,7 +289,7 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
@@ -314,7 +314,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
@@ -336,7 +336,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
@@ -356,7 +356,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
@@ -378,7 +378,7 @@ joystick::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();

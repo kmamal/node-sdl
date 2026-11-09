@@ -126,7 +126,7 @@ video::convert(const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	int src_w = info[0].As<Napi::Number>().Int32Value();
 	int src_h = info[1].As<Napi::Number>().Int32Value();

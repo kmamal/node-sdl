@@ -85,7 +85,7 @@ gamepad::addMappings (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	Napi::Array mappings = info[0].As<Napi::Array>();
@@ -107,7 +107,7 @@ gamepad::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
@@ -153,7 +153,7 @@ gamepad::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 	global::assertReady(env);
 
 	SDL_JoystickID gamepad_id = info[0].As<Napi::Number>().Uint32Value();

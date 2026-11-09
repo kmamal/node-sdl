@@ -80,7 +80,7 @@ _leave (napi_env env, bool from_hook)
 {
 	Thread thread;
 	{
-		std::lock_guard<std::mutex> guard(global::lock());
+		std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 		{
 			std::lock_guard<std::mutex> registry_guard(mutex);
@@ -230,7 +230,7 @@ threads::registerThread (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std::lock_guard<std::mutex> guard(global::lock());
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
 	Napi::Function poll = info[0].As<Napi::Function>();
 	bool is_main = info[1].As<Napi::Boolean>().Value();
