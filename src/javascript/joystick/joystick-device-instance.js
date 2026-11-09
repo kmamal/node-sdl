@@ -54,7 +54,7 @@ const startEffect = (effect, id, _a, _b, duration) => {
 	if (duration === null || duration > MAX_DURATION) {
 		timers.push(setInterval(() => {
 			try { effect.call(id, a, b, MAX_DURATION) }
-			catch (_) { clearTimers(effect, id) }
+			catch { clearTimers(effect, id) }
 		}, 30e3))
 	}
 	if (duration !== null) {
@@ -63,7 +63,7 @@ const startEffect = (effect, id, _a, _b, duration) => {
 				stopEffect(effect, id)
 				Globals.events.poll()
 			}
-			catch (_) {}
+			catch {}
 		}, duration))
 	}
 	effect.timers.set(id, timers)
@@ -77,7 +77,7 @@ const releaseDevice = (id) => {
 
 		// This call will throw if the device is gone
 		try { stopEffect(effect, id) }
-		catch (_) {}
+		catch {}
 	}
 }
 

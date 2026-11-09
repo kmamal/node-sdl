@@ -111,7 +111,7 @@ T.test("sdl::window opengl and webgpu modes reject renderer calls", (t) => {
 	for (const mode of [ 'opengl', 'webgpu' ]) {
 		let window
 		try { window = create({ [mode]: true }) }
-		catch (_) { continue }
+		catch { continue }
 		try {
 			t.equal(window[mode], true)
 			t.throws(() => { window.setAccelerated(true) })

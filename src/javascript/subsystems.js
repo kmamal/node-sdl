@@ -39,7 +39,7 @@ const ensure = (name) => {
 
 const isAvailable = (name) => {
 	try { return ensure(name) }
-	catch (_) { return false }
+	catch { return false }
 }
 
 const assertInitialized = (name) => {

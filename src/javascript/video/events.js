@@ -174,7 +174,7 @@ const handleWindowEvent = (event, targetId) => {
 				device = Globals.touchDevices.find(({ id }) => id === touchId)
 				if (!device) {
 					try { refreshTouchDevices() }
-					catch (_) { return }
+					catch { return }
 					device = Globals.touchDevices.find(({ id }) => id === touchId)
 					if (!device) { return }
 				}

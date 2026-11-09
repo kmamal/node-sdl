@@ -40,7 +40,7 @@ const gamepad = new class extends EventsViaPoll {
 		try { Bindings.gamepad_addMappings(mappings) }
 		catch (error) {
 			try { refreshDevices() }
-			catch (_) { }
+			catch { }
 			throw error
 		}
 		refreshDevices()

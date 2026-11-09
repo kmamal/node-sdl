@@ -46,7 +46,7 @@ class DeviceInstance extends EventsViaPoll {
 
 		// This call could throw if the device is gone
 		try { this._closeBinding(this._device.id) }
-		catch (_) {}
+		catch {}
 
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("instance is closed"), { id: this._device.id }))

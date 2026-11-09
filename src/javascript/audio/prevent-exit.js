@@ -26,7 +26,7 @@ process.on('beforeExit', (code) => {
 			Bindings.audio_flush(stream.id)
 			queued = Bindings.audio_getQueued(stream.id)
 		}
-		catch (_) { }
+		catch { }
 		if (!queued) { continue }
 
 		const { device, channels, frequency, bytesPerSample, frequencyRatio } = stream

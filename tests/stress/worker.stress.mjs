@@ -56,7 +56,7 @@ T.test("sdl::worker survives main thread exit", async (t) => {
 				const buffer = Buffer.alloc(4800 * 4)
 				const loop = () => {
 					try { stream.putData(buffer) }
-					catch (_) {}
+					catch {}
 					setImmediate(loop)
 				}
 				loop()

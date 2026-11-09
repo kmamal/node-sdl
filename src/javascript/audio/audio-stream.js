@@ -56,7 +56,7 @@ class AudioStream extends EventsViaPoll {
 		}
 		catch (error) {
 			try { Bindings.audio_close(id, device) }
-			catch (_) { }
+			catch { }
 			throw error
 		}
 
@@ -176,7 +176,7 @@ class AudioStream extends EventsViaPoll {
 
 		// This call could throw if the device is gone
 		try { Bindings.audio_close(this._id, this._device) }
-		catch (_) { }
+		catch { }
 
 		// We might be inside an event listener
 		this._retire(() => this._makeClosedError())

@@ -540,19 +540,23 @@ class Window extends EventsViaPoll {
 	destroy () {
 		validateNotDestroyed(this)
 
+		this._destroyed = true
+		Globals.windows.all.delete(this._id)
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
 
+		const destroyNative = () => {
+			try { Bindings.window_destroy(this._id) }
+			catch {}
+		}
+
 		// Defer the native destruction until the pump has unwound.
 		if (Bindings.events_isDispatchingFromWatch()) {
-			process.nextTick(() => { Bindings.window_destroy(this._id) })
+			process.nextTick(destroyNative)
 		}
 		else {
-			Bindings.window_destroy(this._id)
+			destroyNative()
 		}
-		this._destroyed = true
-
-		Globals.windows.all.delete(this._id)
 
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("window is destroyed"), { id: this._id }))
