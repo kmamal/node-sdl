@@ -74,6 +74,7 @@ const handleWindowEvent = (event, targetId) => {
 
 	switch (type) {
 		case 'move': {
+			if (window._x === event.x && window._y === event.y) { return }
 			window._x = event.x
 			window._y = event.y
 		} break

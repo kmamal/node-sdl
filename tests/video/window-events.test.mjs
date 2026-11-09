@@ -69,6 +69,12 @@ T.test("sdl::window state events", async (t) => {
 		handleWindowEvent({ type: 'move', x: 7, y: 8 }, id)
 		t.equal([ window.x, window.y ], [ 7, 8 ])
 		t.equal(events.at(-1), { type: 'move', x: 7, y: 8 })
+		const moveCount = events.length
+		handleWindowEvent({ type: 'move', x: 7, y: 8 }, id)
+		t.equal(events.length, moveCount)
+		handleWindowEvent({ type: 'move', x: 9, y: 8 }, id)
+		t.equal(events.length, moveCount + 1)
+		t.equal(window.x, 9)
 
 		const size = { width: 101, height: 102, pixelWidth: 203, pixelHeight: 204 }
 		handleWindowEvent({ type: 'resize', ...size }, id)
