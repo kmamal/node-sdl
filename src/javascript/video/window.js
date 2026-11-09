@@ -158,7 +158,10 @@ class Window extends EventsViaPoll {
 			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
 		})
 
-		// Manually emit some initial events for convenience
+		// Manually emit some initial events for convenience.
+		// Note that these can duplicate real events.
+		// Something may have polled synchronously before this tick runs, e.g. a getter read right after createWindow().
+		// In that case the real move/resize/expose events have already fired and the ones below repeat them with the same values.
 		process.nextTick(() => {
 			if (this._destroyed) { return }
 			Globals.events.withoutPolling(() => {
@@ -194,7 +197,12 @@ class Window extends EventsViaPoll {
 
 	get id () { return this._id }
 
-	get title () { return this._title }
+	get title () {
+		validateNotDestroyed(this)
+
+		return this._title
+	}
+
 	setTitle (title) {
 		validateNotDestroyed(this)
 

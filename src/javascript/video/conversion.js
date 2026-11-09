@@ -55,7 +55,7 @@ const convert = (srcSpec, srcData, dstSpec, dstData) => {
 	}
 
 	validateImageBuffer('dstData', dstData, size, { dstData, dstStride, dstHeight, dstFormat })
-	if (overlaps(srcData, dstData)) { throw Object.assign(new Error("srcData and dstData must not overlap")) }
+	if (overlaps(srcData, dstData)) { throw Object.assign(new Error("srcData and dstData must not overlap"), { srcData, dstData }) }
 	Bindings.video_convert(srcWidth, srcHeight, _srcFormat, srcData, srcStride, dstWidth, dstHeight, _dstFormat, dstData, dstStride, _scaling)
 	return size
 }
