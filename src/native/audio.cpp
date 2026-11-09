@@ -98,6 +98,8 @@ _unbind (OpenStream &entry)
 	else { SDL_SetAudioStreamGetCallback(entry.stream, nullptr, nullptr); }
 }
 
+static void _destroy (SDL_AudioDeviceID audio_id, OpenStream &entry, bool same_env);
+
 static void
 _envCleanup (void *arg)
 {
@@ -108,8 +110,7 @@ _envCleanup (void *arg)
 	auto it = open_streams.find(audio_id);
 	if (it == open_streams.end()) { return; }
 
-	_unbind(it->second);
-	SDL_DestroyAudioStream(it->second.stream);
+	_destroy(audio_id, it->second, false);
 	open_streams.erase(it);
 }
 
@@ -342,6 +343,7 @@ audio::open (const Napi::CallbackInfo &info)
 		throw;
 	}
 	napi_status status = napi_unref_threadsafe_function(env, state->tsfn);
+	// Keying the hook by audio_id is safe: SDL never reuses audio device IDs (its instance counter only grows and isn't reset by SDL_Quit).
 	if (status == napi_ok) { status = napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id); }
 	if (status != napi_ok) {
 		state->tsfn.Release();
