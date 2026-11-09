@@ -35,20 +35,16 @@ const stopEffect = (effect, id) => {
 }
 
 const startEffect = (effect, id, _a, _b, duration) => {
-	clearTimers(effect, id)
-
-	if (duration === 0) {
+	const a = Math.round(_a * 0xFFFF)
+	const b = Math.round(_b * 0xFFFF)
+	if (duration === 0 || (a === 0 && b === 0)) {
 		stopEffect(effect, id)
 		Globals.events.poll()
 		return
 	}
 
-	const a = Math.round(_a * 0xFFFF)
-	const b = Math.round(_b * 0xFFFF)
+	clearTimers(effect, id)
 	effect.call(id, a, b, duration === null ? MAX_DURATION : Math.min(duration, MAX_DURATION))
-
-	// Zero intensity stops the effect, so there is nothing to wait for
-	if (a === 0 && b === 0) { return }
 
 	// Keeps Node.js alive while rumbling
 	const timers = []
