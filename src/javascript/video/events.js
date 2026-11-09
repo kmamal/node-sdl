@@ -77,7 +77,7 @@ const handleWindowEvent = (event, targetId) => {
 		case 'displayChange': {
 			window._displayId = event.displayId
 			delete event.displayId
-			event.display = window.display
+			event.display = Globals.displays.find((a) => a.id === window._displayId) ?? null
 		} break
 
 		case 'show': {
