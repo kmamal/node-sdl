@@ -1,6 +1,7 @@
 #include "testing.h"
 #include "global.h"
 #include <SDL3/SDL.h>
+#include <cmath>
 
 
 static SDL_Joystick *
@@ -54,9 +55,12 @@ testing::setVirtualJoystickAxis (const Napi::CallbackInfo &info)
 
 	SDL_JoystickID id = info[0].As<Napi::Number>().Int32Value();
 	int axis = info[1].As<Napi::Number>().Int32Value();
-	int value = info[2].As<Napi::Number>().Int32Value();
+	double value = info[2].As<Napi::Number>().DoubleValue();
+	if (value != std::trunc(value) || value < SDL_JOYSTICK_AXIS_MIN || value > SDL_JOYSTICK_AXIS_MAX) {
+		throw Napi::Error::New(env, "value must be a signed 16-bit integer");
+	}
 
-	if (!SDL_SetJoystickVirtualAxis(_getVirtual(env, id), axis, value)) {
+	if (!SDL_SetJoystickVirtualAxis(_getVirtual(env, id), axis, (Sint16) value)) {
 		throw global::sdlError(env, "SDL_SetJoystickVirtualAxis");
 	}
 
