@@ -12,10 +12,8 @@
 #include <SDL3/SDL.h>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <atomic>
 #include <condition_variable>
-#include <chrono>
 
 #if defined(SDL_PLATFORM_MACOS)
 	#include "cocoa-global.h"
@@ -516,14 +514,7 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 
 	{
 		std::unique_lock<std::mutex> guard(request_mutex);
-		while (!request.done) {
-			if (!ready.load(std::memory_order_acquire)) {
-				auto it = std::find(pending_requests.begin(), pending_requests.end(), &request);
-				if (it != pending_requests.end()) { pending_requests.erase(it); }
-				throw Napi::Error::New(env, "SDL has been shut down");
-			}
-			request_cv.wait_for(guard, std::chrono::milliseconds(100));
-		}
+		request_cv.wait(guard, [&] { return request.done; });
 	}
 
 	return _initResult(env, request.result, request.error);
