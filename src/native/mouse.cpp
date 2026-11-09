@@ -122,9 +122,9 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 
 	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, x, y);
 	if (cursor == nullptr) {
+		Napi::Error error = global::sdlError(env, "SDL_CreateColorCursor", x, y);
 		SDL_DestroySurface(surface);
-
-		throw global::sdlError(env, "SDL_CreateColorCursor", x, y);
+		throw error;
 	}
 
 	SDL_DestroySurface(surface);

@@ -158,18 +158,30 @@ window::create (const Napi::CallbackInfo &info)
 	if (create_props == 0) {
 		throw global::sdlError(env, "SDL_CreateProperties");
 	}
-	SDL_SetStringProperty(create_props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str());
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, desired_flags);
+	if (!SDL_SetStringProperty(create_props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str())) {
+		Napi::Error error = global::sdlError(env, "SDL_SetStringProperty", title);
+		SDL_DestroyProperties(create_props);
+		throw error;
+	}
+	bool numbers_set = true
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, desired_flags);
+	if (!numbers_set) {
+		Napi::Error error = global::sdlError(env, "SDL_SetNumberProperty", x, y, width, height, desired_flags);
+		SDL_DestroyProperties(create_props);
+		throw error;
+	}
 
 	SDL_Window *window = SDL_CreateWindowWithProperties(create_props);
-	SDL_DestroyProperties(create_props);
 	if (window == nullptr) {
-		throw global::sdlError(env, "SDL_CreateWindowWithProperties", title, x, y, width, height, desired_flags);
+		Napi::Error error = global::sdlError(env, "SDL_CreateWindowWithProperties", title, x, y, width, height, desired_flags);
+		SDL_DestroyProperties(create_props);
+		throw error;
 	}
+	SDL_DestroyProperties(create_props);
 
 	try {
 		SDL_WindowID window_id = SDL_GetWindowID(window);
@@ -723,11 +735,12 @@ window::setIcon (const Napi::CallbackInfo &info)
 		throw global::sdlError(env, "SDL_CreateSurfaceFrom", window_id, w, h, format);
 	}
 
-	bool success = SDL_SetWindowIcon(window, surface);
-	SDL_DestroySurface(surface);
-	if (!success) {
-		throw global::sdlError(env, "SDL_SetWindowIcon", window_id);
+	if (!SDL_SetWindowIcon(window, surface)) {
+		Napi::Error error = global::sdlError(env, "SDL_SetWindowIcon", window_id);
+		SDL_DestroySurface(surface);
+		throw error;
 	}
+	SDL_DestroySurface(surface);
 
 	return env.Undefined();
 }
