@@ -110,6 +110,7 @@ updateRenderer(
 	}
 
 	if (!SDL_SetRenderVSync(renderer, *vsync)) { SDL_ClearError(); }
+	if (!SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE)) { SDL_ClearError(); }
 
 	const char *renderer_name = SDL_GetRendererName(renderer);
 	if (renderer_name == nullptr) { SDL_ClearError(); }
