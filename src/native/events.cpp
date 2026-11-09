@@ -709,8 +709,8 @@ events::poll (const Napi::CallbackInfo &info)
 	Napi::Function callback = info[0].As<Napi::Function>();
 
 	if (global::isMainThread()) {
-		global::processInitRequests();
 		threads::drain(env, callback);
+		global::processInitRequests();
 		_pump(env, callback);
 		return Napi::Boolean::New(env, threads::isPollingFast());
 	}
