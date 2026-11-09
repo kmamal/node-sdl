@@ -580,6 +580,7 @@ _dispatchEvent (const SDL_Event &event)
 {
 	if (poll_env == nullptr) { return false; }
 	Napi::Env &env = *poll_env;
+	Napi::HandleScope scope(env);
 
 	Packing packing;
 	if (!_packEvent(event, packing)) { return false; }

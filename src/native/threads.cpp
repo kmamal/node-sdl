@@ -165,6 +165,7 @@ threads::drain (Napi::Env &env, Napi::Function &callback)
 	}
 
 	while (!pending.empty()) {
+		Napi::HandleScope scope(env);
 		Event event = std::move(pending.front());
 		pending.pop_front();
 		try {
