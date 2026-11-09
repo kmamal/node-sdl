@@ -18,6 +18,7 @@ const { handleEvent: handleGamepadEvent } = require('../gamepad/events')
 const { handleEvent: handleSensorEvent } = require('../sensor/events')
 const { handleEvent: handleAudioDeviceEvent } = require('../audio/events')
 const { handleDevicesChange: handleJoystickDevicesChange } = require('../joystick/devices')
+const Timers = require('node:timers')
 
 const handleAppEvent = ({ type }) => {
 	if (type !== 'quit') { return }
@@ -72,8 +73,8 @@ let pollingFast = null
 const setPollingFast = (fast) => {
 	if (!isMainThread || fast === pollingFast) { return }
 	pollingFast = fast
-	clearInterval(pollInterval)
-	pollInterval = setInterval(poll, fast ? 0 : 1e3)
+	Timers.clearInterval(pollInterval)
+	pollInterval = Timers.setInterval(poll, fast ? 0 : 1e3)
 	pollInterval.unref()
 }
 
@@ -96,7 +97,7 @@ const withoutPolling = (fn) => {
 const setDemand = (demand) => { setPollingFast(Bindings.events_setDemand(demand)) }
 
 const stopPolling = () => {
-	clearInterval(pollInterval)
+	Timers.clearInterval(pollInterval)
 	pollInterval = null
 }
 
