@@ -138,14 +138,16 @@ class JoystickDeviceInstance extends DeviceInstance {
 		return effect
 	}
 
-	_startEffect (kind, nameA, a, nameB, b, duration) {
+	_startEffect (kind, nameA, _a, nameB, _b, duration) {
 		validateNotClosed(this)
 
+		const a = _a === undefined ? 1 : _a
+		const b = _b === undefined ? 1 : _b
 		validateUnit(nameA, a)
 		validateUnit(nameB, b)
-		if (duration !== null) { validateNonNegativeInt32('duration', duration) }
+		if (duration !== undefined) { validateNonNegativeInt32('duration', duration) }
 
-		startEffect(this._getEffect(kind), this._device.id, a, b, duration)
+		startEffect(this._getEffect(kind), this._device.id, a, b, duration ?? null)
 	}
 
 	_stopEffect (kind) {
@@ -155,13 +157,13 @@ class JoystickDeviceInstance extends DeviceInstance {
 		Globals.events.poll()
 	}
 
-	rumble (lowFreqRumble = 1, highFreqRumble = 1, duration = null) {
+	rumble (lowFreqRumble, highFreqRumble, duration) {
 		this._startEffect('rumble', 'lowFreqRumble', lowFreqRumble, 'highFreqRumble', highFreqRumble, duration)
 	}
 
 	stopRumble () { this._stopEffect('rumble') }
 
-	rumbleTriggers (leftRumble = 1, rightRumble = 1, duration = null) {
+	rumbleTriggers (leftRumble, rightRumble, duration) {
 		this._startEffect('rumbleTriggers', 'leftRumble', leftRumble, 'rightRumble', rightRumble, duration)
 	}
 

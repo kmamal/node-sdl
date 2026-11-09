@@ -668,11 +668,11 @@ The window under the mouse, or `null` if the mouse is not over a window.
 
 - `options: <object>`
   - `title: <string>` Appears in the window's title bar. Default: `''`
-  - `display: <object>|<null>` An object from [`sdl.video.displays`](#sdlvideodisplays), or a copy of one, that selects the display for the window (if you have multiple displays). Passing `null` selects the primary display. Default: `null`
-  - `x: <number>` The x position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
-  - `y: <number>` The y position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
-  - `width: <number>` The width of the window in points, or `null` for the default of `640`. Must be a positive 32-bit integer. Default: `null`
-  - `height: <number>` The height of the window in points, or `null` for the default of `480`. Must be a positive 32-bit integer. Default: `null`
+  - `display: <object>` An object from [`sdl.video.displays`](#sdlvideodisplays), or a copy of one, that selects the display for the window (if you have multiple displays). Default: the primary display
+  - `x: <number>` The x position of the window in points, relative to the screen. Must be a 32-bit integer. Default: centered
+  - `y: <number>` The y position of the window in points, relative to the screen. Must be a 32-bit integer. Default: centered
+  - `width: <number>` The width of the window in points. Must be a positive 32-bit integer. Default: `640`
+  - `height: <number>` The height of the window in points. Must be a positive 32-bit integer. Default: `480`
   - `visible: <boolean>` Set to `false` to create a hidden window that appears only when you call [`window.show()`](#windowshowshow). Default: `true`
   - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
@@ -1251,7 +1251,7 @@ Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemode
 - `width, height, stride, format, buffer: `[`<Image>`](#image-data) The image to display on the window.
 - `options: <object>`
   - `scaling: <string>` How to scale the image to match the window size. Default: `'nearest'`
-  - `dstRect: <object>|<null>` Where exactly on the window to draw the image. Default: `null`, meaning the whole window.
+  - `dstRect: <object>` Where exactly on the window to draw the image. Default: the whole window
     - `x, y, width, height: <rect>` The components of the rectangle, in points, relative to the window (the same units as [`width`](#windowwidth) and mouse events, not pixels). May be fractional, in which case the image is positioned at sub-pixel precision. All four must be finite numbers that fit in a 32-bit float. `width` and `height` must be positive.
 
 Displays an image in the window.
@@ -2071,7 +2071,7 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
+- `duration: <number>` The duration of the rumble, in ms. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: until stopped
 
 Makes the joystick rumble for a set `duration`, or until stopped.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
@@ -2097,7 +2097,7 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
+- `duration: <number>` The duration of the rumble, in ms. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: until stopped
 
 Makes the joystick triggers rumble for a set `duration`, or until stopped.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
@@ -2442,7 +2442,7 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `lowFreqRumble: <number>` The intensity of the low frequency rumble motor, from `0` to `1`. Default: `1`
 - `highFreqRumble: <number>` The intensity of the high frequency rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
+- `duration: <number>` The duration of the rumble, in ms. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: until stopped
 
 Makes the gamepad rumble for a set `duration`, or until stopped.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.
@@ -2468,7 +2468,7 @@ This can change while the instance is open, for example when SDL switches a cont
 
 - `leftRumble: <number>` The intensity of the left trigger rumble motor, from `0` to `1`. Default: `1`
 - `rightRumble: <number>` The intensity of the right trigger rumble motor, from `0` to `1`. Default: `1`
-- `duration: <number>|<null>` The duration of the rumble, in ms, or `null` to rumble until stopped. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: `null`
+- `duration: <number>` The duration of the rumble, in ms. Must be a non-negative 32-bit integer; `0` stops the rumble. Default: until stopped
 
 Makes the gamepad triggers rumble for a set `duration`, or until stopped.
 Passing `0` for both intensities, or `0` for `duration`, stops the rumble.

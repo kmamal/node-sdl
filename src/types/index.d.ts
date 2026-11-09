@@ -673,7 +673,7 @@ export namespace Sdl {
 					y: Points,
 					width: Points,
 					height: Points,
-				} | null
+				}
 			}): void
 
 			setIcon (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer): void
@@ -708,11 +708,11 @@ export namespace Sdl {
 
 			createWindow (options?: {
 				title?: string
-				display?: Display | null
-				x?: Points | null
-				y?: Points | null
-				width?: Points | null
-				height?: Points | null
+				display?: Display
+				x?: Points
+				y?: Points
+				width?: Points
+				height?: Points
 				visible?: boolean
 				fullscreen?: boolean
 				resizable?: boolean
@@ -1164,11 +1164,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1299,11 +1299,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean

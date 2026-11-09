@@ -110,6 +110,7 @@ T.test("sdl::audio validates stream options", (t) => {
 		t.throws(() => { stream.readSample(new Uint8Array(4), 0) })
 		t.throws(() => { stream.writeSample(new Uint8Array(4), 0, 0) })
 		t.throws(() => { stream.putData(new Uint8Array(4)) })
+		t.throws(() => { stream.putData(Buffer.alloc(4), null) })
 		stream.setGain(1)
 		stream.setFrequencyRatio(1)
 		t.equal(stream.gain, 1)
@@ -138,6 +139,7 @@ T.test("sdl::audio recording validates arguments", (t) => {
 	const stream = sdl.audio.recording.openDevice()
 	try {
 		t.throws(() => { stream.getData(1) })
+		t.throws(() => { stream.getData(Buffer.alloc(4), null) })
 		t.throws(() => { stream.on('drain', () => {}) })
 	}
 	finally { stream.close() }

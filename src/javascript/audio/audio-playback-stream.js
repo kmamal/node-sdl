@@ -17,11 +17,11 @@ class AudioPlaybackStream extends AudioStream {
 		return Bindings.audio_getQueued(this._id)
 	}
 
-	putData (buffer, _bytes = null) {
+	putData (buffer, _bytes) {
 		this._assertOpen()
 
 		validateBuffer('buffer', buffer)
-		const bytes = _bytes ?? buffer.length
+		const bytes = _bytes === undefined ? buffer.length : _bytes
 		validateBytes(buffer, bytes)
 		if (bytes % this._frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${this._frameSize}`), { bytes }) }
 

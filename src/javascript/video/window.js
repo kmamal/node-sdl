@@ -62,9 +62,9 @@ class Window extends EventsViaPoll {
 
 		const {
 			title = "",
-			display = null,
-			x = null, y = null,
-			width = null, height = null,
+			display,
+			x, y,
+			width, height,
 			visible = true,
 			fullscreen = false,
 			resizable = false,
@@ -80,11 +80,11 @@ class Window extends EventsViaPoll {
 		const hasVsync = vsync !== undefined
 
 		validateString('title', title)
-		if (display !== null) { validateObject('display', display) }
-		if (x !== null) { validateInt32('x', x) }
-		if (y !== null) { validateInt32('y', y) }
-		if (width !== null) { validatePositiveInt32('width', width) }
-		if (height !== null) { validatePositiveInt32('height', height) }
+		if (display !== undefined) { validateObject('display', display) }
+		if (x !== undefined) { validateInt32('x', x) }
+		if (y !== undefined) { validateInt32('y', y) }
+		if (width !== undefined) { validatePositiveInt32('width', width) }
+		if (height !== undefined) { validatePositiveInt32('height', height) }
 		validateBoolean('visible', visible)
 		validateBoolean('fullscreen', fullscreen)
 		validateBoolean('resizable', resizable)
@@ -94,14 +94,14 @@ class Window extends EventsViaPoll {
 		if (hasVsync) { validateVsync(vsync) }
 		validateBoolean('opengl', opengl)
 		validateBoolean('webgpu', webgpu)
-		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
+		if (display !== undefined && (x !== undefined || y !== undefined)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 		if (opengl && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("opengl and accelerated/vsync are mutually exclusive"), { opengl, accelerated, vsync }) }
 		if (webgpu && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("webgpu and accelerated/vsync are mutually exclusive"), { webgpu, accelerated, vsync }) }
 
 		let displayId = 0
-		if (display !== null) {
+		if (display !== undefined) {
 			Globals.events.poll()
 			const found = Globals.displays.find(({ id }) => id === display.id)
 			if (!found) { throw Object.assign(new Error("display must be from sdl.video.displays"), { display }) }
@@ -111,10 +111,10 @@ class Window extends EventsViaPoll {
 		const result = Bindings.window_create(
 			title,
 			displayId,
-			x,
-			y,
-			width,
-			height,
+			x ?? null,
+			y ?? null,
+			width ?? null,
+			height ?? null,
 			visible,
 			fullscreen,
 			resizable,
@@ -501,13 +501,13 @@ class Window extends EventsViaPoll {
 
 		const {
 			scaling = 'nearest',
-			dstRect = null,
+			dstRect,
 		} = options
 
 		validateImage(width, height, stride, format, buffer, validateRenderableFormat)
 		validateString('scaling', scaling)
 
-		if (dstRect !== null) {
+		if (dstRect !== undefined) {
 			validateObject('dstRect', dstRect)
 			validateFloat('dstRect.x', dstRect.x)
 			validateFloat('dstRect.y', dstRect.y)
@@ -520,7 +520,7 @@ class Window extends EventsViaPoll {
 		const _scaling = Enums.scaleMode[scaling]
 		if (_scaling === undefined) { throw Object.assign(new Error("scaling must be 'nearest' or 'linear'"), { scaling }) }
 
-		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling, dstRect)
+		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling, dstRect ?? null)
 	}
 
 	setIcon (width, height, stride, format, buffer) {

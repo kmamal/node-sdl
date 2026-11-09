@@ -269,6 +269,8 @@ T.test("sdl::joystick instance validation", async (t) => {
 			t.throws(() => { instance.rumble(1, -1) })
 			t.throws(() => { instance.rumble(1, 1, -1) })
 			t.throws(() => { instance.rumble(1, 1, 1.5) })
+			t.throws(() => { instance.rumble(1, 1, null) })
+			t.throws(() => { instance.rumbleTriggers(1, 1, null) })
 			t.throws(() => { instance.rumbleTriggers(1, 2) })
 			t.equal(typeof instance.power, 'object')
 		}
@@ -296,6 +298,7 @@ T.test("sdl::joystick instance validation", async (t) => {
 			t.throws(() => { instance.setLed(2, 0, 0) })
 			t.throws(() => { instance.rumble(2) })
 			t.throws(() => { instance.rumbleTriggers(1, 1, -1) })
+			t.throws(() => { instance.rumble(1, 1, null) })
 			t.equal(typeof instance.power, 'object')
 		}
 		finally { instance.close() }

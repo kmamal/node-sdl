@@ -16,11 +16,11 @@ class AudioRecordingStream extends AudioStream {
 		return Bindings.audio_getAvailable(this._id)
 	}
 
-	getData (buffer, _bytes = null) {
+	getData (buffer, _bytes) {
 		this._assertOpen()
 
 		validateBuffer('buffer', buffer)
-		const bytes = _bytes ?? buffer.length
+		const bytes = _bytes === undefined ? buffer.length : _bytes
 		validateBytes(buffer, bytes)
 		// Unlike putData(), a partial frame isn't rejected: SDL rounds the read down to whole frames and the return value reports what was read.
 
