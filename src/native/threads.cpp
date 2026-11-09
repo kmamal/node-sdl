@@ -95,7 +95,8 @@ _leave (napi_env env, bool from_hook)
 		if (global::isReady()) { _closeOpens(thread); }
 	}
 
-	if (thread.demand) { napi_unref_threadsafe_function(env, thread.wake); }
+	// Not needed: the loop never runs again after this, and the abort release finalizes the function whether or not it is ref'd.
+	// if (thread.demand) { napi_unref_threadsafe_function(env, thread.wake); }
 	napi_release_threadsafe_function(thread.wake, napi_tsfn_abort);
 	if (!from_hook) { napi_remove_env_cleanup_hook(env, _envCleanup, (void *) env); }
 
