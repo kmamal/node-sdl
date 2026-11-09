@@ -224,7 +224,7 @@ joystick::open (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Joystick *joystick = SDL_OpenJoystick(id);
 	if (joystick == nullptr) {
@@ -270,7 +270,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 	int low_freq_rumble = info[1].As<Napi::Number>().Int32Value();
 	int high_freq_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
@@ -292,7 +292,7 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
@@ -317,7 +317,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 	double red = info[1].As<Napi::Number>().DoubleValue();
 	double green = info[2].As<Napi::Number>().DoubleValue();
 	double blue = info[3].As<Napi::Number>().DoubleValue();
@@ -339,7 +339,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 	int player = info[1].As<Napi::Number>().Int32Value();
 
 	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
@@ -359,7 +359,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 	int left_rumble = info[1].As<Napi::Number>().Int32Value();
 	int right_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
@@ -381,7 +381,7 @@ joystick::close (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int joystick_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID joystick_id = info[0].As<Napi::Number>().Uint32Value();
 
 	threads::trackClose(env, threads::JOYSTICK, joystick_id);
 

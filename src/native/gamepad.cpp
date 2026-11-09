@@ -110,7 +110,7 @@ gamepad::open (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Gamepad *gamepad = SDL_OpenGamepad(id);
 	if (gamepad == nullptr) {
@@ -156,7 +156,7 @@ gamepad::close (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int gamepad_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID gamepad_id = info[0].As<Napi::Number>().Uint32Value();
 
 	threads::trackClose(env, threads::GAMEPAD, gamepad_id);
 

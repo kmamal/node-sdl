@@ -70,7 +70,7 @@ sensor::open (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int id = info[0].As<Napi::Number>().Int32Value();
+	SDL_SensorID id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Sensor *sensor = SDL_OpenSensor(id);
 	if (sensor == nullptr) {
@@ -91,7 +91,7 @@ sensor::getData (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int sensor_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_SensorID sensor_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Sensor *sensor = global::fromIdOrThrow(env, SDL_GetSensorFromID(sensor_id), "SDL_GetSensorFromID", "sensor", sensor_id);
 
@@ -116,7 +116,7 @@ sensor::close (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	int sensor_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_SensorID sensor_id = info[0].As<Napi::Number>().Uint32Value();
 
 	threads::trackClose(env, threads::SENSOR, sensor_id);
 

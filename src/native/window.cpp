@@ -20,7 +20,7 @@ window::resetTexture (SDL_Window *window)
 }
 
 static SDL_Window *
-getWindow (Napi::Env &env, int window_id)
+getWindow (Napi::Env &env, SDL_WindowID window_id)
 {
 	return global::fromIdOrThrow(env, SDL_GetWindowFromID(window_id), "SDL_GetWindowFromID", "window", window_id);
 }
@@ -83,7 +83,7 @@ updateRenderer(
 	bool *is_accelerated,
 	int *vsync
 ) {
-	int window_id = SDL_GetWindowID(window);
+	SDL_WindowID window_id = SDL_GetWindowID(window);
 	// Not likely to fail.
 
 	// The renderer is recreated even when only vsync changed and
@@ -128,7 +128,7 @@ window::create (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	std::string title = info[0].As<Napi::String>().Utf8Value();
-	int display = info[1].As<Napi::Number>().Int32Value();
+	SDL_DisplayID display = info[1].As<Napi::Number>().Uint32Value();
 	int x = info[2].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[2].As<Napi::Number>().Int32Value();
 	int y = info[3].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[3].As<Napi::Number>().Int32Value();
 	int width = info[4].IsNull() ? 640 : info[4].As<Napi::Number>().Int32Value();
@@ -172,7 +172,7 @@ window::create (const Napi::CallbackInfo &info)
 	}
 
 	try {
-		int window_id = SDL_GetWindowID(window);
+		SDL_WindowID window_id = SDL_GetWindowID(window);
 		if (window_id == 0) {
 			throw global::sdlError(env, "SDL_GetWindowID");
 		}
@@ -344,7 +344,7 @@ window::setTitle (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	std::string title = info[1].As<Napi::String>().Utf8Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -361,7 +361,7 @@ window::setPosition (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int x = info[1].As<Napi::Number>().Int32Value();
 	int y = info[2].As<Napi::Number>().Int32Value();
 
@@ -379,7 +379,7 @@ window::setSize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
 	bool in_pixels = info[3].As<Napi::Boolean>().Value();
@@ -408,7 +408,7 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_fullscreen = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -425,7 +425,7 @@ window::setResizable (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_resizable = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -445,7 +445,7 @@ window::setBorderless (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_borderless = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -465,7 +465,7 @@ window::setRelativeMouseMode (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool relative = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -482,7 +482,7 @@ window::getMouseCaptured (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -494,7 +494,7 @@ window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_accelerated = info[1].As<Napi::Boolean>().Value();
 	int vsync = info[2].As<Napi::Number>().Int32Value();
 
@@ -514,7 +514,7 @@ window::focus (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -530,7 +530,7 @@ window::show (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -546,7 +546,7 @@ window::hide (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -562,7 +562,7 @@ window::maximize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -578,7 +578,7 @@ window::minimize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -594,7 +594,7 @@ window::restore (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -610,7 +610,7 @@ window::render (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
 	int stride = info[3].As<Napi::Number>().Int32Value();
@@ -708,7 +708,7 @@ window::setIcon (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int w = info[1].As<Napi::Number>().Int32Value();
 	int h = info[2].As<Napi::Number>().Int32Value();
 	int stride = info[3].As<Napi::Number>().Int32Value();
@@ -736,7 +736,7 @@ window::flash (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int type = info[1].As<Napi::Number>().Int32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -760,7 +760,7 @@ window::destroy (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 

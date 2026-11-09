@@ -53,7 +53,7 @@ testing::setVirtualJoystickAxis (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	SDL_JoystickID id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
 	int axis = info[1].As<Napi::Number>().Int32Value();
 	double value = info[2].As<Napi::Number>().DoubleValue();
 	if (value != std::trunc(value) || value < SDL_JOYSTICK_AXIS_MIN || value > SDL_JOYSTICK_AXIS_MAX) {
@@ -75,7 +75,7 @@ testing::setVirtualJoystickButton (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	SDL_JoystickID id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
 	int button = info[1].As<Napi::Number>().Int32Value();
 	bool down = info[2].As<Napi::Boolean>().Value();
 
@@ -94,7 +94,7 @@ testing::detachVirtualJoystick (const Napi::CallbackInfo &info)
 	std::lock_guard<std::mutex> guard(global::lock());
 	global::assertReady(env);
 
-	SDL_JoystickID id = info[0].As<Napi::Number>().Int32Value();
+	SDL_JoystickID id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_CloseJoystick(_getVirtual(env, id));
 
