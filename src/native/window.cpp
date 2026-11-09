@@ -633,7 +633,7 @@ window::render (const Napi::CallbackInfo &info)
 	SDL_ScaleMode scaling = static_cast<SDL_ScaleMode>(info[6].As<Napi::Number>().Int32Value());
 	Napi::Value dstRectVal = info[7];
 	bool hasDstRect = !dstRectVal.IsNull();
-	SDL_FRect rect;
+	SDL_FRect rect = {};
 	if (hasDstRect) {
 		Napi::Object dstRect = dstRectVal.As<Napi::Object>();
 		rect.x = dstRect.Get("x").As<Napi::Number>().FloatValue();
