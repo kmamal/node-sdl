@@ -27,6 +27,7 @@ process.on('beforeExit', (code) => {
 			queued = Bindings.audio_getQueued(stream.id)
 		}
 		catch { }
+		// Skipping empty queues misses the device buffer's tail, so if something else kept the loop alive while the queue drained, up to one device buffer gets cut off at exit. Accepted.
 		if (!queued) { continue }
 
 		const { device, channels, frequency, bytesPerSample, frequencyRatio } = stream

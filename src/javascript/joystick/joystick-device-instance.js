@@ -6,6 +6,7 @@ const { refreshAndBroadcast } = require('./devices')
 
 const MAX_DURATION = 0xFFFF
 
+// Timers are kept per device id at module level, not per instance, since every joystick and gamepad instance of a device drives the same motors.
 const effects = {
 	rumble: {
 		call: Bindings.joystick_rumble,
@@ -95,6 +96,7 @@ class JoystickDeviceInstance extends DeviceInstance {
 	setPlayer (player) {
 		validateNotClosed(this)
 
+		// SDL sizes its player array to player + 1 and zero-fills it (overflowing at the max); that's an SDL issue, not ours to cap.
 		validateNonNegativeInt32('player', player)
 
 		this._setPlayer(player)

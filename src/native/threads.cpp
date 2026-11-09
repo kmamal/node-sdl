@@ -147,6 +147,7 @@ threads::distribute (const Event &event, napi_env except)
 		if (entry.first == except) { continue; }
 		Thread &thread = entry.second;
 		if (!_wants(thread, event)) { continue; }
+		// Unbounded and uncoalesced on purpose: a blocked worker can't observe the queue anyway, and dropping or merging events would make poll() on a worker differ from the main thread.
 		thread.queue.push_back(event);
 		_wake(thread);
 	}
@@ -252,6 +253,7 @@ threads::registerThread (const Napi::CallbackInfo &info)
 			throw Napi::Error::New(env, "@kmamal/sdl is already loaded in this thread");
 		}
 
+		// Registered right after the wake function so that on worker termination it runs before Node finalizes it (cleanup hooks run last-registered-first).
 		status = napi_add_env_cleanup_hook(env, _envCleanup, (void *) (napi_env) env);
 		if (status != napi_ok) {
 			napi_release_threadsafe_function(wake, napi_tsfn_abort);

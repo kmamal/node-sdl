@@ -65,6 +65,7 @@ global::assertReady(Napi::Env &env)
 		: "@kmamal/sdl must be imported on the main thread before it can be used in a worker");
 }
 
+// Delivers window move/resize/expose events synchronously so handlers run during the OS's modal move/resize loop.
 static bool SDLCALL
 watchEvents (void *, SDL_Event *event)
 {

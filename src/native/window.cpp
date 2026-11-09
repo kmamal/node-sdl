@@ -211,6 +211,7 @@ window::create (const Napi::CallbackInfo &info)
 			native.Set("subsystem", env.Null());
 		#endif
 
+		// Queried before updateRenderer(), and on X11 SDL's GL renderer recreates the window, so this handle may be stale; it only matters for opengl/webgpu windows, which have no renderer.
 		Napi::Value native_handle;
 		if (has_wm_info) {
 			NativeWindowHandle _native_handle;

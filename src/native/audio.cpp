@@ -62,6 +62,7 @@ _wake (StreamState *state)
 	}
 }
 
+// _onGet and _onPut run on SDL's audio thread and must not take global::lock(): stream teardown holds it while SDL waits for this thread.
 static void SDLCALL
 _onGet (void *userdata, SDL_AudioStream *, int additional_amount, int)
 {
@@ -117,6 +118,7 @@ _envCleanup (void *arg)
 static void
 _destroy (SDL_AudioDeviceID audio_id, OpenStream &entry, bool same_env)
 {
+	// The SDL callback is cleared before anything else.
 	_unbind(entry);
 	entry.state->closed.store(true, std::memory_order_release);
 	SDL_DestroyAudioStream(entry.stream);
@@ -145,6 +147,7 @@ _getStream (Napi::Env &env, SDL_AudioDeviceID audio_id)
 void
 audio::closeAllStreams ()
 {
+	// Runs on the main thread and may touch other threads' streams, so it doesn't remove their cleanup hooks; those hooks find the stream gone and do nothing.
 	for (auto &entry : open_streams) {
 		_destroy(entry.first, entry.second, false);
 	}
@@ -334,6 +337,7 @@ audio::open (const Napi::CallbackInfo &info)
 
 	StreamState *state = new StreamState();
 	try {
+		// state is freed only by this finalizer, never directly, because wake-ups can still be queued after close.
 		state->tsfn = NotifyFunction::New(env, callback, "audioStreamNotify", 0, 1, state,
 			[](Napi::Env, void *, StreamState *state) { delete state; });
 	}
@@ -343,6 +347,7 @@ audio::open (const Napi::CallbackInfo &info)
 		throw;
 	}
 	napi_status status = napi_unref_threadsafe_function(env, state->tsfn);
+	// Registered right after the thread-safe function so that on worker termination it runs before Node finalizes it (cleanup hooks run last-registered-first).
 	// Keying the hook by audio_id is safe: SDL never reuses audio device IDs (its instance counter only grows and isn't reset by SDL_Quit).
 	if (status == napi_ok) { status = napi_add_env_cleanup_hook(env, _envCleanup, (void *) (uintptr_t) audio_id); }
 	if (status != napi_ok) {

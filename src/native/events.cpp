@@ -650,8 +650,10 @@ events::isDispatchingFromWatch (const Napi::CallbackInfo &info)
 bool
 events::dispatchEventFromWatch(const SDL_Event &event)
 {
+	// Only dispatch while no JS callback is running; otherwise the event arrives through the normal poll.
 	if (in_callback) { return false; }
 
+	// No try/catch: the JS handler only assigns fields before routing user code through tryEmit, so only an out-of-memory failure inside Node-API could throw here, which isn't worth guarding against.
 	dispatching_from_watch++;
 	bool dispatched = _dispatchEvent(event);
 	dispatching_from_watch--;
