@@ -76,7 +76,7 @@ _closeOpens (Thread &thread)
 static void _envCleanup (void *arg);
 
 static void
-_leave (napi_env env, bool from_hook)
+_leaveEnv (napi_env env, bool from_hook)
 {
 	Thread thread;
 	{
@@ -106,13 +106,13 @@ _leave (napi_env env, bool from_hook)
 static void
 _envCleanup (void *arg)
 {
-	_leave((napi_env) arg, true);
+	_leaveEnv((napi_env) arg, true);
 }
 
 void
 threads::leave (napi_env env)
 {
-	_leave(env, false);
+	_leaveEnv(env, false);
 }
 
 void
