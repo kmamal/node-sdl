@@ -76,6 +76,7 @@ sensor::open (const Napi::CallbackInfo &info)
 	if (sensor == nullptr) {
 		throw global::sdlError(env, "SDL_OpenSensor", id);
 	}
+	SDL_ClearError();
 
 	threads::trackOpen(env, threads::SENSOR, id);
 
