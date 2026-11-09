@@ -165,7 +165,7 @@ window::create (const Napi::CallbackInfo &info)
 	SDL_Window *window = SDL_CreateWindowWithProperties(create_props);
 	SDL_DestroyProperties(create_props);
 	if (window == nullptr) {
-		throw global::sdlError(env, "SDL_CreateWindow");
+		throw global::sdlError(env, "SDL_CreateWindowWithProperties", title, x, y, width, height, desired_flags);
 	}
 
 	try {
@@ -282,11 +282,17 @@ window::create (const Napi::CallbackInfo &info)
 		bool is_minimized = actual_flags & SDL_WINDOW_MINIMIZED;
 		bool is_maximized = actual_flags & SDL_WINDOW_MAXIMIZED;
 
-		SDL_GetWindowPosition(window, &x, &y);
-		SDL_GetWindowSize(window, &width, &height);
+		if (!SDL_GetWindowPosition(window, &x, &y)) {
+			throw global::sdlError(env, "SDL_GetWindowPosition", window_id);
+		}
+		if (!SDL_GetWindowSize(window, &width, &height)) {
+			throw global::sdlError(env, "SDL_GetWindowSize", window_id);
+		}
 
 		int pixel_width, pixel_height;
-		SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+		if (!SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height)) {
+			throw global::sdlError(env, "SDL_GetWindowSizeInPixels", window_id);
+		}
 
 		display = SDL_GetDisplayForWindow(window);
 		if (display == 0) {

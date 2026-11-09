@@ -165,7 +165,7 @@ video::convert(const Napi::CallbackInfo &info)
 		: SDL_CreateSurfaceFrom(dst_w, dst_h, dst_format, dst, dst_stride);
 	if (dst_surface == nullptr) {
 		SDL_DestroySurface(src_surface);
-		throw global::sdlError(env, is_yuv ? "SDL_CreateSurface" : "SDL_CreateSurfaceFrom", dst_w, dst_h, dst_format);
+		throw global::sdlError(env, is_yuv ? "SDL_CreateSurface" : "SDL_CreateSurfaceFrom", dst_w, dst_h, is_yuv ? SDL_PIXELFORMAT_ARGB8888 : dst_format);
 	}
 
 	bool ok = SDL_BlitSurfaceScaled(src_surface, nullptr, dst_surface, nullptr, scaling);

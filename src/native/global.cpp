@@ -347,7 +347,7 @@ _start (Napi::Env &env)
 	SDL_SetHint(SDL_HINT_QUIT_ON_LAST_WINDOW_CLOSE, "0");
 
 	if (!SDL_InitSubSystem(SDL_INIT_EVENTS)) {
-		throw global::sdlError(env, "SDL_Init");
+		throw global::sdlError(env, "SDL_InitSubSystem", "SDL_INIT_EVENTS");
 	}
 
 	main_thread_id.store(SDL_GetCurrentThreadID(), std::memory_order_release);
