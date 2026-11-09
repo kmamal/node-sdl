@@ -2,11 +2,12 @@ const Globals = require('../globals')
 const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { lookupDevice } = require('../device-instance')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
 const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
 const { convert } = require('./conversion')
-const { validateBuffer, validateObject } = require('../validate')
+const { validateBuffer } = require('../validate')
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
@@ -22,16 +23,13 @@ const makeModule = (type, Stream) => new class extends EventsViaPoll {
 
 	openDevice (requested = null, options = {}) {
 		assertInitialized('audio')
-		Globals.events.poll()
-		const list = Globals.audioDevices[type]
 
-		if (requested === null) { return new Stream(list[0], options) }
+		if (requested === null) {
+			Globals.events.poll()
+			return new Stream(Globals.audioDevices[type][0], options)
+		}
 
-		validateObject('device', requested)
-
-		const device = list.find(({ id }) => id === requested.id)
-		if (!device) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device: requested }) }
-
+		const device = lookupDevice(requested, `audio.${type}`, () => Globals.audioDevices[type])
 		return new Stream(device, options)
 	}
 }()
