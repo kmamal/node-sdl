@@ -148,11 +148,12 @@ const handleWindowEvent = (event, targetId) => {
 		}
 
 		case 'renderDeviceLost': {
-			tryCall(() => {
+			try {
 				const result = Bindings.window_setAcceleratedAndVsync(window._id, window._accelerated, window._vsync)
 				window._accelerated = result.accelerated
 				window._vsync = result.vsync
-			})
+			}
+			catch (error) { tryEmit(window, 'error', error) }
 			return
 		}
 
