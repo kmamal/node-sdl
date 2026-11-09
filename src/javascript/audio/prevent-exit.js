@@ -1,5 +1,6 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
+const { INT32_MAX } = require('../validate')
 
 let timeout
 
@@ -39,7 +40,7 @@ process.on('beforeExit', (code) => {
 	if (duration) {
 		// Keeps Node.js alive while audio is playing
 		resetTimeout()
-		timeout = setTimeout(() => { timeout = null }, Math.min(duration * 1e3, 2 ** 31 - 1))
+		timeout = setTimeout(() => { timeout = null }, Math.min(duration * 1e3, INT32_MAX))
 	}
 })
 

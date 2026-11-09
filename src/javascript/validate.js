@@ -91,6 +91,7 @@ const validateNotDestroyed = (window) => {
 }
 
 module.exports = {
+	INT32_MAX,
 	validateBoolean,
 	validateString,
 	validateObject,

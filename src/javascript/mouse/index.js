@@ -3,7 +3,7 @@ const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { validateImage, validateRgbFormat } = require('../video/validate')
-const { validateBoolean, validateInteger, validateIntegerRange, validateFloat, validateString } = require('../validate')
+const { validateBoolean, validateIntegerRange, validateFloat, validateString } = require('../validate')
 
 let captured = false
 
@@ -51,10 +51,8 @@ const mouse = {
 	setCursorImage (width, height, stride, format, buffer, x, y) {
 		assertInitialized('video')
 		validateImage(width, height, stride, format, buffer, validateRgbFormat)
-		validateInteger('x', x)
-		if (x < 0 || x >= width) { throw Object.assign(new Error("x must be between 0 and width - 1"), { x, width }) }
-		validateInteger('y', y)
-		if (y < 0 || y >= height) { throw Object.assign(new Error("y must be between 0 and height - 1"), { y, height }) }
+		validateIntegerRange('x', x, 0, width - 1, "must be between 0 and width - 1")
+		validateIntegerRange('y', y, 0, height - 1, "must be between 0 and height - 1")
 
 		const _format = Enums.pixelFormat[format]
 

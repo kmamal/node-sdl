@@ -1,14 +1,13 @@
 const { VideoFormatHelpers } = require('./format-helpers')
-const { validateString, validateBuffer, validateInteger, validatePositiveInt32 } = require('../validate')
+const { INT32_MAX, validateString, validateBuffer, validateInteger, validateIntegerRange, validatePositiveInt32 } = require('../validate')
 
 const validateVsync = (vsync) => {
-	validateInteger('vsync', vsync)
-	if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
+	validateIntegerRange('vsync', vsync, -1, INT32_MAX, "must be -1 or a non-negative 32-bit integer")
 }
 
 const validateStride = (name, stride, minStride, details) => {
 	validateInteger(name, stride)
-	if (stride > 2 ** 31 - 1) { throw Object.assign(new Error(`${name} must be a 32-bit integer`), details) }
+	if (stride > INT32_MAX) { throw Object.assign(new Error(`${name} must be a 32-bit integer`), details) }
 	if (stride < minStride) { throw Object.assign(new Error(`${name} is smaller than expected`), details) }
 }
 
