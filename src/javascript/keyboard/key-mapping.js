@@ -249,6 +249,8 @@ const buildReverseMapping = () => {
 	const reverseMapping = Object.create(null)
 
 	for (const [ key, value ] of Object.entries(mapping)) {
+		if (isCharacter(value)) { continue }
+
 		maybeSkip: {
 			const existing = reverseMapping[value]
 			if (existing === undefined) { break maybeSkip }
@@ -263,25 +265,6 @@ const buildReverseMapping = () => {
 		}
 
 		reverseMapping[value] = key
-	}
-
-	for (const [ value, key ] of Object.entries(reverseMapping)) {
-		if (!isCharacter(value)) { continue }
-
-		const valueScancode = Bindings.keyboard_getScancode(value)
-		if (valueScancode === null) { continue }
-
-		const keyScancode = Bindings.keyboard_getScancode(key)
-		if (keyScancode === null) {
-			delete reverseMapping[value]
-			continue
-		}
-
-		const _key = Bindings.keyboard_getKey(valueScancode)
-		const roundTrips = (mapping[_key] ?? _key) === value
-		if (roundTrips && valueScancode < keyScancode) {
-			delete reverseMapping[value]
-		}
 	}
 
 	return reverseMapping
