@@ -8,18 +8,12 @@ clipboard::getText (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	SDL_ClearError();
-
 	global::SdlPtr<char> text(SDL_GetClipboardText());
-	if (!text || *text == '\0') {
-		const char *error = SDL_GetError();
-		if (error[0] == '\0') {
-			return Napi::String::New(env, "");
-		}
-
+	if (!text) {
 		throw global::sdlError(env, "SDL_GetClipboardText");
 	}
 
+	SDL_ClearError();
 	return Napi::String::New(env, text.get());
 }
 
