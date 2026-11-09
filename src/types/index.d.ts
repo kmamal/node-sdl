@@ -558,13 +558,13 @@ export namespace Sdl {
 				readonly y: Points
 				readonly width: Points
 				readonly height: Points
-			} | null
+			}
 			readonly usable: {
 				readonly x: Points
 				readonly y: Points
 				readonly width: Points
 				readonly height: Points
-			} | null
+			}
 			readonly scale: number | null
 			readonly orientation: Orientation | null
 		}

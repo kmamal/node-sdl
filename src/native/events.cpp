@@ -128,11 +128,6 @@ _windowEventType (Uint32 type)
 	}
 }
 
-struct JoysticksLock {
-	JoysticksLock () { SDL_LockJoysticks(); }
-	~JoysticksLock () { SDL_UnlockJoysticks(); }
-};
-
 template <typename Map, typename Key>
 static packed::Value
 _lookup (const Map &map, Key key)
@@ -166,10 +161,14 @@ _packWindowEvent (const SDL_Event &event, Packing &packed)
 				return false;
 			}
 
-			int width, height;
-			SDL_GetWindowSize(window, &width, &height);
-			int pixel_width, pixel_height;
-			SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+			int width, height, pixel_width, pixel_height;
+			if (
+				!SDL_GetWindowSize(window, &width, &height)
+				|| !SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height)
+			) {
+				SDL_ClearError();
+				return false;
+			}
 
 			packed.set("width", width);
 			packed.set("height", height);
@@ -203,6 +202,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 
 		case SDL_EVENT_DISPLAY_ADDED: {
 			packed::Value display = video::_getDisplay(event.display.displayID);
+			if (display.isNull()) { return false; }
 
 			packed.setTarget(events::targets::VIDEO);
 			packed.setType(events::types::DISPLAY_ADD);
@@ -227,6 +227,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 		case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED:
 		case SDL_EVENT_DISPLAY_USABLE_BOUNDS_CHANGED: {
 			packed::Value display = video::_getDisplay(event.display.displayID);
+			if (display.isNull()) { return false; }
 
 			packed.setTarget(events::targets::VIDEO);
 			packed.setType(event.type == SDL_EVENT_DISPLAY_MOVED
@@ -458,7 +459,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.setTarget(events::targets::GAMEPAD);
 			packed.setType(events::types::STEAM_HANDLE_UPDATE);
 
-			JoysticksLock joysticks_lock;
+			joystick::JoysticksLock joysticks_lock;
 			SDL_JoystickID gamepad_id = event.gdevice.which;
 			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 			if (gamepad == nullptr) {
@@ -475,7 +476,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.setTarget(events::targets::GAMEPAD);
 			packed.setType(events::types::REMAP);
 
-			JoysticksLock joysticks_lock;
+			joystick::JoysticksLock joysticks_lock;
 			SDL_JoystickID gamepad_id = event.gdevice.which;
 			SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
 			if (gamepad == nullptr) {

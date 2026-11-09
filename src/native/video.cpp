@@ -12,6 +12,18 @@ std::map<SDL_PixelFormat, packed::Str> video::formats;
 static packed::Value
 _packDisplay (SDL_DisplayID display_id)
 {
+	SDL_Rect rect;
+
+	if (!SDL_GetDisplayBounds(display_id, &rect)) {
+		SDL_ClearError();
+		return packed::Value();
+	}
+	packed::Value geometry = packed::Value::object();
+	geometry.set("x", rect.x);
+	geometry.set("y", rect.y);
+	geometry.set("width", rect.w);
+	geometry.set("height", rect.h);
+
 	const char *_name = SDL_GetDisplayName(display_id);
 	packed::Value name;
 	if (_name != nullptr) { name = _name; }
@@ -27,27 +39,14 @@ _packDisplay (SDL_DisplayID display_id)
 		if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
 	}
 
-	SDL_Rect rect;
-
-	packed::Value geometry;
-	if (!SDL_GetDisplayBounds(display_id, &rect)) { SDL_ClearError(); }
-	else {
-		geometry = packed::Value::object();
-		geometry.set("x", rect.x);
-		geometry.set("y", rect.y);
-		geometry.set("width", rect.w);
-		geometry.set("height", rect.h);
-	}
-
-	packed::Value usable;
-	if (!SDL_GetDisplayUsableBounds(display_id, &rect)) { SDL_ClearError(); }
-	else {
-		usable = packed::Value::object();
-		usable.set("x", rect.x);
-		usable.set("y", rect.y);
-		usable.set("width", rect.w);
-		usable.set("height", rect.h);
-	}
+	// Can't fail: SDL only rejects unknown displays (falling back to the full
+	// bounds otherwise), and SDL_GetDisplayBounds just succeeded for this one.
+	SDL_GetDisplayUsableBounds(display_id, &rect);
+	packed::Value usable = packed::Value::object();
+	usable.set("x", rect.x);
+	usable.set("y", rect.y);
+	usable.set("width", rect.w);
+	usable.set("height", rect.h);
 
 	packed::Value scale;
 	float _scale = SDL_GetDisplayContentScale(display_id);
@@ -90,8 +89,11 @@ video::_getDisplays (Napi::Env &env)
 
 	Napi::Array displays = Napi::Array::New(env);
 
+	int num_returned = 0;
 	for (int i = 0; i < num_displays; i++) {
-		displays.Set(i, _packDisplay(display_ids[i]).toNapi(env));
+		packed::Value display = _packDisplay(display_ids[i]);
+		if (display.isNull()) { continue; }
+		displays.Set(num_returned++, display.toNapi(env));
 	}
 
 	return displays;

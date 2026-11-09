@@ -27,6 +27,8 @@ joystick::mapAxisValue (int value) {
 packed::Value
 joystick::_getDevice (SDL_JoystickID id)
 {
+	joystick::JoysticksLock joysticks_lock;
+
 	const char *_name = SDL_GetJoystickNameForID(id);
 	packed::Value name;
 	if (_name != nullptr) { name = _name; }

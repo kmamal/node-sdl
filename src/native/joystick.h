@@ -9,6 +9,11 @@
 
 namespace joystick {
 
+	struct JoysticksLock {
+		JoysticksLock () { SDL_LockJoysticks(); }
+		~JoysticksLock () { SDL_UnlockJoysticks(); }
+	};
+
 	extern std::map<SDL_JoystickType, packed::Str> types;
 	extern std::map<Uint8, packed::Str> hat_positions;
 	extern SDL_GUID zero_guid;

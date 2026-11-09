@@ -378,21 +378,19 @@ T.test("sdl::video display events", (t) => {
 		t.equal(events.at(-1), { type: 'displayRemove', device: display })
 		t.ok(!sdl.video.displays.includes(display))
 
-		const partial = makeDisplay({ format: null, frequency: null, geometry: null, usable: null })
-		handleDisplayEvent({ type: 'displayAdd', display: partial })
-		t.equal(sdl.video.displays.find((d) => d.id === -777), partial)
-		const recovered = makeDisplay({
+		const unknownMode = makeDisplay({ format: null, frequency: null })
+		handleDisplayEvent({ type: 'displayAdd', display: unknownMode })
+		t.equal(sdl.video.displays.find((d) => d.id === -777), unknownMode)
+		const relocated = makeDisplay({
 			geometry: { x: 1, y: 2, width: 5, height: 6 },
 			usable: { x: 3, y: 4, width: 5, height: 6 },
 		})
-		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: recovered })
-		t.equal(partial.geometry, { x: 1, y: 2, width: 5, height: 6 })
-		t.equal(partial.usable, { x: 3, y: 4, width: 5, height: 6 })
-		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: makeDisplay({ geometry: null, usable: null }) })
-		t.equal([ partial.geometry, partial.usable ], [ null, null ])
-		t.equal(events.at(-1), { type: 'displayMove', device: partial })
-		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ geometry: null }) })
-		t.equal(events.at(-1).geometry, null)
+		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: relocated })
+		t.equal(unknownMode.geometry, { x: 1, y: 2, width: 5, height: 6 })
+		t.equal(unknownMode.usable, { x: 3, y: 4, width: 5, height: 6 })
+		t.equal(events.at(-1), { type: 'displayMove', device: unknownMode })
+		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ geometry: { x: 7, y: 8, width: 9, height: 10 } }) })
+		t.equal(events.at(-1).geometry, { x: 7, y: 8, width: 9, height: 10 })
 		handleDisplayEvent({ type: 'displayRemove', displayId: -777 })
 	}
 	finally {
