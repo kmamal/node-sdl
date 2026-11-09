@@ -101,10 +101,11 @@ class Window extends EventsViaPoll {
 		if (webgpu && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("webgpu and accelerated/vsync are mutually exclusive"), { webgpu, accelerated, vsync }) }
 
 		let displayId = 0
-		if (display) {
+		if (display !== null) {
 			Globals.events.poll()
-			if (!Globals.displays.includes(display)) { throw Object.assign(new Error("display must be from sdl.video.displays"), { display }) }
-			displayId = display.id
+			const found = Globals.displays.find(({ id }) => id === display.id)
+			if (!found) { throw Object.assign(new Error("display must be from sdl.video.displays"), { display }) }
+			displayId = found.id
 		}
 
 		const result = Bindings.window_create(

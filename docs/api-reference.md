@@ -668,7 +668,7 @@ The window under the mouse, or `null` if the mouse is not over a window.
 
 - `options: <object>`
   - `title: <string>` Appears in the window's title bar. Default: `''`
-  - `display: <object>` An object from `sdl.video.displays` that selects the display for the window (if you have multiple displays), or `null` for the primary display. Default: `null`
+  - `display: <object>|<null>` An object from [`sdl.video.displays`](#sdlvideodisplays), or a copy of one, that selects the display for the window (if you have multiple displays). Passing `null` selects the primary display. Default: `null`
   - `x: <number>` The x position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
   - `y: <number>` The y position of the window in points, relative to the screen, or `null` for centered. Must be a 32-bit integer. Default: `null`
   - `width: <number>` The width of the window in points, or `null` for the default of `640`. Must be a positive 32-bit integer. Default: `null`
@@ -1906,7 +1906,7 @@ Sample output:
 
 ### sdl.joystick.openDevice(device)
 
-- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`joystickInstance.device`](#joystickinstancedevice) returns.
+- `device: <object>` An object from [`sdl.joystick.devices`](#sdljoystickdevices), or a copy of one.
 - Returns: [`<joystickInstance>`](#class-joystickinstance) the opened joystick device instance.
 
 Opens a joystick device and returns its instance.
@@ -2236,7 +2236,7 @@ Sample output:
 
 ### sdl.gamepad.openDevice(device)
 
-- `device: <object>` An object from [`sdl.gamepad.devices`](#sdlgamepaddevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`gamepadInstance.device`](#gamepadinstancedevice) returns.
+- `device: <object>` An object from [`sdl.gamepad.devices`](#sdlgamepaddevices), or a copy of one.
 - Returns: [`<GamepadInstance>`](#class-gamepadinstance) the opened gamepad device instance.
 
 Opens a gamepad device and returns its instance.
@@ -2530,7 +2530,7 @@ Sample output:
 
 ### sdl.sensor.openDevice(device)
 
-- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices), or a copy of one. The device is looked up by its `id`, and the instance is bound to the object in the list, which is what [`sensorInstance.device`](#sensorinstancedevice) returns.
+- `device: <object>` An object from [`sdl.sensor.devices`](#sdlsensordevices), or a copy of one.
 - Returns: [`<SensorInstance>`](#class-sensorinstance) the opened sensor device instance.
 
 Opens a sensor device and returns an instance for it.
@@ -2848,7 +2848,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
 
 ### sdl.audio.playback.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices), or a copy of one. The device is looked up by its `id`, and the stream is bound to the object in the list, which is what [`stream.device`](#audiostreamdevice) returns. Passing `null` selects the default device, the list's first entry. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.playback.devices`](#sdlaudioplaybackdevices), or a copy of one. Passing `null` selects the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`
@@ -2944,7 +2944,7 @@ The device counts `buffered` in frames at its `frequency`, so `buffered` adds a 
 
 ### sdl.audio.recording.openDevice([device[, options]])
 
-- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices), or a copy of one. The device is looked up by its `id`, and the stream is bound to the object in the list, which is what [`stream.device`](#audiostreamdevice) returns. Passing `null` selects the default device, the list's first entry. Default: `null`
+- `device: <object>|<null>` An object from [`sdl.audio.recording.devices`](#sdlaudiorecordingdevices), or a copy of one. Passing `null` selects the default device, the list's first entry. Default: `null`
 - `options: <object>`
   - `channels: <number>`: Number of audio channels. Must be an integer from `1` to `8`, see [audio data](#audio-data) for the layouts. Default: `1`
   - `frequency: <number>`: The sampling frequency in frames per second. Must be a positive 32-bit integer. Default: `48e3`

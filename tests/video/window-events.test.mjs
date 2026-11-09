@@ -406,11 +406,17 @@ T.test("sdl::video.createWindow with a display", (t) => {
 
 	const window = sdl.video.createWindow({ display, visible: false })
 	try {
-		t.equal(window.display, display)
+		t.ok(window.display === display)
 	}
 	finally { window.destroy() }
 
-	t.throws(() => { sdl.video.createWindow({ display: { ...display }, visible: false }) })
+	const copied = sdl.video.createWindow({ display: { ...display }, visible: false })
+	try {
+		t.ok(copied.display === display)
+	}
+	finally { copied.destroy() }
+
+	t.throws(() => { sdl.video.createWindow({ display: { id: -1 }, visible: false }) })
 	t.throws(() => { sdl.video.createWindow({ display, x: 0, visible: false }) })
 	t.throws(() => { sdl.video.createWindow({ display, y: 0, visible: false }) })
 	t.throws(() => { sdl.video.createWindow({ display: 1, visible: false }) })
