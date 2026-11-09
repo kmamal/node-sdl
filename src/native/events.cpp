@@ -190,7 +190,7 @@ _packWindowEvent (const SDL_Event &event, Packing &packed)
 			break;
 		}
 		case SDL_EVENT_WINDOW_DISPLAY_CHANGED: {
-			packed.set("displayId", event.window.data1);
+			packed.set("displayId", (Uint32) event.window.data1);
 			break;
 		}
 		default: break;
