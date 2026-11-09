@@ -99,12 +99,7 @@ sensor::getData (const Napi::CallbackInfo &info)
 
 	int sensor_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
-	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Sensor *sensor = global::fromIdOrThrow(env, SDL_GetSensorFromID(sensor_id), "SDL_GetSensorFromID", "sensor", sensor_id);
 
 	float data[3];
 	if (!SDL_GetSensorData(sensor, data, 3)) {
@@ -131,12 +126,7 @@ sensor::close (const Napi::CallbackInfo &info)
 
 	threads::trackClose(env, threads::SENSOR, sensor_id);
 
-	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
-	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Sensor *sensor = global::fromIdOrThrow(env, SDL_GetSensorFromID(sensor_id), "SDL_GetSensorFromID", "sensor", sensor_id);
 
 	SDL_CloseSensor(sensor);
 

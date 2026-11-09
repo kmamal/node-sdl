@@ -160,12 +160,7 @@ gamepad::close (const Napi::CallbackInfo &info)
 
 	threads::trackClose(env, threads::GAMEPAD, gamepad_id);
 
-	SDL_Gamepad *gamepad = SDL_GetGamepadFromID(gamepad_id);
-	if (gamepad == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetGamepadFromID(" << gamepad_id << ") error: invalid gamepad id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Gamepad *gamepad = global::fromIdOrThrow(env, SDL_GetGamepadFromID(gamepad_id), "SDL_GetGamepadFromID", "gamepad", gamepad_id);
 
 	SDL_CloseGamepad(gamepad);
 

@@ -22,14 +22,7 @@ window::resetTexture (SDL_Window *window)
 static SDL_Window *
 getWindow (Napi::Env &env, int window_id)
 {
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: invalid window id";
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
-	}
-	return window;
+	return global::fromIdOrThrow(env, SDL_GetWindowFromID(window_id), "SDL_GetWindowFromID", "window", window_id);
 }
 
 #if defined(SDL_PLATFORM_LINUX) || defined(SDL_PLATFORM_FREEBSD) || defined(SDL_PLATFORM_OPENBSD) || defined(SDL_PLATFORM_NETBSD)

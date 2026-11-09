@@ -284,12 +284,7 @@ joystick::rumble (const Napi::CallbackInfo &info)
 	int high_freq_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	if (!SDL_RumbleJoystick(joystick, low_freq_rumble, high_freq_rumble, duration)) {
 		throw global::sdlError(env, "SDL_RumbleJoystick", joystick_id);
@@ -308,12 +303,7 @@ joystick::getCapabilities (const Napi::CallbackInfo &info)
 
 	int joystick_id = info[0].As<Napi::Number>().Int32Value();
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	SDL_PropertiesID props = SDL_GetJoystickProperties(joystick);
 	if (props == 0) {
@@ -341,12 +331,7 @@ joystick::setLed (const Napi::CallbackInfo &info)
 	double green = info[2].As<Napi::Number>().DoubleValue();
 	double blue = info[3].As<Napi::Number>().DoubleValue();
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	if (!SDL_SetJoystickLED(joystick, std::lround(red * 0xFF), std::lround(green * 0xFF), std::lround(blue * 0xFF))) {
 		throw global::sdlError(env, "SDL_SetJoystickLED", joystick_id);
@@ -366,12 +351,7 @@ joystick::setPlayer (const Napi::CallbackInfo &info)
 	int joystick_id = info[0].As<Napi::Number>().Int32Value();
 	int player = info[1].As<Napi::Number>().Int32Value();
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	if (!SDL_SetJoystickPlayerIndex(joystick, player)) {
 		throw global::sdlError(env, "SDL_SetJoystickPlayerIndex", joystick_id);
@@ -393,12 +373,7 @@ joystick::rumbleTriggers (const Napi::CallbackInfo &info)
 	int right_rumble = info[2].As<Napi::Number>().Int32Value();
 	int duration = info[3].As<Napi::Number>().Int32Value();
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	if (!SDL_RumbleJoystickTriggers(joystick, left_rumble, right_rumble, duration)) {
 		throw global::sdlError(env, "SDL_RumbleJoystickTriggers", joystick_id);
@@ -419,12 +394,7 @@ joystick::close (const Napi::CallbackInfo &info)
 
 	threads::trackClose(env, threads::JOYSTICK, joystick_id);
 
-	SDL_Joystick *joystick = SDL_GetJoystickFromID(joystick_id);
-	if (joystick == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetJoystickFromID(" << joystick_id << ") error: invalid joystick id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_Joystick *joystick = global::fromIdOrThrow(env, SDL_GetJoystickFromID(joystick_id), "SDL_GetJoystickFromID", "joystick", joystick_id);
 
 	SDL_CloseJoystick(joystick);
 

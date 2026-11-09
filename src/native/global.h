@@ -33,6 +33,16 @@ namespace global {
 		return Napi::Error::New(env, message.str());
 	}
 
+	template <typename T>
+	T *fromIdOrThrow (Napi::Env &env, T *ptr, const char *call, const char *what, Uint32 id)
+	{
+		if (ptr != nullptr) { return ptr; }
+		std::ostringstream message;
+		message << call << '(' << id << ") error: invalid " << what << " id";
+		SDL_ClearError();
+		throw Napi::Error::New(env, message.str());
+	}
+
 	std::mutex &lock();
 	void assertReady(Napi::Env &env);
 	bool isReady();
