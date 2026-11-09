@@ -606,7 +606,12 @@ _createStandaloneStream (Napi::Env &env, const SDL_AudioSpec *src_spec, const SD
 	if (stream == nullptr) { throw global::sdlError(env, "SDL_CreateAudioStream"); }
 
 	SDL_PropertiesID props = SDL_GetAudioStreamProperties(stream);
-	if (props == 0 || !SDL_SetBooleanProperty(props, SDL_PROP_AUDIOSTREAM_AUTO_CLEANUP_BOOLEAN, false)) {
+	if (props == 0) {
+		Napi::Error error = global::sdlError(env, "SDL_GetAudioStreamProperties");
+		SDL_DestroyAudioStream(stream);
+		throw error;
+	}
+	if (!SDL_SetBooleanProperty(props, SDL_PROP_AUDIOSTREAM_AUTO_CLEANUP_BOOLEAN, false)) {
 		Napi::Error error = global::sdlError(env, "SDL_SetBooleanProperty");
 		SDL_DestroyAudioStream(stream);
 		throw error;

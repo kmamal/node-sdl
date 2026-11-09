@@ -153,7 +153,11 @@ video::convert(const Napi::CallbackInfo &info)
 	if (src_surface == nullptr) {
 		throw global::sdlError(env, "SDL_CreateSurfaceFrom", src_w, src_h, src_format);
 	}
-	SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE);
+	if (!SDL_SetSurfaceBlendMode(src_surface, SDL_BLENDMODE_NONE)) {
+		Napi::Error error = global::sdlError(env, "SDL_SetSurfaceBlendMode");
+		SDL_DestroySurface(src_surface);
+		throw error;
+	}
 
 	bool is_yuv = SDL_ISPIXELFORMAT_FOURCC(dst_format);
 	SDL_Surface *dst_surface = is_yuv
@@ -165,8 +169,7 @@ video::convert(const Napi::CallbackInfo &info)
 		throw error;
 	}
 
-	bool ok = SDL_BlitSurfaceScaled(src_surface, nullptr, dst_surface, nullptr, scaling);
-	if (!ok) {
+	if (!SDL_BlitSurfaceScaled(src_surface, nullptr, dst_surface, nullptr, scaling)) {
 		Napi::Error error = global::sdlError(env, "SDL_BlitSurfaceScaled", src_w, src_h, src_format, dst_w, dst_h, dst_format);
 		SDL_DestroySurface(src_surface);
 		SDL_DestroySurface(dst_surface);
@@ -175,12 +178,11 @@ video::convert(const Napi::CallbackInfo &info)
 	SDL_DestroySurface(src_surface);
 
 	if (is_yuv) {
-		ok = SDL_ConvertPixels(dst_w, dst_h, dst_surface->format, dst_surface->pixels, dst_surface->pitch, dst_format, dst, dst_stride);
-	}
-	if (!ok) {
-		Napi::Error error = global::sdlError(env, "SDL_ConvertPixels", dst_w, dst_h, SDL_PIXELFORMAT_ARGB8888, dst_format);
-		SDL_DestroySurface(dst_surface);
-		throw error;
+		if (!SDL_ConvertPixels(dst_w, dst_h, dst_surface->format, dst_surface->pixels, dst_surface->pitch, dst_format, dst, dst_stride)) {
+			Napi::Error error = global::sdlError(env, "SDL_ConvertPixels", dst_w, dst_h, SDL_PIXELFORMAT_ARGB8888, dst_format);
+			SDL_DestroySurface(dst_surface);
+			throw error;
+		}
 	}
 	SDL_DestroySurface(dst_surface);
 
