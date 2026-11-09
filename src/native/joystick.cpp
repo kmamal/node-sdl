@@ -130,6 +130,62 @@ joystick::getPowerInfo (SDL_Joystick *joystick)
 	return mapPowerInfo(state, percent);
 }
 
+const char *
+joystick::getState (SDL_Joystick *joystick, packed::Value &dst)
+{
+	int num_axes = SDL_GetNumJoystickAxes(joystick);
+	if (num_axes < 0) {
+		return "SDL_GetNumJoystickAxes";
+	}
+
+	packed::Value axes = packed::Value::array();
+	for (int i = 0; i < num_axes; i++) {
+		axes.push(joystick::mapAxis(joystick, i));
+	}
+
+	int num_balls = SDL_GetNumJoystickBalls(joystick);
+	if (num_balls < 0) {
+		return "SDL_GetNumJoystickBalls";
+	}
+
+	packed::Value balls = packed::Value::array();
+	for (int i = 0; i < num_balls; i++) {
+		packed::Value ball = packed::Value::object();
+		ball.set("x", 0);
+		ball.set("y", 0);
+		balls.push(std::move(ball));
+	}
+
+	int num_buttons = SDL_GetNumJoystickButtons(joystick);
+	if (num_buttons < 0) {
+		return "SDL_GetNumJoystickButtons";
+	}
+
+	packed::Value buttons = packed::Value::array();
+	for (int i = 0; i < num_buttons; i++) {
+		buttons.push(SDL_GetJoystickButton(joystick, i));
+	}
+
+	int num_hats = SDL_GetNumJoystickHats(joystick);
+	if (num_hats < 0) {
+		return "SDL_GetNumJoystickHats";
+	}
+
+	packed::Value hats = packed::Value::array();
+	for (int i = 0; i < num_hats; i++) {
+		auto hat_position_entry = joystick::hat_positions.find(SDL_GetJoystickHat(joystick, i));
+		packed::Value hat_position;
+		if (hat_position_entry != joystick::hat_positions.end()) { hat_position = packed::Value::ref(hat_position_entry->second); }
+		hats.push(std::move(hat_position));
+	}
+
+	dst.set("axes", std::move(axes));
+	dst.set("balls", std::move(balls));
+	dst.set("buttons", std::move(buttons));
+	dst.set("hats", std::move(hats));
+	return nullptr;
+}
+
 packed::Value
 joystick::mapPowerInfo (SDL_PowerState _state, int _percent)
 {
@@ -180,81 +236,24 @@ joystick::open (const Napi::CallbackInfo &info)
 
 	try {
 		int _firmware_version = SDL_GetJoystickFirmwareVersion(joystick);
-		Napi::Value firmware_version = _firmware_version != 0
-			? Napi::Number::New(env, _firmware_version)
-			: env.Null();
+		packed::Value firmware_version;
+		if (_firmware_version != 0) { firmware_version = _firmware_version; }
 
 		const char *_serial_number = SDL_GetJoystickSerial(joystick);
-		Napi::Value serial_number = _serial_number != nullptr
-			? Napi::String::New(env, _serial_number)
-			: env.Null();
+		packed::Value serial_number;
+		if (_serial_number != nullptr) { serial_number = _serial_number; }
 
-		int num_axes = SDL_GetNumJoystickAxes(joystick);
-		if (num_axes < 0) {
-			throw global::sdlError(env, "SDL_GetNumJoystickAxes", id);
+		packed::Value result = packed::Value::object();
+		result.set("firmwareVersion", std::move(firmware_version));
+		result.set("serialNumber", std::move(serial_number));
+		result.set("power", getPowerInfo(joystick));
+
+		const char *failed_call = joystick::getState(joystick, result);
+		if (failed_call != nullptr) {
+			throw global::sdlError(env, failed_call, id);
 		}
 
-		Napi::Array axes = Napi::Array::New(env, num_axes);
-
-		for (int i = 0; i < num_axes; i++) {
-			axes.Set(i, joystick::mapAxis(joystick, i));
-		}
-
-		int num_balls = SDL_GetNumJoystickBalls(joystick);
-		if (num_balls < 0) {
-			throw global::sdlError(env, "SDL_GetNumJoystickBalls", id);
-		}
-
-		Napi::Array balls = Napi::Array::New(env, num_balls);
-
-		for (int i = 0; i < num_balls; i++) {
-			Napi::Object ball = Napi::Object::New(env);
-			ball.Set("x", 0);
-			ball.Set("y", 0);
-
-			balls.Set(i, ball);
-		}
-
-		int num_buttons = SDL_GetNumJoystickButtons(joystick);
-		if (num_buttons < 0) {
-			throw global::sdlError(env, "SDL_GetNumJoystickButtons", id);
-		}
-
-		Napi::Array buttons = Napi::Array::New(env, num_buttons);
-
-		for (int i = 0; i < num_buttons; i++) {
-			bool pressed = SDL_GetJoystickButton(joystick, i);
-			buttons.Set(i, pressed);
-		}
-
-		int num_hats = SDL_GetNumJoystickHats(joystick);
-		if (num_hats < 0) {
-			throw global::sdlError(env, "SDL_GetNumJoystickHats", id);
-		}
-
-		Napi::Array hats = Napi::Array::New(env, num_hats);
-
-		for (int i = 0; i < num_hats; i++) {
-			int hat_position = SDL_GetJoystickHat(joystick, i);
-			auto hat_position_entry = joystick::hat_positions.find(hat_position);
-			Napi::Value hat_position_name = hat_position_entry != joystick::hat_positions.end()
-				? Napi::String::New(env, hat_position_entry->second)
-				: env.Null();
-			hats.Set(i, hat_position_name);
-		}
-
-		Napi::Value power = getPowerInfo(joystick).toNapi(env);
-
-		Napi::Object result = Napi::Object::New(env);
-		result.Set("firmwareVersion", firmware_version);
-		result.Set("serialNumber", serial_number);
-		result.Set("axes", axes);
-		result.Set("balls", balls);
-		result.Set("buttons", buttons);
-		result.Set("hats", hats);
-		result.Set("power", power);
-
-		return result;
+		return result.toNapi(env);
 	}
 	catch (...) {
 		threads::trackClose(env, threads::JOYSTICK, id);

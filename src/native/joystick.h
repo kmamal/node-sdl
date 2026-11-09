@@ -23,6 +23,7 @@ namespace joystick {
 	packed::Value _getDevice (SDL_JoystickID id);
 	Napi::Array _getDevices (Napi::Env &env);
 	packed::Value getPowerInfo(SDL_Joystick *joystick);
+	const char *getState (SDL_Joystick *joystick, packed::Value &dst);
 	packed::Value mapPowerInfo(SDL_PowerState state, int percent);
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
