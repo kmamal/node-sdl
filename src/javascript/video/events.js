@@ -28,17 +28,7 @@ const handleDisplayEvent = (event) => {
 			Globals.displays.splice(index, 1)
 		} break
 
-		case 'displayOrient': {
-			const { displayId } = event
-			delete event.displayId
-
-			const display = Globals.displays.find((a) => a.id === displayId)
-			if (!display) { return }
-
-			display.orientation = event.orientation
-			event.device = display
-		} break
-
+		case 'displayOrient':
 		case 'displayMove':
 		case 'displayScaleChange':
 		case 'displayModeChange':
@@ -52,12 +42,6 @@ const handleDisplayEvent = (event) => {
 
 			Object.assign(display, fresh)
 			event.device = display
-			if (type === 'displayScaleChange') { event.scale = display.scale }
-			if (type === 'displayModeChange') {
-				event.format = display.format
-				event.frequency = display.frequency
-				event.geometry = display.geometry
-			}
 		} break
 
 		// No default

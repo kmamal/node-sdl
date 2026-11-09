@@ -472,38 +472,37 @@ Read [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 ### Event: 'displayOrient'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
-- `orientation: <string>|<null>`: The display's new orientation, or `null` if it is unknown.
 
 Fired when a display changes orientation.
+Read the new value from `device.orientation`.
 
 ### Event: 'displayMove'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes position.
+Read the new values from `device.geometry` and `device.usable`.
 
 ### Event: 'displayScaleChange'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
-- `scale: <number>|<null>`: The display's new `scale`, or `null` if it can't be determined.
 
 Fired when a display changes content scale.
+Read the new value from `device.scale`.
 
 ### Event: 'displayModeChange'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
-- `format: `[`<PixelFormat>`](#pixel-formats)`|<null>`: The display's new pixel format, or `null` if it can't be determined.
-- `frequency: <number>|<null>`: The display's new refresh rate, or `null` if it can't be determined.
-- `geometry: <object>`: The display's new `geometry`, since the mode determines its size.
-  - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
 
 Fired when a display changes its current mode.
+Read the new values from `device.format`, `device.frequency`, `device.geometry`, and `device.usable`.
 
 ### Event: 'displayUsableChange'
 
 - `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display's `usable` region changes, for example when a dock or taskbar appears, disappears, or moves.
+Read the new value from `device.usable`.
 
 ### sdl.video.convert(srcSpec, srcData, dstSpec[, dstData])
 

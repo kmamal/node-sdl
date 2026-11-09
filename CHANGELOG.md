@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attaching a listener to a destroyed window or a closed instance or stream now throws, instead of silently never firing.
 - Audio and video formats are reported using the platform-independent enums. The platform-dependent ones are only used as input.
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
+- Display device events now only include the device object itself. Read the changed props from the object.
 - `sdl.keyboard.getState()` returns a `Uint8Array` of `0`/`1` values instead of an array of booleans.
 - steamHandle is now reported as a BigInt.
 

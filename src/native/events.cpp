@@ -128,6 +128,19 @@ _windowEventType (Uint32 type)
 	}
 }
 
+static const packed::Str *
+_displayEventType (Uint32 type)
+{
+	switch (type) {
+		case SDL_EVENT_DISPLAY_ORIENTATION: return &events::types::DISPLAY_ORIENT;
+		case SDL_EVENT_DISPLAY_MOVED: return &events::types::DISPLAY_MOVE;
+		case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED: return &events::types::DISPLAY_SCALE;
+		case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED: return &events::types::DISPLAY_MODE;
+		case SDL_EVENT_DISPLAY_USABLE_BOUNDS_CHANGED: return &events::types::DISPLAY_USABLE;
+		default: return nullptr;
+	}
+}
+
 template <typename Map, typename Key>
 static packed::Value
 _lookup (const Map &map, Key key)
@@ -215,13 +228,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			packed.set("displayId", event.display.displayID);
 			break;
 		}
-		case SDL_EVENT_DISPLAY_ORIENTATION: {
-			packed.setTarget(events::targets::VIDEO);
-			packed.set("displayId", event.display.displayID);
-			packed.setType(events::types::DISPLAY_ORIENT);
-			packed.set("orientation", _lookup(video::orientations, (SDL_DisplayOrientation) event.display.data1));
-			break;
-		}
+		case SDL_EVENT_DISPLAY_ORIENTATION:
 		case SDL_EVENT_DISPLAY_MOVED:
 		case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
 		case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED:
@@ -230,13 +237,7 @@ _packEvent (const SDL_Event &event, Packing &packed)
 			if (display.isNull()) { return false; }
 
 			packed.setTarget(events::targets::VIDEO);
-			packed.setType(event.type == SDL_EVENT_DISPLAY_MOVED
-				? events::types::DISPLAY_MOVE
-				: event.type == SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
-					? events::types::DISPLAY_SCALE
-					: event.type == SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED
-						? events::types::DISPLAY_MODE
-						: events::types::DISPLAY_USABLE);
+			packed.setType(*_displayEventType(event.type));
 			packed.set("displayId", event.display.displayID);
 			packed.set("display", std::move(display));
 			break;

@@ -23,20 +23,15 @@ export namespace Events {
 		}
 		export interface Orient extends DisplayEvent {
 			readonly type: 'displayOrient'
-			readonly orientation: Sdl.Video.Orientation | null
 		}
 		export interface Move extends DisplayEvent {
 			readonly type: 'displayMove'
 		}
 		export interface Scale extends DisplayEvent {
 			readonly type: 'displayScaleChange'
-			readonly scale: number | null
 		}
 		export interface Mode extends DisplayEvent {
 			readonly type: 'displayModeChange'
-			readonly format: Sdl.Video.Format | null
-			readonly frequency: number | null
-			readonly geometry: Sdl.Video.Display['geometry']
 		}
 		export interface Usable extends DisplayEvent {
 			readonly type: 'displayUsableChange'
