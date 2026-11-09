@@ -672,37 +672,32 @@ events::dispatchEventFromWatch(const SDL_Event &event)
 	return dispatched;
 }
 
+struct PollGuard {
+	PollGuard (Napi::Env &env, Napi::Function &callback) { poll_env = &env; poll_callback = &callback; }
+	~PollGuard () { poll_env = nullptr; poll_callback = nullptr; }
+};
+
 static void
 _pump (Napi::Env &env, Napi::Function &callback)
 {
 	Uint64 poll_start = SDL_GetTicksNS();
 
-	poll_env = &env;
-	poll_callback = &callback;
+	PollGuard guard(env, callback);
 
-	try {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			if (wasDispatchedFromWatch(event)) { continue; }
-			_dispatchEvent(event);
-		}
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		if (wasDispatchedFromWatch(event)) { continue; }
+		_dispatchEvent(event);
+	}
 
-		watch_dispatched_events.erase(
-			std::remove_if(
-				watch_dispatched_events.begin(),
-				watch_dispatched_events.end(),
-				[poll_start](const WatchDispatchedEvent &it) { return it.timestamp < poll_start; }
-			),
-			watch_dispatched_events.end()
-		);
-	}
-	catch (...) {
-		poll_env = nullptr;
-		poll_callback = nullptr;
-		throw;
-	}
-	poll_env = nullptr;
-	poll_callback = nullptr;
+	watch_dispatched_events.erase(
+		std::remove_if(
+			watch_dispatched_events.begin(),
+			watch_dispatched_events.end(),
+			[poll_start](const WatchDispatchedEvent &it) { return it.timestamp < poll_start; }
+		),
+		watch_dispatched_events.end()
+	);
 }
 
 Napi::Value
