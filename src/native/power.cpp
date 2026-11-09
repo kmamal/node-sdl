@@ -14,6 +14,9 @@ power::getInfo (const Napi::CallbackInfo &info)
 
 	std::lock_guard<std::mutex> guard(global::lock());
 
+	// SDL_GetPowerInfo() reads the battery state straight from the OS and needs
+	// no SDL_Init(), so unlike the other worker-reachable bindings this one
+	// deliberately skips global::assertReady().
 	int _seconds, _percent;
 	SDL_PowerState _state = SDL_GetPowerInfo(&_seconds, &_percent);
 

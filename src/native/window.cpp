@@ -86,6 +86,8 @@ updateRenderer(
 	int window_id = SDL_GetWindowID(window);
 	// Not likely to fail.
 
+	// The renderer is recreated even when only vsync changed and
+	// SDL_SetRenderVSync() alone would do. The code is simpler this way.
 	SDL_Renderer *old_renderer = SDL_GetRenderer(window);
 	if (old_renderer != nullptr) {
 		SDL_DestroyRenderer(old_renderer);

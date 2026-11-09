@@ -274,6 +274,8 @@ audio::getDrivers(const Napi::CallbackInfo &info)
 
 	Napi::Object result = Napi::Object::New(env);
 	result.Set("all", all);
+	// Only NULL before the audio subsystem is initialized, which the JS
+	// assertInitialized() guard rules out, so this can never be NULL here.
 	result.Set("current", Napi::String::New(env, SDL_GetCurrentAudioDriver()));
 
 	return result;
