@@ -121,12 +121,10 @@ const handleWindowEvent = (event, targetId) => {
 
 		case 'enterFullscreen': {
 			window._fullscreen = true
-			return
-		}
+		} break
 		case 'leaveFullscreen': {
 			window._fullscreen = false
-			return
-		}
+		} break
 
 		case 'focus': {
 			Globals.windows.focused = window

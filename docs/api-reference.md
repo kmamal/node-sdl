@@ -36,6 +36,8 @@
     - [Event: 'minimize'](#event-minimize)
     - [Event: 'maximize'](#event-maximize)
     - [Event: 'restore'](#event-restore)
+    - [Event: 'enterFullscreen'](#event-enterfullscreen)
+    - [Event: 'leaveFullscreen'](#event-leavefullscreen)
     - [Event: 'move'](#event-move)
     - [Event: 'resize'](#event-resize)
     - [Event: 'displayChange'](#event-displaychange)
@@ -724,6 +726,14 @@ Fired when the window becomes maximized.
 
 Fired when the window is restored.
 
+### Event: 'enterFullscreen'
+
+Fired when the window becomes fullscreen.
+
+### Event: 'leaveFullscreen'
+
+Fired when the window stops being fullscreen.
+
 ### Event: 'move'
 
 - `x: <number>` The window's new x position in points, relative to the screen.
@@ -1049,7 +1059,7 @@ A fullscreen window covers the entire screen.
 
 Changes the window's fullscreen property.
 The call only submits a request to the windowing system, which may adjust or deny it.
-The [`fullscreen`](#windowfullscreen) property updates once the windowing system reports the change.
+The [`fullscreen`](#windowfullscreen) property updates once the corresponding [`'enterFullscreen'`](#event-enterfullscreen) or [`'leaveFullscreen'`](#event-leavefullscreen) event has been received.
 
 ### window.resizable
 

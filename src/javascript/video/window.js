@@ -26,6 +26,8 @@ const validEvents = [
 	'minimize',
 	'maximize',
 	'restore',
+	'enterFullscreen',
+	'leaveFullscreen',
 	'move',
 	'resize',
 	'displayChange',

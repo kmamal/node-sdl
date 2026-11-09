@@ -101,12 +101,12 @@ T.test("sdl::window state events", async (t) => {
 		handleWindowEvent({ type: 'restore' }, id)
 		t.equal([ window._minimized, window._maximized ], [ false, false ])
 
-		const before = events.length
 		handleWindowEvent({ type: 'enterFullscreen' }, id)
 		t.equal(window._fullscreen, true)
+		t.equal(events.at(-1), { type: 'enterFullscreen' })
 		handleWindowEvent({ type: 'leaveFullscreen' }, id)
 		t.equal(window._fullscreen, false)
-		t.equal(events.length, before)
+		t.equal(events.at(-1), { type: 'leaveFullscreen' })
 
 		const display = sdl.video.displays[0] ?? null
 		handleWindowEvent({ type: 'displayChange', displayId: display?.id ?? -1 }, id)

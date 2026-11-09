@@ -126,6 +126,8 @@ export namespace Events {
 		export interface Minimize extends WindowEvent { readonly type: 'minimize' }
 		export interface Maximize extends WindowEvent { readonly type: 'maximize' }
 		export interface Restore extends WindowEvent { readonly type: 'restore' }
+		export interface EnterFullscreen extends WindowEvent { readonly type: 'enterFullscreen' }
+		export interface LeaveFullscreen extends WindowEvent { readonly type: 'leaveFullscreen' }
 		export interface Move extends WindowEvent {
 			readonly type: 'move'
 			readonly x: Points,
@@ -181,6 +183,8 @@ export namespace Events {
 			| Minimize
 			| Maximize
 			| Restore
+			| EnterFullscreen
+			| LeaveFullscreen
 			| Move
 			| Resize
 			| DisplayChange
@@ -576,6 +580,8 @@ export namespace Sdl {
 			on (event: 'minimize', listener: (event: Events.Window.Minimize) => void): this
 			on (event: 'maximize', listener: (event: Events.Window.Maximize) => void): this
 			on (event: 'restore', listener: (event: Events.Window.Restore) => void): this
+			on (event: 'enterFullscreen', listener: (event: Events.Window.EnterFullscreen) => void): this
+			on (event: 'leaveFullscreen', listener: (event: Events.Window.LeaveFullscreen) => void): this
 			on (event: 'move', listener: (event: Events.Window.Move) => void): this
 			on (event: 'resize', listener: (event: Events.Window.Resize) => void): this
 			on (event: 'displayChange', listener: (event: Events.Window.DisplayChange) => void): this

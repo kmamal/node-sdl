@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Relative mouse mode for FPS-style camera controls.
 - `mouseMove` and `ballMotion` events report relative movement through `dx` and `dy`.
 - Window event `'fingerCancel'`, fired when the system cancels a touch.
+- Windows emit `'enterFullscreen'` and `'leaveFullscreen'` events when they enter or leave fullscreen mode.
 - Audio device objects report the `format`, `channels`, `frequency`, and `buffered` the device is running with while streams are open on them.
 - Gamepad buttons `misc1` and `touchpad` are now reported instead of arriving with `button: null`.
 - Pixel-format helpers similar to audio format helpers.
