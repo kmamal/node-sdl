@@ -1,36 +1,46 @@
 const Globals = require('../globals')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
-const { mapping, reverseMapping, isCharacter } = require('./key-mapping')
+const { mapKey, getReverseMapping, isCharacter } = require('./key-mapping')
+const { validateIntegerRange, validateString } = require('../validate')
 
 const validEvents = [ 'keymapChange' ]
 
 const keyboard = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('video') }) }
+
+	isAvailable () { return isAvailable('video') }
 
 	get SCANCODE () { return Enums.scancodes }
 
 	getKey (scancode) {
-		if (!Number.isInteger(scancode)) { throw Object.assign(new Error("scancode must be an integer"), { scancode }) }
-		if (scancode < 0 || scancode >= 512) { throw Object.assign(new Error("scancode must be between 0 and 511"), { scancode }) }
+		assertInitialized('video')
+		validateIntegerRange('scancode', scancode, 0, 511)
 
 		Globals.events.poll()
-		const _key = Bindings.keyboard_getKey(scancode)
-		return mapping[_key] ?? (isCharacter(_key) ? _key : null)
+		return mapKey(Bindings.keyboard_getKey(scancode))
 	}
 
 	getScancode (key) {
-		if (typeof key !== 'string') { throw Object.assign(new Error("key must be a string"), { key }) }
-
-		const _key = reverseMapping[key] ?? (isCharacter(key) ? key : null)
-		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
+		assertInitialized('video')
+		validateString('key', key)
 
 		Globals.events.poll()
-		return Bindings.keyboard_getScancode(_key)
+		const isChar = isCharacter(key)
+		const _key = isChar ? key : getReverseMapping()[key] ?? null
+		if (_key === null) { throw Object.assign(new Error("invalid key"), { key }) }
+
+		const scancode = Bindings.keyboard_getScancode(_key)
+		if (scancode === null) { return null }
+		if (!isChar && mapKey(Bindings.keyboard_getKey(scancode)) !== key) { return null }
+
+		return scancode
 	}
 
 	getState () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Bindings.keyboard_getState()
 	}

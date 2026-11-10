@@ -14,6 +14,8 @@
 #include "audio.h"
 #include "clipboard.h"
 #include "power.h"
+#include "threads.h"
+#include "testing.h"
 
 
 Napi::Object
@@ -22,12 +24,18 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("enums_get", Napi::Function::New<enums::get>(env));
 
 	exports.Set("global_initialize", Napi::Function::New<global::initialize>(env));
+	exports.Set("global_initSubsystem", Napi::Function::New<global::initSubsystem>(env));
 	exports.Set("global_cleanup", Napi::Function::New<global::cleanup>(env));
 
+	exports.Set("events_register", Napi::Function::New<threads::registerThread>(env));
+	exports.Set("events_setDemand", Napi::Function::New<threads::setDemand>(env));
 	exports.Set("events_poll", Napi::Function::New<events::poll>(env));
+	exports.Set("events_broadcastChange", Napi::Function::New<events::broadcastChange>(env));
 	exports.Set("events_isDispatchingFromWatch", Napi::Function::New<events::isDispatchingFromWatch>(env));
 
+	exports.Set("video_getDrivers", Napi::Function::New<video::getDrivers>(env));
 	exports.Set("video_getDisplays", Napi::Function::New<video::getDisplays>(env));
+	exports.Set("video_convert", Napi::Function::New<video::convert>(env));
 
 	exports.Set("window_create", Napi::Function::New<window::create>(env));
 	exports.Set("window_setTitle", Napi::Function::New<window::setTitle>(env));
@@ -84,19 +92,30 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("sensor_getData", Napi::Function::New<sensor::getData>(env));
 	exports.Set("sensor_close", Napi::Function::New<sensor::close>(env));
 
+	exports.Set("audio_getDrivers", Napi::Function::New<audio::getDrivers>(env));
 	exports.Set("audio_getDevices", Napi::Function::New<audio::getDevices>(env));
 	exports.Set("audio_open", Napi::Function::New<audio::open>(env));
-	exports.Set("audio_getDeviceFormat", Napi::Function::New<audio::getDeviceFormat>(env));
 	exports.Set("audio_play", Napi::Function::New<audio::play>(env));
 	exports.Set("audio_getQueued", Napi::Function::New<audio::getQueued>(env));
+	exports.Set("audio_flush", Napi::Function::New<audio::flush>(env));
 	exports.Set("audio_getAvailable", Napi::Function::New<audio::getAvailable>(env));
 	exports.Set("audio_putData", Napi::Function::New<audio::putData>(env));
 	exports.Set("audio_getData", Napi::Function::New<audio::getData>(env));
 	exports.Set("audio_clear", Napi::Function::New<audio::clear>(env));
 	exports.Set("audio_close", Napi::Function::New<audio::close>(env));
+	exports.Set("audio_setNotify", Napi::Function::New<audio::setNotify>(env));
+	exports.Set("audio_setGain", Napi::Function::New<audio::setGain>(env));
+	exports.Set("audio_setFrequencyRatio", Napi::Function::New<audio::setFrequencyRatio>(env));
+	exports.Set("audio_convert", Napi::Function::New<audio::convert>(env));
 
 	exports.Set("clipboard_getText", Napi::Function::New<clipboard::getText>(env));
 	exports.Set("clipboard_setText", Napi::Function::New<clipboard::setText>(env));
+
+	exports.Set("testing_attachVirtualJoystick", Napi::Function::New<testing::attachVirtualJoystick>(env));
+	exports.Set("testing_setVirtualJoystickAxis", Napi::Function::New<testing::setVirtualJoystickAxis>(env));
+	exports.Set("testing_setVirtualJoystickButton", Napi::Function::New<testing::setVirtualJoystickButton>(env));
+	exports.Set("testing_detachVirtualJoystick", Napi::Function::New<testing::detachVirtualJoystick>(env));
+	exports.Set("testing_pushAudioDeviceEvent", Napi::Function::New<testing::pushAudioDeviceEvent>(env));
 
 	exports.Set("power_getInfo", Napi::Function::New<power::getInfo>(env));
 

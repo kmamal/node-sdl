@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v1.0.0] - 2026-10-01
-
-The library now builds against SDL3 (3.4.x) instead of SDL2. This release contains breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
+## [v1.0.0] - 2026-11-08
 
 ### Changed
 
-- Exceptions thrown in event listeners are re-emitted as an `'error'` event on the window or instance, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception. They no longer stop event delivery or crash the process.
+- The library now builds against SDL3 (3.4.x) instead of SDL2. This introduces many breaking changes, see the [migration guide](https://github.com/kmamal/node-sdl/tree/master/docs/migrating-to-sdl3.md) for a walkthrough.
+- All SDL subsystems are now initialized lazily, on first use. The `sdl.info.initialized` flags are gone and instead every submodule now has an `isAvailable()` function that tries to initialize the subsystem and returns `true` or `false`. Functions, properties, and event listeners that need an SDL subsystem throw if that subsystem has failed to initialize.
+- `sdl.info.drivers.video` and `sdl.info.drivers.audio` moved to `sdl.video.drivers` and `sdl.audio.drivers`.
+- `@kmamal/sdl` can now be imported from worker threads and works exactly as in the main thread with the exception of the video subsystem (`sdl.video`, `sdl.keyboard`, `sdl.mouse`, `sdl.touch`, and `sdl.clipboard`) which can only be used on the main thread. `@kmamal/sdl/helpers` is no longer needed and has been removed.
+- Exceptions thrown in event listeners are re-emitted as an `'error'` event, following the usual `EventEmitter` semantics: with no `'error'` listener they surface as an uncaught exception. They no longer stop event delivery or crash the process.
 - Attaching a listener to a destroyed window or a closed instance or stream now throws, instead of silently never firing.
 - Audio and video formats are reported using the platform-independent enums. The platform-dependent ones are only used as input.
 - Character keys are reported as the unshifted character (`'ü'` instead of `'Ü'`), so `getKey(getScancode('ü'))` round-trips.
+- Display device events now only include the device object itself. Read the changed props from the object.
+- `sdl.keyboard.getState()` returns a `Uint8Array` of `0`/`1` values instead of an array of booleans.
 - steamHandle is now reported as a BigInt.
 
 ### Added
@@ -28,11 +32,12 @@ The library now builds against SDL3 (3.4.x) instead of SDL2. This release contai
 - Relative mouse mode for FPS-style camera controls.
 - `mouseMove` and `ballMotion` events report relative movement through `dx` and `dy`.
 - Window event `'fingerCancel'`, fired when the system cancels a touch.
+- Windows emit `'enterFullscreen'` and `'leaveFullscreen'` events when they enter or leave fullscreen mode.
 - Audio device objects report the `format`, `channels`, `frequency`, and `buffered` the device is running with while streams are open on them.
 - Gamepad buttons `misc1` and `touchpad` are now reported instead of arriving with `button: null`.
 - Pixel-format helpers similar to audio format helpers.
-- More stuff in `@kmamal/sdl/helpers`
 - More scancodes and keys
+- Sensor `'update'` events carry the reading (`x`, `y`, `z`) and the sensor's `timestamp`, so readings queued between polls are no longer lost.
 
 ### Fixed
 
@@ -50,6 +55,7 @@ Windows:
 - `setResizable()` and `setBorderless()` enforce the same mutual exclusivity as `createWindow()`.
 - `window.destroy()` no longer crashes when called from a `beforeClose` listener, or from a `move` or `resize` listener while the window is being dragged.
 - Removing all of a window's listeners no longer breaks event polling, lets the process exit while the window is open, or turns `destroy()` into a no-op.
+- `window.render()` interprets `dstRect` in window coordinates, the same units as `width`/`height` and mouse events. On high-DPI displays it was previously in physical pixels, so a rectangle built from the window size covered only part of the window.
 - `window.render()` throws instead of silently presenting stale contents when updating the texture fails, and no longer corrupts memory or leaks after a failed render or renderer switch.
 - Windows recover from a lost graphics device instead of failing every `render()` from then on.
 - `window.render()` validates image `stride` and buffer sizes, preventing out-of-bounds reads, including for planar and packed YUV formats with odd dimensions.
@@ -98,7 +104,7 @@ Sensors:
 
 Audio:
 
-- `putData()` and `getData()` accept empty buffers as no-ops, and reject a `bytes` count that isn't a whole number of sample frames with a validation error.
+- `putData()` and `getData()` accept empty buffers as no-ops. `putData()` rejects a `bytes` count that isn't a whole number of sample frames with a validation error.
 - `buffered` values larger than `32768` are rejected instead of silently truncated, and the buffer size the driver actually uses is reported on the stream's device.
 - `playbackStream.queued` no longer reports negative values for queues over 2 GiB.
 - `stream.playing` is `false` once the stream is closed.

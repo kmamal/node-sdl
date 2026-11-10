@@ -1,50 +1,44 @@
 const Globals = require('../globals')
 const { EventEmitter } = require('node:events')
 
-let _ID = 0
-const activeEmitters = new Set()
+let numListeners = 0
 
 const commonEvents = [ 'newListener', 'removeListener', 'error', '*' ]
+const metaEvents = [ 'newListener', 'removeListener' ]
+const undemandingEvents = [ ...metaEvents, 'error' ]
 
 class EventsViaPoll extends EventEmitter {
-	constructor (validEvents) {
+	constructor (validEvents, assertReady = null) {
 		super()
 
 		this._validEvents = validEvents
-
-		const id = _ID++
-		let count = 0
+		this._internalListeners = new Set()
 
 		// NOTE: this needs to be first, otherwise it will emit for 'newListener'
-		this.on('removeListener', (type) => {
-			if (type === 'newListener' || type === 'removeListener') { return }
+		this._addInternalListener('removeListener', (type) => {
+			if (undemandingEvents.includes(type)) { return }
 
-			count--
-			if (count !== 0) { return }
-
-			activeEmitters.delete(id)
-			if (activeEmitters.size !== 0) { return }
-
-			Globals.events.switchToPollingSlow()
+			if (--numListeners === 0) { Globals.events.setDemand(false) }
 		})
 
-		this.on('newListener', (type) => {
+		this._addInternalListener('newListener', (type) => {
 			if (this._makeRetiredError) { throw this._makeRetiredError() }
 
 			if (!commonEvents.includes(type) && !validEvents.includes(type)) {
 				throw Object.assign(new Error("invalid event"), { type })
 			}
 
-			if (type === 'newListener' || type === 'removeListener') { return }
+			if (undemandingEvents.includes(type)) { return }
 
-			count++
-			if (count !== 1) { return }
+			if (assertReady) { assertReady() }
 
-			activeEmitters.add(id)
-			if (activeEmitters.size !== 1) { return }
-
-			Globals.events.switchToPollingFast()
+			if (++numListeners === 1) { Globals.events.setDemand(true) }
 		})
+	}
+
+	_addInternalListener (type, listener) {
+		this._internalListeners.add(listener)
+		this.on(type, listener)
 	}
 
 	_retire (makeError) {
@@ -53,10 +47,22 @@ class EventsViaPoll extends EventEmitter {
 	}
 
 	removeAllListeners (type) {
-		const types = type !== undefined ? [ type ] : this.eventNames()
-		for (const eventType of types) {
-			if (eventType === 'newListener' || eventType === 'removeListener') { continue }
-			super.removeAllListeners(eventType)
+		if (type === undefined) {
+			const types = this.eventNames().filter((name) => name !== 'removeListener')
+			for (const eventType of [ ...types, 'removeListener' ]) {
+				this.removeAllListeners(eventType)
+			}
+			return this
+		}
+
+		if (!metaEvents.includes(type)) {
+			super.removeAllListeners(type)
+			return this
+		}
+
+		for (const listener of this.listeners(type)) {
+			if (this._internalListeners.has(listener)) { continue }
+			this.removeListener(type, listener)
 		}
 		return this
 	}

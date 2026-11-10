@@ -1,9 +1,10 @@
 #include "power.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <map>
 
 
-std::map<SDL_PowerState, std::string> power::states;
+std::map<SDL_PowerState, packed::Str> power::states;
 
 
 Napi::Value
@@ -11,6 +12,11 @@ power::getInfo (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
+
+	// SDL_GetPowerInfo() reads the battery state straight from the OS and needs
+	// no SDL_Init(), so unlike the other worker-reachable bindings this one
+	// deliberately skips global::assertReady().
 	int _seconds, _percent;
 	SDL_PowerState _state = SDL_GetPowerInfo(&_seconds, &_percent);
 

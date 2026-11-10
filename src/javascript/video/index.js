@@ -1,13 +1,11 @@
 const Globals = require('../globals')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { Window } = require('./window')
 const { getFormatHelpers } = require('./format-helpers')
-
-
-Globals.displays = Globals.info.initialized.video
-	? Bindings.video_getDisplays()
-	: []
+const { convert } = require('./conversion')
+const { validateNonNegativeInteger } = require('../validate')
 
 
 const validEvents = [
@@ -21,26 +19,45 @@ const validEvents = [
 ]
 
 const video = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('video') }) }
+
+	isAvailable () { return isAvailable('video') }
+
+	get drivers () {
+		assertInitialized('video')
+		return Bindings.video_getDrivers()
+	}
 
 	get displays () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return [ ...Globals.displays ]
 	}
 
-	get windows () { return [ ...Globals.windows.all.values() ] }
+	get windows () {
+		assertInitialized('video')
+		Globals.events.poll()
+		return [ ...Globals.windows.all.values() ]
+	}
 
 	get focused () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Globals.windows.focused
 	}
 
 	get hovered () {
+		assertInitialized('video')
 		Globals.events.poll()
 		return Globals.windows.hovered
 	}
 
-	createWindow (options) { return new Window(options) }
+	createWindow (options) {
+		assertInitialized('video')
+		return new Window(options)
+	}
+
+	convert (...args) { return convert(...args) }
 
 	bytesPerPixel (format) { return getFormatHelpers(format).bytesPerPixel }
 	isYuv (format) { return getFormatHelpers(format).isYuv }
@@ -48,17 +65,14 @@ const video = new class extends EventsViaPoll {
 
 	minStride (format, width) {
 		const helpers = getFormatHelpers(format)
-		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width < 0) { throw Object.assign(new Error("width must be non-negative"), { width }) }
+		validateNonNegativeInteger('width', width)
 		return helpers.minStride(width)
 	}
 
 	minBufferSize (format, stride, height) {
 		const helpers = getFormatHelpers(format)
-		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (stride < 0) { throw Object.assign(new Error("stride must be non-negative"), { stride }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height < 0) { throw Object.assign(new Error("height must be non-negative"), { height }) }
+		validateNonNegativeInteger('stride', stride)
+		validateNonNegativeInteger('height', height)
 		return helpers.minBufferSize(stride, height)
 	}
 }()

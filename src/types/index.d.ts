@@ -1,5 +1,8 @@
 import { EventEmitter } from 'node:events'
 
+export type Points = number
+export type Pixels = number
+
 export namespace Events {
 
 	interface BaseEvent { readonly type: string }
@@ -20,20 +23,15 @@ export namespace Events {
 		}
 		export interface Orient extends DisplayEvent {
 			readonly type: 'displayOrient'
-			readonly orientation: Sdl.Video.Orientation | null
 		}
 		export interface Move extends DisplayEvent {
 			readonly type: 'displayMove'
 		}
 		export interface Scale extends DisplayEvent {
 			readonly type: 'displayScaleChange'
-			readonly scale: number | null
 		}
 		export interface Mode extends DisplayEvent {
 			readonly type: 'displayModeChange'
-			readonly format: Sdl.Video.Format | null
-			readonly frequency: number | null
-			readonly geometry: Sdl.Video.Display['geometry']
 		}
 		export interface Usable extends DisplayEvent {
 			readonly type: 'displayUsableChange'
@@ -71,16 +69,16 @@ export namespace Events {
 		}
 
 		interface MouseEvent extends WindowEvent {
-			readonly x: number
-			readonly y: number
+			readonly x: Points
+			readonly y: Points
 			readonly touch: boolean
 			readonly pen: boolean
 		}
 
 		export interface MouseMove extends MouseEvent {
 			readonly type: 'mouseMove'
-			readonly dx: number
-			readonly dy: number
+			readonly dx: Points
+			readonly dy: Points
 		}
 
 		interface MouseButtonEvent extends MouseEvent {
@@ -123,17 +121,19 @@ export namespace Events {
 		export interface Minimize extends WindowEvent { readonly type: 'minimize' }
 		export interface Maximize extends WindowEvent { readonly type: 'maximize' }
 		export interface Restore extends WindowEvent { readonly type: 'restore' }
+		export interface EnterFullscreen extends WindowEvent { readonly type: 'enterFullscreen' }
+		export interface LeaveFullscreen extends WindowEvent { readonly type: 'leaveFullscreen' }
 		export interface Move extends WindowEvent {
 			readonly type: 'move'
-			readonly x: number,
-			readonly y: number
+			readonly x: Points,
+			readonly y: Points
 		}
 		export interface Resize extends WindowEvent {
 			readonly type: 'resize'
-			readonly width: number
-			readonly height: number
-			readonly pixelWidth: number
-			readonly pixelHeight: number
+			readonly width: Points
+			readonly height: Points
+			readonly pixelWidth: Pixels
+			readonly pixelHeight: Pixels
 		}
 		export interface DisplayChange extends WindowEvent {
 			readonly type: 'displayChange'
@@ -178,6 +178,8 @@ export namespace Events {
 			| Minimize
 			| Maximize
 			| Restore
+			| EnterFullscreen
+			| LeaveFullscreen
 			| Move
 			| Resize
 			| DisplayChange
@@ -318,6 +320,10 @@ export namespace Events {
 
 		export interface Update extends SensorEvent {
 			readonly type: 'update'
+			readonly x: number
+			readonly y: number
+			readonly z: number
+			readonly timestamp: bigint
 		}
 
 		export interface Close extends SensorEvent { readonly type: 'close' }
@@ -348,9 +354,20 @@ export namespace Events {
 		interface AudioEvent extends BaseEvent {}
 
 		export interface Close extends AudioEvent { readonly type: 'close' }
+		export interface Drain extends AudioEvent {
+			readonly type: 'drain'
+			readonly underruns: number
+			readonly missing: number
+		}
+		export interface Readable extends AudioEvent {
+			readonly type: 'readable'
+			readonly available: number
+		}
 
 		export type Any
 			= Close
+			| Drain
+			| Readable
 
 	}
 
@@ -381,6 +398,11 @@ export namespace Events {
 }
 
 export namespace Sdl {
+
+	export interface Drivers {
+		readonly all: string[]
+		readonly current: string
+	}
 
 	export interface Info {
 		readonly version: {
@@ -429,24 +451,6 @@ export namespace Sdl {
 			| 'tvOS'
 			| 'visionOS'
 			| null
-		readonly drivers: {
-			readonly video: {
-				readonly all: string[]
-				readonly current: string | null
-			}
-			readonly audio: {
-				readonly all: string[]
-				readonly current: string | null
-			}
-		}
-		readonly initialized: {
-			readonly video: boolean
-			readonly audio: boolean
-			readonly joystick: boolean
-			readonly gamepad: boolean
-			readonly haptic: boolean
-			readonly sensor: boolean
-		}
 	}
 
 	export namespace Video {
@@ -524,6 +528,21 @@ export namespace Sdl {
 			| 'bgrx32'
 			| 'xbgr32'
 
+		export interface ConversionSrcSpec {
+			readonly width: number
+			readonly height: number
+			readonly stride?: number
+			readonly format: Format | FormatAlias
+		}
+
+		export interface ConversionDstSpec {
+			readonly width?: number
+			readonly height?: number
+			readonly stride?: number
+			readonly format: Format | FormatAlias
+			readonly scaling?: Scaling
+		}
+
 		export type Scaling
 			= 'nearest'
 			| 'linear'
@@ -534,16 +553,16 @@ export namespace Sdl {
 			readonly format: Format | null
 			readonly frequency: number | null
 			readonly geometry: {
-				readonly x: number
-				readonly y: number
-				readonly width: number
-				readonly height: number
+				readonly x: Points
+				readonly y: Points
+				readonly width: Points
+				readonly height: Points
 			}
 			readonly usable: {
-				readonly x: number
-				readonly y: number
-				readonly width: number
-				readonly height: number
+				readonly x: Points
+				readonly y: Points
+				readonly width: Points
+				readonly height: Points
 			}
 			readonly scale: number | null
 			readonly orientation: Orientation | null
@@ -556,6 +575,8 @@ export namespace Sdl {
 			on (event: 'minimize', listener: (event: Events.Window.Minimize) => void): this
 			on (event: 'maximize', listener: (event: Events.Window.Maximize) => void): this
 			on (event: 'restore', listener: (event: Events.Window.Restore) => void): this
+			on (event: 'enterFullscreen', listener: (event: Events.Window.EnterFullscreen) => void): this
+			on (event: 'leaveFullscreen', listener: (event: Events.Window.LeaveFullscreen) => void): this
 			on (event: 'move', listener: (event: Events.Window.Move) => void): this
 			on (event: 'resize', listener: (event: Events.Window.Resize) => void): this
 			on (event: 'displayChange', listener: (event: Events.Window.DisplayChange) => void): this
@@ -588,17 +609,17 @@ export namespace Sdl {
 			readonly title: string
 			setTitle (title: string): void
 
-			readonly x: number
-			readonly y: number
-			setPosition (x: number, y: number): void
+			readonly x: Points
+			readonly y: Points
+			setPosition (x: Points, y: Points): void
 
-			readonly width: number
-			readonly height: number
-			setSize (width: number, height: number): void
+			readonly width: Points
+			readonly height: Points
+			setSize (width: Points, height: Points): void
 
-			readonly pixelWidth: number
-			readonly pixelHeight: number
-			setSizeInPixels (pixelWidth: number, pixelHeight: number): void
+			readonly pixelWidth: Pixels
+			readonly pixelHeight: Pixels
+			setSizeInPixels (pixelWidth: Pixels, pixelHeight: Pixels): void
 
 			readonly display: Display | null
 
@@ -625,10 +646,7 @@ export namespace Sdl {
 
 			readonly opengl: boolean
 			readonly webgpu: boolean
-			readonly native: {
-				readonly handle: Buffer | null,
-				readonly subsystem: 'x11' | 'wayland' | null,
-			}
+			readonly native: unknown
 
 			readonly maximized: boolean
 			maximize (): void
@@ -651,11 +669,11 @@ export namespace Sdl {
 			render (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer, options?: {
 				scaling?: Scaling,
 				dstRect?: {
-					x: number,
-					y: number,
-					width: number,
-					height: number,
-				} | null
+					x: Points,
+					y: Points,
+					width: Points,
+					height: Points,
+				}
 			}): void
 
 			setIcon (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer): void
@@ -669,6 +687,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'displayAdd', listener: (event: Events.Display.Add) => void): this
 			on (event: 'displayRemove', listener: (event: Events.Display.Remove) => void): this
 			on (event: 'displayOrient', listener: (event: Events.Display.Orient) => void): this
@@ -679,6 +699,7 @@ export namespace Sdl {
 			on (event: '*', listener: (type: string, event: Events.Display.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this
 
+			readonly drivers: Drivers
 			readonly displays: Display[]
 
 			readonly windows: Window[]
@@ -687,11 +708,11 @@ export namespace Sdl {
 
 			createWindow (options?: {
 				title?: string
-				display?: Display | null
-				x?: number | null
-				y?: number | null
-				width?: number | null
-				height?: number | null
+				display?: Display
+				x?: Points
+				y?: Points
+				width?: Points
+				height?: Points
 				visible?: boolean
 				fullscreen?: boolean
 				resizable?: boolean
@@ -702,6 +723,9 @@ export namespace Sdl {
 				opengl?: boolean
 				webgpu?: boolean
 			}): Window
+
+			convert (srcSpec: ConversionSrcSpec, srcData: Buffer, dstSpec: ConversionDstSpec, dstData?: undefined): Buffer
+			convert (srcSpec: ConversionSrcSpec, srcData: Buffer, dstSpec: ConversionDstSpec, dstData: Buffer): number
 
 			bytesPerPixel (format: Format | FormatAlias): number
 			isYuv (format: Format | FormatAlias): boolean
@@ -874,6 +898,7 @@ export namespace Sdl {
 			| 'CLEARAGAIN'
 			| 'CRSEL'
 			| 'EXSEL'
+			| 'FRONT'
 			| 'KP_00'
 			| 'KP_000'
 			| 'THOUSANDSSEPARATOR'
@@ -966,6 +991,8 @@ export namespace Sdl {
 		export type Key = string
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			readonly SCANCODE: { [name in ScancodeNames]: Scancode }
 
 			on (event: 'keymapChange', listener: (event: Events.Keyboard.KeymapChange) => void): this
@@ -975,7 +1002,7 @@ export namespace Sdl {
 			getKey (scancode: Scancode): Key | null
 			getScancode (key: Key): Scancode | null
 
-			getState (): boolean[]
+			getState (): Uint8Array
 		}
 
 	}
@@ -1014,19 +1041,21 @@ export namespace Sdl {
 			| 'wResize'
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly BUTTON: { [name in ButtonNames]: number }
 
 			getButton (button: number): boolean
 
 			readonly position: {
-				x: number
-				y: number
+				x: Points
+				y: Points
 			}
-			setPosition (x: number, y: number): void
+			setPosition (x: Points, y: Points): void
 
 			setCursor (cursor: Cursor): void
 			resetCursor (): void
-			setCursorImage (width: number, height: number, stride: number, format: Video.Format | Video.FormatAlias, buffer: Buffer, x: number, y: number): void
+			setCursorImage (width: number, height: number, stride: number, format: Video.Format | Video.FormatAlias, buffer: Buffer, x: Pixels, y: Pixels): void
 
 			showCursor (show?: boolean): void
 			hideCursor (): void
@@ -1053,6 +1082,8 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly devices: Device[]
 		}
 
@@ -1133,11 +1164,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1145,6 +1176,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'deviceAdd', listener: (event: Events.JoystickDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.JoystickDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.JoystickDevice.Any) => void): this
@@ -1171,6 +1204,7 @@ export namespace Sdl {
 			| 'nintendoSwitchJoyconRight'
 			| 'nintendoSwitchJoyconPair'
 			| 'gamecube'
+			| 'steam'
 
 		export type Axis
 			= 'leftStickX'
@@ -1265,11 +1299,11 @@ export namespace Sdl {
 			setLed (red: number, green: number, blue: number): void
 
 			readonly hasRumble: boolean
-			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number | null): void
+			rumble (lowFreqRumble?: number, highFreqRumble?: number, duration?: number): void
 			stopRumble (): void
 
 			readonly hasRumbleTriggers: boolean
-			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number | null): void
+			rumbleTriggers (leftRumble?: number, rightRumble?: number, duration?: number): void
 			stopRumbleTriggers (): void
 
 			readonly closed: boolean
@@ -1277,6 +1311,8 @@ export namespace Sdl {
 		}
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'deviceAdd', listener: (event: Events.GamepadDevice.Add) => void): this
 			on (event: 'deviceRemove', listener: (event: Events.GamepadDevice.Remove) => void): this
 			on (event: '*', listener: (type: string, event: Events.GamepadDevice.Any) => void): this
@@ -1329,6 +1365,8 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
 			readonly STANDARD_GRAVITY: 9.80665
 
 			readonly devices: Device[]
@@ -1369,6 +1407,14 @@ export namespace Sdl {
 			readonly frequency?: number
 			readonly format?: Format | FormatAlias
 			readonly buffered?: number
+			readonly gain?: number
+			readonly frequencyRatio?: number
+		}
+
+		export interface ConversionSpec {
+			readonly format?: Format | FormatAlias
+			readonly channels?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+			readonly frequency?: number
 		}
 
 		export interface AudioStream extends EventEmitter {
@@ -1387,6 +1433,11 @@ export namespace Sdl {
 			play (play?: boolean): void
 			pause (): void
 
+			readonly gain: number
+			setGain (gain: number): void
+			readonly frequencyRatio: number
+			setFrequencyRatio (frequencyRatio: number): void
+
 			clear (): void
 
 			readonly bytesPerSample: number
@@ -1401,11 +1452,21 @@ export namespace Sdl {
 		}
 
 		export interface AudioPlaybackStream extends AudioStream {
+			on (event: 'drain', listener: (event: Events.Audio.Drain) => void): this
+			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
+			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
+
 			readonly queued: number
 			putData (buffer: Buffer, bytes?: number): void
 		}
 
 		export interface AudioRecordingStream extends AudioStream {
+			on (event: 'readable', listener: (event: Events.Audio.Readable) => void): this
+			on (event: 'close', listener: (event: Events.Audio.Close) => void): this
+			on (event: '*', listener: (type: string, event: Events.Audio.Any) => void): this
+			on (event: 'error', listener: (error: Error) => void): this
+
 			readonly available: number
 			getData (buffer: Buffer, bytes?: number): number
 		}
@@ -1422,8 +1483,14 @@ export namespace Sdl {
 		}
 
 		interface Module {
+			isAvailable (): boolean
+
+			readonly drivers: Drivers
 			readonly playback: DeviceModule<AudioPlaybackStream>
 			readonly recording: DeviceModule<AudioRecordingStream>
+
+			convert (srcSpec: ConversionSpec, srcData: Buffer, dstSpec: ConversionSpec, dstData?: undefined): Buffer
+			convert (srcSpec: ConversionSpec, srcData: Buffer, dstSpec: ConversionSpec, dstData: Buffer): number
 
 			bytesPerSample (format: Format | FormatAlias): number
 			minSampleValue (format: Format | FormatAlias): number
@@ -1437,6 +1504,8 @@ export namespace Sdl {
 	export namespace Clipboard {
 
 		interface Module extends EventEmitter {
+			isAvailable (): boolean
+
 			on (event: 'update', listener: (event: Events.Clipboard.Update) => void): this
 			on (event: '*', listener: (type: string, event: Events.Clipboard.Any) => void): this
 			on (event: 'error', listener: (error: Error) => void): this

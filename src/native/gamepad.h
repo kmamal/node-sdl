@@ -2,21 +2,20 @@
 #define _GAMEPAD_H_
 
 #include <napi.h>
+#include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
-#include <string>
 
 namespace gamepad {
 
-	extern std::map<SDL_GamepadType, std::string> types;
-	extern std::map<SDL_GamepadAxis, std::string> axes;
-	extern std::map<SDL_GamepadButton, std::string> buttons;
-	extern std::map<SDL_GamepadButtonLabel, std::string> button_labels;
+	extern std::map<SDL_GamepadType, packed::Str> types;
+	extern std::map<SDL_GamepadAxis, packed::Str> axes;
+	extern std::map<SDL_GamepadButton, packed::Str> buttons;
+	extern std::map<SDL_GamepadButtonLabel, packed::Str> button_labels;
 
 	double mapAxis (SDL_Gamepad *gamepad, SDL_GamepadAxis axis);
-	double mapAxisValue (int value);
-	void getState (Napi::Env &env, SDL_Gamepad *gamepad, Napi::Object dst);
-	Napi::Value getSteamHandle(Napi::Env &env, SDL_Gamepad *gamepad);
+	void getState (SDL_Gamepad *gamepad, packed::Value &dst);
+	packed::Value getSteamHandle(SDL_Gamepad *gamepad);
 
 	Napi::Value addMappings(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);

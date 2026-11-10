@@ -1,24 +1,28 @@
 #include "window.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 #include <cstdint>
 #include <cmath>
 #include <algorithm>
 
 static const char *TEXTURE_PROPERTY = "kmamal.sdl.texture";
 
-static SDL_Window *
-getWindow (Napi::Env &env, int window_id)
+void
+window::resetTexture (SDL_Window *window)
 {
-	SDL_Window *window = SDL_GetWindowFromID(window_id);
-	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetWindowFromID(" << window_id << ") error: invalid window id";
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+	SDL_PropertiesID props = SDL_GetWindowProperties(window);
+	SDL_Texture *texture = (SDL_Texture *) SDL_GetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
+	if (texture != nullptr) {
+		SDL_DestroyTexture(texture);
+		SDL_SetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
 	}
-	return window;
+}
+
+static SDL_Window *
+getWindow (Napi::Env &env, SDL_WindowID window_id)
+{
+	return global::fromIdOrThrow(env, SDL_GetWindowFromID(window_id), "SDL_GetWindowFromID", "window", window_id);
 }
 
 #if defined(SDL_PLATFORM_LINUX) || defined(SDL_PLATFORM_FREEBSD) || defined(SDL_PLATFORM_OPENBSD) || defined(SDL_PLATFORM_NETBSD)
@@ -35,6 +39,25 @@ getWindow (Napi::Env &env, int window_id)
 	#define GL_NativeWindow LinuxNativeData
 	#define GPU_NativeData LinuxNativeData
 	#define GPU_WINDOW_FLAG SDL_WINDOW_VULKAN
+
+	static LinuxNativeData
+	getLinuxNativeData (SDL_PropertiesID window_props, bool is_x11, bool use_egl_window)
+	{
+		if (is_x11) {
+			return {
+				1,
+				SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
+				(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
+			};
+		}
+		return {
+			2,
+			SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
+			(uintptr_t) SDL_GetPointerProperty(window_props, use_egl_window
+				? SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER
+				: SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
+		};
+	}
 #elif defined(SDL_PLATFORM_WIN32)
 	#define NativeWindowHandle void *
 	#define GL_NativeWindow void *
@@ -53,16 +76,18 @@ getWindow (Napi::Env &env, int window_id)
 	#define GPU_WINDOW_FLAG SDL_WINDOW_METAL
 #endif
 
-void
+static void
 updateRenderer(
 	Napi::Env &env,
 	SDL_Window *window,
 	bool *is_accelerated,
 	int *vsync
 ) {
-	int window_id = SDL_GetWindowID(window);
+	SDL_WindowID window_id = SDL_GetWindowID(window);
 	// Not likely to fail.
 
+	// The renderer is recreated even when only vsync changed and
+	// SDL_SetRenderVSync() alone would do. The code is simpler this way.
 	SDL_Renderer *old_renderer = SDL_GetRenderer(window);
 	if (old_renderer != nullptr) {
 		SDL_DestroyRenderer(old_renderer);
@@ -81,13 +106,11 @@ updateRenderer(
 	}
 
 	if (renderer == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateRenderer(" << window_id << ", " << *is_accelerated << ", " << *vsync << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateRenderer", window_id, *is_accelerated, *vsync);
 	}
 
 	if (!SDL_SetRenderVSync(renderer, *vsync)) { SDL_ClearError(); }
+	if (!SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE)) { SDL_ClearError(); }
 
 	const char *renderer_name = SDL_GetRendererName(renderer);
 	if (renderer_name == nullptr) { SDL_ClearError(); }
@@ -104,8 +127,8 @@ window::create (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	std:: string title = info[0].As<Napi::String>().Utf8Value();
-	int display = info[1].As<Napi::Number>().Int32Value();
+	std::string title = info[0].As<Napi::String>().Utf8Value();
+	SDL_DisplayID display = info[1].As<Napi::Number>().Uint32Value();
 	int x = info[2].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[2].As<Napi::Number>().Int32Value();
 	int y = info[3].IsNull() ? (int) SDL_WINDOWPOS_CENTERED_DISPLAY(display) : info[3].As<Napi::Number>().Int32Value();
 	int width = info[4].IsNull() ? 640 : info[4].As<Napi::Number>().Int32Value();
@@ -135,34 +158,37 @@ window::create (const Napi::CallbackInfo &info)
 
 	SDL_PropertiesID create_props = SDL_CreateProperties();
 	if (create_props == 0) {
-		std::ostringstream message;
-		message << "SDL_CreateProperties() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateProperties");
 	}
-	SDL_SetStringProperty(create_props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str());
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height);
-	SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, desired_flags);
+	if (!SDL_SetStringProperty(create_props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title.c_str())) {
+		Napi::Error error = global::sdlError(env, "SDL_SetStringProperty", title);
+		SDL_DestroyProperties(create_props);
+		throw error;
+	}
+	bool numbers_set = true
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_X_NUMBER, x)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, y)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, width)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, height)
+		&& SDL_SetNumberProperty(create_props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, desired_flags);
+	if (!numbers_set) {
+		Napi::Error error = global::sdlError(env, "SDL_SetNumberProperty", x, y, width, height, desired_flags);
+		SDL_DestroyProperties(create_props);
+		throw error;
+	}
 
 	SDL_Window *window = SDL_CreateWindowWithProperties(create_props);
-	SDL_DestroyProperties(create_props);
 	if (window == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateWindow() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		Napi::Error error = global::sdlError(env, "SDL_CreateWindowWithProperties", title, x, y, width, height, desired_flags);
+		SDL_DestroyProperties(create_props);
+		throw error;
 	}
+	SDL_DestroyProperties(create_props);
 
 	try {
-		int window_id = SDL_GetWindowID(window);
+		SDL_WindowID window_id = SDL_GetWindowID(window);
 		if (window_id == 0) {
-			std::ostringstream message;
-			message << "SDL_GetWindowID() error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetWindowID");
 		}
 
 		if (!SDL_StartTextInput(window)) { SDL_ClearError(); }
@@ -199,24 +225,12 @@ window::create (const Napi::CallbackInfo &info)
 			native.Set("subsystem", env.Null());
 		#endif
 
+		// Queried before updateRenderer(), and on X11 SDL's GL renderer recreates the window, so this handle may be stale; it only matters for opengl/webgpu windows, which have no renderer.
 		Napi::Value native_handle;
 		if (has_wm_info) {
 			NativeWindowHandle _native_handle;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					_native_handle = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					_native_handle = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
-					};
-				}
+				_native_handle = getLinuxNativeData(window_props, is_x11, false);
 			#elif defined(SDL_PLATFORM_WIN32)
 				_native_handle = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
@@ -240,20 +254,7 @@ window::create (const Napi::CallbackInfo &info)
 
 			GL_NativeWindow native_gl;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					native_gl = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					native_gl = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER, nullptr),
-					};
-				}
+				native_gl = getLinuxNativeData(window_props, is_x11, true);
 			#elif defined(SDL_PLATFORM_WIN32)
 				native_gl = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 			#elif defined(SDL_PLATFORM_MACOS)
@@ -272,20 +273,7 @@ window::create (const Napi::CallbackInfo &info)
 
 			GPU_NativeData native_gpu;
 			#if defined(PLATFORM_LINUX_OR_BSD)
-				if (is_x11) {
-					native_gpu = {
-						1,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetNumberProperty(window_props, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0),
-					};
-				}
-				else {
-					native_gpu = {
-						2,
-						SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr),
-						(uintptr_t) SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr),
-					};
-				}
+				native_gpu = getLinuxNativeData(window_props, is_x11, false);
 			#elif defined(SDL_PLATFORM_WIN32)
 				native_gpu.hwnd = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 				native_gpu.hinstance = SDL_GetPointerProperty(window_props, SDL_PROP_WINDOW_WIN32_INSTANCE_POINTER, nullptr);
@@ -300,35 +288,40 @@ window::create (const Napi::CallbackInfo &info)
 		}
 
 		if (is_visible && !SDL_ShowWindow(window)) {
-			std::ostringstream message;
-			message << "SDL_ShowWindow(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_ShowWindow", window_id);
 		}
 
 		Uint64 actual_flags = SDL_GetWindowFlags(window);
+		is_visible = !(actual_flags & SDL_WINDOW_HIDDEN);
 		is_fullscreen = actual_flags & SDL_WINDOW_FULLSCREEN;
 		is_resizable = actual_flags & SDL_WINDOW_RESIZABLE;
 		is_borderless = actual_flags & SDL_WINDOW_BORDERLESS;
 		is_always_on_top = actual_flags & SDL_WINDOW_ALWAYS_ON_TOP;
 		is_transparent = actual_flags & SDL_WINDOW_TRANSPARENT;
+		bool is_minimized = actual_flags & SDL_WINDOW_MINIMIZED;
+		bool is_maximized = actual_flags & SDL_WINDOW_MAXIMIZED;
 
-		SDL_GetWindowPosition(window, &x, &y);
-		SDL_GetWindowSize(window, &width, &height);
+		if (!SDL_GetWindowPosition(window, &x, &y)) {
+			throw global::sdlError(env, "SDL_GetWindowPosition", window_id);
+		}
+		if (!SDL_GetWindowSize(window, &width, &height)) {
+			throw global::sdlError(env, "SDL_GetWindowSize", window_id);
+		}
 
 		int pixel_width, pixel_height;
-		SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height);
+		if (!SDL_GetWindowSizeInPixels(window, &pixel_width, &pixel_height)) {
+			throw global::sdlError(env, "SDL_GetWindowSizeInPixels", window_id);
+		}
 
 		display = SDL_GetDisplayForWindow(window);
 		if (display == 0) {
-			std::ostringstream message;
-			message << "SDL_GetDisplayForWindow(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetDisplayForWindow", window_id);
 		}
 
 		Napi::Object result = Napi::Object::New(env);
 		result.Set("id", window_id);
+		result.Set("title", SDL_GetWindowTitle(window));
+		result.Set("visible", is_visible);
 		result.Set("x", x);
 		result.Set("y", y);
 		result.Set("width", width);
@@ -341,6 +334,8 @@ window::create (const Napi::CallbackInfo &info)
 		result.Set("borderless", is_borderless);
 		result.Set("alwaysOnTop", is_always_on_top);
 		result.Set("transparent", is_transparent);
+		result.Set("minimized", is_minimized);
+		result.Set("maximized", is_maximized);
 		if (has_renderer) {
 			result.Set("accelerated", is_accelerated);
 			result.Set("vsync", vsync);
@@ -354,6 +349,7 @@ window::create (const Napi::CallbackInfo &info)
 		return result;
 	}
 	catch (...) {
+		// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
 		SDL_Renderer *renderer = SDL_GetRenderer(window);
 		if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 		SDL_DestroyWindow(window);
@@ -366,19 +362,16 @@ window::setTitle (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
-	std:: string title = info[1].As<Napi::String>().Utf8Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
+	std::string title = info[1].As<Napi::String>().Utf8Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowTitle(window, title.c_str())) {
-		std::ostringstream message;
-		message << "SDL_SetWindowTitle(" << window_id << ", " << title << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowTitle", window_id, title);
 	}
 
-	return env.Undefined();
+	return Napi::String::New(env, SDL_GetWindowTitle(window));
 }
 
 Napi::Value
@@ -386,17 +379,14 @@ window::setPosition (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int x = info[1].As<Napi::Number>().Int32Value();
 	int y = info[2].As<Napi::Number>().Int32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowPosition(window, x, y)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowPosition(" << window_id << ", " << x << ", " << y << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowPosition", window_id, x, y);
 	}
 
 	return env.Undefined();
@@ -407,7 +397,7 @@ window::setSize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
 	bool in_pixels = info[3].As<Napi::Boolean>().Value();
@@ -417,21 +407,15 @@ window::setSize (const Napi::CallbackInfo &info)
 	if (in_pixels) {
 		float density = SDL_GetWindowPixelDensity(window);
 		if (density == 0.0f) {
-			std::ostringstream message;
-			message << "SDL_GetWindowPixelDensity(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_GetWindowPixelDensity", window_id);
 		}
 
-		width = std::clamp<long>(std::lround(width / (double) density), 1, INT32_MAX);
-		height = std::clamp<long>(std::lround(height / (double) density), 1, INT32_MAX);
+		width = (int) std::clamp<long long>(std::llround(width / (double) density), 1, INT32_MAX);
+		height = (int) std::clamp<long long>(std::llround(height / (double) density), 1, INT32_MAX);
 	}
 
 	if (!SDL_SetWindowSize(window, width, height)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowSize(" << window_id << ", " << width << ", " << height << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowSize", window_id, width, height);
 	}
 
 	return env.Undefined();
@@ -442,16 +426,13 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_fullscreen = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowFullscreen(window, is_fullscreen)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowFullscreen(" << window_id << ", " << is_fullscreen << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowFullscreen", window_id, is_fullscreen);
 	}
 
 	return env.Undefined();
@@ -462,16 +443,13 @@ window::setResizable (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_resizable = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowResizable(window, is_resizable)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowResizable(" << window_id << ", " << is_resizable << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowResizable", window_id, is_resizable);
 	}
 
 	Uint64 actual_flags = SDL_GetWindowFlags(window);
@@ -485,16 +463,13 @@ window::setBorderless (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_borderless = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowBordered(window, !is_borderless)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowBordered(" << window_id << ", " << !is_borderless << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowBordered", window_id, !is_borderless);
 	}
 
 	Uint64 actual_flags = SDL_GetWindowFlags(window);
@@ -508,16 +483,13 @@ window::setRelativeMouseMode (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool relative = info[1].As<Napi::Boolean>().Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_SetWindowRelativeMouseMode(window, relative)) {
-		std::ostringstream message;
-		message << "SDL_SetWindowRelativeMouseMode(" << window_id << ", " << relative << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetWindowRelativeMouseMode", window_id, relative);
 	}
 
 	return Napi::Boolean::New(env, SDL_GetWindowRelativeMouseMode(window));
@@ -528,7 +500,7 @@ window::getMouseCaptured (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
@@ -540,7 +512,7 @@ window::setAcceleratedAndVsync (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	bool is_accelerated = info[1].As<Napi::Boolean>().Value();
 	int vsync = info[2].As<Napi::Number>().Int32Value();
 
@@ -560,15 +532,12 @@ window::focus (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_RaiseWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_RaiseWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RaiseWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -579,15 +548,12 @@ window::show (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_ShowWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_ShowWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_ShowWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -598,15 +564,12 @@ window::hide (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_HideWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_HideWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_HideWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -617,15 +580,12 @@ window::maximize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_MaximizeWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_MaximizeWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_MaximizeWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -636,15 +596,12 @@ window::minimize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_MinimizeWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_MinimizeWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_MinimizeWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -655,15 +612,12 @@ window::restore (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
 	if (!SDL_RestoreWindow(window)) {
-		std::ostringstream message;
-		message << "SDL_RestoreWindow(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RestoreWindow", window_id);
 	}
 
 	return env.Undefined();
@@ -674,7 +628,7 @@ window::render (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int width = info[1].As<Napi::Number>().Int32Value();
 	int height = info[2].As<Napi::Number>().Int32Value();
 	int stride = info[3].As<Napi::Number>().Int32Value();
@@ -683,7 +637,7 @@ window::render (const Napi::CallbackInfo &info)
 	SDL_ScaleMode scaling = static_cast<SDL_ScaleMode>(info[6].As<Napi::Number>().Int32Value());
 	Napi::Value dstRectVal = info[7];
 	bool hasDstRect = !dstRectVal.IsNull();
-	SDL_FRect rect;
+	SDL_FRect rect = {};
 	if (hasDstRect) {
 		Napi::Object dstRect = dstRectVal.As<Napi::Object>();
 		rect.x = dstRect.Get("x").As<Napi::Number>().FloatValue();
@@ -701,6 +655,18 @@ window::render (const Napi::CallbackInfo &info)
 		throw Napi::Error::New(env, message.str());
 	}
 
+	if (hasDstRect) {
+		float x2, y2;
+		if (false
+			|| !SDL_RenderCoordinatesFromWindow(renderer, rect.x + rect.w, rect.y + rect.h, &x2, &y2)
+			|| !SDL_RenderCoordinatesFromWindow(renderer, rect.x, rect.y, &rect.x, &rect.y)
+		) {
+			throw global::sdlError(env, "SDL_RenderCoordinatesFromWindow", window_id);
+		}
+		rect.w = x2 - rect.x;
+		rect.h = y2 - rect.y;
+	}
+
 	SDL_PropertiesID props = SDL_GetWindowProperties(window);
 	SDL_Texture *texture = (SDL_Texture *) SDL_GetPointerProperty(props, TEXTURE_PROPERTY, nullptr);
 
@@ -716,62 +682,40 @@ window::render (const Napi::CallbackInfo &info)
 
 		texture = SDL_CreateTexture(renderer, (SDL_PixelFormat) format, SDL_TEXTUREACCESS_STREAMING, width, height);
 		if (texture == nullptr) {
-			std::ostringstream message;
-			message << "SDL_CreateTexture(" << width << ", " << height << ", " << format << ") error: " << SDL_GetError();
-			SDL_ClearError();
-			throw Napi::Error::New(env, message.str());
+			throw global::sdlError(env, "SDL_CreateTexture", width, height, format);
 		}
 
 		if (!SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE)) {
-			std::ostringstream message;
-			message << "SDL_SetTextureBlendMode(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
+			Napi::Error error = global::sdlError(env, "SDL_SetTextureBlendMode", window_id);
 			SDL_DestroyTexture(texture);
-			throw Napi::Error::New(env, message.str());
+			throw error;
 		}
 
 		if (!SDL_SetPointerProperty(props, TEXTURE_PROPERTY, texture)) {
-			std::ostringstream message;
-			message << "SDL_SetPointerProperty(" << window_id << ") error: " << SDL_GetError();
-			SDL_ClearError();
+			Napi::Error error = global::sdlError(env, "SDL_SetPointerProperty", window_id);
 			SDL_DestroyTexture(texture);
-			throw Napi::Error::New(env, message.str());
+			throw error;
 		}
 	}
 
 	if(!SDL_SetTextureScaleMode(texture, scaling)) {
-		std::ostringstream message;
-		message << "SDL_SetTextureScaleMode(" << window_id << ", " << scaling << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetTextureScaleMode", window_id, scaling);
 	}
 
 	if (!SDL_UpdateTexture(texture, nullptr, pixels, stride)) {
-		std::ostringstream message;
-		message << "SDL_UpdateTexture(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_UpdateTexture", window_id);
 	}
 
 	if (!SDL_RenderClear(renderer)) {
-		std::ostringstream message;
-		message << "SDL_RenderClear(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RenderClear", window_id);
 	}
 
 	if (!SDL_RenderTexture(renderer, texture, nullptr, hasDstRect ? &rect : nullptr)) {
-		std::ostringstream message;
-		message << "SDL_RenderTexture(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RenderTexture", window_id);
 	}
 
 	if (!SDL_RenderPresent(renderer)) {
-		std::ostringstream message;
-		message << "SDL_RenderPresent(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_RenderPresent", window_id);
 	}
 
 	return env.Undefined();
@@ -782,7 +726,7 @@ window::setIcon (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int w = info[1].As<Napi::Number>().Int32Value();
 	int h = info[2].As<Napi::Number>().Int32Value();
 	int stride = info[3].As<Napi::Number>().Int32Value();
@@ -793,20 +737,15 @@ window::setIcon (const Napi::CallbackInfo &info)
 
 	SDL_Surface* surface = SDL_CreateSurfaceFrom(w, h, (SDL_PixelFormat) format, pixels, stride);
 	if (surface == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateSurfaceFrom(" << window_id << ", " << w << ", " << h << ", " << format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateSurfaceFrom", window_id, w, h, format);
 	}
 
-	bool success = SDL_SetWindowIcon(window, surface);
-	SDL_DestroySurface(surface);
-	if (!success) {
-		std::ostringstream message;
-		message << "SDL_SetWindowIcon(" << window_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+	if (!SDL_SetWindowIcon(window, surface)) {
+		Napi::Error error = global::sdlError(env, "SDL_SetWindowIcon", window_id);
+		SDL_DestroySurface(surface);
+		throw error;
 	}
+	SDL_DestroySurface(surface);
 
 	return env.Undefined();
 }
@@ -816,7 +755,7 @@ window::flash (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 	int type = info[1].As<Napi::Number>().Int32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
@@ -829,10 +768,7 @@ window::flash (const Napi::CallbackInfo &info)
 	}
 
 	if (!SDL_FlashWindow(window, op)) {
-		std::ostringstream message;
-		message << "SDL_FlashWindow(" << window_id << ", " << type << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_FlashWindow", window_id, type);
 	}
 
 	return env.Undefined();
@@ -843,10 +779,11 @@ window::destroy (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int window_id = info[0].As<Napi::Number>().Int32Value();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Window *window = getWindow(env, window_id);
 
+	// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
 	SDL_Renderer *renderer = SDL_GetRenderer(window);
 	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
 

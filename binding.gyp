@@ -19,6 +19,9 @@
                 'src/native/audio.cpp',
                 'src/native/clipboard.cpp',
                 'src/native/power.cpp',
+                'src/native/threads.cpp',
+                'src/native/packed.cpp',
+                'src/native/testing.cpp',
             ],
             'dependencies': [
                 "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
@@ -27,6 +30,7 @@
                 # Node-API version of the oldest supported Node.js (v22.0.0)
                 'NAPI_VERSION=9',
                 'NODE_ADDON_API_DISABLE_DEPRECATED',
+                'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS',
             ],
             'cflags': ['-Werror', '-Wall', '-Wextra'],
             'conditions': [

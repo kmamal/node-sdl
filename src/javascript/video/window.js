@@ -1,8 +1,23 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
-const { VideoFormatHelpers } = require('./format-helpers')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const {
+	validateBoolean,
+	validateString,
+	validateObject,
+	validateInt32,
+	validateFloat,
+	validatePositiveFloat,
+	validatePositiveInt32,
+	validateNotDestroyed,
+} = require('../validate')
+const {
+	validateVsync,
+	validateImage,
+	validateRenderableFormat,
+	validateRgbFormat,
+} = require('./validate')
 
 const validEvents = [
 	'show',
@@ -11,6 +26,8 @@ const validEvents = [
 	'minimize',
 	'maximize',
 	'restore',
+	'enterFullscreen',
+	'leaveFullscreen',
 	'move',
 	'resize',
 	'displayChange',
@@ -41,13 +58,13 @@ class Window extends EventsViaPoll {
 	constructor (options = {}) {
 		super(validEvents)
 
-		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+		validateObject('options', options)
 
 		const {
 			title = "",
-			display = null,
-			x = null, y = null,
-			width = null, height = null,
+			display,
+			x, y,
+			width, height,
 			visible = true,
 			fullscreen = false,
 			resizable = false,
@@ -63,52 +80,42 @@ class Window extends EventsViaPoll {
 		const hasAccelerated = accelerated !== undefined
 		const hasVsync = vsync !== undefined
 
-		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
-		if (display !== null && typeof display !== 'object') { throw Object.assign(new Error("display must be an object"), { display }) }
-		if (x !== null && !Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
-		if (x !== null && (x < -(2 ** 31) || x > 2 ** 31 - 1)) { throw Object.assign(new Error("x must be a 32-bit integer"), { x }) }
-		if (y !== null && !Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
-		if (y !== null && (y < -(2 ** 31) || y > 2 ** 31 - 1)) { throw Object.assign(new Error("y must be a 32-bit integer"), { y }) }
-		if (width !== null) {
-			if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-			if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("width must be a positive 32-bit integer"), { width }) }
-		}
-		if (height !== null) {
-			if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-			if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("height must be a positive 32-bit integer"), { height }) }
-		}
-		if (typeof visible !== 'boolean') { throw Object.assign(new Error("visible must be a boolean"), { visible }) }
-		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
-		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
-		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
-		if (typeof alwaysOnTop !== 'boolean') { throw Object.assign(new Error("alwaysOnTop must be a boolean"), { alwaysOnTop }) }
-		if (hasAccelerated && typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
-		if (hasVsync) {
-			if (!Number.isInteger(vsync)) { throw Object.assign(new Error("vsync must be an integer"), { vsync }) }
-			if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
-		}
-		if (typeof opengl !== 'boolean') { throw Object.assign(new Error("opengl must be a boolean"), { opengl }) }
-		if (typeof webgpu !== 'boolean') { throw Object.assign(new Error("webgpu must be a boolean"), { webgpu }) }
-		if (display !== null && (x !== null || y !== null)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
+		validateString('title', title)
+		if (display !== undefined) { validateObject('display', display) }
+		if (x !== undefined) { validateInt32('x', x) }
+		if (y !== undefined) { validateInt32('y', y) }
+		if (width !== undefined) { validatePositiveInt32('width', width) }
+		if (height !== undefined) { validatePositiveInt32('height', height) }
+		validateBoolean('visible', visible)
+		validateBoolean('fullscreen', fullscreen)
+		validateBoolean('resizable', resizable)
+		validateBoolean('borderless', borderless)
+		validateBoolean('alwaysOnTop', alwaysOnTop)
+		if (hasAccelerated) { validateBoolean('accelerated', accelerated) }
+		if (hasVsync) { validateVsync(vsync) }
+		validateBoolean('opengl', opengl)
+		validateBoolean('webgpu', webgpu)
+		if (display !== undefined && (x !== undefined || y !== undefined)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
 		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 		if (opengl && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("opengl and accelerated/vsync are mutually exclusive"), { opengl, accelerated, vsync }) }
 		if (webgpu && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("webgpu and accelerated/vsync are mutually exclusive"), { webgpu, accelerated, vsync }) }
 
 		let displayId = 0
-		if (display) {
+		if (display !== undefined) {
 			Globals.events.poll()
-			if (!Globals.displays.includes(display)) { throw Object.assign(new Error("display must be from sdl.video.displays"), { display }) }
-			displayId = display.id
+			const found = Globals.displays.find(({ id }) => id === display.id)
+			if (!found) { throw Object.assign(new Error("display must be from sdl.video.displays"), { display }) }
+			displayId = found.id
 		}
 
 		const result = Bindings.window_create(
 			title,
 			displayId,
-			x,
-			y,
-			width,
-			height,
+			x ?? null,
+			y ?? null,
+			width ?? null,
+			height ?? null,
 			visible,
 			fullscreen,
 			resizable,
@@ -122,6 +129,8 @@ class Window extends EventsViaPoll {
 		)
 
 		this._id = result.id
+		this._title = result.title
+		this._visible = result.visible
 		this._x = result.x
 		this._y = result.y
 		this._width = result.width
@@ -137,13 +146,11 @@ class Window extends EventsViaPoll {
 		this._vsync = result.vsync
 		this._native = result.native
 
-		this._title = title
-		this._visible = visible
 		this._opengl = opengl
 		this._webgpu = webgpu
 
-		this._minimized = false
-		this._maximized = false
+		this._minimized = result.minimized
+		this._maximized = result.maximized
 		this._relativeMouseMode = false
 		this._destroyed = false
 
@@ -152,11 +159,14 @@ class Window extends EventsViaPoll {
 		// Keeps Node.js alive while windows are open
 		const keepAlive = () => {}
 		this.on('close', keepAlive)
-		this.on('removeListener', (type, listener) => {
+		this._addInternalListener('removeListener', (type, listener) => {
 			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
 		})
 
-		// Manually emit some initial events for convenience
+		// Manually emit some initial events for convenience.
+		// Note that these can duplicate real events.
+		// Something may have polled synchronously before this tick runs, e.g. a getter read right after createWindow().
+		// In that case the real move/resize/expose events have already fired and the ones below repeat them with the same values.
 		process.nextTick(() => {
 			if (this._destroyed) { return }
 			Globals.events.withoutPolling(() => {
@@ -192,181 +202,177 @@ class Window extends EventsViaPoll {
 
 	get id () { return this._id }
 
-	get title () { return this._title }
+	get title () {
+		validateNotDestroyed(this)
+
+		return this._title
+	}
+
 	setTitle (title) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof title !== 'string') { throw Object.assign(new Error("title must be a string"), { title }) }
+		validateString('title', title)
 
-		Bindings.window_setTitle(this._id, title)
-		this._title = title
+		this._title = Bindings.window_setTitle(this._id, title)
 	}
 
 	get x () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._x
 	}
 
 	get y () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._y
 	}
 
 	setPosition (x, y) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
-		if (x < -(2 ** 31) || x > 2 ** 31 - 1) { throw Object.assign(new Error("x must be a 32-bit integer"), { x }) }
-		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
-		if (y < -(2 ** 31) || y > 2 ** 31 - 1) { throw Object.assign(new Error("y must be a 32-bit integer"), { y }) }
+		validateInt32('x', x)
+		validateInt32('y', y)
 
 		Bindings.window_setPosition(this._id, x, y)
 	}
 
 	get width () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._width
 	}
 
 	get height () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._height
 	}
 
 	setSize (width, height) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("width must be a positive 32-bit integer"), { width }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("height must be a positive 32-bit integer"), { height }) }
+		validatePositiveInt32('width', width)
+		validatePositiveInt32('height', height)
 
 		Bindings.window_setSize(this._id, width, height, false)
 	}
 
 	setSizeInPixels (pixelWidth, pixelHeight) {
-		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (!Number.isInteger(pixelWidth)) { throw Object.assign(new Error("pixelWidth must be an integer"), { pixelWidth }) }
-		if (pixelWidth <= 0 || pixelWidth > 2 ** 31 - 1) { throw Object.assign(new Error("pixelWidth must be a positive 32-bit integer"), { pixelWidth }) }
-		if (!Number.isInteger(pixelHeight)) { throw Object.assign(new Error("pixelHeight must be an integer"), { pixelHeight }) }
-		if (pixelHeight <= 0 || pixelHeight > 2 ** 31 - 1) { throw Object.assign(new Error("pixelHeight must be a positive 32-bit integer"), { pixelHeight }) }
+		validatePositiveInt32('pixelWidth', pixelWidth)
+		validatePositiveInt32('pixelHeight', pixelHeight)
 
 		Bindings.window_setSize(this._id, pixelWidth, pixelHeight, true)
 	}
 
 	get pixelWidth () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._pixelWidth
 	}
 
 	get pixelHeight () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._pixelHeight
 	}
 
 	get display () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.displays.find((a) => a.id === this._displayId) ?? null
 	}
 
 	get visible () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._visible
 	}
 
 	show (show = true) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
+		validateBoolean('show', show)
 
 		show ? Bindings.window_show(this._id) : Bindings.window_hide(this._id)
-		this._visible = show
 	}
 
 	hide () { this.show(false) }
 
 	get fullscreen () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._fullscreen
 	}
 
 	setFullscreen (fullscreen) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof fullscreen !== 'boolean') { throw Object.assign(new Error("fullscreen must be a boolean"), { fullscreen }) }
+		validateBoolean('fullscreen', fullscreen)
 
 		Bindings.window_setFullscreen(this._id, fullscreen)
 	}
 
 	get resizable () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._resizable
 	}
 
 	setResizable (resizable) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof resizable !== 'boolean') { throw Object.assign(new Error("resizable must be a boolean"), { resizable }) }
+		validateBoolean('resizable', resizable)
 		if (resizable && this._borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless: this._borderless }) }
 
 		this._resizable = Bindings.window_setResizable(this._id, resizable)
 	}
 
 	get borderless () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._borderless
 	}
 
 	setBorderless (borderless) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof borderless !== 'boolean') { throw Object.assign(new Error("borderless must be a boolean"), { borderless }) }
+		validateBoolean('borderless', borderless)
 		if (borderless && this._resizable) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable: this._resizable, borderless }) }
 
 		this._borderless = Bindings.window_setBorderless(this._id, borderless)
 	}
 
 	get alwaysOnTop () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._alwaysOnTop
 	}
 
 	get accelerated () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._accelerated
 	}
 
 	setAccelerated (accelerated) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call setAccelerated in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setAccelerated in webgpu mode") }
 
-		if (typeof accelerated !== 'boolean') { throw Object.assign(new Error("accelerated must be a boolean"), { accelerated }) }
+		validateBoolean('accelerated', accelerated)
 
 		const result = Bindings.window_setAcceleratedAndVsync(this._id, accelerated, this._vsync)
 		this._accelerated = result.accelerated
@@ -374,19 +380,18 @@ class Window extends EventsViaPoll {
 	}
 
 	get vsync () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._vsync
 	}
 
 	setVsync (vsync) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call setVsync in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call setVsync in webgpu mode") }
 
-		if (!Number.isInteger(vsync)) { throw Object.assign(new Error("vsync must be an integer"), { vsync }) }
-		if (vsync < -1 || vsync > 2 ** 31 - 1) { throw Object.assign(new Error("vsync must be -1 or a non-negative 32-bit integer"), { vsync }) }
+		validateVsync(vsync)
 
 		const result = Bindings.window_setAcceleratedAndVsync(this._id, this._accelerated, vsync)
 		this._accelerated = result.accelerated
@@ -394,45 +399,45 @@ class Window extends EventsViaPoll {
 	}
 
 	get opengl () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._opengl
 	}
 
 	get webgpu () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._webgpu
 	}
 
 	get native () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._native
 	}
 
 	get minimized () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._minimized
 	}
 
 	minimize () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_minimize(this._id)
 	}
 
 	get maximized () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._maximized
 	}
 
 	maximize () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (!this._resizable) { throw new Error("can't maximize a non-resizable window") }
 
@@ -440,48 +445,48 @@ class Window extends EventsViaPoll {
 	}
 
 	restore () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_restore(this._id)
 	}
 
 	get focused () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.windows.focused === this
 	}
 
 	focus () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_focus(this._id)
 	}
 
 	get hovered () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Globals.windows.hovered === this
 	}
 
 	get mouseCaptured () {
 		Globals.events.poll()
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return Bindings.window_getMouseCaptured(this._id)
 	}
 
 	get relativeMouseMode () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		return this._relativeMouseMode
 	}
 
 	setRelativeMouseMode (relative = true) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof relative !== 'boolean') { throw Object.assign(new Error("relative must be a boolean"), { relative }) }
+		validateBoolean('relative', relative)
 
 		this._relativeMouseMode = Bindings.window_setRelativeMouseMode(this._id, relative)
 	}
@@ -489,41 +494,27 @@ class Window extends EventsViaPoll {
 	unsetRelativeMouseMode () { this.setRelativeMouseMode(false) }
 
 	render (width, height, stride, format, buffer, options = {}) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		if (this._opengl) { throw new Error("can't call render in opengl mode") }
 		if (this._webgpu) { throw new Error("can't call render in webgpu mode") }
 
-		if (typeof options !== 'object' || options === null) { throw Object.assign(new Error("options must be an object"), { options }) }
+		validateObject('options', options)
 
 		const {
 			scaling = 'nearest',
-			dstRect = null,
+			dstRect,
 		} = options
 
-		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("width must be a positive 32-bit integer"), { width }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("height must be a positive 32-bit integer"), { height }) }
-		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const helpers = VideoFormatHelpers[format]
-		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (!helpers.isRenderable) { throw Object.assign(new Error("format can't be rendered"), { format }) }
-		if (stride < helpers.minStride(width)) { throw Object.assign(new Error("stride is smaller than expected"), { stride, width, format }) }
-		if (stride > 2 ** 31 - 1) { throw Object.assign(new Error("stride must be a 32-bit integer"), { stride }) }
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
-		if (typeof scaling !== 'string') { throw Object.assign(new Error("scaling must be a string"), { scaling }) }
+		validateImage(width, height, stride, format, buffer, validateRenderableFormat)
+		validateString('scaling', scaling)
 
-		if (dstRect !== null) {
-			if (typeof dstRect !== 'object') { throw Object.assign(new Error("dstRect must be an object"), { dstRect }) }
-			if (!Number.isFinite(dstRect.x)) { throw Object.assign(new Error("dstRect.x must be a number"), { dstRect }) }
-			if (!Number.isFinite(dstRect.y)) { throw Object.assign(new Error("dstRect.y must be a number"), { dstRect }) }
-			if (!Number.isFinite(dstRect.width)) { throw Object.assign(new Error("dstRect.width must be a number"), { dstRect }) }
-			if (dstRect.width <= 0) { throw Object.assign(new Error("dstRect.width must be positive"), { dstRect }) }
-			if (!Number.isFinite(dstRect.height)) { throw Object.assign(new Error("dstRect.height must be a number"), { dstRect }) }
-			if (dstRect.height <= 0) { throw Object.assign(new Error("dstRect.height must be positive"), { dstRect }) }
+		if (dstRect !== undefined) {
+			validateObject('dstRect', dstRect)
+			validateFloat('dstRect.x', dstRect.x)
+			validateFloat('dstRect.y', dstRect.y)
+			validatePositiveFloat('dstRect.width', dstRect.width)
+			validatePositiveFloat('dstRect.height', dstRect.height)
 		}
 
 		const _format = Enums.pixelFormat[format]
@@ -531,25 +522,13 @@ class Window extends EventsViaPoll {
 		const _scaling = Enums.scaleMode[scaling]
 		if (_scaling === undefined) { throw Object.assign(new Error("scaling must be 'nearest' or 'linear'"), { scaling }) }
 
-		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling, dstRect)
+		Bindings.window_render(this._id, width, height, stride, _format, buffer, _scaling, dstRect ?? null)
 	}
 
 	setIcon (width, height, stride, format, buffer) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("width must be a positive 32-bit integer"), { width }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("height must be a positive 32-bit integer"), { height }) }
-		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const helpers = VideoFormatHelpers[format]
-		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (helpers.isYuv) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
-		if (stride < helpers.minStride(width)) { throw Object.assign(new Error("stride is smaller than expected"), { stride, width, format }) }
-		if (stride > 2 ** 31 - 1) { throw Object.assign(new Error("stride must be a 32-bit integer"), { stride }) }
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
+		validateImage(width, height, stride, format, buffer, validateRgbFormat)
 
 		const _format = Enums.pixelFormat[format]
 
@@ -557,36 +536,40 @@ class Window extends EventsViaPoll {
 	}
 
 	flash (untilFocused = false) {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
-		if (typeof untilFocused !== 'boolean') { throw Object.assign(new Error("untilFocused must be a boolean"), { untilFocused }) }
+		validateBoolean('untilFocused', untilFocused)
 
 		Bindings.window_flash(this._id, untilFocused ? 2 : 1)
 	}
 
 	stopFlashing () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		Bindings.window_flash(this._id, 0)
 	}
 
 	get destroyed () { return this._destroyed }
 	destroy () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
+		this._destroyed = true
+		Globals.windows.all.delete(this._id)
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }
 
+		const destroyNative = () => {
+			try { Bindings.window_destroy(this._id) }
+			catch {}
+		}
+
 		// Defer the native destruction until the pump has unwound.
 		if (Bindings.events_isDispatchingFromWatch()) {
-			process.nextTick(() => { Bindings.window_destroy(this._id) })
+			process.nextTick(destroyNative)
 		}
 		else {
-			Bindings.window_destroy(this._id)
+			destroyNative()
 		}
-		this._destroyed = true
-
-		Globals.windows.all.delete(this._id)
 
 		// We might be inside an event listener
 		this._retire(() => Object.assign(new Error("window is destroyed"), { id: this._id }))
@@ -598,7 +581,7 @@ class Window extends EventsViaPoll {
 	}
 
 	destroyGently () {
-		if (this._destroyed) { throw Object.assign(new Error("window is destroyed"), { id: this._id }) }
+		validateNotDestroyed(this)
 
 		let shouldPrevent = false
 		Globals.events.withoutPolling(() => {

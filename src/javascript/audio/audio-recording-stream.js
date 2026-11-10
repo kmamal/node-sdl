@@ -1,6 +1,8 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { AudioStream } = require('./audio-stream')
+const { validateBytes } = require('./validate')
+const { validateBuffer } = require('../validate')
 
 class AudioRecordingStream extends AudioStream {
 	constructor (device, options) {
@@ -9,19 +11,18 @@ class AudioRecordingStream extends AudioStream {
 
 	get available () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		return Bindings.audio_getAvailable(this._id)
 	}
 
-	getData (buffer, bytes = null) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+	getData (buffer, _bytes) {
+		this._assertOpen()
 
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		bytes ??= buffer.length
-		if (!Number.isInteger(bytes)) { throw Object.assign(new Error("bytes must be an integer"), { bytes }) }
-		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("bytes must be a non-negative 32-bit integer"), { bytes }) }
-		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
+		validateBuffer('buffer', buffer)
+		const bytes = _bytes === undefined ? buffer.length : _bytes
+		validateBytes(buffer, bytes)
+		// Unlike putData(), a partial frame isn't rejected: SDL rounds the read down to whole frames and the return value reports what was read.
 
 		if (bytes === 0) { return 0 }
 

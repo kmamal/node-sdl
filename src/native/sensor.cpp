@@ -1,12 +1,13 @@
 #include "sensor.h"
+#include "global.h"
+#include "threads.h"
 #include <SDL3/SDL.h>
 #include <map>
 #include <string>
-#include <sstream>
 
 
-std::map<SDL_SensorType, std::string> sensor::types;
-std::map<SDL_SensorType, std::string> sensor::sides;
+std::map<SDL_SensorType, packed::Str> sensor::types;
+std::map<SDL_SensorType, packed::Str> sensor::sides;
 
 
 Napi::Value
@@ -14,56 +15,49 @@ sensor::getDevices (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
+	global::assertReady(env);
+
 	int num_devices;
-	SDL_SensorID *sensor_ids = SDL_GetSensors(&num_devices);
-	if (sensor_ids == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensors() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+	global::SdlArray<SDL_SensorID> sensor_ids(SDL_GetSensors(&num_devices));
+	if (!sensor_ids) {
+		throw global::sdlError(env, "SDL_GetSensors");
 	}
 
 	Napi::Array devices = Napi::Array::New(env, num_devices);
 
-	try {
-		for (int i = 0; i < num_devices; i++) {
-			SDL_SensorID id = sensor_ids[i];
+	for (int i = 0; i < num_devices; i++) {
+		SDL_SensorID id = sensor_ids[i];
 
-			SDL_SensorType _type = SDL_GetSensorTypeForID(id);
-			if (_type == SDL_SENSOR_INVALID) { SDL_ClearError(); }
-			auto type_entry = sensor::types.find(_type);
-			Napi::Value type = type_entry != sensor::types.end()
-				? Napi::String::New(env, type_entry->second)
-				: env.Null();
-			auto side_entry = sensor::sides.find(_type);
-			Napi::Value side = side_entry != sensor::sides.end()
-				? Napi::String::New(env, side_entry->second)
-				: env.Null();
+		SDL_SensorType _type = SDL_GetSensorTypeForID(id);
+		if (_type == SDL_SENSOR_INVALID) { SDL_ClearError(); }
+		auto type_entry = sensor::types.find(_type);
+		Napi::Value type = type_entry != sensor::types.end()
+			? Napi::String::New(env, type_entry->second)
+			: env.Null();
+		auto side_entry = sensor::sides.find(_type);
+		Napi::Value side = side_entry != sensor::sides.end()
+			? Napi::String::New(env, side_entry->second)
+			: env.Null();
 
-			const char *_name = SDL_GetSensorNameForID(id);
-			Napi::Value name;
-			if (_name != nullptr) {
-				name = Napi::String::New(env, _name);
-			}
-			else {
-				SDL_ClearError();
-				name = env.Null();
-			}
-
-			Napi::Object device = Napi::Object::New(env);
-			device.Set("id", id);
-			device.Set("name", name);
-			device.Set("type", type);
-			device.Set("side", side);
-
-			devices.Set(i, device);
+		const char *_name = SDL_GetSensorNameForID(id);
+		Napi::Value name;
+		if (_name != nullptr) {
+			name = Napi::String::New(env, _name);
 		}
+		else {
+			SDL_ClearError();
+			name = env.Null();
+		}
+
+		Napi::Object device = Napi::Object::New(env);
+		device.Set("id", id);
+		device.Set("name", name);
+		device.Set("type", type);
+		device.Set("side", side);
+
+		devices.Set(i, device);
 	}
-	catch (...) {
-		SDL_free(sensor_ids);
-		throw;
-	}
-	SDL_free(sensor_ids);
 
 	return devices;
 }
@@ -73,15 +67,18 @@ sensor::open (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int id = info[0].As<Napi::Number>().Int32Value();
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
+	global::assertReady(env);
+
+	SDL_SensorID id = info[0].As<Napi::Number>().Uint32Value();
 
 	SDL_Sensor *sensor = SDL_OpenSensor(id);
 	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_OpenSensor(" << id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_OpenSensor", id);
 	}
+	SDL_ClearError();
+
+	threads::trackOpen(env, threads::SENSOR, id);
 
 	return env.Undefined();
 }
@@ -91,21 +88,16 @@ sensor::getData (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int sensor_id = info[0].As<Napi::Number>().Int32Value();
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
+	global::assertReady(env);
 
-	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
-	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_SensorID sensor_id = info[0].As<Napi::Number>().Uint32Value();
+
+	SDL_Sensor *sensor = global::fromIdOrThrow(env, SDL_GetSensorFromID(sensor_id), "SDL_GetSensorFromID", "sensor", sensor_id);
 
 	float data[3];
 	if (!SDL_GetSensorData(sensor, data, 3)) {
-		std::ostringstream message;
-		message << "SDL_GetSensorData(" << sensor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetSensorData", sensor_id);
 	}
 
 	Napi::Object result = Napi::Object::New(env);
@@ -121,14 +113,14 @@ sensor::close (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	int sensor_id = info[0].As<Napi::Number>().Int32Value();
+	std::lock_guard<std::recursive_mutex> guard(global::lock());
+	global::assertReady(env);
 
-	SDL_Sensor *sensor = SDL_GetSensorFromID(sensor_id);
-	if (sensor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetSensorFromID(" << sensor_id << ") error: invalid sensor id";
-		throw Napi::Error::New(env, message.str());
-	}
+	SDL_SensorID sensor_id = info[0].As<Napi::Number>().Uint32Value();
+
+	threads::trackClose(env, threads::SENSOR, sensor_id);
+
+	SDL_Sensor *sensor = global::fromIdOrThrow(env, SDL_GetSensorFromID(sensor_id), "SDL_GetSensorFromID", "sensor", sensor_id);
 
 	SDL_CloseSensor(sensor);
 

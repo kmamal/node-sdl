@@ -1,44 +1,47 @@
 const Globals = require('../globals')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { lookupDevice } = require('../device-instance')
 const { AudioPlaybackStream } = require('./audio-playback-stream')
 const { AudioRecordingStream } = require('./audio-recording-stream')
 const { getFormatHelpers } = require('./format-helpers')
-const {
-	make: makeDevice,
-	makeDefault: makeDefaultDevice,
-} = require('./device')
-
-
-Globals.audioDevices.playback = [ makeDefaultDevice() ]
-Globals.audioDevices.recording = [ makeDefaultDevice() ]
-if (Globals.info.initialized.audio) {
-	Globals.audioDevices.playback.push(...Bindings.audio_getDevices(false).map(makeDevice))
-	Globals.audioDevices.recording.push(...Bindings.audio_getDevices(true).map(makeDevice))
-}
+const { convert } = require('./conversion')
+const { validateBuffer } = require('../validate')
 
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 const makeModule = (type, Stream) => new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('audio') }) }
 
 	get devices () {
+		assertInitialized('audio')
 		Globals.events.poll()
 		return [ ...Globals.audioDevices[type] ]
 	}
 
-	openDevice (device = null, options = {}) {
-		Globals.events.poll()
-		const list = Globals.audioDevices[type]
-		if (device === null) { device = list[0] }
-		else if (!list.includes(device)) { throw Object.assign(new Error(`device must be from sdl.audio.${type}.devices`), { device }) }
+	openDevice (requested = null, options = {}) {
+		assertInitialized('audio')
 
+		if (requested === null) {
+			Globals.events.poll()
+			return new Stream(Globals.audioDevices[type][0], options)
+		}
+
+		const device = lookupDevice(requested, `audio.${type}`, () => Globals.audioDevices[type])
 		return new Stream(device, options)
 	}
 }()
 
 const audio = {
+	isAvailable () { return isAvailable('audio') },
+
+	get drivers () {
+		assertInitialized('audio')
+		return Bindings.audio_getDrivers()
+	},
+
 	playback: makeModule('playback', AudioPlaybackStream),
 	recording: makeModule('recording', AudioRecordingStream),
 
@@ -47,13 +50,15 @@ const audio = {
 	maxSampleValue (format) { return getFormatHelpers(format).maxSampleValue },
 	zeroSampleValue (format) { return getFormatHelpers(format).zeroSampleValue },
 
+	convert,
+
 	readSample (format, buffer, offset) {
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		validateBuffer('buffer', buffer)
 		return getFormatHelpers(format).reader.call(buffer, offset)
 	},
 
 	writeSample (format, buffer, value, offset) {
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
+		validateBuffer('buffer', buffer)
 		return getFormatHelpers(format).writer.call(buffer, value, offset)
 	},
 }

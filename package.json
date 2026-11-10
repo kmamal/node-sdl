@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-3",
+  "version": "1.0.0-8",
   "name": "@kmamal/sdl",
   "description": "SDL bindings for Node.js",
   "keywords": [
@@ -41,7 +41,7 @@
     "url": "git+ssh://git@github.com/kmamal/node-sdl.git"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.16.0"
   },
   "main": "./src/javascript/index.js",
   "types": "./src/types/index.d.ts",
@@ -49,15 +49,12 @@
     ".": {
       "types": "./src/types/index.d.ts",
       "default": "./src/javascript/index.js"
-    },
-    "./helpers": {
-      "types": "./src/types/helpers.d.ts",
-      "default": "./src/javascript/helpers.js"
     }
   },
   "gypfile": true,
   "scripts": {
     "test": "npx @kmamal/testing",
+    "test:stress": "npx @kmamal/testing 'tests/stress/*.stress.mjs'",
     "install": "cd scripts && node install.mjs",
     "download-release": "cd scripts && node download-release.mjs",
     "download-sdl": "cd scripts && node download-sdl.mjs",
@@ -67,9 +64,8 @@
     "clean": "cd scripts && node clean.mjs"
   },
   "devDependencies": {
-    "@kmamal/evdev": "0.0.8",
     "@kmamal/testing": "0.0.34",
-    "@types/node": "26.6.4",
+    "@types/node": "26.6.6",
     "node-addon-api": "8.9.2",
     "node-gyp": "13.1.0"
   },
@@ -77,13 +73,10 @@
     "sdl": {
       "owner": "kmamal",
       "repo": "build-sdl",
-      "version": "3.4.14"
+      "version": "3.4.18"
     }
   },
-  "allowScripts": {
-    "@kmamal/evdev": true
-  },
   "dependencies": {
-    "modern-tar": "0.8.5"
+    "modern-tar": "0.8.6"
   }
 }

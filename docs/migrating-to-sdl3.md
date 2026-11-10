@@ -25,7 +25,7 @@ SDL3 renamed game controllers to gamepads, and this library follows that change.
 | --- | --- |
 | `sdl.controller` | `sdl.gamepad` |
 | `ControllerInstance` | `GamepadInstance` |
-| `sdl.info.initialized.controller` | `sdl.info.initialized.gamepad` |
+| `sdl.info.initialized.controller` | `sdl.gamepad.isAvailable()` |
 | joystick device `type: 'gamecontroller'` | `type: 'gamepad'` |
 
 ```js

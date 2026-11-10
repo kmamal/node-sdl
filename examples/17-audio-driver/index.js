@@ -3,8 +3,8 @@ import Canvas from '@napi-rs/canvas'
 import { fork } from 'node:child_process'
 import { once } from 'node:events'
 
-const audioDrivers = sdl.info.drivers.audio.all
-let currentAudioDriver = sdl.info.drivers.audio.current
+const audioDrivers = sdl.audio.drivers.all
+let currentAudioDriver = sdl.audio.drivers.current
 let currentState = 'stopped'
 let currentTime = 0
 
@@ -14,7 +14,7 @@ const restartAudioProcessWith = async (driver) => {
 	audioProcess = fork('./audio-proc.js', {
 		env: {
 			...process.env,
-			SDL_AUDIODRIVER: driver,
+			SDL_AUDIO_DRIVER: driver,
 		},
 	})
 

@@ -1,9 +1,23 @@
 #include "mouse.h"
+#include "global.h"
 #include <SDL3/SDL.h>
 #include <string>
-#include <sstream>
 
 static SDL_Cursor *allocated_cursor = nullptr;
+
+template <typename... Args>
+static void
+_adoptCursor (Napi::Env &env, SDL_Cursor *cursor, const Args &...args)
+{
+	if (!SDL_SetCursor(cursor)) {
+		Napi::Error error = global::sdlError(env, "SDL_SetCursor", args...);
+		SDL_DestroyCursor(cursor);
+		throw error;
+	}
+
+	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
+	allocated_cursor = cursor;
+}
 
 
 Napi::Value
@@ -43,10 +57,7 @@ mouse::setPosition (const Napi::CallbackInfo &info)
 	float y = info[1].As<Napi::Number>().FloatValue();
 
 	if (!SDL_WarpMouseGlobal(x, y)) {
-		std::ostringstream message;
-		message << "SDL_WarpMouseGlobal(" << x << ", " << y << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_WarpMouseGlobal", x, y);
 	}
 
 	return env.Undefined();
@@ -61,22 +72,10 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 
 	SDL_Cursor *cursor = SDL_CreateSystemCursor((SDL_SystemCursor) cursor_id);
 	if (cursor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateSystemCursor(" << cursor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateSystemCursor", cursor_id);
 	}
 
-	if (!SDL_SetCursor(cursor)) {
-		std::ostringstream message;
-		message << "SDL_SetCursor(" << cursor_id << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		SDL_DestroyCursor(cursor);
-		throw Napi::Error::New(env, message.str());
-	}
-
-	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
-	allocated_cursor = cursor;
+	_adoptCursor(env, cursor, cursor_id);
 
 	return env.Undefined();
 }
@@ -88,17 +87,11 @@ mouse::resetCursor(const Napi::CallbackInfo &info)
 
 	SDL_Cursor *cursor = SDL_GetDefaultCursor();
 	if (cursor == nullptr) {
-		std::ostringstream message;
-		message << "SDL_GetDefaultCursor() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_GetDefaultCursor");
 	}
 
 	if (!SDL_SetCursor(cursor)) {
-		std::ostringstream message;
-		message << "SDL_SetCursor() error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetCursor");
 	}
 
 	if (allocated_cursor != nullptr) {
@@ -124,34 +117,19 @@ mouse::setCursorImage (const Napi::CallbackInfo &info)
 
 	SDL_Surface* surface = SDL_CreateSurfaceFrom(w, h, (SDL_PixelFormat) format, pixels, stride);
 	if (surface == nullptr) {
-		std::ostringstream message;
-		message << "SDL_CreateSurfaceFrom(" << w << ", " << h << ", " << format << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CreateSurfaceFrom", w, h, format);
 	}
 
 	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, x, y);
 	if (cursor == nullptr) {
+		Napi::Error error = global::sdlError(env, "SDL_CreateColorCursor", x, y);
 		SDL_DestroySurface(surface);
-
-		std::ostringstream message;
-		message << "SDL_CreateColorCursor(" << x << ", " << y << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw error;
 	}
 
 	SDL_DestroySurface(surface);
 
-	if (!SDL_SetCursor(cursor)) {
-		std::ostringstream message;
-		message << "SDL_SetCursor() error: " << SDL_GetError();
-		SDL_ClearError();
-		SDL_DestroyCursor(cursor);
-		throw Napi::Error::New(env, message.str());
-	}
-
-	if (allocated_cursor != nullptr) { SDL_DestroyCursor(allocated_cursor); }
-	allocated_cursor = cursor;
+	_adoptCursor(env, cursor);
 
 	return env.Undefined();
 }
@@ -165,10 +143,7 @@ mouse::showCursor (const Napi::CallbackInfo &info)
 
 	bool success = should_show ? SDL_ShowCursor() : SDL_HideCursor();
 	if (!success) {
-		std::ostringstream message;
-		message << (should_show ? "SDL_ShowCursor(" : "SDL_HideCursor(") << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, should_show ? "SDL_ShowCursor" : "SDL_HideCursor");
 	}
 
 	return env.Undefined();
@@ -180,10 +155,7 @@ mouse::redrawCursor (const Napi::CallbackInfo &info)
 	Napi::Env env = info.Env();
 
 	if (!SDL_SetCursor(nullptr)) {
-		std::ostringstream message;
-		message << "SDL_SetCursor(nullptr) error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_SetCursor", "nullptr");
 	}
 
 	return env.Undefined();
@@ -197,10 +169,7 @@ mouse::capture (const Napi::CallbackInfo &info)
 	bool should_capture = info[0].As<Napi::Boolean>().Value();
 
 	if (!SDL_CaptureMouse(should_capture)) {
-		std::ostringstream message;
-		message << "SDL_CaptureMouse(" << should_capture << ") error: " << SDL_GetError();
-		SDL_ClearError();
-		throw Napi::Error::New(env, message.str());
+		throw global::sdlError(env, "SDL_CaptureMouse", should_capture);
 	}
 
 	return env.Undefined();

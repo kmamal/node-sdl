@@ -1,4 +1,5 @@
 const Os = require('node:os')
+const { validateString } = require('../validate')
 
 const signedLimits = (bits) => ({
 	bytesPerSample: bits / 8,
@@ -79,11 +80,14 @@ else {
 	AudioFormatHelpers.f32 = AudioFormatHelpers.f32be
 }
 
-const getFormatHelpers = (format) => {
-	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+const getFormatHelpers = (format, name = 'format') => {
+	validateString(name, format)
 	const helpers = AudioFormatHelpers[format]
-	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
+	if (helpers === undefined) { throw Object.assign(new Error(`invalid ${name}`), { format }) }
 	return helpers
 }
 
-module.exports = { AudioFormatHelpers, getFormatHelpers }
+module.exports = {
+	AudioFormatHelpers,
+	getFormatHelpers,
+}

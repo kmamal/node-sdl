@@ -1,11 +1,16 @@
+const Globals = require('../globals')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const { refreshDevices } = require('./devices')
 
 
-refreshDevices()
-
-
 const touch = {
-	get devices () { return [ ...refreshDevices() ] },
+	isAvailable () { return isAvailable('video') },
+
+	get devices () {
+		assertInitialized('video')
+		Globals.events.poll()
+		return [ ...refreshDevices() ]
+	},
 }
 
 module.exports = { touch }

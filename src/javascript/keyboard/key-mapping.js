@@ -1,5 +1,6 @@
 const Bindings = require('../bindings')
 
+// Some entries look unreachable but aren't: X11 and Wayland fall back to scancode names like 'A' and 'Space' for keys without a character, and macOS and Windows rename modifiers to 'Left Command', 'Left Option' and 'Left Windows'.
 const mapping = Object.assign(Object.create(null), {
 	'±': '+/-',
 	'A': 'a',
@@ -72,15 +73,22 @@ const mapping = Object.assign(Object.create(null), {
 	'F8': 'f8',
 	'F9': 'f9',
 	'Find': 'find',
+	'Front': 'front',
 	'G': 'g',
 	'H': 'h',
 	'Help': 'help',
 	'Home': 'home',
 	'I': 'i',
 	'Insert': 'insert',
+	'International 1': 'international1',
 	'International 2': 'international2',
+	'International 3': 'international3',
 	'International 4': 'international4',
 	'International 5': 'international5',
+	'International 6': 'international6',
+	'International 7': 'international7',
+	'International 8': 'international8',
+	'International 9': 'international9',
 	'J': 'j',
 	'K': 'k',
 	'Keypad -': '-',
@@ -130,7 +138,7 @@ const mapping = Object.assign(Object.create(null), {
 	'Keypad D': 'd',
 	'Keypad Decimal': 'decimal',
 	'Keypad E': 'e',
-	'Keypad Enter': 'enter',
+	'Keypad Enter': 'return',
 	'Keypad F': 'f',
 	'Keypad Hexadecimal': 'hexadecimal',
 	'Keypad MemAdd': 'memAdd',
@@ -149,6 +157,11 @@ const mapping = Object.assign(Object.create(null), {
 	'Language 2': 'language2',
 	'Language 3': 'language3',
 	'Language 4': 'language4',
+	'Language 5': 'language5',
+	'Language 6': 'language6',
+	'Language 7': 'language7',
+	'Language 8': 'language8',
+	'Language 9': 'language9',
 	'Left Alt': 'alt',
 	'Left Command': 'command',
 	'Left Ctrl': 'ctrl',
@@ -160,7 +173,7 @@ const mapping = Object.assign(Object.create(null), {
 	'Left Windows': 'windows',
 	'LeftTab': 'leftTab',
 	'Left': 'left',
-	'Level5Shift': 'modeSwitch',
+	'Level5Shift': 'level5Shift',
 	'M': 'm',
 	'MediaFastForward': 'mediaFastForward',
 	'MediaPause': 'mediaPause',
@@ -177,6 +190,7 @@ const mapping = Object.assign(Object.create(null), {
 	'MultiKeyCompose': 'compose',
 	'Mute': 'mute',
 	'N': 'n',
+	'NonUSBackslash': 'nonUsBackslash',
 	'Numlock': 'numlock',
 	'O': 'o',
 	'Oper': 'oper',
@@ -188,7 +202,7 @@ const mapping = Object.assign(Object.create(null), {
 	'Pause': 'pause',
 	'Power': 'power',
 	'PrintScreen': 'printScreen',
-	'Prior': 'prior',
+	'Prior': 'pageUp',
 	'Q': 'q',
 	'R': 'r',
 	'Return': 'return',
@@ -228,43 +242,48 @@ const mapping = Object.assign(Object.create(null), {
 	'Z': 'z',
 })
 
-const reverseMapping = Object.create(null)
-
 const isCharacter = (key) => key !== null && [ ...key ].length === 1
 
-for (const [ key, value ] of Object.entries(mapping)) {
-	maybeSkip: {
-		const existing = reverseMapping[value]
-		if (existing === undefined) { break maybeSkip }
+const mapKey = (key) => mapping[key] ?? (isCharacter(key) ? key : null)
 
-		const keyScancode = Bindings.keyboard_getScancode(key)
-		if (keyScancode === null) { continue }
+const buildReverseMapping = () => {
+	const reverseMapping = Object.create(null)
 
-		const existingScancode = Bindings.keyboard_getScancode(existing)
-		if (existingScancode === null) { break maybeSkip }
+	for (const [ key, value ] of Object.entries(mapping)) {
+		if (isCharacter(value)) { continue }
 
-		if (existingScancode < keyScancode) { continue }
+		maybeSkip: {
+			const existing = reverseMapping[value]
+			if (existing === undefined) { break maybeSkip }
+
+			const keyScancode = Bindings.keyboard_getScancode(key)
+			if (keyScancode === null) { continue }
+
+			const existingScancode = Bindings.keyboard_getScancode(existing)
+			if (existingScancode === null) { break maybeSkip }
+
+			if (existingScancode < keyScancode) { continue }
+		}
+
+		reverseMapping[value] = key
 	}
 
-	reverseMapping[value] = key
+	return reverseMapping
 }
 
-// Single-character keys are valid SDL key names.
-// Prefer bare key when it has a lower scancode.
-for (const [ value, key ] of Object.entries(reverseMapping)) {
-	if (!isCharacter(value)) { continue }
+let reverseMapping = null
 
-	const valueScancode = Bindings.keyboard_getScancode(value)
-	if (valueScancode === null) { continue }
-
-	const keyScancode = Bindings.keyboard_getScancode(key)
-	if (keyScancode === null || valueScancode < keyScancode) {
-		delete reverseMapping[value]
-	}
+const getReverseMapping = () => {
+	reverseMapping ??= buildReverseMapping()
+	return reverseMapping
 }
+
+const invalidateReverseMapping = () => { reverseMapping = null }
 
 module.exports = {
 	mapping,
-	reverseMapping,
+	mapKey,
+	getReverseMapping,
+	invalidateReverseMapping,
 	isCharacter,
 }

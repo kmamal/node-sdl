@@ -11,20 +11,11 @@ T.test("sdl::info", (t) => {
 	t.equal(typeof sdl.info.version.runtime.patch, 'number')
 
 	t.ok([ 'Linux', 'macOS', 'Windows' ].includes(sdl.info.platform))
+})
 
-	t.ok(Array.isArray(sdl.info.drivers.video.all))
-	for (const driver of sdl.info.drivers.video.all) {
-		t.equal(typeof driver, 'string')
-		t.ok(driver.length > 0)
+T.test("sdl::isAvailable", (t) => {
+	for (const module of [ sdl.video, sdl.keyboard, sdl.mouse, sdl.touch, sdl.clipboard, sdl.audio, sdl.joystick, sdl.gamepad, sdl.sensor ]) {
+		t.equal(typeof module.isAvailable(), 'boolean')
 	}
-	t.equal(typeof sdl.info.drivers.video.current, 'string')
-	t.ok(sdl.info.drivers.video.all.includes(sdl.info.drivers.video.current))
-
-	t.ok(Array.isArray(sdl.info.drivers.audio.all))
-	for (const driver of sdl.info.drivers.audio.all) {
-		t.equal(typeof driver, 'string')
-		t.ok(driver.length > 0)
-	}
-	t.equal(typeof sdl.info.drivers.audio.current, 'string')
-	t.ok(sdl.info.drivers.audio.all.includes(sdl.info.drivers.audio.current))
+	t.equal(sdl.keyboard.isAvailable(), sdl.video.isAvailable())
 })

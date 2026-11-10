@@ -2,12 +2,13 @@
 #define _TOUCH_H_
 
 #include <napi.h>
+#include "packed.h"
 #include <SDL3/SDL.h>
 #include <map>
 
 namespace touch {
 
-	extern std::map<SDL_TouchDeviceType, std::string> device_types;
+	extern std::map<SDL_TouchDeviceType, packed::Str> device_types;
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 

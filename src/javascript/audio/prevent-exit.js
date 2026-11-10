@@ -1,5 +1,6 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
+const { INT32_MAX } = require('../validate')
 
 let timeout
 
@@ -12,6 +13,7 @@ const resetTimeout = () => {
 
 process.on('beforeExit', (code) => {
 	if (code !== 0) { return }
+	if (Globals.audioStreams.size === 0) { return }
 
 	let duration = 0
 
@@ -21,23 +23,24 @@ process.on('beforeExit', (code) => {
 		if (!stream.playing) { continue }
 
 		let queued = null
-		let device = null
 		try {
+			Bindings.audio_flush(stream.id)
 			queued = Bindings.audio_getQueued(stream.id)
-			device = Bindings.audio_getDeviceFormat(stream.id)
 		}
-		catch (_) { }
-		if (!queued || !device) { continue }
+		catch { }
+		// Skipping empty queues misses the device buffer's tail, so if something else kept the loop alive while the queue drained, up to one device buffer gets cut off at exit. Accepted.
+		if (!queued) { continue }
 
-		const { channels, frequency, bytesPerSample } = stream
-		const bytesPerSecond = channels * frequency * bytesPerSample
-		duration = Math.max(duration, queued / bytesPerSecond + device.buffered / device.frequency)
+		const { device, channels, frequency, bytesPerSample, frequencyRatio } = stream
+		const bytesPerSecond = channels * frequency * bytesPerSample * frequencyRatio
+		const tail = device.frequency ? device.buffered / device.frequency : 0
+		duration = Math.max(duration, queued / bytesPerSecond + tail)
 	}
 
 	if (duration) {
 		// Keeps Node.js alive while audio is playing
 		resetTimeout()
-		timeout = setTimeout(() => { timeout = null }, Math.min(duration * 1e3, 2 ** 31 - 1))
+		timeout = setTimeout(() => { timeout = null }, Math.min(duration * 1e3, INT32_MAX))
 	}
 })
 

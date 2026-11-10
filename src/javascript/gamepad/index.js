@@ -1,47 +1,46 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const { GamepadInstance } = require('./gamepad-instance')
-const { make: makeGamepadDevice } = require('./device')
-const { make: makeJoystickDevice } = require('../joystick/device')
+const { refreshAndBroadcast } = require('../joystick/devices')
+const { validateString } = require('../validate')
 
 const validEvents = [ 'deviceAdd', 'deviceRemove' ]
 
 // Updated mappings change existing joystick and gamepad devices without an event
 const refreshDevices = () => {
-	const devices = Bindings.joystick_getDevices()
-	for (const joystickDevice of Globals.joystickDevices) {
-		const device = devices.find(({ id }) => id === joystickDevice.id)
-		if (device) { Object.assign(joystickDevice, makeJoystickDevice(device)) }
-	}
-	for (const gamepadDevice of Globals.gamepadDevices) {
-		const device = devices.find(({ id }) => id === gamepadDevice.id)
-		if (device?.isGamepad) { Object.assign(gamepadDevice, makeGamepadDevice(device)) }
-	}
-
+	refreshAndBroadcast()
 	Globals.events.poll()
 }
 
 const gamepad = new class extends EventsViaPoll {
-	constructor () { super(validEvents) }
+	constructor () { super(validEvents, () => { assertInitialized('gamepad') }) }
+
+	isAvailable () { return isAvailable('gamepad') }
 
 	get devices () {
+		assertInitialized('gamepad')
 		Globals.events.poll()
 		return [ ...Globals.gamepadDevices ]
 	}
 
-	openDevice (device) { return new GamepadInstance(device) }
+	openDevice (device) {
+		assertInitialized('gamepad')
+		return new GamepadInstance(device)
+	}
 
 	addMappings (mappings) {
+		assertInitialized('gamepad')
 		if (!Array.isArray(mappings)) { throw Object.assign(new Error("mappings must be an array"), { mappings }) }
 		for (const mapping of mappings) {
-			if (typeof mapping !== 'string') { throw Object.assign(new Error("mapping must be a string"), { mapping }) }
+			validateString('mapping', mapping)
 		}
 
 		try { Bindings.gamepad_addMappings(mappings) }
 		catch (error) {
 			try { refreshDevices() }
-			catch (_) { }
+			catch { }
 			throw error
 		}
 		refreshDevices()

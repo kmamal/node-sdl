@@ -1,0 +1,175 @@
+const Globals = require('../globals')
+const Bindings = require('../bindings')
+const { DeviceInstance } = require('../device-instance')
+const { validateNotClosed, validateNumberRange, validateNonNegativeInt32 } = require('../validate')
+const { refreshAndBroadcast } = require('./devices')
+
+const MAX_DURATION = 0xFFFF
+
+// Timers are kept per device id at module level, not per instance, since every joystick and gamepad instance of a device drives the same motors.
+const effects = {
+	rumble: {
+		call: Bindings.joystick_rumble,
+		capability: 'hasRumble',
+		missing: "device has no rumble",
+		timers: new Map(),
+	},
+	rumbleTriggers: {
+		call: Bindings.joystick_rumbleTriggers,
+		capability: 'hasRumbleTriggers',
+		missing: "device has no trigger rumble",
+		timers: new Map(),
+	},
+}
+
+const validateUnit = (name, value) => { validateNumberRange(name, value, 0, 1) }
+
+const clearTimers = (effect, id) => {
+	for (const timer of effect.timers.get(id) ?? []) { clearTimeout(timer) }
+	effect.timers.delete(id)
+}
+
+const stopEffect = (effect, id) => {
+	clearTimers(effect, id)
+	effect.call(id, 0, 0, 0)
+}
+
+const startEffect = (effect, id, _a, _b, duration) => {
+	const a = Math.round(_a * 0xFFFF)
+	const b = Math.round(_b * 0xFFFF)
+	if (duration === 0 || (a === 0 && b === 0)) {
+		stopEffect(effect, id)
+		Globals.events.poll()
+		return
+	}
+
+	clearTimers(effect, id)
+	effect.call(id, a, b, duration === null ? MAX_DURATION : Math.min(duration, MAX_DURATION))
+
+	// Keeps Node.js alive while rumbling
+	const timers = []
+	if (duration === null || duration > MAX_DURATION) {
+		timers.push(setInterval(() => {
+			try { effect.call(id, a, b, MAX_DURATION) }
+			catch { clearTimers(effect, id) }
+		}, 30e3))
+	}
+	if (duration !== null) {
+		timers.push(setTimeout(() => {
+			try {
+				stopEffect(effect, id)
+				Globals.events.poll()
+			}
+			catch {}
+		}, duration))
+	}
+	effect.timers.set(id, timers)
+}
+
+const releaseDevice = (id) => {
+	if (Globals.joystickInstances.byId.has(id) || Globals.gamepadInstances.byId.has(id)) { return }
+
+	for (const effect of Object.values(effects)) {
+		if (!effect.timers.has(id)) { continue }
+
+		// This call will throw if the device is gone
+		try { stopEffect(effect, id) }
+		catch {}
+	}
+}
+
+class JoystickDeviceInstance extends DeviceInstance {
+	get firmwareVersion () { return this._firmwareVersion }
+	get serialNumber () { return this._serialNumber }
+
+	get power () {
+		Globals.events.poll()
+		validateNotClosed(this)
+
+		return this._power
+	}
+
+	setPlayer (player) {
+		validateNotClosed(this)
+
+		// SDL sizes its player array to player + 1 and zero-fills it (overflowing at the max); that's an SDL issue, not ours to cap.
+		validateNonNegativeInt32('player', player)
+
+		this._setPlayer(player)
+	}
+
+	resetPlayer () {
+		validateNotClosed(this)
+
+		this._setPlayer(-1)
+	}
+
+	_setPlayer (player) {
+		Bindings.joystick_setPlayer(this._device.id, player)
+		refreshAndBroadcast()
+	}
+
+	_hasCapability (name) {
+		Globals.events.poll()
+		validateNotClosed(this)
+
+		return Bindings.joystick_getCapabilities(this._device.id)[name]
+	}
+
+	get hasLed () { return this._hasCapability('hasLed') }
+	get hasRumble () { return this._hasCapability('hasRumble') }
+	get hasRumbleTriggers () { return this._hasCapability('hasRumbleTriggers') }
+
+	setLed (red, green, blue) {
+		validateNotClosed(this)
+
+		validateUnit('red', red)
+		validateUnit('green', green)
+		validateUnit('blue', blue)
+
+		if (!this.hasLed) { throw Object.assign(new Error("device has no led"), { id: this._device.id }) }
+
+		Bindings.joystick_setLed(this._device.id, red, green, blue)
+	}
+
+	_getEffect (kind) {
+		const effect = effects[kind]
+		if (!this[effect.capability]) { throw Object.assign(new Error(effect.missing), { id: this._device.id }) }
+		return effect
+	}
+
+	_startEffect (kind, nameA, _a, nameB, _b, duration) {
+		validateNotClosed(this)
+
+		const a = _a === undefined ? 1 : _a
+		const b = _b === undefined ? 1 : _b
+		validateUnit(nameA, a)
+		validateUnit(nameB, b)
+		if (duration !== undefined) { validateNonNegativeInt32('duration', duration) }
+
+		startEffect(this._getEffect(kind), this._device.id, a, b, duration ?? null)
+	}
+
+	_stopEffect (kind) {
+		validateNotClosed(this)
+
+		stopEffect(this._getEffect(kind), this._device.id)
+		Globals.events.poll()
+	}
+
+	rumble (lowFreqRumble, highFreqRumble, duration) {
+		this._startEffect('rumble', 'lowFreqRumble', lowFreqRumble, 'highFreqRumble', highFreqRumble, duration)
+	}
+
+	stopRumble () { this._stopEffect('rumble') }
+
+	rumbleTriggers (leftRumble, rightRumble, duration) {
+		this._startEffect('rumbleTriggers', 'leftRumble', leftRumble, 'rightRumble', rightRumble, duration)
+	}
+
+	stopRumbleTriggers () { this._stopEffect('rumbleTriggers') }
+
+	_beforeCloseBinding () { releaseDevice(this._device.id) }
+}
+
+module.exports = { JoystickDeviceInstance }

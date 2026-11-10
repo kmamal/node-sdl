@@ -1,68 +1,28 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { refreshDevices } = require('./devices')
-const { EventsViaPoll } = require('../events/events-via-poll')
+const { DeviceInstance, lookupDevice } = require('../device-instance')
+const { validateNotClosed } = require('../validate')
 
 const validEvents = [
 	'update',
 	'close',
 ]
 
-class SensorInstance extends EventsViaPoll {
-	constructor (device) {
-		super(validEvents)
-
-		refreshDevices()
-		if (!Globals.sensorDevices.includes(device)) { throw Object.assign(new Error("device must be from sdl.sensor.devices"), { device }) }
+class SensorInstance extends DeviceInstance {
+	constructor (requested) {
+		const device = lookupDevice(requested, 'sensor', refreshDevices)
 
 		Bindings.sensor_open(device.id)
 
-		this._device = device
-
-		this._closed = false
-
-		Globals.sensorInstances.all.add(this)
-		let collection = Globals.sensorInstances.byId.get(this._device.id)
-		if (!collection) {
-			collection = new Set()
-			Globals.sensorInstances.byId.set(this._device.id, collection)
-		}
-		collection.add(this)
+		super(validEvents, device, Globals.sensorInstances, Bindings.sensor_close)
 	}
-
-	get device () { return this._device }
 
 	get data () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
+		validateNotClosed(this)
 
 		return Bindings.sensor_getData(this._device.id)
-	}
-
-	get closed () { return this._closed }
-	close () {
-		if (this._closed) { throw Object.assign(new Error("instance is closed"), { id: this._device.id }) }
-
-		this._closed = true
-
-		Globals.sensorInstances.all.delete(this)
-		const collection = Globals.sensorInstances.byId.get(this._device.id)
-		collection.delete(this)
-		if (collection.size === 0) {
-			Globals.sensorInstances.byId.delete(this._device.id)
-		}
-
-		// This call could throw if the device is gone
-		try { Bindings.sensor_close(this._device.id) }
-		catch (_) {}
-
-		// We might be inside an event listener
-		this._retire(() => Object.assign(new Error("instance is closed"), { id: this._device.id }))
-
-		Globals.events.withoutPolling(() => {
-			try { this.emit('close', { type: 'close' }) }
-			catch (error) { this.emit('error', error) }
-		})
 	}
 }
 

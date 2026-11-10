@@ -1,32 +1,41 @@
 const Globals = require('../globals')
+const { assertInitialized, isAvailable } = require('../subsystems')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
-const { VideoFormatHelpers } = require('../video/format-helpers')
+const { validateImage, validateRgbFormat } = require('../video/validate')
+const { validateBoolean, validateIntegerRange, validateFloat, validateString } = require('../validate')
 
 let captured = false
 
 const mouse = {
+	isAvailable () { return isAvailable('video') },
+
 	get BUTTON () { return Enums.mouseButtons },
 
 	getButton (button) {
-		if (!Number.isInteger(button)) { throw Object.assign(new Error("button must be an integer"), { button }) }
-		if (button < 1 || button > 32) { throw Object.assign(new Error("button must be between 1 and 32"), { button }) }
+		assertInitialized('video')
+		validateIntegerRange('button', button, 1, 32)
 
 		Globals.events.poll()
 		return Bindings.mouse_getButton(button)
 	},
 
-	get position () { return Bindings.mouse_getPosition() },
+	get position () {
+		assertInitialized('video')
+		return Bindings.mouse_getPosition()
+	},
 
 	setPosition (x, y) {
-		if (!Number.isFinite(x)) { throw Object.assign(new Error("x must be a number"), { x }) }
-		if (!Number.isFinite(y)) { throw Object.assign(new Error("y must be a number"), { y }) }
+		assertInitialized('video')
+		validateFloat('x', x)
+		validateFloat('y', y)
 
 		Bindings.mouse_setPosition(x, y)
 	},
 
 	setCursor (cursor) {
-		if (typeof cursor !== 'string') { throw Object.assign(new Error("cursor must be a string"), { cursor }) }
+		assertInitialized('video')
+		validateString('cursor', cursor)
 
 		const _cursor = Enums.cursors[cursor]
 		if (_cursor === undefined) { throw Object.assign(new Error("invalid cursor"), { cursor }) }
@@ -34,26 +43,16 @@ const mouse = {
 		Bindings.mouse_setCursor(_cursor)
 	},
 
-	resetCursor () { Bindings.mouse_resetCursor() },
+	resetCursor () {
+		assertInitialized('video')
+		Bindings.mouse_resetCursor()
+	},
 
 	setCursorImage (width, height, stride, format, buffer, x, y) {
-		if (!Number.isInteger(width)) { throw Object.assign(new Error("width must be an integer"), { width }) }
-		if (width <= 0 || width > 2 ** 31 - 1) { throw Object.assign(new Error("width must be a positive 32-bit integer"), { width }) }
-		if (!Number.isInteger(height)) { throw Object.assign(new Error("height must be an integer"), { height }) }
-		if (height <= 0 || height > 2 ** 31 - 1) { throw Object.assign(new Error("height must be a positive 32-bit integer"), { height }) }
-		if (!Number.isInteger(stride)) { throw Object.assign(new Error("stride must be an integer"), { stride }) }
-		if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
-		const helpers = VideoFormatHelpers[format]
-		if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
-		if (helpers.isYuv) { throw Object.assign(new Error("format must be an RGB format"), { format }) }
-		if (stride < helpers.minStride(width)) { throw Object.assign(new Error("stride is smaller than expected"), { stride, width, format }) }
-		if (stride > 2 ** 31 - 1) { throw Object.assign(new Error("stride must be a 32-bit integer"), { stride }) }
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		if (buffer.length < helpers.minBufferSize(stride, height)) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, stride, height, format }) }
-		if (!Number.isInteger(x)) { throw Object.assign(new Error("x must be an integer"), { x }) }
-		if (x < 0 || x >= width) { throw Object.assign(new Error("x must be between 0 and width - 1"), { x, width }) }
-		if (!Number.isInteger(y)) { throw Object.assign(new Error("y must be an integer"), { y }) }
-		if (y < 0 || y >= height) { throw Object.assign(new Error("y must be between 0 and height - 1"), { y, height }) }
+		assertInitialized('video')
+		validateImage(width, height, stride, format, buffer, validateRgbFormat)
+		validateIntegerRange('x', x, 0, width - 1, "must be between 0 and width - 1")
+		validateIntegerRange('y', y, 0, height - 1, "must be between 0 and height - 1")
 
 		const _format = Enums.pixelFormat[format]
 
@@ -61,19 +60,27 @@ const mouse = {
 	},
 
 	showCursor (show = true) {
-		if (typeof show !== 'boolean') { throw Object.assign(new Error("show must be a boolean"), { show }) }
+		assertInitialized('video')
+		validateBoolean('show', show)
 
 		Bindings.mouse_showCursor(show)
 	},
 
 	hideCursor () { mouse.showCursor(false) },
 
-	redrawCursor () { Bindings.mouse_redrawCursor() },
+	redrawCursor () {
+		assertInitialized('video')
+		Bindings.mouse_redrawCursor()
+	},
 
-	get captured () { return captured },
+	get captured () {
+		assertInitialized('video')
+		return captured
+	},
 
 	capture (capture = true) {
-		if (typeof capture !== 'boolean') { throw Object.assign(new Error("capture must be a boolean"), { capture }) }
+		assertInitialized('video')
+		validateBoolean('capture', capture)
 
 		Bindings.mouse_capture(capture)
 		captured = capture

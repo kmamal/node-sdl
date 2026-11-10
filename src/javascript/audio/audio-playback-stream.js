@@ -1,6 +1,8 @@
 const Globals = require('../globals')
 const Bindings = require('../bindings')
 const { AudioStream } = require('./audio-stream')
+const { validateBytes } = require('./validate')
+const { validateBuffer } = require('../validate')
 const { resetTimeout } = require('./prevent-exit')
 
 class AudioPlaybackStream extends AudioStream {
@@ -10,21 +12,18 @@ class AudioPlaybackStream extends AudioStream {
 
 	get queued () {
 		Globals.events.poll()
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+		this._assertOpen()
 
 		return Bindings.audio_getQueued(this._id)
 	}
 
-	putData (buffer, bytes = null) {
-		if (this._closed) { throw Object.assign(new Error("stream is closed"), { id: this._id }) }
+	putData (buffer, _bytes) {
+		this._assertOpen()
 
-		if (!(buffer instanceof Buffer)) { throw Object.assign(new Error("buffer must be a Buffer"), { buffer }) }
-		bytes ??= buffer.length
-		if (!Number.isInteger(bytes)) { throw Object.assign(new Error("bytes must be an integer"), { bytes }) }
-		if (bytes < 0 || bytes > 2 ** 31 - 1) { throw Object.assign(new Error("bytes must be a non-negative 32-bit integer"), { bytes }) }
-		if (buffer.length < bytes) { throw Object.assign(new Error("buffer is smaller than expected"), { buffer, bytes }) }
-		const frameSize = this._channels * this._bytesPerSample
-		if (bytes % frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${frameSize}`), { bytes }) }
+		validateBuffer('buffer', buffer)
+		const bytes = _bytes === undefined ? buffer.length : _bytes
+		validateBytes(buffer, bytes)
+		if (bytes % this._frameSize !== 0) { throw Object.assign(new Error(`bytes must be a multiple of ${this._frameSize}`), { bytes }) }
 
 		if (bytes === 0) { return }
 

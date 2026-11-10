@@ -31,6 +31,7 @@ When the buffer's dimensions differ from the window's, the library scales the bu
 That distorts the image's aspect ratio, which you usually don't want.
 To prevent the distortion, we calculate the `dstRect` property and set it.
 Because this example displays pixel art, we also scale only by integer multiples of the image's dimensions.
+We work that out in pixels, and then convert the result to points, because `dstRect` is measured in points.
 
 ## [5. Canvas Drawing](https://github.com/kmamal/node-sdl/tree/master/examples/05-canvas-drawing)
 
@@ -97,12 +98,12 @@ We again use [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static), thi
 
 ## [16. Audio rendering thread](https://github.com/kmamal/node-sdl/tree/master/examples/16-audio-thread)
 
-You can use `@kmamal/sdl` only from the main thread of your Node.js program, but you may still want to move expensive computations to worker threads.
-This example shows how to implement an audio rendering thread.
+Worker threads can import `@kmamal/sdl` and open audio streams just like the main thread, as long as the main thread imports it too.
+This example renders a sine wave in a worker and queues it on a playback stream opened by the worker itself, so the main thread stays free for input and drawing.
 
 ## [17. Changing audio driver dynamically](https://github.com/kmamal/node-sdl/tree/master/examples/17-audio-driver)
 SDL initializes automatically when you import `@kmamal/sdl`, and after that you can't change the audio or video driver.
-To change drivers, you must restart the process with different values for the `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` environment variables.
+To change drivers, you must restart the process with different values for the `SDL_VIDEO_DRIVER` and `SDL_AUDIO_DRIVER` environment variables.
 This example shows how to build an audio player that changes audio drivers without closing its main window.
 It keeps the audio playback in a child process, separate from the main window.
 

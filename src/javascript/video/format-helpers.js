@@ -1,4 +1,5 @@
 const Os = require('node:os')
+const { validateString } = require('../validate')
 
 const minStride = (bytesPerPixel) => (width) => width * bytesPerPixel
 const minStridePacked = (width) => 4 * Math.ceil(width / 2)
@@ -13,15 +14,17 @@ const rgb = (bytesPerPixel) => ({
 	minStride: minStride(bytesPerPixel),
 	minBufferSize,
 	isRenderable: true,
+	isConvertible: true,
 })
 
-const yuv = (bytesPerPixel, isPlanarYuv, isRenderable = true) => ({
+const yuv = (bytesPerPixel, isPlanarYuv, isSupported = true) => ({
 	bytesPerPixel,
 	isYuv: true,
 	isPlanarYuv,
 	minStride: isPlanarYuv ? minStride(bytesPerPixel) : minStridePacked,
 	minBufferSize: isPlanarYuv ? minBufferSizePlanar : minBufferSize,
-	isRenderable,
+	isRenderable: isSupported,
+	isConvertible: isSupported,
 })
 
 const VideoFormatHelpers = Object.assign(Object.create(null), {
@@ -82,10 +85,6 @@ const VideoFormatHelpers = Object.assign(Object.create(null), {
 	p010: { ...yuv(2, true, false), minStride: minStridePacked },
 })
 
-for (const [ key, value ] of Object.entries(VideoFormatHelpers)) {
-	value.name = key
-}
-
 if (Os.endianness() === 'LE') {
 	VideoFormatHelpers.rgba32 = VideoFormatHelpers.abgr8888
 	VideoFormatHelpers.argb32 = VideoFormatHelpers.bgra8888
@@ -108,10 +107,13 @@ else {
 }
 
 const getFormatHelpers = (format) => {
-	if (typeof format !== 'string') { throw Object.assign(new Error("format must be a string"), { format }) }
+	validateString('format', format)
 	const helpers = VideoFormatHelpers[format]
 	if (helpers === undefined) { throw Object.assign(new Error("invalid format"), { format }) }
 	return helpers
 }
 
-module.exports = { VideoFormatHelpers, getFormatHelpers }
+module.exports = {
+	VideoFormatHelpers,
+	getFormatHelpers,
+}
