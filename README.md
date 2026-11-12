@@ -28,7 +28,8 @@ In addition, all these things can now be used without a browser:
 - __WebGL:__ [@kmamal/gl](https://github.com/kmamal/headless-gl#readme). A fork of [headless-gl](https://github.com/stackgl/headless-gl#readme) modified to render directly to SDL windows.
 - __WebGPU:__ [@kmamal/gpu](https://github.com/kmamal/gpu#readme). A fork of [Google Dawn](https://dawn.googlesource.com/dawn/+/refs/heads/main/src/dawn/node/) modified to render directly to SDL windows.
 - __Web Audio:__ [@kmamal/audio](https://github.com/kmamal/audio#readme). An implementation of the Web Audio API that uses `@kmamal/sdl` for audio playback and recording.
-- __Three.js:__ [@kmamal/three](https://github.com/kmamal/three#readme). A fork of [Three.js](https://threejs.org/) ported to the desktop via tha above libraries.
+- __GUI:__ [@kmamal/lil-gui](https://github.com/kmamal/lil-gui#readme). An implementation of the [lil-gui](https://lil-gui.georgealways.com/) API that draws each GUI in its own SDL window.
+- __Three.js:__ [@kmamal/three](https://github.com/kmamal/three.js#readme). A fork of [Three.js](https://threejs.org/) ported to the desktop via the above libraries.
 
 This package officially supports Linux (X11 and Wayland), Mac, and Windows.
 It should work on any system that both SDL and Node.js support, but I haven't tried others.
