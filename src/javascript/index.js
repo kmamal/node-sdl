@@ -16,10 +16,10 @@ const { clipboard } = require('./clipboard')
 const { power } = require('./power')
 
 require('./events')
-require('./cleanup')
 
 module.exports = {
 	info: Globals.info,
+	cleanup: require('./cleanup'),
 	video,
 	keyboard,
 	mouse,
