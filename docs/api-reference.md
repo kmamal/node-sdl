@@ -4,6 +4,7 @@
 
 - [sdl](#sdl)
   - [sdl.info](#sdlinfo)
+  - [sdl.cleanup()](#sdlcleanup)
   - [Event emitters](#event-emitters)
 - [sdl.video](#sdlvideo)
   - [Image data](#image-data)
@@ -309,6 +310,10 @@ Sample data for Linux:
   platform: 'Linux',
 }
 ```
+
+### sdl.cleanup()
+
+Disposes of the library, releasing all threads. Called automatically on the `process` `exit` event, but useful for freeing resources earlier in the session if needed.
 
 ### Event emitters
 
