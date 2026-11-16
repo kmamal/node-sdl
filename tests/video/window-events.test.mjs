@@ -332,7 +332,7 @@ T.test("sdl::video display events", (t) => {
 		handleDisplayEvent({ type: 'displayAdd', display: fresh })
 		const display = sdl.video.displays.find((d) => d.id === -777)
 		t.equal(display, fresh)
-		t.equal(events.at(-1), { type: 'displayAdd', device: display })
+		t.equal(events.at(-1), { type: 'displayAdd', display })
 
 		const count = events.length
 		handleDisplayEvent({ type: 'displayAdd', display: makeDisplay() })
@@ -341,7 +341,7 @@ T.test("sdl::video display events", (t) => {
 
 		handleDisplayEvent({ type: 'displayOrient', displayId: -777, display: makeDisplay({ orientation: 'portrait' }) })
 		t.equal(display.orientation, 'portrait')
-		t.equal(events.at(-1), { type: 'displayOrient', device: display })
+		t.equal(events.at(-1), { type: 'displayOrient', display })
 
 		const moved = makeDisplay({
 			geometry: { x: 11, y: 12, width: 1, height: 1 },
@@ -350,23 +350,23 @@ T.test("sdl::video display events", (t) => {
 		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: moved })
 		t.equal(sdl.video.displays.find((d) => d.id === -777), display)
 		t.equal([ display.geometry.x, display.geometry.y, display.usable.x, display.usable.y ], [ 11, 12, 13, 14 ])
-		t.equal(events.at(-1), { type: 'displayMove', device: display })
+		t.equal(events.at(-1), { type: 'displayMove', display })
 
 		handleDisplayEvent({ type: 'displayScaleChange', displayId: -777, display: makeDisplay({ scale: 2.5 }) })
 		t.equal(sdl.video.displays.find((d) => d.id === -777), display)
 		t.equal(display.scale, 2.5)
-		t.equal(events.at(-1), { type: 'displayScaleChange', device: display })
+		t.equal(events.at(-1), { type: 'displayScaleChange', display })
 
 		const geometry = { x: 0, y: 0, width: 123, height: 456 }
 		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ frequency: 144, geometry }) })
 		t.equal(display.frequency, 144)
 		t.equal(display.geometry, geometry)
-		t.equal(events.at(-1), { type: 'displayModeChange', device: display })
+		t.equal(events.at(-1), { type: 'displayModeChange', display })
 
 		const usable = { x: 1, y: 2, width: 3, height: 4 }
 		handleDisplayEvent({ type: 'displayUsableChange', displayId: -777, display: makeDisplay({ usable }) })
 		t.equal(display.usable, usable)
-		t.equal(events.at(-1), { type: 'displayUsableChange', device: display })
+		t.equal(events.at(-1), { type: 'displayUsableChange', display })
 
 		const count2 = events.length
 		handleDisplayEvent({ type: 'displayOrient', displayId: -888, display: makeDisplay() })
@@ -376,7 +376,7 @@ T.test("sdl::video display events", (t) => {
 		t.equal(events.length, count2)
 
 		handleDisplayEvent({ type: 'displayRemove', displayId: -777 })
-		t.equal(events.at(-1), { type: 'displayRemove', device: display })
+		t.equal(events.at(-1), { type: 'displayRemove', display })
 		t.ok(!sdl.video.displays.includes(display))
 
 		const unknownMode = makeDisplay({ format: null, frequency: null })
@@ -389,7 +389,7 @@ T.test("sdl::video display events", (t) => {
 		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: relocated })
 		t.equal(unknownMode.geometry, { x: 1, y: 2, width: 5, height: 6 })
 		t.equal(unknownMode.usable, { x: 3, y: 4, width: 5, height: 6 })
-		t.equal(events.at(-1), { type: 'displayMove', device: unknownMode })
+		t.equal(events.at(-1), { type: 'displayMove', display: unknownMode })
 		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ geometry: { x: 7, y: 8, width: 9, height: 10 } }) })
 		t.equal(unknownMode.geometry, { x: 7, y: 8, width: 9, height: 10 })
 		handleDisplayEvent({ type: 'displayRemove', displayId: -777 })

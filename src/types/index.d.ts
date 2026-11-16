@@ -12,7 +12,7 @@ export namespace Events {
 	export namespace Display {
 
 		interface DisplayEvent extends BaseEvent {
-			readonly device: Sdl.Video.Display
+			readonly display: Sdl.Video.Display
 		}
 
 		export interface Add extends DisplayEvent {

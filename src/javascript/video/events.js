@@ -15,7 +15,7 @@ const handleDisplayEvent = (event) => {
 
 			if (Globals.displays.some((a) => a.id === display.id)) { return }
 			Globals.displays.push(display)
-			event.device = display
+			event.display = display
 		} break
 
 		case 'displayRemove': {
@@ -24,7 +24,7 @@ const handleDisplayEvent = (event) => {
 
 			const index = Globals.displays.findIndex((a) => a.id === displayId)
 			if (index === -1) { return }
-			event.device = Globals.displays[index]
+			event.display = Globals.displays[index]
 			Globals.displays.splice(index, 1)
 		} break
 
@@ -41,7 +41,7 @@ const handleDisplayEvent = (event) => {
 			if (!display) { return }
 
 			Object.assign(display, fresh)
-			event.device = display
+			event.display = display
 		} break
 
 		// No default

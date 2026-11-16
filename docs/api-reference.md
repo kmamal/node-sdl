@@ -457,52 +457,52 @@ Every pixel format the library reports, such as a display's `format`, is one of 
 
 ### Event: 'displayAdd'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when the system adds a display.
 Read [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
 ### Event: 'displayRemove'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when the system removes a display.
 Read [`sdl.video.displays`](#sdlvideodisplays) to get the new list of displays.
 
 ### Event: 'displayOrient'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes orientation.
-Read the new value from `device.orientation`.
+Read the new value from `display.orientation`.
 
 ### Event: 'displayMove'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes position.
-Read the new values from `device.geometry` and `device.usable`.
+Read the new values from `display.geometry` and `display.usable`.
 
 ### Event: 'displayScaleChange'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes content scale.
-Read the new value from `device.scale`.
+Read the new value from `display.scale`.
 
 ### Event: 'displayModeChange'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes its current mode.
-Read the new values from `device.format`, `device.frequency`, `device.geometry`, and `device.usable`.
+Read the new values from `display.format`, `display.frequency`, `display.geometry`, and `display.usable`.
 
 ### Event: 'displayUsableChange'
 
-- `device: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
+- `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display's `usable` region changes, for example when a dock or taskbar appears, disappears, or moves.
-Read the new value from `device.usable`.
+Read the new value from `display.usable`.
 
 ### sdl.video.convert(srcSpec, srcData, dstSpec[, dstData])
 
