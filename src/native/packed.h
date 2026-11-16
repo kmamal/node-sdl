@@ -16,17 +16,14 @@ namespace packed {
 	using Array = std::vector<Value>;
 
 	struct Str {
-		Str () = default;
-		Str (const Str &) = delete;
-		Str &operator= (const Str &) = delete;
-		Str &operator= (const char *value) { string = value; return *this; }
+		template <size_t N>
+		constexpr Str (const char (&value)[N]) : string(value) {}
 
-		const std::string &str () const { return string; }
-		const char *c_str () const { return string.c_str(); }
-		operator const std::string & () const { return string; }
+		constexpr const char *c_str () const { return string; }
+		constexpr operator const char * () const { return string; }
 
 	private:
-		std::string string;
+		const char *string;
 	};
 
 	struct Value {
@@ -38,7 +35,7 @@ namespace packed {
 			double,
 			int64_t,
 			uint64_t,
-			const std::string *,
+			const char *,
 			std::string,
 			Object,
 			Array
@@ -58,8 +55,7 @@ namespace packed {
 		Value (const std::string &value) : data(std::in_place_type<std::string>, value) {}
 		Value (std::string &&value) : data(std::in_place_type<std::string>, std::move(value)) {}
 
-		static Value ref (const Str &value);
-		static Value ref (Str &&value) = delete;
+		static Value ref (Str value);
 		static Value ref (const std::string &value) = delete;
 		static Value ref (std::string &&value) = delete;
 		static Value object ();
@@ -70,8 +66,7 @@ namespace packed {
 		const Value *get (const char *key) const;
 		const Object &members () const { return std::get<Object>(data); }
 		Value &set (const char *key, Value value);
-		Value &set (const Str &key, Value value);
-		Value &set (Str &&key, Value value) = delete;
+		Value &set (Str key, Value value);
 		Value &set (const std::string &key, Value value) = delete;
 		Value &set (std::string &&key, Value value) = delete;
 		Value &push (Value value);

@@ -8,8 +8,8 @@
 
 namespace sensor {
 
-	extern std::map<SDL_SensorType, packed::Str> types;
-	extern std::map<SDL_SensorType, packed::Str> sides;
+	extern const std::map<SDL_SensorType, packed::Str> types;
+	extern const std::map<SDL_SensorType, packed::Str> sides;
 
 	Napi::Value getDevices(const Napi::CallbackInfo &info);
 	Napi::Value open(const Napi::CallbackInfo &info);

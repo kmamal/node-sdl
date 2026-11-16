@@ -7,10 +7,71 @@
 #include <string>
 
 
-std::map<SDL_GamepadType, packed::Str> gamepad::types;
-std::map<SDL_GamepadAxis, packed::Str> gamepad::axes;
-std::map<SDL_GamepadButton, packed::Str> gamepad::buttons;
-std::map<SDL_GamepadButtonLabel, packed::Str> gamepad::button_labels;
+const std::map<SDL_GamepadType, packed::Str> gamepad::types {
+	// { SDL_GAMEPAD_TYPE_UNKNOWN, nullptr },
+	{ SDL_GAMEPAD_TYPE_STANDARD, "standard" },
+	{ SDL_GAMEPAD_TYPE_XBOX360, "xbox360" },
+	{ SDL_GAMEPAD_TYPE_XBOXONE, "xboxOne" },
+	{ SDL_GAMEPAD_TYPE_PS3, "ps3" },
+	{ SDL_GAMEPAD_TYPE_PS4, "ps4" },
+	{ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO, "nintendoSwitchPro" },
+	{ SDL_GAMEPAD_TYPE_PS5, "ps5" },
+	{ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT, "nintendoSwitchJoyconLeft" },
+	{ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT, "nintendoSwitchJoyconRight" },
+	{ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR, "nintendoSwitchJoyconPair" },
+	{ SDL_GAMEPAD_TYPE_GAMECUBE, "gamecube" },
+	{ SDL_GAMEPAD_TYPE_STEAM, "steam" },
+};
+
+const std::map<SDL_GamepadAxis, packed::Str> gamepad::axes {
+	{ SDL_GAMEPAD_AXIS_LEFTX, "leftStickX" },
+	{ SDL_GAMEPAD_AXIS_LEFTY, "leftStickY" },
+	{ SDL_GAMEPAD_AXIS_RIGHTX, "rightStickX" },
+	{ SDL_GAMEPAD_AXIS_RIGHTY, "rightStickY" },
+	{ SDL_GAMEPAD_AXIS_LEFT_TRIGGER, "leftTrigger" },
+	{ SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, "rightTrigger" },
+};
+
+const std::map<SDL_GamepadButton, packed::Str> gamepad::buttons {
+	{ SDL_GAMEPAD_BUTTON_DPAD_LEFT, "dpadLeft" },
+	{ SDL_GAMEPAD_BUTTON_DPAD_RIGHT, "dpadRight" },
+	{ SDL_GAMEPAD_BUTTON_DPAD_UP, "dpadUp" },
+	{ SDL_GAMEPAD_BUTTON_DPAD_DOWN, "dpadDown" },
+	{ SDL_GAMEPAD_BUTTON_SOUTH, "south" },
+	{ SDL_GAMEPAD_BUTTON_EAST, "east" },
+	{ SDL_GAMEPAD_BUTTON_WEST, "west" },
+	{ SDL_GAMEPAD_BUTTON_NORTH, "north" },
+	{ SDL_GAMEPAD_BUTTON_GUIDE, "guide" },
+	{ SDL_GAMEPAD_BUTTON_BACK, "back" },
+	{ SDL_GAMEPAD_BUTTON_START, "start" },
+	{ SDL_GAMEPAD_BUTTON_LEFT_STICK, "leftStick" },
+	{ SDL_GAMEPAD_BUTTON_RIGHT_STICK, "rightStick" },
+	{ SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, "leftShoulder" },
+	{ SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, "rightShoulder" },
+	{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1, "rightPaddle1" },
+	{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE1, "leftPaddle1" },
+	{ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2, "rightPaddle2" },
+	{ SDL_GAMEPAD_BUTTON_LEFT_PADDLE2, "leftPaddle2" },
+	{ SDL_GAMEPAD_BUTTON_MISC1, "misc1" },
+	{ SDL_GAMEPAD_BUTTON_MISC2, "misc2" },
+	{ SDL_GAMEPAD_BUTTON_MISC3, "misc3" },
+	{ SDL_GAMEPAD_BUTTON_MISC4, "misc4" },
+	{ SDL_GAMEPAD_BUTTON_MISC5, "misc5" },
+	{ SDL_GAMEPAD_BUTTON_MISC6, "misc6" },
+	{ SDL_GAMEPAD_BUTTON_TOUCHPAD, "touchpad" },
+};
+
+const std::map<SDL_GamepadButtonLabel, packed::Str> gamepad::button_labels {
+	// { SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN, nullptr },
+	{ SDL_GAMEPAD_BUTTON_LABEL_A, "a" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_B, "b" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_X, "x" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_Y, "y" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_CROSS, "cross" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_CIRCLE, "circle" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_SQUARE, "square" },
+	{ SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE, "triangle" },
+};
 
 
 double

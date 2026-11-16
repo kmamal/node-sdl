@@ -6,8 +6,21 @@
 #include <atomic>
 #include <cstdint>
 
-std::map<bool, packed::Str> audio::device_types;
-std::map<SDL_AudioFormat, packed::Str> audio::formats;
+const std::map<bool, packed::Str> audio::device_types {
+	{ true, "recording" },
+	{ false, "playback" },
+};
+
+const std::map<SDL_AudioFormat, packed::Str> audio::formats {
+	{ SDL_AUDIO_S8, "s8" },
+	{ SDL_AUDIO_U8, "u8" },
+	{ SDL_AUDIO_S16LE, "s16le" },
+	{ SDL_AUDIO_S16BE, "s16be" },
+	{ SDL_AUDIO_S32LE, "s32le" },
+	{ SDL_AUDIO_S32BE, "s32be" },
+	{ SDL_AUDIO_F32LE, "f32le" },
+	{ SDL_AUDIO_F32BE, "f32be" },
+};
 
 struct StreamState;
 

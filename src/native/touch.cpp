@@ -3,7 +3,12 @@
 #include <SDL3/SDL.h>
 #include <string>
 
-std::map<SDL_TouchDeviceType, packed::Str> touch::device_types;
+const std::map<SDL_TouchDeviceType, packed::Str> touch::device_types {
+	// { SDL_TOUCH_DEVICE_INVALID, nullptr },
+	{ SDL_TOUCH_DEVICE_DIRECT, "direct" },
+	{ SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE, "indirectAbsolute" },
+	{ SDL_TOUCH_DEVICE_INDIRECT_RELATIVE, "indirectRelative" },
+};
 
 Napi::Value
 touch::getDevices(const Napi::CallbackInfo &info)

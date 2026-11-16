@@ -4,7 +4,13 @@
 #include <map>
 
 
-std::map<SDL_PowerState, packed::Str> power::states;
+const std::map<SDL_PowerState, packed::Str> power::states {
+	// { SDL_POWERSTATE_UNKNOWN, nullptr },
+	{ SDL_POWERSTATE_NO_BATTERY, "noBattery" },
+	{ SDL_POWERSTATE_ON_BATTERY, "battery" },
+	{ SDL_POWERSTATE_CHARGING, "charging" },
+	{ SDL_POWERSTATE_CHARGED, "charged" },
+};
 
 
 Napi::Value

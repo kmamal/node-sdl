@@ -8,7 +8,7 @@
 
 namespace power {
 
-	extern std::map<SDL_PowerState, packed::Str> states;
+	extern const std::map<SDL_PowerState, packed::Str> states;
 
 	Napi::Value getInfo(const Napi::CallbackInfo &info);
 

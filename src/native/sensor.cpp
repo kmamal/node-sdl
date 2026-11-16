@@ -6,8 +6,25 @@
 #include <string>
 
 
-std::map<SDL_SensorType, packed::Str> sensor::types;
-std::map<SDL_SensorType, packed::Str> sensor::sides;
+const std::map<SDL_SensorType, packed::Str> sensor::types {
+	// { SDL_SENSOR_UNKNOWN, nullptr },
+	{ SDL_SENSOR_ACCEL, "accelerometer" },
+	{ SDL_SENSOR_GYRO, "gyroscope" },
+	{ SDL_SENSOR_ACCEL_L, "accelerometer" },
+	{ SDL_SENSOR_GYRO_L, "gyroscope" },
+	{ SDL_SENSOR_ACCEL_R, "accelerometer" },
+	{ SDL_SENSOR_GYRO_R, "gyroscope" },
+};
+
+const std::map<SDL_SensorType, packed::Str> sensor::sides {
+	// { SDL_SENSOR_UNKNOWN, nullptr },
+	// { SDL_SENSOR_ACCEL, nullptr },
+	// { SDL_SENSOR_GYRO, nullptr },
+	{ SDL_SENSOR_ACCEL_L, "left" },
+	{ SDL_SENSOR_GYRO_L, "left" },
+	{ SDL_SENSOR_ACCEL_R, "right" },
+	{ SDL_SENSOR_GYRO_R, "right" },
+};
 
 
 Napi::Value

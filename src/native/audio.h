@@ -9,8 +9,8 @@
 
 namespace audio {
 
-	extern std::map<bool, packed::Str> device_types;
-	extern std::map<SDL_AudioFormat, packed::Str> formats;
+	extern const std::map<bool, packed::Str> device_types;
+	extern const std::map<SDL_AudioFormat, packed::Str> formats;
 
 	void closeAllStreams();
 

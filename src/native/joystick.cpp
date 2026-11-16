@@ -9,8 +9,31 @@
 #include <cmath>
 
 
-std::map<Uint8, packed::Str> joystick::hat_positions;
-std::map<SDL_JoystickType, packed::Str> joystick::types;
+const std::map<Uint8, packed::Str> joystick::hat_positions {
+	{ SDL_HAT_CENTERED, "centered" },
+	{ SDL_HAT_UP, "up" },
+	{ SDL_HAT_RIGHT, "right" },
+	{ SDL_HAT_DOWN, "down" },
+	{ SDL_HAT_LEFT, "left" },
+	{ SDL_HAT_RIGHTUP, "rightUp" },
+	{ SDL_HAT_RIGHTDOWN, "rightDown" },
+	{ SDL_HAT_LEFTUP, "leftUp" },
+	{ SDL_HAT_LEFTDOWN, "leftDown" },
+};
+
+const std::map<SDL_JoystickType, packed::Str> joystick::types {
+	// { SDL_JOYSTICK_TYPE_UNKNOWN, nullptr },
+	{ SDL_JOYSTICK_TYPE_GAMEPAD, "gamepad" },
+	{ SDL_JOYSTICK_TYPE_WHEEL, "wheel" },
+	{ SDL_JOYSTICK_TYPE_ARCADE_STICK, "arcadeStick" },
+	{ SDL_JOYSTICK_TYPE_FLIGHT_STICK, "flightStick" },
+	{ SDL_JOYSTICK_TYPE_DANCE_PAD, "dancePad" },
+	{ SDL_JOYSTICK_TYPE_GUITAR, "guitar" },
+	{ SDL_JOYSTICK_TYPE_DRUM_KIT, "drumKit" },
+	{ SDL_JOYSTICK_TYPE_ARCADE_PAD, "arcadePad" },
+	{ SDL_JOYSTICK_TYPE_THROTTLE, "throttle" },
+};
+
 SDL_GUID joystick::zero_guid;
 
 double

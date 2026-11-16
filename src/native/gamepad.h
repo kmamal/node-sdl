@@ -8,10 +8,10 @@
 
 namespace gamepad {
 
-	extern std::map<SDL_GamepadType, packed::Str> types;
-	extern std::map<SDL_GamepadAxis, packed::Str> axes;
-	extern std::map<SDL_GamepadButton, packed::Str> buttons;
-	extern std::map<SDL_GamepadButtonLabel, packed::Str> button_labels;
+	extern const std::map<SDL_GamepadType, packed::Str> types;
+	extern const std::map<SDL_GamepadAxis, packed::Str> axes;
+	extern const std::map<SDL_GamepadButton, packed::Str> buttons;
+	extern const std::map<SDL_GamepadButtonLabel, packed::Str> button_labels;
 
 	double mapAxis (SDL_Gamepad *gamepad, SDL_GamepadAxis axis);
 	void getState (SDL_Gamepad *gamepad, packed::Value &dst);

@@ -10,10 +10,10 @@ Overload(Fs...) -> Overload<Fs...>;
 
 
 packed::Value
-packed::Value::ref (const Str &value)
+packed::Value::ref (Str value)
 {
 	Value result;
-	result.data.emplace<const std::string *>(&value.str());
+	result.data.emplace<const char *>(value.c_str());
 	return result;
 }
 
@@ -63,7 +63,7 @@ packed::Value::set (const char *key, Value value)
 }
 
 packed::Value &
-packed::Value::set (const Str &key, Value value)
+packed::Value::set (Str key, Value value)
 {
 	return set(key.c_str(), std::move(value));
 }
@@ -86,7 +86,7 @@ packed::Value::toNapi (Napi::Env env) const
 		[&](double value) -> Napi::Value { return Napi::Number::New(env, value); },
 		[&](int64_t value) -> Napi::Value { return Napi::BigInt::New(env, value); },
 		[&](uint64_t value) -> Napi::Value { return Napi::BigInt::New(env, value); },
-		[&](const std::string *value) -> Napi::Value { return Napi::String::New(env, *value); },
+		[&](const char *value) -> Napi::Value { return Napi::String::New(env, value); },
 		[&](const std::string &value) -> Napi::Value { return Napi::String::New(env, value); },
 		[&](const Object &members) -> Napi::Value {
 			Napi::Object object = Napi::Object::New(env);

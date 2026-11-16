@@ -13,8 +13,8 @@ namespace joystick {
 		~JoysticksLock () { SDL_UnlockJoysticks(); }
 	};
 
-	extern std::map<SDL_JoystickType, packed::Str> types;
-	extern std::map<Uint8, packed::Str> hat_positions;
+	extern const std::map<SDL_JoystickType, packed::Str> types;
+	extern const std::map<Uint8, packed::Str> hat_positions;
 	extern SDL_GUID zero_guid;
 
 	double mapAxis (SDL_Joystick *joystick, int axis);
