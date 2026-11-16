@@ -73,8 +73,8 @@ T.test("sdl::window", async (t) => {
 		t.equal(window1.fullscreen, false)
 		{
 			const window3 = sdl.video.createWindow({ fullscreen: true })
-			t.equal(window3.fullscreen, true)
-			window3.destroy()
+			try { t.ok(await waitFor(() => window3.fullscreen)) }
+			finally { window3.destroy() }
 		}
 		window1.setFullscreen(true)
 		t.ok(await waitFor(() => window1.fullscreen))
@@ -91,8 +91,8 @@ T.test("sdl::window", async (t) => {
 		t.equal(window1.borderless, false)
 		{
 			const window3 = sdl.video.createWindow({ borderless: true })
-			t.equal(window3.borderless, true)
-			window3.destroy()
+			try { t.equal(window3.borderless, true) }
+			finally { window3.destroy() }
 		}
 		window1.setBorderless(true)
 		t.equal(window1.borderless, true)
