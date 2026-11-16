@@ -1,8 +1,6 @@
 const Globals = require('../globals')
 const { EventEmitter } = require('node:events')
 
-let numListeners = 0
-
 const commonEvents = [ 'newListener', 'removeListener', 'error', '*' ]
 const metaEvents = [ 'newListener', 'removeListener' ]
 const undemandingEvents = [ ...metaEvents, 'error' ]
@@ -18,7 +16,7 @@ class EventsViaPoll extends EventEmitter {
 		this._addInternalListener('removeListener', (type) => {
 			if (undemandingEvents.includes(type)) { return }
 
-			if (--numListeners === 0) { Globals.events.setDemand(false) }
+			Globals.events.unref()
 		})
 
 		this._addInternalListener('newListener', (type) => {
@@ -32,7 +30,7 @@ class EventsViaPoll extends EventEmitter {
 
 			if (assertReady) { assertReady() }
 
-			if (++numListeners === 1) { Globals.events.setDemand(true) }
+			Globals.events.ref()
 		})
 	}
 

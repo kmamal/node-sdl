@@ -98,6 +98,16 @@ const withoutPolling = (fn) => {
 
 const setDemand = (demand) => { setPollingFast(Bindings.events_setDemand(demand)) }
 
+let refCount = 0
+
+const ref = () => {
+	if (++refCount === 1) { setDemand(true) }
+}
+
+const unref = () => {
+	if (--refCount === 0) { setDemand(false) }
+}
+
 const stopPolling = () => {
 	Timers.clearInterval(pollInterval)
 	pollInterval = null
@@ -108,7 +118,8 @@ const broadcastChange = (name) => { Bindings.events_broadcastChange(name) }
 Globals.events = {
 	poll,
 	withoutPolling,
-	setDemand,
+	ref,
+	unref,
 	stopPolling,
 	broadcastChange,
 }

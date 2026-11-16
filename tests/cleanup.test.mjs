@@ -58,6 +58,29 @@ T.test("sdl::cleanup shuts down without closing on a non-zero exit", async (t) =
 	t.equal(closed, [])
 })
 
+T.test("sdl::cleanup keeps the process alive while a window is open", async (t) => {
+	t.timeout(10e3)
+
+	const { stdout, status, signal } = await runProcess(`
+		import Timers from 'node:timers'
+		import sdl from ${JSON.stringify(indexPath)}
+		if (sdl.video.isAvailable()) {
+			const window = sdl.video.createWindow({ visible: false })
+			window.removeAllListeners()
+			Timers.setTimeout(() => {
+				window.destroy()
+				console.log('destroyed')
+			}, 300).unref()
+		}
+		else {
+			console.log('destroyed')
+		}
+	`)
+	t.equal(signal, null)
+	t.equal(status, 0)
+	t.equal(stdout.trim(), 'destroyed')
+})
+
 T.test("sdl::cleanup lets the process exit once everything is closed", async (t) => {
 	t.timeout(10e3)
 

@@ -154,12 +154,8 @@ class Window extends EventsViaPoll {
 
 		Globals.windows.all.set(this._id, this)
 
-		// Keeps Node.js alive while windows are open; don't remove it, only destroy() drops it
-		const keepAlive = () => {}
-		this.on('close', keepAlive)
-		this._addInternalListener('removeListener', (type, listener) => {
-			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
-		})
+		// Keep Node.js alive while windows are open
+		Globals.events.ref()
 
 		// Manually emit some initial events for convenience.
 		// Note that these can duplicate real events.
@@ -552,6 +548,7 @@ class Window extends EventsViaPoll {
 		validateNotDestroyed(this)
 
 		this._destroyed = true
+		Globals.events.unref()
 		Globals.windows.all.delete(this._id)
 		if (Globals.windows.hovered === this) { Globals.windows.hovered = null }
 		if (Globals.windows.focused === this) { Globals.windows.focused = null }

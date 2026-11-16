@@ -211,3 +211,17 @@ T.test("sdl::window", async (t) => {
 		if (window2 && !window2.destroyed) { window2.destroy() }
 	}
 })
+
+T.test("sdl::window has no listeners of its own", (t) => {
+	const window = sdl.video.createWindow({ visible: false })
+	try {
+		t.equal(window.listenerCount('close'), 0)
+		t.equal(window.listeners('close'), [])
+		window.on('close', () => {})
+		window.removeAllListeners('close')
+		t.equal(window.listenerCount('close'), 0)
+	}
+	finally {
+		window.destroy()
+	}
+})
