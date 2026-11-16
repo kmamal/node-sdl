@@ -70,6 +70,8 @@ let polling = false
 let pollInterval = null
 let pollingFast = null
 
+// I would like to move this to native code eventually.
+// Sadly a native uv_timer poll loop would needs direct libuv calls, making the binary non-portable across Node.js versions.
 const setPollingFast = (fast) => {
 	if (!isMainThread || fast === pollingFast) { return }
 	pollingFast = fast

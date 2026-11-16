@@ -17,6 +17,7 @@ struct Thread {
 	bool wake_pending = false;
 };
 
+// Lock order must always be global::lock() before this mutex.
 static std::mutex mutex;
 static std::map<napi_env, Thread> all_threads;
 static std::atomic<int> num_demanding { 0 };

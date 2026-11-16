@@ -27,7 +27,7 @@
                 "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except",
             ],
             'defines': [
-                # Node-API version of the oldest supported Node.js (v22.0.0)
+                # Node-API 9, which every supported Node.js (v22.16.0 and later) has
                 'NAPI_VERSION=9',
                 'NODE_ADDON_API_DISABLE_DEPRECATED',
                 'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS',

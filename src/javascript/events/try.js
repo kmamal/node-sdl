@@ -1,3 +1,6 @@
+// Only for code that runs inside a NAPI callback.
+// This is to prevent the exception from bubbling up through C++ code.
+// Everywhere else, emit synchronously with `try { this.emit(...) } catch (error) { this.emit('error', error) }`
 const rethrow = (error) => {
 	process.nextTick(() => { throw error })
 }

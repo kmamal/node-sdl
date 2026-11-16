@@ -420,6 +420,8 @@ global::initialize(const Napi::CallbackInfo &info)
 }
 
 
+// Only the main thread must initializes SDL and polls for events.
+// On macOS the Cocoa backend refuses any other thread.
 static bool
 _initSubsystem (SDL_InitFlags flags, std::string &error)
 {

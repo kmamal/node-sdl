@@ -47,6 +47,7 @@ const startEffect = (effect, id, _a, _b, duration) => {
 	effect.call(id, a, b, duration === null ? MAX_DURATION : Math.min(duration, MAX_DURATION))
 
 	// Keeps Node.js alive while rumbling
+	// Not unref'd on purpose, so that the process stays alive until the effect finishes
 	const timers = []
 	if (duration === null || duration > MAX_DURATION) {
 		timers.push(setInterval(() => {
