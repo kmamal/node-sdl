@@ -51,14 +51,7 @@ packed::Value::get (const char *key) const
 packed::Value &
 packed::Value::set (const char *key, Value value)
 {
-	Object &members = std::get<Object>(data);
-	for (Member &member : members) {
-		if (std::strcmp(member.key, key) == 0) {
-			member.value = std::move(value);
-			return *this;
-		}
-	}
-	members.push_back({ key, std::move(value) });
+	std::get<Object>(data).push_back({ key, std::move(value) });
 	return *this;
 }
 

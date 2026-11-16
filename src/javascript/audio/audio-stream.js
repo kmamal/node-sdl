@@ -49,13 +49,14 @@ class AudioStream extends EventsViaPoll {
 			Globals.events.withoutPolling(() => { tryEmit(this, notifyEvent, event) })
 		}
 
-		const id = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered, notify, device)
+		const { id, format: deviceFormat } = Bindings.audio_open(device.id, recording, frequency, _format, channels, buffered, notify)
+		Object.assign(device, deviceFormat)
 		try {
 			if (gain !== 1) { Bindings.audio_setGain(id, gain) }
 			if (frequencyRatio !== 1) { Bindings.audio_setFrequencyRatio(id, frequencyRatio) }
 		}
 		catch (error) {
-			try { Bindings.audio_close(id, device) }
+			try { Object.assign(device, Bindings.audio_close(id)) }
 			catch { }
 			throw error
 		}
@@ -169,7 +170,7 @@ class AudioStream extends EventsViaPoll {
 		Globals.audioStreams.delete(this._id)
 
 		// This call could throw if the device is gone
-		try { Bindings.audio_close(this._id, this._device) }
+		try { Object.assign(this._device, Bindings.audio_close(this._id)) }
 		catch { }
 
 		// We might be inside an event listener

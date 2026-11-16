@@ -192,18 +192,6 @@ _setFormat (packed::Value &target, SDL_AudioDeviceID id)
 	target.set("buffered", sample_frames);
 }
 
-static void
-_setFormat (Napi::Object &target, SDL_AudioDeviceID id)
-{
-	packed::Value format = packed::Value::object();
-	_setFormat(format, id);
-
-	Napi::Env env = target.Env();
-	for (const packed::Member &member : format.members()) {
-		target.Set(member.key, member.value.toNapi(env));
-	}
-}
-
 static SDL_AudioDeviceID
 _defaultId (bool is_recording)
 {
@@ -228,7 +216,7 @@ audio::_getDevice (SDL_AudioDeviceID id)
 }
 
 packed::Value
-audio::_getFormat(SDL_AudioDeviceID id)
+audio::_getFormat (SDL_AudioDeviceID id)
 {
 	packed::Value result = packed::Value::object();
 	_setFormat(result, id);
@@ -320,7 +308,6 @@ audio::open (const Napi::CallbackInfo &info)
 	int channels = info[4].As<Napi::Number>().Int32Value();
 	int samples = info[5].As<Napi::Number>().Int32Value();
 	Napi::Function callback = info[6].As<Napi::Function>();
-	Napi::Object device = info[7].As<Napi::Object>();
 
 	SDL_AudioDeviceID device_id = has_id
 		? info[0].As<Napi::Number>().Uint32Value()
@@ -381,15 +368,16 @@ audio::open (const Napi::CallbackInfo &info)
 	}
 
 	try {
-		_setFormat(device, audio_id);
+		packed::Value result = packed::Value::object();
+		result.set("id", audio_id);
+		result.set("format", audio::_getFormat(audio_id));
+		return result.toNapi(env);
 	}
 	catch (...) {
 		_destroy(audio_id, entry, true);
 		open_streams.erase(audio_id);
 		throw;
 	}
-
-	return Napi::Number::New(env, audio_id);
 }
 
 Napi::Value
@@ -533,16 +521,13 @@ audio::close (const Napi::CallbackInfo &info)
 	global::assertReady(env);
 
 	SDL_AudioDeviceID audio_id = info[0].As<Napi::Number>().Uint32Value();
-	Napi::Object device = info[1].As<Napi::Object>();
 
 	OpenStream &entry = _getEntry(env, audio_id);
 	SDL_AudioDeviceID device_id = entry.device_id;
 	_destroy(audio_id, entry, entry.env == (napi_env) env);
 	open_streams.erase(audio_id);
 
-	_setFormat(device, device_id);
-
-	return env.Undefined();
+	return audio::_getFormat(device_id).toNapi(env);
 }
 
 Napi::Value
