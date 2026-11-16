@@ -81,7 +81,7 @@ mouse::setCursor (const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-mouse::resetCursor(const Napi::CallbackInfo &info)
+mouse::resetCursor (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

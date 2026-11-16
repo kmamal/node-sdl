@@ -7,7 +7,7 @@ const bool *keyboard::keys;
 
 
 packed::Value
-keyboard::packKey(SDL_Keycode keycode)
+keyboard::packKey (SDL_Keycode keycode)
 {
 	bool is_masked = (keycode & (SDLK_SCANCODE_MASK | SDLK_EXTENDED_MASK)) != 0;
 
@@ -40,7 +40,7 @@ keyboard::packKey(SDL_Keycode keycode)
 }
 
 Napi::Value
-keyboard::getKey(const Napi::CallbackInfo &info)
+keyboard::getKey (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -51,7 +51,7 @@ keyboard::getKey(const Napi::CallbackInfo &info)
 }
 
 static bool
-isKeypad(int scancode)
+isKeypad (int scancode)
 {
 	return (scancode >= SDL_SCANCODE_KP_DIVIDE && scancode <= SDL_SCANCODE_KP_PERIOD)
 		|| scancode == SDL_SCANCODE_KP_EQUALS
@@ -61,7 +61,7 @@ isKeypad(int scancode)
 }
 
 static int
-findScancode(SDL_Keycode keycode)
+findScancode (SDL_Keycode keycode)
 {
 	for (int i = 1; i < SDL_SCANCODE_COUNT; i++) {
 		if (isKeypad(i)) { continue; }
@@ -71,7 +71,7 @@ findScancode(SDL_Keycode keycode)
 }
 
 Napi::Value
-keyboard::getScancode(const Napi::CallbackInfo &info)
+keyboard::getScancode (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -102,7 +102,7 @@ keyboard::getScancode(const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-keyboard::getState(const Napi::CallbackInfo &info)
+keyboard::getState (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

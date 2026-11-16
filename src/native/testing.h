@@ -5,11 +5,11 @@
 
 namespace testing {
 
-	Napi::Value attachVirtualJoystick(const Napi::CallbackInfo &info);
-	Napi::Value setVirtualJoystickAxis(const Napi::CallbackInfo &info);
-	Napi::Value setVirtualJoystickButton(const Napi::CallbackInfo &info);
-	Napi::Value detachVirtualJoystick(const Napi::CallbackInfo &info);
-	Napi::Value pushAudioDeviceEvent(const Napi::CallbackInfo &info);
+	Napi::Value attachVirtualJoystick (const Napi::CallbackInfo &info);
+	Napi::Value setVirtualJoystickAxis (const Napi::CallbackInfo &info);
+	Napi::Value setVirtualJoystickButton (const Napi::CallbackInfo &info);
+	Napi::Value detachVirtualJoystick (const Napi::CallbackInfo &info);
+	Napi::Value pushAudioDeviceEvent (const Napi::CallbackInfo &info);
 
 }; // namespace testing
 

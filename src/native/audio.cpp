@@ -224,7 +224,7 @@ audio::_getFormat (SDL_AudioDeviceID id)
 }
 
 packed::Value
-audio::_getDefaultDevice(bool is_recording)
+audio::_getDefaultDevice (bool is_recording)
 {
 	packed::Value device = packed::Value::object();
 	device.set("id", packed::Value());
@@ -258,7 +258,7 @@ _getDevices (Napi::Env &env, bool is_recording)
 }
 
 Napi::Value
-audio::getDrivers(const Napi::CallbackInfo &info)
+audio::getDrivers (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -281,7 +281,7 @@ audio::getDrivers(const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-audio::getDevices(const Napi::CallbackInfo &info)
+audio::getDevices (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

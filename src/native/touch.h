@@ -10,7 +10,7 @@ namespace touch {
 
 	extern const std::map<SDL_TouchDeviceType, packed::Str> device_types;
 
-	Napi::Value getDevices(const Napi::CallbackInfo &info);
+	Napi::Value getDevices (const Napi::CallbackInfo &info);
 
 }; // namespace touch
 

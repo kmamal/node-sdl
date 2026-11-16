@@ -79,11 +79,11 @@ namespace events {
 		inline constexpr packed::Str UPDATE { "update" };
 	};
 
-	bool dispatchEventFromWatch(const SDL_Event &event);
+	bool dispatchEventFromWatch (const SDL_Event &event);
 
-	Napi::Value isDispatchingFromWatch(const Napi::CallbackInfo &info);
-	Napi::Value poll(const Napi::CallbackInfo &info);
-	Napi::Value broadcastChange(const Napi::CallbackInfo &info);
+	Napi::Value isDispatchingFromWatch (const Napi::CallbackInfo &info);
+	Napi::Value poll (const Napi::CallbackInfo &info);
+	Napi::Value broadcastChange (const Napi::CallbackInfo &info);
 
 }; // namespace events
 

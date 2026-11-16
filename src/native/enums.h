@@ -5,7 +5,7 @@
 
 namespace enums {
 
-	Napi::Value get(const Napi::CallbackInfo &info);
+	Napi::Value get (const Napi::CallbackInfo &info);
 
 }; // namespace enums
 

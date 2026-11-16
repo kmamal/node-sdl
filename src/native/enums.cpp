@@ -2,7 +2,7 @@
 #include <SDL3/SDL.h>
 
 Napi::Value
-enums::get(const Napi::CallbackInfo &info)
+enums::get (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

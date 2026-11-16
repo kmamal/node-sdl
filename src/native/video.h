@@ -14,9 +14,9 @@ namespace video {
 	packed::Value _getDisplay (SDL_DisplayID display_id);
 	Napi::Array _getDisplays (Napi::Env &env);
 
-	Napi::Value getDrivers(const Napi::CallbackInfo &info);
-	Napi::Value getDisplays(const Napi::CallbackInfo &info);
-	Napi::Value convert(const Napi::CallbackInfo &info);
+	Napi::Value getDrivers (const Napi::CallbackInfo &info);
+	Napi::Value getDisplays (const Napi::CallbackInfo &info);
+	Napi::Value convert (const Napi::CallbackInfo &info);
 
 }; // namespace video
 

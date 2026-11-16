@@ -582,7 +582,7 @@ events::isDispatchingFromWatch (const Napi::CallbackInfo &info)
 }
 
 bool
-events::dispatchEventFromWatch(const SDL_Event &event)
+events::dispatchEventFromWatch (const SDL_Event &event)
 {
 	// Only dispatch while no JS callback is running; otherwise the event arrives through the normal poll.
 	if (in_callback) { return false; }

@@ -11,7 +11,7 @@ const std::map<SDL_TouchDeviceType, packed::Str> touch::device_types {
 };
 
 Napi::Value
-touch::getDevices(const Napi::CallbackInfo &info)
+touch::getDevices (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

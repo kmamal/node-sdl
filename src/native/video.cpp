@@ -157,7 +157,7 @@ video::_getDisplays (Napi::Env &env)
 }
 
 Napi::Value
-video::getDrivers(const Napi::CallbackInfo &info)
+video::getDrivers (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -177,7 +177,7 @@ video::getDrivers(const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-video::getDisplays(const Napi::CallbackInfo &info)
+video::getDisplays (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -185,7 +185,7 @@ video::getDisplays(const Napi::CallbackInfo &info)
 }
 
 Napi::Value
-video::convert(const Napi::CallbackInfo &info)
+video::convert (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

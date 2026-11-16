@@ -77,7 +77,7 @@ getWindow (Napi::Env &env, SDL_WindowID window_id)
 #endif
 
 static void
-updateRenderer(
+updateRenderer (
 	Napi::Env &env,
 	SDL_Window *window,
 	bool *is_accelerated,

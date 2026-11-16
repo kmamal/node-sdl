@@ -12,9 +12,9 @@ namespace keyboard {
 
 	packed::Value packKey (SDL_Keycode keycode);
 
-	Napi::Value getKey(const Napi::CallbackInfo &info);
-	Napi::Value getScancode(const Napi::CallbackInfo &info);
-	Napi::Value getState(const Napi::CallbackInfo &info);
+	Napi::Value getKey (const Napi::CallbackInfo &info);
+	Napi::Value getScancode (const Napi::CallbackInfo &info);
+	Napi::Value getState (const Napi::CallbackInfo &info);
 
 }; // namespace keyboard
 

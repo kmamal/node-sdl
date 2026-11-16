@@ -5,8 +5,8 @@
 
 namespace clipboard {
 
-	Napi::Value getText(const Napi::CallbackInfo &info);
-	Napi::Value setText(const Napi::CallbackInfo &info);
+	Napi::Value getText (const Napi::CallbackInfo &info);
+	Napi::Value setText (const Napi::CallbackInfo &info);
 
 }; // namespace clipboard
 

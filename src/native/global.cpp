@@ -31,26 +31,26 @@ static std::vector<InitRequest *> pending_requests;
 
 // Recursive because watchEvents holds this lock while dispatching window events to JS, and the handlers re-enter it through the wrappers.
 std::recursive_mutex &
-global::lock()
+global::lock ()
 {
 	static std::recursive_mutex mutex;
 	return mutex;
 }
 
 bool
-global::isReady()
+global::isReady ()
 {
 	return ready.load(std::memory_order_acquire);
 }
 
 bool
-global::isMainThread()
+global::isMainThread ()
 {
 	return ready.load(std::memory_order_acquire) && SDL_GetCurrentThreadID() == main_thread_id.load(std::memory_order_acquire);
 }
 
 void
-global::assertReady(Napi::Env &env)
+global::assertReady (Napi::Env &env)
 {
 	if (ready.load(std::memory_order_acquire)) { return; }
 
@@ -111,7 +111,7 @@ _start (Napi::Env &env)
 
 
 Napi::Value
-global::initialize(const Napi::CallbackInfo &info)
+global::initialize (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -190,7 +190,7 @@ _failInitRequests ()
 }
 
 void
-global::processInitRequests()
+global::processInitRequests ()
 {
 	std::vector<InitRequest *> batch;
 	{
@@ -220,7 +220,7 @@ global::processInitRequests()
 
 
 Napi::Value
-global::initSubsystem(const Napi::CallbackInfo &info)
+global::initSubsystem (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
@@ -264,7 +264,7 @@ global::initSubsystem(const Napi::CallbackInfo &info)
 
 
 void
-global::teardown()
+global::teardown ()
 {
 	std::lock_guard<std::recursive_mutex> guard(global::lock());
 
@@ -278,7 +278,7 @@ global::teardown()
 }
 
 Napi::Value
-global::cleanup(const Napi::CallbackInfo &info)
+global::cleanup (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

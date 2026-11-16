@@ -229,7 +229,7 @@ joystick::mapPowerInfo (SDL_PowerState _state, int _percent)
 
 
 Napi::Value
-joystick::getDevices(const Napi::CallbackInfo &info)
+joystick::getDevices (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 

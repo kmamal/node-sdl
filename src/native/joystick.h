@@ -21,18 +21,18 @@ namespace joystick {
 	double mapAxisValue (int value);
 	packed::Value _getDevice (SDL_JoystickID id);
 	Napi::Array _getDevices (Napi::Env &env);
-	packed::Value getPowerInfo(SDL_Joystick *joystick);
+	packed::Value getPowerInfo (SDL_Joystick *joystick);
 	const char *getState (SDL_Joystick *joystick, packed::Value &dst);
-	packed::Value mapPowerInfo(SDL_PowerState state, int percent);
+	packed::Value mapPowerInfo (SDL_PowerState state, int percent);
 
-	Napi::Value getDevices(const Napi::CallbackInfo &info);
-	Napi::Value open(const Napi::CallbackInfo &info);
-	Napi::Value getCapabilities(const Napi::CallbackInfo &info);
-	Napi::Value setLed(const Napi::CallbackInfo &info);
-	Napi::Value setPlayer(const Napi::CallbackInfo &info);
-	Napi::Value rumble(const Napi::CallbackInfo &info);
-	Napi::Value rumbleTriggers(const Napi::CallbackInfo &info);
-	Napi::Value close(const Napi::CallbackInfo &info);
+	Napi::Value getDevices (const Napi::CallbackInfo &info);
+	Napi::Value open (const Napi::CallbackInfo &info);
+	Napi::Value getCapabilities (const Napi::CallbackInfo &info);
+	Napi::Value setLed (const Napi::CallbackInfo &info);
+	Napi::Value setPlayer (const Napi::CallbackInfo &info);
+	Napi::Value rumble (const Napi::CallbackInfo &info);
+	Napi::Value rumbleTriggers (const Napi::CallbackInfo &info);
+	Napi::Value close (const Napi::CallbackInfo &info);
 
 }; // namespace joystick
 
