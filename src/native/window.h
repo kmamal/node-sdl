@@ -27,6 +27,8 @@ namespace window {
 	Napi::Value setIcon(const Napi::CallbackInfo &info);
 	Napi::Value flash(const Napi::CallbackInfo &info);
 	Napi::Value destroy(const Napi::CallbackInfo &info);
+	Napi::Value setHitTest (const Napi::CallbackInfo& info);
+	Napi::Value clearHitTest (const Napi::CallbackInfo& info);
 
 }; // namespace window
 
