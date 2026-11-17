@@ -155,7 +155,9 @@ class Window extends EventsViaPoll {
 		Globals.windows.all.set(this._id, this)
 
 		// Keeps Node.js alive while windows are open
-		const keepAlive = () => {}
+		const keepAlive = () => {
+			Bindings.window_freeHitTest(this._id);
+		}
 		this.on('close', keepAlive)
 		this._addInternalListener('removeListener', (type, listener) => {
 			if (listener === keepAlive && !this._destroyed) { this.on('close', keepAlive) }
@@ -597,6 +599,11 @@ class Window extends EventsViaPoll {
 		if (this._destroyed) { return }
 
 		this.destroy()
+	}
+	
+	setHitTest(hitTest){
+		validateNotDestroyed(this)
+		Bindings.window_setHitTest(this._id,hitTest);
 	}
 }
 
