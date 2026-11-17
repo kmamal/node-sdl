@@ -1,6 +1,7 @@
 #include "window.h"
 #include "global.h"
 #include <SDL3/SDL.h>
+#include <map>
 #include <string>
 #include <cstdint>
 #include <cmath>
@@ -787,3 +788,81 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	return env.Undefined();
 }
+
+struct Callback{
+	Napi::FunctionReference callback;
+};
+
+SDL_HitTestResult SDLCALL testHit(SDL_Window *win, const SDL_Point *area, void *data);
+SDL_HitTestResult SDLCALL testHit(SDL_Window *win, const SDL_Point *area, void *data){
+		Callback* callbackStruct = (Callback*)data;
+		std::string result = (std::string)
+			callbackStruct->callback({
+				Napi::Value::From(callbackStruct->callback.Env(),area->x),
+				Napi::Value::From(callbackStruct->callback.Env(),area->y)
+			}).As<Napi::String>();
+		if(result == "normal")
+			return SDL_HITTEST_NORMAL;
+		if(result == "draggable")
+			return SDL_HITTEST_DRAGGABLE;
+		if(result == "resize_topleft")
+			return SDL_HITTEST_RESIZE_TOPLEFT;
+		if(result == "resize_top")
+			return SDL_HITTEST_RESIZE_TOP;
+		if(result == "resize_topright")
+			return SDL_HITTEST_RESIZE_TOPRIGHT;
+		if(result == "resize_right")
+			return SDL_HITTEST_RESIZE_RIGHT;
+		if(result == "resize_bottomright")
+			return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+		if(result == "resize_bottom")
+			return SDL_HITTEST_RESIZE_BOTTOM;
+		if(result == "resize_bottomleft")
+			return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+		if(result == "resize_left")
+			return SDL_HITTEST_RESIZE_LEFT;
+		return SDL_HITTEST_NORMAL;
+ }
+
+std::map<SDL_WindowID, Callback*> callbacks;
+
+Napi::Value window::clearHitTest(const Napi::CallbackInfo& info){
+	Napi::Env env = info.Env();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
+	if(callbacks.contains(window_id)){
+		callbacks[window_id]->~Callback();
+		SDL_free(callbacks[window_id]);
+	}
+	return env.Undefined();
+}
+
+Napi::Value
+window::setHitTest (const Napi::CallbackInfo& info){
+	Napi::Env env = info.Env();
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
+	SDL_Window *window = getWindow(env, window_id);
+	Napi::Value callback = info[1];
+	if(callback.IsNull()){
+		if(!SDL_SetWindowHitTest(window,nullptr,nullptr)){
+			throw global::sdlError(env, "SDL_SetWindowHitTest", window_id);
+		}
+		if(callbacks.contains(window_id)){
+			callbacks[window_id]->~Callback();
+			SDL_free(callbacks[window_id]);
+		}
+	}
+	Callback* callbackStruct = 
+		new (SDL_malloc(sizeof(Callback)))Callback(Callback{
+			.callback=Napi::Persistent(callback.As<Napi::Function>())
+		});
+	if(callbacks.contains(window_id)){
+		callbacks[window_id]->~Callback();
+		SDL_free(callbacks[window_id]);
+	}
+	if(!SDL_SetWindowHitTest(window,&testHit,(void*)callbackStruct)){
+		throw global::sdlError(env, "SDL_SetWindowHitTest", window_id);
+	}
+	callbacks[window_id] = callbackStruct;
+	return env.Undefined();
+}
+
