@@ -666,7 +666,7 @@ export namespace Sdl {
 			setRelativeMouseMode (relative?: boolean): void
 			unsetRelativeMouseMode (): void
 
-			setHitTest(hitTest:()=>("normal"
+			setHitTest(hitTest:(x:number,y:number)=>("normal"
 							|"draggable"
 							|"resize_topleft"
 							|"resize_top"
