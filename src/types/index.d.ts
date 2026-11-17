@@ -666,6 +666,18 @@ export namespace Sdl {
 			setRelativeMouseMode (relative?: boolean): void
 			unsetRelativeMouseMode (): void
 
+			setHitTest(hitTest:()=>("normal"
+							|"draggable"
+							|"resize_topleft"
+							|"resize_top"
+							|"resize_topright"
+							|"resize_right"
+							|"resize_bottomright"
+							|"resize_bottom"
+							|"resize_bottomleft"
+							|"resize_left"
+							|"resize_topleft")): void
+
 			render (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer, options?: {
 				scaling?: Scaling,
 				dstRect?: {
