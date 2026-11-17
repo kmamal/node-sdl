@@ -57,6 +57,8 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("window_setIcon", Napi::Function::New<window::setIcon>(env));
 	exports.Set("window_flash", Napi::Function::New<window::flash>(env));
 	exports.Set("window_destroy", Napi::Function::New<window::destroy>(env));
+	exports.Set("window_setHitTest", Napi::Function::New<window::setHitTest>(env));
+	exports.Set("window_freeHitTest", Napi::Function::New<window::clearHitTest>(env));
 
 	exports.Set("keyboard_getKey", Napi::Function::New<keyboard::getKey>(env));
 	exports.Set("keyboard_getScancode", Napi::Function::New<keyboard::getScancode>(env));
