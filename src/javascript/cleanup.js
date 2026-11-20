@@ -1,10 +1,11 @@
 const Bindings = require('./bindings')
 const Globals = require('./globals')
 
-process.on('exit', (code) => {
+
+const cleanup = (exitCode=0) => {
 	Globals.events.stopPolling()
 
-	if (code !== 0) {
+	if (exitCode !== 0) {
 		Bindings.global_cleanup()
 		return
 	}
@@ -39,4 +40,8 @@ process.on('exit', (code) => {
 	Bindings.global_cleanup()
 
 	if (errors.length) { throw new AggregateError(errors, "errors occurred during exit cleanup") }
-})
+}
+
+process.on('exit', cleanup)
+
+module.exports = cleanup
