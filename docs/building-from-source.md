@@ -41,6 +41,7 @@ If you want to contribute to this package, these npm scripts in `package.json` c
 - `npm run download-release` downloads the prebuilt binaries. The install script tries this first.
 - `npm run download-sdl` downloads the SDL headers and libraries from `@kmamal/build-sdl` so you can compile against them in later steps. The install script runs this second, after `download-release` fails.
 - `npm run build` prepares the environment variables and calls `node-gyp` to build the package.
+  The install script turns this off by default, so that a newer compiler with new warnings doesn't break the build for users; the release build turns it back on.
 - `NODE_SDL_FROM_SOURCE=1 npm install` runs the install script normally, but skips the initial attempt to download the binaries and goes straight to building from source.
 - `NODE_SDL_SYSTEM=1 npm install` skips both downloads and builds against the SDL that `pkg-config` finds on the system, as described above.
 

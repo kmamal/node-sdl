@@ -27,6 +27,7 @@ sdl.assetName = `SDL-v${sdl.version}-${platform}-${targetArch}.tar.gz`
 
 module.exports = {
 	dir,
+	isSet,
 	fromSource,
 	systemSdl,
 	version,

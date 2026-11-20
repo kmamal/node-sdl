@@ -1,4 +1,7 @@
 {
+    'variables': {
+        'werror%': 0,
+    },
     'targets': [
         {
             'target_name':
@@ -32,8 +35,21 @@
                 'NODE_ADDON_API_DISABLE_DEPRECATED',
                 'NODE_API_SWALLOW_UNTHROWABLE_EXCEPTIONS',
             ],
-            'cflags': ['-Werror', '-Wall', '-Wextra'],
+            'cflags': ['-Wall', '-Wextra'],
             'conditions': [
+                [
+                    'werror == 1', {
+                        'cflags': ['-Werror'],
+                        'xcode_settings': {
+                            'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
+                        },
+                        'msvs_settings': {
+                            'VCCLCompilerTool': {
+                                'WarnAsError': 'true',
+                            },
+                        },
+                    }
+                ],
                 [
                     'OS == "linux" or OS == "freebsd" or OS == "openbsd" or OS == "netbsd"', {
                         'cflags': ['-D_REENTRANT'],
@@ -55,7 +71,6 @@
                         'xcode_settings': {
                             'OTHER_CFLAGS': ['-std=c++17'],
                             'WARNING_CFLAGS': ['-Wall', '-Wextra'],
-                            'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
                         },
                         'include_dirs': [
                             '$(SDL_INC)',
@@ -74,7 +89,6 @@
                             'VCCLCompilerTool': {
                                 'AdditionalOptions': ['-std:c++17'],
                                 'WarningLevel': '4',
-                                'WarnAsError': 'true',
                                 'DisableSpecificWarnings': ['4127'],
                             },
                         },

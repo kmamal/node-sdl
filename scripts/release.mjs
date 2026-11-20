@@ -7,6 +7,7 @@ execSync('npm install', {
 	env: {
 		...process.env,
 		NODE_SDL_FROM_SOURCE: 1,
+		NODE_SDL_WERROR: 1,
 	},
 })
 

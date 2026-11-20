@@ -23,13 +23,15 @@ if (C.systemSdl) {
 
 console.log("build in", C.dir.build)
 
+const werror = C.isSet(process.env.NODE_SDL_WERROR ?? '1') ? 1 : 0
+
 let archFlag = ''
 if (process.env.CROSS_COMPILE_ARCH) {
 	archFlag = `--arch ${process.env.CROSS_COMPILE_ARCH}`
 }
 
 process.chdir(C.dir.root)
-execSync(`npx -y node-gyp rebuild ${archFlag} -j max --verbose`, {
+execSync(`npx -y node-gyp rebuild ${archFlag} -j max --verbose -- -Dwerror=${werror}`, {
 	stdio: 'inherit',
 	env: {
 		...process.env,

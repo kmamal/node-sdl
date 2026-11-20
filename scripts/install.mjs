@@ -1,6 +1,8 @@
 
 import C from './util/common.js'
 
+process.env.NODE_SDL_WERROR ??= '0'
+
 if (C.systemSdl) {
 	console.log("build against the system sdl")
 	await import('./build.mjs')
