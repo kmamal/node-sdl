@@ -80,7 +80,7 @@ T.test("sdl::audio::no events after close", async (t) => {
 	const count = drains
 	await sleep(100)
 	t.equal(drains, count)
-	t.throws(() => stream.on('drain', listener), /stream is closed/u)
+	t.throwsWith(() => stream.on('drain', listener), (error) => { t.ok((/stream is closed/u).test(error.message), { message: error.message }) })
 })
 
 T.test("sdl::audio::wildcard listener enables drain", async (t) => {
@@ -113,7 +113,7 @@ T.test("sdl::audio::recording readable", async (t) => {
 		return
 	}
 	const stream = sdl.audio.recording.openDevice(null, { channels: 1, buffered: 1024 })
-	t.throws(() => stream.on('drain', () => {}), /invalid event/u)
+	t.throwsWith(() => stream.on('drain', () => {}), (error) => { t.ok((/invalid event/u).test(error.message), { message: error.message }) })
 	let readable = 0
 	let available = 0
 	stream.on('readable', (event) => {

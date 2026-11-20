@@ -27,8 +27,8 @@ T.test("sdl::audio::convert", (t) => {
 	t.equal(sdl.audio.convert(f32Mono, input, s16Stereo, big), size)
 	t.ok(big.subarray(0, size).equals(output))
 	t.ok(allocated.equals(output))
-	t.throws(() => sdl.audio.convert(f32Mono, input, s16Stereo, Buffer.alloc(size - 1)), /dstData must hold at least/u)
-	t.throws(() => sdl.audio.convert(f32Mono, input, s16Stereo, new Uint8Array(size)), /dstData must be a Buffer/u)
+	t.throwsWith(() => sdl.audio.convert(f32Mono, input, s16Stereo, Buffer.alloc(size - 1)), (error) => { t.ok((/dstData must hold at least/u).test(error.message), { message: error.message }) })
+	t.throwsWith(() => sdl.audio.convert(f32Mono, input, s16Stereo, new Uint8Array(size)), (error) => { t.ok((/dstData must be a Buffer/u).test(error.message), { message: error.message }) })
 
 	for (const [ srcRate, dstRate, frames ] of [ [ 44100, 48000, 1000 ], [ 48000, 44100, 1001 ], [ 8000, 96000, 333 ], [ 22050, 48000, 7 ] ]) {
 		const src = { format: 'f32', channels: 2, frequency: srcRate }
@@ -47,9 +47,9 @@ T.test("sdl::audio::convert", (t) => {
 
 	t.equal(sdl.audio.convert({}, Buffer.alloc(0), {}, Buffer.alloc(0)), 0)
 	t.equal(sdl.audio.convert({}, Buffer.alloc(0), {}).length, 0)
-	t.throws(() => sdl.audio.convert({}, new Uint8Array(8), {}, Buffer.alloc(8)), /srcData must be a Buffer/u)
-	t.throws(() => sdl.audio.convert({}, Buffer.alloc(6), {}, Buffer.alloc(8)), /multiple of 4/u)
-	t.throws(() => sdl.audio.convert({ format: 'x' }, Buffer.alloc(8), {}, Buffer.alloc(8)), /invalid srcSpec.format/u)
-	t.throws(() => sdl.audio.convert({}, Buffer.alloc(8), { channels: 9 }, Buffer.alloc(8)), /dstSpec.channels must be between 1 and 8/u)
-	t.throws(() => sdl.audio.convert({ frequency: 0 }, Buffer.alloc(8), {}, Buffer.alloc(8)), /srcSpec.frequency must be between/u)
+	t.throwsWith(() => sdl.audio.convert({}, new Uint8Array(8), {}, Buffer.alloc(8)), (error) => { t.ok((/srcData must be a Buffer/u).test(error.message), { message: error.message }) })
+	t.throwsWith(() => sdl.audio.convert({}, Buffer.alloc(6), {}, Buffer.alloc(8)), (error) => { t.ok((/multiple of 4/u).test(error.message), { message: error.message }) })
+	t.throwsWith(() => sdl.audio.convert({ format: 'x' }, Buffer.alloc(8), {}, Buffer.alloc(8)), (error) => { t.ok((/invalid srcSpec.format/u).test(error.message), { message: error.message }) })
+	t.throwsWith(() => sdl.audio.convert({}, Buffer.alloc(8), { channels: 9 }, Buffer.alloc(8)), (error) => { t.ok((/dstSpec.channels must be between 1 and 8/u).test(error.message), { message: error.message }) })
+	t.throwsWith(() => sdl.audio.convert({ frequency: 0 }, Buffer.alloc(8), {}, Buffer.alloc(8)), (error) => { t.ok((/srcSpec.frequency must be a positive 32-bit integer/u).test(error.message), { message: error.message }) })
 })
