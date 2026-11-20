@@ -2,10 +2,12 @@ const Globals = require('../globals')
 const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
+const { tryEmit } = require('../events/try')
 const {
 	validateBoolean,
 	validateString,
 	validateObject,
+	validateFunction,
 	validateInt32,
 	validateFloat,
 	validatePositiveFloat,
@@ -53,6 +55,29 @@ const validEvents = [
 	'dropFile',
 	'dropComplete',
 ]
+
+const handleHitTest = (windowId, x, y) => {
+	const window = Globals.windows.all.get(windowId)
+	if (!window?._hitTest) { return Enums.hitTestResult.normal }
+
+	let value
+	hitTestDepth++
+	try {
+		Globals.events.withoutPolling(() => {
+			try {
+				const result = window._hitTest(x, y)
+				value = result === undefined ? Enums.hitTestResult.normal : Enums.hitTestResult[result]
+				if (value === undefined) { throw Object.assign(new Error("invalid hit test result"), { result }) }
+			}
+			catch (error) { tryEmit(window, 'error', error) }
+		})
+	}
+	finally { hitTestDepth-- }
+	return value ?? Enums.hitTestResult.normal
+}
+
+let hitTestDepth = 0
+let hitTestHandlerRegistered = false
 
 class Window extends EventsViaPoll {
 	constructor (options = {}) {
@@ -150,6 +175,7 @@ class Window extends EventsViaPoll {
 		this._minimized = result.minimized
 		this._maximized = result.maximized
 		this._relativeMouseMode = false
+		this._hitTest = null
 		this._destroyed = false
 
 		Globals.windows.all.set(this._id, this)
@@ -487,6 +513,29 @@ class Window extends EventsViaPoll {
 
 	unsetRelativeMouseMode () { this.setRelativeMouseMode(false) }
 
+	setHitTest (hitTest) {
+		validateNotDestroyed(this)
+
+		if (hitTest !== null) { validateFunction('hitTest', hitTest) }
+
+		if (!hitTestHandlerRegistered) {
+			Bindings.window_registerHitTestHandler(handleHitTest)
+			hitTestHandlerRegistered = true
+		}
+
+		const previous = this._hitTest
+		this._hitTest = hitTest
+		if ((hitTest !== null) !== (previous !== null)) {
+			try { Bindings.window_setHitTest(this._id, hitTest !== null) }
+			catch (error) {
+				this._hitTest = previous
+				throw error
+			}
+		}
+	}
+
+	unsetHitTest () { this.setHitTest(null) }
+
 	render (width, height, stride, format, buffer, options = {}) {
 		validateNotDestroyed(this)
 
@@ -559,7 +608,7 @@ class Window extends EventsViaPoll {
 		}
 
 		// Defer the native destruction until the pump has unwound.
-		if (Bindings.events_isDispatchingFromWatch()) {
+		if (hitTestDepth > 0 || Bindings.events_isDispatchingFromWatch()) {
 			process.nextTick(destroyNative)
 		}
 		else {

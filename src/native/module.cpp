@@ -56,6 +56,8 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("window_render", Napi::Function::New<window::render>(env));
 	exports.Set("window_setIcon", Napi::Function::New<window::setIcon>(env));
 	exports.Set("window_flash", Napi::Function::New<window::flash>(env));
+	exports.Set("window_registerHitTestHandler", Napi::Function::New<window::registerHitTestHandler>(env));
+	exports.Set("window_setHitTest", Napi::Function::New<window::setHitTest>(env));
 	exports.Set("window_destroy", Napi::Function::New<window::destroy>(env));
 
 	exports.Set("keyboard_getKey", Napi::Function::New<keyboard::getKey>(env));
@@ -116,6 +118,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("testing_setVirtualJoystickButton", Napi::Function::New<testing::setVirtualJoystickButton>(env));
 	exports.Set("testing_detachVirtualJoystick", Napi::Function::New<testing::detachVirtualJoystick>(env));
 	exports.Set("testing_pushAudioDeviceEvent", Napi::Function::New<testing::pushAudioDeviceEvent>(env));
+	exports.Set("testing_hitTest", Napi::Function::New<testing::hitTest>(env));
 
 	exports.Set("power_getInfo", Napi::Function::New<power::getInfo>(env));
 

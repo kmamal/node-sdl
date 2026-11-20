@@ -10,6 +10,7 @@ namespace testing {
 	Napi::Value setVirtualJoystickButton (const Napi::CallbackInfo &info);
 	Napi::Value detachVirtualJoystick (const Napi::CallbackInfo &info);
 	Napi::Value pushAudioDeviceEvent (const Napi::CallbackInfo &info);
+	Napi::Value hitTest (const Napi::CallbackInfo &info);
 
 }; // namespace testing
 

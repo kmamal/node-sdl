@@ -368,6 +368,18 @@ enums::get (const Napi::CallbackInfo &info)
 	cursors.Set("swResize", (int) SDL_SYSTEM_CURSOR_SW_RESIZE);
 	cursors.Set("wResize", (int) SDL_SYSTEM_CURSOR_W_RESIZE);
 
+	Napi::Object hit_test_results = Napi::Object::New(env);
+	hit_test_results.Set("normal", (int) SDL_HITTEST_NORMAL);
+	hit_test_results.Set("draggable", (int) SDL_HITTEST_DRAGGABLE);
+	hit_test_results.Set("resizeTopLeft", (int) SDL_HITTEST_RESIZE_TOPLEFT);
+	hit_test_results.Set("resizeTop", (int) SDL_HITTEST_RESIZE_TOP);
+	hit_test_results.Set("resizeTopRight", (int) SDL_HITTEST_RESIZE_TOPRIGHT);
+	hit_test_results.Set("resizeRight", (int) SDL_HITTEST_RESIZE_RIGHT);
+	hit_test_results.Set("resizeBottomRight", (int) SDL_HITTEST_RESIZE_BOTTOMRIGHT);
+	hit_test_results.Set("resizeBottom", (int) SDL_HITTEST_RESIZE_BOTTOM);
+	hit_test_results.Set("resizeBottomLeft", (int) SDL_HITTEST_RESIZE_BOTTOMLEFT);
+	hit_test_results.Set("resizeLeft", (int) SDL_HITTEST_RESIZE_LEFT);
+
 	Napi::Object all = Napi::Object::New(env);
 	all.Set("pixelFormat", pixel_formats);
 	all.Set("scaleMode", scale_mode);
@@ -375,6 +387,7 @@ enums::get (const Napi::CallbackInfo &info)
 	all.Set("scancodes", scancodes);
 	all.Set("mouseButtons", mouse_buttons);
 	all.Set("cursors", cursors);
+	all.Set("hitTestResult", hit_test_results);
 
 	return all;
 }

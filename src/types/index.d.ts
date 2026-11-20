@@ -547,6 +547,18 @@ export namespace Sdl {
 			= 'nearest'
 			| 'linear'
 
+		export type HitTestResult
+			= 'normal'
+			| 'draggable'
+			| 'resizeTopLeft'
+			| 'resizeTop'
+			| 'resizeTopRight'
+			| 'resizeRight'
+			| 'resizeBottomRight'
+			| 'resizeBottom'
+			| 'resizeBottomLeft'
+			| 'resizeLeft'
+
 		export interface Display {
 			readonly id: number
 			readonly name: string | null
@@ -665,6 +677,9 @@ export namespace Sdl {
 			readonly relativeMouseMode: boolean
 			setRelativeMouseMode (relative?: boolean): void
 			unsetRelativeMouseMode (): void
+
+			setHitTest (hitTest: ((x: Points, y: Points) => HitTestResult | undefined) | null): void
+			unsetHitTest (): void
 
 			render (width: number, height: number, stride: number, format: Format | FormatAlias, buffer: Buffer, options?: {
 				scaling?: Scaling,

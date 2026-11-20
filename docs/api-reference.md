@@ -104,6 +104,8 @@
     - [window.relativeMouseMode](#windowrelativemousemode)
     - [window.setRelativeMouseMode([relative])](#windowsetrelativemousemoderelative)
     - [window.unsetRelativeMouseMode()](#windowunsetrelativemousemode)
+    - [window.setHitTest(hitTest)](#windowsethittesthittest)
+    - [window.unsetHitTest()](#windowunsethittest)
     - [window.render(width, height, stride, format, buffer[, options])](#windowrenderwidth-height-stride-format-buffer-options)
     - [window.setIcon(width, height, stride, format, buffer)](#windowseticonwidth-height-stride-format-buffer)
     - [window.flash([untilFocused])](#windowflashuntilfocused)
@@ -1245,6 +1247,25 @@ This function may fail on platforms that don't support raw mouse input.
 ### window.unsetRelativeMouseMode()
 
 Equivalent to [`window.setRelativeMouseMode(false)`](#windowsetrelativemousemoderelative).
+
+### window.setHitTest(hitTest)
+
+- `hitTest: <function> | <null>` A function that classifies points in the window, or `null` to remove it.
+  - `x, y: <number>` The position of the mouse, in the same units as mouse events.
+  - Returns: `<string> | <undefined>` How the window should treat that point. One of:
+    - `'normal'`: The point behaves like any other part of the window. Returning `undefined` is the same.
+    - `'draggable'`: Dragging from the point moves the window.
+    - `'resizeTopLeft'`, `'resizeTop'`, `'resizeTopRight'`, `'resizeRight'`, `'resizeBottomRight'`, `'resizeBottom'`, `'resizeBottomLeft'`, `'resizeLeft'`: Dragging from the point resizes the window from that edge or corner.
+
+Lets parts of the window act as a title bar or resize border.
+This is mostly useful with [`borderless`](#windowborderless) windows that draw their own decorations.
+
+SDL calls `hitTest` synchronously whenever the OS needs to know what is under the mouse, which can be on every mouse move, so keep it fast.
+If `hitTest` throws or returns anything other than the values above, the error is emitted as an `'error'` event on the window and the point is treated as `'normal'`.
+
+### window.unsetHitTest()
+
+Equivalent to [`window.setHitTest(null)`](#windowsethittesthittest).
 
 ### window.render(width, height, stride, format, buffer[, options])
 

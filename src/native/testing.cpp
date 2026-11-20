@@ -1,5 +1,6 @@
 #include "testing.h"
 #include "global.h"
+#include "window.h"
 #include <SDL3/SDL.h>
 #include <cmath>
 
@@ -128,4 +129,20 @@ testing::pushAudioDeviceEvent (const Napi::CallbackInfo &info)
 	if (!SDL_PushEvent(&event)) { throw global::sdlError(env, "SDL_PushEvent"); }
 
 	return env.Undefined();
+}
+
+Napi::Value
+testing::hitTest (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
+	SDL_Point point = {
+		info[1].As<Napi::Number>().Int32Value(),
+		info[2].As<Napi::Number>().Int32Value(),
+	};
+
+	SDL_Window *window = global::fromIdOrThrow(env, SDL_GetWindowFromID(window_id), "SDL_GetWindowFromID", "window", window_id);
+
+	return Napi::Number::New(env, window::hitTest(window, &point, nullptr));
 }

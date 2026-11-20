@@ -53,6 +53,8 @@ T.test("sdl::window validates arguments", (t) => {
 		t.throws(() => { window.maximize() })
 		t.throws(() => { window.setRelativeMouseMode(1) })
 		t.throws(() => { window.flash(1) })
+		t.throws(() => { window.setHitTest() })
+		t.throws(() => { window.setHitTest('draggable') })
 
 		const buffer = Buffer.alloc(4 * 4 * 4)
 		t.throws(() => { window.render(4, 4, 16, 'rgba32', buffer, null) })
@@ -177,6 +179,8 @@ T.test("sdl::window methods throw after destroy", (t) => {
 		() => { window.setIcon(1, 1, 4, 'rgba32', buffer) },
 		() => { window.flash() },
 		() => { window.stopFlashing() },
+		() => { window.setHitTest(() => {}) },
+		() => { window.unsetHitTest() },
 		() => { window.destroy() },
 		() => { window.destroyGently() },
 	]

@@ -18,6 +18,10 @@ const validateObject = (name, value) => {
 	if (typeof value !== 'object' || value === null) { fail(`${name} must be an object`, name, value) }
 }
 
+const validateFunction = (name, value) => {
+	if (typeof value !== 'function') { fail(`${name} must be a function`, name, value) }
+}
+
 const validateBuffer = (name, value) => {
 	if (!(value instanceof Buffer)) { fail(`${name} must be a Buffer`, name, value) }
 }
@@ -95,6 +99,7 @@ module.exports = {
 	validateBoolean,
 	validateString,
 	validateObject,
+	validateFunction,
 	validateBuffer,
 	validateNumber,
 	validateNonNegativeNumber,
