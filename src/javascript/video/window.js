@@ -120,7 +120,6 @@ class Window extends EventsViaPoll {
 		validateBoolean('opengl', opengl)
 		validateBoolean('webgpu', webgpu)
 		if (display !== undefined && (x !== undefined || y !== undefined)) { throw Object.assign(new Error("display and x/y are mutually exclusive"), { display, x, y }) }
-		if (resizable && borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless }) }
 		if (opengl && webgpu) { throw Object.assign(new Error("opengl and webgpu are mutually exclusive"), { opengl, webgpu }) }
 		if (opengl && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("opengl and accelerated/vsync are mutually exclusive"), { opengl, accelerated, vsync }) }
 		if (webgpu && (hasAccelerated || hasVsync)) { throw Object.assign(new Error("webgpu and accelerated/vsync are mutually exclusive"), { webgpu, accelerated, vsync }) }
@@ -354,7 +353,6 @@ class Window extends EventsViaPoll {
 		validateNotDestroyed(this)
 
 		validateBoolean('resizable', resizable)
-		if (resizable && this._borderless) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable, borderless: this._borderless }) }
 
 		this._resizable = Bindings.window_setResizable(this._id, resizable)
 	}
@@ -369,7 +367,6 @@ class Window extends EventsViaPoll {
 		validateNotDestroyed(this)
 
 		validateBoolean('borderless', borderless)
-		if (borderless && this._resizable) { throw Object.assign(new Error("resizable and borderless are mutually exclusive"), { resizable: this._resizable, borderless }) }
 
 		this._borderless = Bindings.window_setBorderless(this._id, borderless)
 	}
