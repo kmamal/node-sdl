@@ -691,7 +691,6 @@ Creates a new window.
 The following restrictions apply:
 
 - The `display` option is mutually exclusive with the `x` and `y` options.
-- The `resizable` and `borderless` options are mutually exclusive.
 - The `opengl` and `webgpu` options are mutually exclusive.
 - The `accelerated` and `vsync` options are mutually exclusive with the `opengl` and `webgpu` options, since OpenGL and WebGPU windows have no SDL renderer.
 
@@ -1076,8 +1075,6 @@ Users can resize a resizable window by dragging its borders.
 Changes the window's resizable property.
 The [`resizable`](#windowresizable) property updates immediately to the value SDL reports back.
 
-Throws if `resizable` is `true` and the window is [`borderless`](#windowborderless), since the two properties are mutually exclusive.
-
 ### window.borderless
 
 - `<boolean>`
@@ -1091,8 +1088,6 @@ A borderless window has no borders or title bar.
 
 Changes the window's borderless property.
 The [`borderless`](#windowborderless) property updates immediately to the value SDL reports back.
-
-Throws if `borderless` is `true` and the window is [`resizable`](#windowresizable), since the two properties are mutually exclusive.
 
 ### window.alwaysOnTop
 

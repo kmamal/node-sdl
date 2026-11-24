@@ -25,7 +25,6 @@ T.test("sdl::video.createWindow validates options", (t) => {
 	t.throws(() => { create({ vsync: 2 ** 31 }) })
 	t.throws(() => { create({ opengl: 1 }) })
 	t.throws(() => { create({ webgpu: 1 }) })
-	t.throws(() => { create({ resizable: true, borderless: true }) })
 	t.throws(() => { create({ opengl: true, webgpu: true }) })
 	t.throws(() => { create({ opengl: true, accelerated: true }) })
 	t.throws(() => { create({ opengl: true, vsync: 1 }) })
