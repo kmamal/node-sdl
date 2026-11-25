@@ -9,7 +9,7 @@
 
 namespace threads {
 
-	enum Kind { JOYSTICK, GAMEPAD, SENSOR };
+	enum Kind { JOYSTICK, GAMEPAD, SENSOR, WINDOW, NUM_KINDS };
 
 	struct Event {
 		const packed::Str *target;
@@ -24,7 +24,7 @@ namespace threads {
 	void distribute (const Event &event, napi_env except);
 	void drain (Napi::Env &env, Napi::Function &callback);
 	bool isPollingFast ();
-	bool hasWorkers ();
+	bool hasOthers ();
 	void wakeMain ();
 	void shutdown ();
 

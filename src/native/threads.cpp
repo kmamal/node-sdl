@@ -1,17 +1,19 @@
 #include "threads.h"
 #include "global.h"
 #include "events.h"
+#include "window.h"
 #include <map>
 #include <set>
 #include <deque>
 #include <mutex>
 #include <atomic>
+#include <algorithm>
 
 
 struct Thread {
 	napi_threadsafe_function wake = nullptr;
 	std::deque<threads::Event> queue;
-	std::multiset<Uint32> opens[3];
+	std::multiset<Uint32> opens[threads::NUM_KINDS];
 	bool is_main = false;
 	bool demand = false;
 	bool wake_pending = false;
@@ -71,6 +73,10 @@ _closeOpens (Thread &thread)
 		SDL_Sensor *sensor = SDL_GetSensorFromID(id);
 		if (sensor != nullptr) { SDL_CloseSensor(sensor); }
 	}
+	for (Uint32 id : thread.opens[threads::WINDOW]) {
+		SDL_Window *window = SDL_GetWindowFromID(id);
+		if (window != nullptr) { window::destroyWindow(window); }
+	}
 	SDL_ClearError();
 }
 
@@ -80,6 +86,7 @@ static void
 _leaveEnv (napi_env env, bool from_hook)
 {
 	Thread thread;
+	bool was_last_main = false;
 	{
 		std::lock_guard<std::recursive_mutex> guard(global::lock());
 
@@ -91,9 +98,12 @@ _leaveEnv (napi_env env, bool from_hook)
 			all_threads.erase(it);
 			if (thread.demand) { num_demanding.fetch_sub(1, std::memory_order_acq_rel); }
 			if (!thread.is_main) { num_workers.fetch_sub(1, std::memory_order_acq_rel); }
+			// There can be several main environments on the main thread (in an Electron renderer, every frame with Node integration is one), so SDL must stay up until the last of them leaves.
+			was_last_main = thread.is_main && std::none_of(all_threads.begin(), all_threads.end(), [](const auto &entry) { return entry.second.is_main; });
 		}
 
 		if (global::isReady()) { _closeOpens(thread); }
+		if (thread.is_main) { window::forgetEnv(env); }
 	}
 
 	// Not needed: the loop never runs again after this, and the abort release finalizes the function whether or not it is ref'd.
@@ -101,7 +111,7 @@ _leaveEnv (napi_env env, bool from_hook)
 	napi_release_threadsafe_function(thread.wake, napi_tsfn_abort);
 	if (!from_hook) { napi_remove_env_cleanup_hook(env, _envCleanup, (void *) env); }
 
-	if (thread.is_main) { global::teardown(); }
+	if (was_last_main) { global::teardown(); }
 }
 
 static void
@@ -195,9 +205,10 @@ threads::isPollingFast ()
 }
 
 bool
-threads::hasWorkers ()
+threads::hasOthers ()
 {
-	return num_workers.load(std::memory_order_acquire) > 0;
+	std::lock_guard<std::mutex> guard(mutex);
+	return all_threads.size() > 1;
 }
 
 void

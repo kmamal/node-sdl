@@ -519,7 +519,7 @@ _dispatchEvent (const SDL_Event &event)
 	Packing packing;
 	if (!_packEvent(event, packing)) { return false; }
 
-	if (!threads::hasWorkers()) {
+	if (!threads::hasOthers()) {
 		CallbackGuard guard;
 		poll_callback->Call(env.Global(), { packing.value.toNapi(env) });
 		return true;

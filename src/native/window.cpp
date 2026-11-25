@@ -1,5 +1,7 @@
 #include "window.h"
 #include "global.h"
+#include "threads.h"
+#include <map>
 #include <SDL3/SDL.h>
 #include <string>
 #include <cstdint>
@@ -19,7 +21,7 @@ window::resetTexture (SDL_Window *window)
 	}
 }
 
-static Napi::FunctionReference hit_test_handler;
+static std::map<napi_env, Napi::FunctionReference> hit_test_handlers;
 
 static SDL_Window *
 getWindow (Napi::Env &env, SDL_WindowID window_id)
@@ -344,13 +346,12 @@ window::create (const Napi::CallbackInfo &info)
 		}
 		result.Set("native", native);
 
+		threads::trackOpen(env, threads::WINDOW, window_id);
+
 		return result;
 	}
 	catch (...) {
-		// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
-		SDL_Renderer *renderer = SDL_GetRenderer(window);
-		if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
-		SDL_DestroyWindow(window);
+		window::destroyWindow(window);
 		throw;
 	}
 }
@@ -773,12 +774,15 @@ window::flash (const Napi::CallbackInfo &info)
 }
 
 SDL_HitTestResult SDLCALL
-window::hitTest (SDL_Window *window, const SDL_Point *area, void *)
+window::hitTest (SDL_Window *window, const SDL_Point *area, void *data)
 {
-	Napi::Env env = hit_test_handler.Env();
+	auto entry = hit_test_handlers.find((napi_env) data);
+	if (entry == hit_test_handlers.end()) { return SDL_HITTEST_NORMAL; }
+
+	Napi::Env env = entry->second.Env();
 	Napi::HandleScope scope(env);
 
-	Napi::Value result = hit_test_handler.Call({
+	Napi::Value result = entry->second.Call({
 		Napi::Number::New(env, SDL_GetWindowID(window)),
 		Napi::Number::New(env, area->x),
 		Napi::Number::New(env, area->y),
@@ -792,10 +796,15 @@ window::registerHitTestHandler (const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
-	hit_test_handler = Napi::Persistent(info[0].As<Napi::Function>());
-	hit_test_handler.SuppressDestruct();
+	hit_test_handlers[env] = Napi::Persistent(info[0].As<Napi::Function>());
 
 	return env.Undefined();
+}
+
+void
+window::forgetEnv (napi_env env)
+{
+	hit_test_handlers.erase(env);
 }
 
 Napi::Value
@@ -808,11 +817,21 @@ window::setHitTest (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	if (!SDL_SetWindowHitTest(window, enabled ? window::hitTest : nullptr, nullptr)) {
+	if (!SDL_SetWindowHitTest(window, enabled ? window::hitTest : nullptr, enabled ? (void *) (napi_env) env : nullptr)) {
 		throw global::sdlError(env, "SDL_SetWindowHitTest", window_id, enabled);
 	}
 
 	return env.Undefined();
+}
+
+void
+window::destroyWindow (SDL_Window *window)
+{
+	// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
+	SDL_Renderer *renderer = SDL_GetRenderer(window);
+	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
+
+	SDL_DestroyWindow(window);
 }
 
 Napi::Value
@@ -824,11 +843,8 @@ window::destroy (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = getWindow(env, window_id);
 
-	// SDL_DestroyWindow() tears the renderer down but doesn't free it, so without this it would leak until SDL_Quit().
-	SDL_Renderer *renderer = SDL_GetRenderer(window);
-	if (renderer != nullptr) { SDL_DestroyRenderer(renderer); }
-
-	SDL_DestroyWindow(window);
+	window::destroyWindow(window);
+	threads::trackClose(env, threads::WINDOW, window_id);
 
 	return env.Undefined();
 }

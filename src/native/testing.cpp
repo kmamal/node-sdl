@@ -144,5 +144,5 @@ testing::hitTest (const Napi::CallbackInfo &info)
 
 	SDL_Window *window = global::fromIdOrThrow(env, SDL_GetWindowFromID(window_id), "SDL_GetWindowFromID", "window", window_id);
 
-	return Napi::Number::New(env, window::hitTest(window, &point, nullptr));
+	return Napi::Number::New(env, window::hitTest(window, &point, (void *) (napi_env) env));
 }

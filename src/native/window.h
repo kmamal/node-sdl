@@ -8,6 +8,8 @@ namespace window {
 
 	void resetTexture (SDL_Window *window);
 	SDL_HitTestResult SDLCALL hitTest (SDL_Window *window, const SDL_Point *area, void *data);
+	void destroyWindow (SDL_Window *window);
+	void forgetEnv (napi_env env);
 	Napi::Value create (const Napi::CallbackInfo &info);
 	Napi::Value setTitle (const Napi::CallbackInfo &info);
 	Napi::Value setPosition (const Napi::CallbackInfo &info);
