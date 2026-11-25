@@ -73,6 +73,26 @@ const std::map<SDL_PixelFormat, packed::Str> video::formats {
 
 
 packed::Value
+video::_getDisplayMode (const SDL_DisplayMode *mode)
+{
+	packed::Value format;
+	auto format_entry = video::formats.find(mode->format);
+	if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
+
+	packed::Value frequency;
+	if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
+
+	packed::Value result = packed::Value::object();
+	result.set("width", mode->w);
+	result.set("height", mode->h);
+	result.set("pixelDensity", mode->pixel_density);
+	result.set("frequency", std::move(frequency));
+	result.set("format", std::move(format));
+
+	return result;
+}
+
+packed::Value
 video::_getDisplay (SDL_DisplayID display_id)
 {
 	SDL_Rect rect;
@@ -94,12 +114,14 @@ video::_getDisplay (SDL_DisplayID display_id)
 
 	packed::Value format;
 	packed::Value frequency;
+	packed::Value current_mode;
 	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(display_id);
 	if (mode == nullptr) { SDL_ClearError(); }
 	else {
 		auto format_entry = video::formats.find(mode->format);
 		if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
 		if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
+		current_mode = video::_getDisplayMode(mode);
 	}
 
 	// Can't fail: SDL only rejects unknown displays (falling back to the full
@@ -116,6 +138,18 @@ video::_getDisplay (SDL_DisplayID display_id)
 	if (_scale == 0.0f) { SDL_ClearError(); }
 	else { scale = _scale; }
 
+	// The fullscreen modes the display supports. May legitimately be empty
+	// (e.g. on drivers that don't enumerate modes), so failure is not an error.
+	packed::Value modes = packed::Value::array();
+	int num_modes = 0;
+	global::SdlArray<SDL_DisplayMode *> _modes(SDL_GetFullscreenDisplayModes(display_id, &num_modes));
+	if (!_modes) { SDL_ClearError(); }
+	else {
+		for (int i = 0; i < num_modes; i++) {
+			modes.push(video::_getDisplayMode(_modes[i]));
+		}
+	}
+
 	SDL_DisplayOrientation _orientation = SDL_GetCurrentDisplayOrientation(display_id);
 	auto orientation_entry = video::orientations.find(_orientation);
 	packed::Value orientation;
@@ -131,6 +165,8 @@ video::_getDisplay (SDL_DisplayID display_id)
 	display.set("usable", std::move(usable));
 	display.set("scale", std::move(scale));
 	display.set("orientation", std::move(orientation));
+	display.set("mode", std::move(current_mode));
+	display.set("modes", std::move(modes));
 
 	return display;
 }

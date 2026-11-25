@@ -610,6 +610,12 @@ Sample data for Linux:
     - `x, y, width, height: <Rect>` The position and size of the display's usable region, in points.
   - `scale: <number>|<null>` The content scale of the display: how much larger UI elements should be drawn to appear at their intended size, where `1` is the 96dpi baseline. Might be `null` on some devices if it can't be retrieved.
   - `orientation: <string>|<null>` The orientation of the display.
+  - `mode: <object>|<null>` The display's current mode, in the same shape as the items of `modes`. Is `null` if it can't be determined.
+  - `modes: <object>[]` The fullscreen modes the display supports. Can be empty if the video driver doesn't enumerate modes. SDL sorts them from largest to smallest.
+    - `width, height: <number>` The size of the mode, in pixels (not points, unlike `geometry`).
+    - `pixelDensity: <number>` The pixel density of the mode. `geometry` is in points, so on a high-dpi mode `width / pixelDensity` gives the size in points.
+    - `frequency: <number>|<null>` The refresh rate of the mode. Is `null` if it can't be determined.
+    - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the mode. Is `null` if it can't be determined.
 
 A list of all detected displays.
 
@@ -635,6 +641,11 @@ Note that the geometries don't overlap:
     usable: { x: 0, y: 27, width: 1920, height: 1053 },
     scale: 1.5,
     orientation: 'landscape',
+    mode: { width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    modes: [
+      { width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+      { width: 1280, height: 720, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    ],
   },
   {
     name: '1',
@@ -644,6 +655,11 @@ Note that the geometries don't overlap:
     usable: { x: 1920, y: 27, width: 1920, height: 1053 },
     scale: 1.5,
     orientation: 'landscape',
+    mode: { width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    modes: [
+      { width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+      { width: 1280, height: 720, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    ],
   },
 ]
 ```

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `display.mode` is the display's current mode, in the same shape as the items of `display.modes`.
+- `display.modes` lists the fullscreen modes (`width`, `height`, `pixelDensity`, `frequency`, `format`) that each display in `sdl.video.displays` supports.
+
 ## [v1.0.0] - 2026-11-08
 
 ### Changed

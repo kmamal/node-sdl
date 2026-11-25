@@ -559,6 +559,14 @@ export namespace Sdl {
 			| 'resizeBottomLeft'
 			| 'resizeLeft'
 
+		export interface DisplayMode {
+			readonly width: Pixels
+			readonly height: Pixels
+			readonly pixelDensity: number
+			readonly frequency: number | null
+			readonly format: Format | null
+		}
+
 		export interface Display {
 			readonly id: number
 			readonly name: string | null
@@ -578,6 +586,8 @@ export namespace Sdl {
 			}
 			readonly scale: number | null
 			readonly orientation: Orientation | null
+			readonly mode: DisplayMode | null
+			readonly modes: readonly DisplayMode[]
 		}
 
 		export interface Window extends EventEmitter {

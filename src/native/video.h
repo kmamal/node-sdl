@@ -11,6 +11,7 @@ namespace video {
 	extern const std::map<SDL_DisplayOrientation, packed::Str> orientations;
 	extern const std::map<SDL_PixelFormat, packed::Str> formats;
 
+	packed::Value _getDisplayMode (const SDL_DisplayMode *mode);
 	packed::Value _getDisplay (SDL_DisplayID display_id);
 	Napi::Array _getDisplays (Napi::Env &env);
 
