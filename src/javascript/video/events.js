@@ -4,6 +4,7 @@ const { video: videoModule } = require('.')
 const { mapKey } = require('../keyboard/key-mapping')
 const { refreshDevices: refreshTouchDevices } = require('../touch/devices')
 const { tryEmit, tryCall } = require('../events/try')
+const { internModes } = require('./display-mode')
 
 const handleDisplayEvent = (event) => {
 	const { type } = event
@@ -14,7 +15,7 @@ const handleDisplayEvent = (event) => {
 			delete event.display
 
 			if (Globals.displays.some((a) => a.id === display.id)) { return }
-			Globals.displays.push(display)
+			Globals.displays.push(internModes(display))
 			event.display = display
 		} break
 
@@ -40,7 +41,7 @@ const handleDisplayEvent = (event) => {
 			const display = Globals.displays.find((a) => a.id === displayId)
 			if (!display) { return }
 
-			Object.assign(display, fresh)
+			Object.assign(display, internModes(fresh, display))
 			event.display = display
 		} break
 

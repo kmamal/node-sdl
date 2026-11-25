@@ -15,6 +15,7 @@ namespace window {
 	Napi::Value setPosition (const Napi::CallbackInfo &info);
 	Napi::Value setSize (const Napi::CallbackInfo &info);
 	Napi::Value setFullscreen (const Napi::CallbackInfo &info);
+	Napi::Value setFullscreenMode (const Napi::CallbackInfo &info);
 	Napi::Value setResizable (const Napi::CallbackInfo &info);
 	Napi::Value setBorderless (const Napi::CallbackInfo &info);
 	Napi::Value setRelativeMouseMode (const Napi::CallbackInfo &info);

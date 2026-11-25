@@ -80,6 +80,8 @@
     - [window.hide()](#windowhide)
     - [window.fullscreen](#windowfullscreen)
     - [window.setFullscreen(fullscreen)](#windowsetfullscreenfullscreen)
+    - [window.fullscreenMode](#windowfullscreenmode)
+    - [window.setFullscreenMode(mode)](#windowsetfullscreenmodemode)
     - [window.resizable](#windowresizable)
     - [window.setResizable(resizable)](#windowsetresizableresizable)
     - [window.borderless](#windowborderless)
@@ -497,7 +499,7 @@ Read the new value from `display.scale`.
 - `display: <object>`: An object from [`sdl.video.displays`](#sdlvideodisplays) naming the display that caused the event.
 
 Fired when a display changes its current mode.
-Read the new values from `display.format`, `display.frequency`, `display.geometry`, and `display.usable`.
+Read the new values from `display.currentMode`, `display.geometry`, and `display.usable`.
 
 ### Event: 'displayUsableChange'
 
@@ -602,14 +604,19 @@ Sample data for Linux:
 - `<object>[]`
   - `id: <number>` The unique id of the display. Ids are never reused: a display that is disconnected and reconnected gets a new id.
   - `name: <string>|<null>` The name of the display, or `null` if it can't be determined.
-  - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the display. Is `null` if it can't be determined.
-  - `frequency: <number>|<null>` The refresh rate of the display. Is `null` if it can't be determined.
   - `geometry: <object>` The desktop region that the display covers.
     - `x, y, width, height: <Rect>` The position and size of the display's geometry, in points.
   - `usable: <object>` Similar to `geometry`, but excludes areas that the OS or window manager takes up, such as menus, docks, etc.
     - `x, y, width, height: <Rect>` The position and size of the display's usable region, in points.
   - `scale: <number>|<null>` The content scale of the display: how much larger UI elements should be drawn to appear at their intended size, where `1` is the 96dpi baseline. Might be `null` on some devices if it can't be retrieved.
   - `orientation: <string>|<null>` The orientation of the display.
+  - `currentMode: <object>` The display's current mode, in the same shape as the items of `modes`.
+  - `modes: <object>[]` The fullscreen modes the display supports, sorted from largest to smallest. Can be empty if the video driver doesn't enumerate modes. Each item stays the same object for as long as the display supports that mode. Select one with [`window.setFullscreenMode()`](#windowsetfullscreenmodemode) to use it for exclusive fullscreen.
+    - `display: <object>` The display the mode belongs to. This is a reference back to the containing object, so display objects are circular.
+    - `width, height: <number>` The size of the mode, in points, like `geometry`.
+    - `pixelDensity: <number>` The pixel density of the mode. On a high-dpi mode `width * pixelDensity` gives the size in pixels.
+    - `frequency: <number>|<null>` The refresh rate of the mode. Is `null` if it can't be determined.
+    - `format: `[`<PixelFormat>`](#pixel-formats)`|<null>` The pixel format of the mode. Is `null` if it can't be determined.
 
 A list of all detected displays.
 
@@ -628,22 +635,30 @@ Note that the geometries don't overlap:
 ```js
 [
   {
+    id: 1,
     name: '0',
-    format: 'xrgb8888',
-    frequency: 60,
     geometry: { x: 0, y: 0, width: 1920, height: 1080 },
     usable: { x: 0, y: 27, width: 1920, height: 1053 },
     scale: 1.5,
     orientation: 'landscape',
+    currentMode: { display: [Circular *1], width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    modes: [
+      { display: [Circular *1], width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+      { display: [Circular *1], width: 1280, height: 720, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    ],
   },
   {
+    id: 2,
     name: '1',
-    format: 'xrgb8888',
-    frequency: 60,
     geometry: { x: 1920, y: 0, width: 1920, height: 1080 },
     usable: { x: 1920, y: 27, width: 1920, height: 1053 },
     scale: 1.5,
     orientation: 'landscape',
+    currentMode: { display: [Circular *2], width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    modes: [
+      { display: [Circular *2], width: 1920, height: 1080, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+      { display: [Circular *2], width: 1280, height: 720, pixelDensity: 1, frequency: 60, format: 'xrgb8888' },
+    ],
   },
 ]
 ```
@@ -677,6 +692,7 @@ The window under the mouse, or `null` if the mouse is not over a window.
   - `height: <number>` The height of the window in points. Must be a positive 32-bit integer. Default: `480`
   - `visible: <boolean>` Set to `false` to create a hidden window that appears only when you call [`window.show()`](#windowshowshow). Default: `true`
   - `fullscreen: <boolean>` Set to `true` to create the window in fullscreen mode. Default: `false`
+  - `fullscreenMode: <object>|<null>` The display mode to use for exclusive fullscreen, given as in [`window.setFullscreenMode()`](#windowsetfullscreenmodemode). Default: `null`
   - `resizable: <boolean>` Set to `true` to allow resizing the window by dragging its borders. Default: `false`
   - `borderless: <boolean>` Set to `true` to hide the window's borders and title bar completely. Default: `false`
   - `alwaysOnTop: <boolean>` Set to `true` to always show the window above others. Default: `false`
@@ -1052,6 +1068,8 @@ Equivalent to [`window.show(false)`](#windowshowshow).
 
 Is `true` if the window is fullscreen.
 A fullscreen window covers the entire screen.
+By default this is borderless fullscreen at the display's desktop mode.
+Use [`window.setFullscreenMode()`](#windowsetfullscreenmodemode) to make the display switch to a specific mode instead.
 
 ### window.setFullscreen(fullscreen)
 
@@ -1060,6 +1078,25 @@ A fullscreen window covers the entire screen.
 Changes the window's fullscreen property.
 The call only submits a request to the windowing system, which may adjust or deny it.
 The [`fullscreen`](#windowfullscreen) property updates once the corresponding [`'enterFullscreen'`](#event-enterfullscreen) or [`'leaveFullscreen'`](#event-leavefullscreen) event has been received.
+
+### window.fullscreenMode
+
+- `<object>|<null>` A display mode, in the same shape as the items of [`display.modes`](#sdlvideodisplays).
+
+The display mode the window switches to when it is fullscreen.
+Is `null` if the window uses borderless fullscreen at the display's desktop mode, which is the default.
+Is also `null` while the mode's display doesn't support the mode.
+The window remembers the mode, so the value comes back if the display starts supporting the mode again.
+If the display is disconnected the value stays `null`, because a reconnected display counts as a new display.
+
+### window.setFullscreenMode(mode)
+
+- `mode: <object>|<null>` One of the items of [`display.modes`](#sdlvideodisplays) or an object with the same properties, or `null` for borderless fullscreen at the desktop mode.
+
+Changes the window's [`fullscreenMode`](#windowfullscreenmode) property.
+If the window is already fullscreen, the call submits a request to the windowing system to switch the display to the new mode, which it may adjust or deny.
+Otherwise the mode is applied the next time the window becomes fullscreen with [`window.setFullscreen(true)`](#windowsetfullscreenfullscreen).
+The window goes fullscreen on the display that the mode belongs to, given by its `display`, even if the window is on another display.
 
 ### window.resizable
 

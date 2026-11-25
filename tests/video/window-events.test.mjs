@@ -309,12 +309,12 @@ T.test("sdl::window listener errors go to the error event", async (t) => {
 T.test("sdl::video display events", (t) => {
 	const template = sdl.video.displays[0] ?? {
 		name: 'none',
-		format: 'xrgb8888',
-		frequency: 60,
 		geometry: { x: 0, y: 0, width: 1, height: 1 },
 		usable: { x: 0, y: 0, width: 1, height: 1 },
 		scale: 1,
 		orientation: null,
+		currentMode: { width: 1, height: 1, pixelDensity: 1, frequency: null, format: null },
+		modes: [],
 	}
 	const makeDisplay = (overrides) => ({
 		...structuredClone(template),
@@ -358,8 +358,9 @@ T.test("sdl::video display events", (t) => {
 		t.equal(events.at(-1), { type: 'displayScaleChange', display })
 
 		const geometry = { x: 0, y: 0, width: 123, height: 456 }
-		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ frequency: 144, geometry }) })
-		t.equal(display.frequency, 144)
+		const mode = { width: 123, height: 456, pixelDensity: 1, frequency: 144, format: 'xrgb8888' }
+		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ currentMode: mode, geometry }) })
+		t.equal(display.currentMode, mode)
 		t.equal(display.geometry, geometry)
 		t.equal(events.at(-1), { type: 'displayModeChange', display })
 
@@ -367,6 +368,21 @@ T.test("sdl::video display events", (t) => {
 		handleDisplayEvent({ type: 'displayUsableChange', displayId: -777, display: makeDisplay({ usable }) })
 		t.equal(display.usable, usable)
 		t.equal(events.at(-1), { type: 'displayUsableChange', display })
+
+		const modeA = { width: 200, height: 100, pixelDensity: 1, frequency: 60, format: 'xrgb8888' }
+		const modeB = { ...modeA, width: 100, height: 50 }
+		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ modes: [ modeA, modeB ] }) })
+		const { modes } = display
+		const [ keptA, keptB ] = modes
+		handleDisplayEvent({ type: 'displayMove', displayId: -777, display: makeDisplay({ modes: [ { ...modeA }, { ...modeB } ] }) })
+		t.equal(display.modes.length, 2)
+		t.ok(display.modes[0] === keptA)
+		t.ok(display.modes[1] === keptB)
+		handleDisplayEvent({ type: 'displayModeChange', displayId: -777, display: makeDisplay({ currentMode: { ...modeB }, modes: [ { ...modeB } ] }) })
+		t.equal(display.modes.length, 1)
+		t.ok(display.modes[0] === keptB)
+		t.ok(display.currentMode === keptB)
+		t.ok(!display.modes.includes(keptA))
 
 		const count2 = events.length
 		handleDisplayEvent({ type: 'displayOrient', displayId: -888, display: makeDisplay() })
@@ -379,7 +395,7 @@ T.test("sdl::video display events", (t) => {
 		t.equal(events.at(-1), { type: 'displayRemove', display })
 		t.ok(!sdl.video.displays.includes(display))
 
-		const unknownMode = makeDisplay({ format: null, frequency: null })
+		const unknownMode = makeDisplay({ currentMode: { width: 1, height: 1, pixelDensity: 1, frequency: null, format: null } })
 		handleDisplayEvent({ type: 'displayAdd', display: unknownMode })
 		t.equal(sdl.video.displays.find((d) => d.id === -777), unknownMode)
 		const relocated = makeDisplay({

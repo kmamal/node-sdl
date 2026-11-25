@@ -33,15 +33,6 @@ T.test("sdl::video::displays", (t) => {
 		t.equal(typeof display.name, 'string')
 		t.ok(display.name.length > 0)
 
-		if (display.format !== null) {
-			t.equal(typeof display.format, 'string')
-			t.ok(display.format.length > 0)
-		}
-
-		if (display.frequency !== null) {
-			t.equal(typeof display.frequency, 'number')
-		}
-
 		t.equal(typeof display.geometry.x, 'number')
 		t.equal(typeof display.geometry.y, 'number')
 		t.equal(typeof display.geometry.width, 'number')
@@ -58,6 +49,28 @@ T.test("sdl::video::displays", (t) => {
 
 		if (display.orientation !== null) {
 			t.equal(typeof display.orientation, 'string')
+		}
+
+		t.ok(Array.isArray(display.modes))
+		const modes = [ display.currentMode, ...display.modes ]
+		for (const mode of modes) {
+			t.ok(mode.display === display)
+			t.equal(typeof mode.width, 'number')
+			t.ok(mode.width > 0)
+			t.equal(typeof mode.height, 'number')
+			t.ok(mode.height > 0)
+			t.equal(typeof mode.pixelDensity, 'number')
+			t.ok(mode.pixelDensity > 0)
+
+			if (mode.frequency !== null) {
+				t.equal(typeof mode.frequency, 'number')
+				t.ok(mode.frequency > 0)
+			}
+
+			if (mode.format !== null) {
+				t.equal(typeof mode.format, 'string')
+				t.ok(mode.format.length > 0)
+			}
 		}
 	}
 })

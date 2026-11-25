@@ -58,4 +58,7 @@ class DeviceInstance extends EventsViaPoll {
 	}
 }
 
-module.exports = { DeviceInstance, lookupDevice }
+module.exports = {
+	DeviceInstance,
+	lookupDevice,
+}

@@ -42,6 +42,7 @@ init (Napi::Env env, Napi::Object exports)
 	exports.Set("window_setPosition", Napi::Function::New<window::setPosition>(env));
 	exports.Set("window_setSize", Napi::Function::New<window::setSize>(env));
 	exports.Set("window_setFullscreen", Napi::Function::New<window::setFullscreen>(env));
+	exports.Set("window_setFullscreenMode", Napi::Function::New<window::setFullscreenMode>(env));
 	exports.Set("window_setResizable", Napi::Function::New<window::setResizable>(env));
 	exports.Set("window_setBorderless", Napi::Function::New<window::setBorderless>(env));
 	exports.Set("window_setRelativeMouseMode", Napi::Function::New<window::setRelativeMouseMode>(env));

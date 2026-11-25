@@ -81,6 +81,31 @@ T.test("sdl::window", async (t) => {
 		window1.setFullscreen(false)
 		t.ok(await waitFor(() => !window1.fullscreen))
 
+		t.equal(window1.fullscreenMode, null)
+		{
+			const mode = window1.display?.modes.at(-1)
+			if (mode) {
+				window1.setFullscreenMode(mode)
+				t.equal(window1.fullscreenMode, mode)
+				t.ok(window1.fullscreenMode === mode)
+				window1.setFullscreenMode({ ...mode })
+				t.ok(window1.fullscreenMode === mode)
+
+				const { width, height } = mode
+				t.throws(() => { window1.setFullscreenMode({ ...mode, display: { id: -1 } }) })
+				t.throws(() => { window1.setFullscreenMode({ ...mode, width: width + 100000 }) })
+				t.throwsWith(() => { window1.setFullscreenMode({ width, height }) }, (error) => { t.equal(error.message, "mode is missing display, pixelDensity, frequency, format") })
+				t.equal(window1.fullscreenMode, mode)
+			}
+			window1.setFullscreenMode(null)
+			t.equal(window1.fullscreenMode, null)
+			if (mode) {
+				const window3 = sdl.video.createWindow({ visible: false, fullscreenMode: mode })
+				try { t.equal(window3.fullscreenMode, mode) }
+				finally { window3.destroy() }
+			}
+		}
+
 		t.equal(window1.resizable, false)
 		t.equal(window2.resizable, true)
 		window1.setResizable(true)

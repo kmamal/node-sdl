@@ -4,6 +4,7 @@ const Globals = require('./globals')
 const { makeDevice: makeJoystickDevice } = require('./joystick/devices')
 const { makeDevice: makeGamepadDevice, isGamepadDevice } = require('./gamepad/devices')
 const { refreshDevices: refreshAudioDevices } = require('./audio/devices')
+const { internModes } = require('./video/display-mode')
 
 // The flag is set before the initializers fetch devices on purpose: it tracks whether SDL initialized the subsystem, which stays true even if the fetch fails.
 const initSubsystem = (name) => {
@@ -25,7 +26,7 @@ const initJoysticks = () => {
 const initializers = {
 	video: () => {
 		if (!isMainThread) { throw new Error("the video subsystem is only available on the main thread") }
-		if (initSubsystem('video')) { Globals.displays = Bindings.video_getDisplays() }
+		if (initSubsystem('video')) { Globals.displays = Bindings.video_getDisplays().map((display) => internModes(display)) }
 	},
 	audio: () => { if (initSubsystem('audio')) { refreshAudioDevices() } },
 	joystick: initJoysticks,

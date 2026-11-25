@@ -136,6 +136,21 @@ const pixelsPerInch = 96 * display.scale
 
 The new `displayScaleChange`, `displayModeChange`, and `displayUsableChange` events on `sdl.video` tell you when `scale`, the current mode, or the usable region changes.
 
+### `format` and `frequency` move to `display.currentMode`
+
+Display objects no longer have `format` and `frequency` properties.
+Read them from the display's current mode instead.
+
+```js
+// Before
+const { format, frequency } = display
+
+// After
+const { format, frequency } = display.currentMode
+```
+
+The new `display.modes` lists the fullscreen modes that the display supports, and `window.setFullscreenMode()` selects one of them for exclusive fullscreen.
+
 ## Windows
 
 ### Fractional coordinates
@@ -153,7 +168,7 @@ Pixel formats follow SDL3's names, which mark the unused byte with an `x`:
 | `'rgb555'`, `'bgr555'` | `'xrgb1555'`, `'xbgr1555'` |
 | `'rgb888'`, `'bgr888'` | `'xrgb8888'`, `'xbgr8888'` |
 
-The new names affect `window.render()`, `window.setIcon()`, `sdl.mouse.setCursorImage()`, the pixel-format helpers, and the `format` that displays report.
+The new names affect `window.render()`, `window.setIcon()`, `sdl.mouse.setCursorImage()`, the pixel-format helpers, and the `format` that display modes report.
 All other pixel format names keep their spelling, including the `'rgba32'` family of byte-order aliases.
 You can also use SDL3's additional formats: `'xbgr4444'`, the `'2101010'` variants, the 16-bit-per-channel integer and float formats (`'rgba64'`, `'rgba64f'`, ...), the 32-bit float formats (`'rgba128f'`, ...), the `'xrgb32'` family of aliases, and `'p010'`.
 

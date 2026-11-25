@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 #include <string>
 #include <map>
+#include <cmath>
 
 
 const std::map<SDL_DisplayOrientation, packed::Str> video::orientations {
@@ -72,6 +73,28 @@ const std::map<SDL_PixelFormat, packed::Str> video::formats {
 };
 
 
+static packed::Value
+getDisplayMode (const SDL_DisplayMode *mode)
+{
+	packed::Value result = packed::Value::object();
+	result.set("width", mode->w);
+	result.set("height", mode->h);
+	result.set("pixelDensity", mode->pixel_density);
+
+	// SDL already keeps refresh rates at 2 decimals, so the rounding only strips
+	// the float-to-double noise and the value converts back to the same float.
+	packed::Value frequency;
+	if (mode->refresh_rate != 0.0f) { frequency = std::round((double) mode->refresh_rate * 100.0) / 100.0; }
+	result.set("frequency", std::move(frequency));
+
+	packed::Value format;
+	auto format_entry = video::formats.find(mode->format);
+	if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
+	result.set("format", std::move(format));
+
+	return result;
+}
+
 packed::Value
 video::_getDisplay (SDL_DisplayID display_id)
 {
@@ -92,15 +115,12 @@ video::_getDisplay (SDL_DisplayID display_id)
 	if (_name != nullptr) { name = _name; }
 	else { SDL_ClearError(); }
 
-	packed::Value format;
-	packed::Value frequency;
 	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(display_id);
-	if (mode == nullptr) { SDL_ClearError(); }
-	else {
-		auto format_entry = video::formats.find(mode->format);
-		if (format_entry != video::formats.end()) { format = packed::Value::ref(format_entry->second); }
-		if (mode->refresh_rate != 0.0f) { frequency = mode->refresh_rate; }
+	if (mode == nullptr) {
+		SDL_ClearError();
+		return packed::Value();
 	}
+	packed::Value current_mode = getDisplayMode(mode);
 
 	// Can't fail: SDL only rejects unknown displays (falling back to the full
 	// bounds otherwise), and SDL_GetDisplayBounds just succeeded for this one.
@@ -116,6 +136,16 @@ video::_getDisplay (SDL_DisplayID display_id)
 	if (_scale == 0.0f) { SDL_ClearError(); }
 	else { scale = _scale; }
 
+	packed::Value modes = packed::Value::array();
+	int num_modes = 0;
+	global::SdlArray<SDL_DisplayMode *> _modes(SDL_GetFullscreenDisplayModes(display_id, &num_modes));
+	if (!_modes) { SDL_ClearError(); }
+	else {
+		for (int i = 0; i < num_modes; i++) {
+			modes.push(getDisplayMode(_modes[i]));
+		}
+	}
+
 	SDL_DisplayOrientation _orientation = SDL_GetCurrentDisplayOrientation(display_id);
 	auto orientation_entry = video::orientations.find(_orientation);
 	packed::Value orientation;
@@ -125,12 +155,12 @@ video::_getDisplay (SDL_DisplayID display_id)
 	packed::Value display = packed::Value::object();
 	display.set("id", display_id);
 	display.set("name", std::move(name));
-	display.set("format", std::move(format));
-	display.set("frequency", std::move(frequency));
 	display.set("geometry", std::move(geometry));
 	display.set("usable", std::move(usable));
 	display.set("scale", std::move(scale));
 	display.set("orientation", std::move(orientation));
+	display.set("currentMode", std::move(current_mode));
+	display.set("modes", std::move(modes));
 
 	return display;
 }

@@ -3,6 +3,7 @@ const Bindings = require('../bindings')
 const Enums = require('../enums')
 const { EventsViaPoll } = require('../events/events-via-poll')
 const { tryEmit } = require('../events/try')
+const { findMode } = require('./display-mode')
 const {
 	validateBoolean,
 	validateString,
@@ -76,6 +77,35 @@ const handleHitTest = (windowId, x, y) => {
 	return value ?? Enums.hitTestResult.normal
 }
 
+const fullscreenModeFields = [ 'display', 'width', 'height', 'pixelDensity', 'frequency', 'format' ]
+
+const findFullscreenMode = (mode) => {
+	const display = Globals.displays.find(({ id }) => id === mode.display?.id)
+	return (display && findMode(display.modes, mode)) ?? null
+}
+
+// Modes have no id, so they are matched by value.
+// Partial specs are rejected because frequency and format can legitimately be null.
+const resolveFullscreenMode = (name, mode) => {
+	if (mode === null) { return null }
+
+	validateObject(name, mode)
+
+	const missing = fullscreenModeFields.filter((field) => mode[field] === undefined)
+	if (missing.length > 0) { throw Object.assign(new Error(`${name} is missing ${missing.join(', ')}`), { [name]: mode }) }
+
+	const found = findFullscreenMode(mode)
+	if (!found) { throw Object.assign(new Error(`${name} must be from display.modes`), { [name]: mode }) }
+	return found
+}
+
+const packFullscreenMode = (mode) => {
+	if (mode === null) { return null }
+
+	const { display, width, height, pixelDensity, frequency, format } = mode
+	return [ display.id, width, height, pixelDensity, frequency, Enums.pixelFormat[format] ?? null ]
+}
+
 let hitTestDepth = 0
 let hitTestHandlerRegistered = false
 
@@ -92,6 +122,7 @@ class Window extends EventsViaPoll {
 			width, height,
 			visible = true,
 			fullscreen = false,
+			fullscreenMode = null,
 			resizable = false,
 			borderless = false,
 			alwaysOnTop = false,
@@ -132,6 +163,9 @@ class Window extends EventsViaPoll {
 			displayId = found.id
 		}
 
+		if (fullscreenMode !== null) { Globals.events.poll() }
+		const resolvedFullscreenMode = resolveFullscreenMode('fullscreenMode', fullscreenMode)
+
 		const result = Bindings.window_create(
 			title,
 			displayId,
@@ -148,6 +182,7 @@ class Window extends EventsViaPoll {
 			vsync ?? 1,
 			opengl,
 			webgpu,
+			packFullscreenMode(resolvedFullscreenMode),
 		)
 
 		this._id = result.id
@@ -161,6 +196,7 @@ class Window extends EventsViaPoll {
 		this._pixelHeight = result.pixelHeight
 		this._displayId = result.displayId
 		this._fullscreen = result.fullscreen
+		this._fullscreenMode = resolvedFullscreenMode
 		this._resizable = result.resizable
 		this._borderless = result.borderless
 		this._alwaysOnTop = result.alwaysOnTop
@@ -341,6 +377,24 @@ class Window extends EventsViaPoll {
 		validateBoolean('fullscreen', fullscreen)
 
 		Bindings.window_setFullscreen(this._id, fullscreen)
+	}
+
+	get fullscreenMode () {
+		Globals.events.poll()
+		validateNotDestroyed(this)
+
+		if (this._fullscreenMode === null) { return null }
+
+		return findFullscreenMode(this._fullscreenMode)
+	}
+
+	setFullscreenMode (mode) {
+		Globals.events.poll()
+		validateNotDestroyed(this)
+
+		const resolved = resolveFullscreenMode('mode', mode)
+		Bindings.window_setFullscreenMode(this._id, packFullscreenMode(resolved))
+		this._fullscreenMode = resolved
 	}
 
 	get resizable () {

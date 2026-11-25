@@ -126,6 +126,37 @@ updateRenderer (
 }
 
 
+static void
+applyFullscreenMode (Napi::Env &env, SDL_Window *window, SDL_WindowID window_id, const Napi::Value &value)
+{
+	if (value.IsNull()) {
+		if (!SDL_SetWindowFullscreenMode(window, nullptr)) {
+			throw global::sdlError(env, "SDL_SetWindowFullscreenMode", window_id, "NULL");
+		}
+		return;
+	}
+
+	Napi::Array fields = value.As<Napi::Array>();
+
+	// The mode is rebuilt from its public fields instead of looked up in SDL's list.
+	// SDL only stores a copy of what it is given and re-resolves the real entry with its own matcher.
+	// That matcher ignores the fields left zeroed here.
+	SDL_DisplayMode mode;
+	SDL_zero(mode);
+	mode.displayID = fields.Get(0u).As<Napi::Number>().Uint32Value();
+	mode.w = fields.Get(1u).As<Napi::Number>().Int32Value();
+	mode.h = fields.Get(2u).As<Napi::Number>().Int32Value();
+	mode.pixel_density = fields.Get(3u).As<Napi::Number>().FloatValue();
+	mode.refresh_rate = fields.Get(4u).IsNull() ? 0.0f : fields.Get(4u).As<Napi::Number>().FloatValue();
+	mode.format = fields.Get(5u).IsNull()
+		? SDL_PIXELFORMAT_UNKNOWN
+		: (SDL_PixelFormat) fields.Get(5u).As<Napi::Number>().Int32Value();
+
+	if (!SDL_SetWindowFullscreenMode(window, &mode)) {
+		throw global::sdlError(env, "SDL_SetWindowFullscreenMode", window_id, mode.displayID, mode.w, mode.h, mode.pixel_density, mode.refresh_rate, mode.format);
+	}
+}
+
 Napi::Value
 window::create (const Napi::CallbackInfo &info)
 {
@@ -289,6 +320,8 @@ window::create (const Napi::CallbackInfo &info)
 			updateRenderer(env, window, &is_accelerated, &vsync);
 		}
 
+		if (!info[15].IsNull()) { applyFullscreenMode(env, window, window_id, info[15]); }
+
 		if (is_visible && !SDL_ShowWindow(window)) {
 			throw global::sdlError(env, "SDL_ShowWindow", window_id);
 		}
@@ -433,6 +466,20 @@ window::setFullscreen (const Napi::CallbackInfo &info)
 	if (!SDL_SetWindowFullscreen(window, is_fullscreen)) {
 		throw global::sdlError(env, "SDL_SetWindowFullscreen", window_id, is_fullscreen);
 	}
+
+	return env.Undefined();
+}
+
+Napi::Value
+window::setFullscreenMode (const Napi::CallbackInfo &info)
+{
+	Napi::Env env = info.Env();
+
+	SDL_WindowID window_id = info[0].As<Napi::Number>().Uint32Value();
+
+	SDL_Window *window = getWindow(env, window_id);
+
+	applyFullscreenMode(env, window, window_id, info[1]);
 
 	return env.Undefined();
 }

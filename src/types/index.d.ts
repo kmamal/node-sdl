@@ -559,11 +559,18 @@ export namespace Sdl {
 			| 'resizeBottomLeft'
 			| 'resizeLeft'
 
+		export interface DisplayMode {
+			readonly display: Display
+			readonly width: Points
+			readonly height: Points
+			readonly pixelDensity: number
+			readonly frequency: number | null
+			readonly format: Format | null
+		}
+
 		export interface Display {
 			readonly id: number
 			readonly name: string | null
-			readonly format: Format | null
-			readonly frequency: number | null
 			readonly geometry: {
 				readonly x: Points
 				readonly y: Points
@@ -578,6 +585,8 @@ export namespace Sdl {
 			}
 			readonly scale: number | null
 			readonly orientation: Orientation | null
+			readonly currentMode: DisplayMode
+			readonly modes: readonly DisplayMode[]
 		}
 
 		export interface Window extends EventEmitter {
@@ -641,6 +650,9 @@ export namespace Sdl {
 
 			readonly fullscreen: boolean
 			setFullscreen (fullscreen: boolean): void
+
+			readonly fullscreenMode: DisplayMode | null
+			setFullscreenMode (mode: DisplayMode | null): void
 
 			readonly resizable: boolean
 			setResizable (resizable: boolean): void
@@ -730,6 +742,7 @@ export namespace Sdl {
 				height?: Points
 				visible?: boolean
 				fullscreen?: boolean
+				fullscreenMode?: DisplayMode | null
 				resizable?: boolean
 				borderless?: boolean
 				alwaysOnTop?: boolean
